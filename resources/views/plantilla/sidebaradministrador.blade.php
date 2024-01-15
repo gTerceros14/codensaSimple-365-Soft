@@ -19,7 +19,7 @@
                             <li @click="menu=14" class="nav-item">
                                 <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Sucursales</a>
                             </li>
-                            <li @click="menu=40" class="nav-item">
+                            <li @click="menu=41" class="nav-item">
                                 <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Puntos de Venta</a>
                             </li>
                             <li @click="menu=15" class="nav-item">

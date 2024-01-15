@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 //use Illuminate\Support\Facades\DB;
 use App\Categoria;
+use App\Exports\LineaExport;
+use App\Imports\LineaImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon; // Agrega la clase Carbon para manejar fechas
+
 
 class CategoriaController extends Controller
 {
@@ -101,6 +106,20 @@ class CategoriaController extends Controller
         $categoria->condicion = '1';
         $categoria->save();
     }
+    //---importacion--
+    public function importsaveExecelUser(Request $request){
+        $path = $request->file('select_users_file')->getRealPath();
+        Excel::import(new LineaImport, $path);
+    }
+    //---exportar---
+    public function excelLinea()
+    {
+        $fechaActual = Carbon::now()->format('Y-m-d_H-i-s'); // Obtiene la fecha actual en el formato deseado
+        $nombreArchivo = 'linea_' . $fechaActual;
 
+        // Puedes elegir entre 'xlsx' o 'csv' según el formato deseado
+        return Excel::download(new LineaExport, $nombreArchivo . '.xlsx');
+        //return Excel::download(new LineaExport, $nombreArchivo . '.csv');
+    }
     
 }

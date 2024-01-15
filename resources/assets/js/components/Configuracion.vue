@@ -57,9 +57,12 @@
 
                             <div class="form-group">
 
-                                <label>
-                                    <input type="checkbox" v-model="consultarAlmacenes" true-value="1" false-value="0">
-
+                                <label> 
+                                    <input type="checkbox" v-model="consultarAlmacenes"
+                                        true-value="1"
+                                        false-value="0"
+                                        >
+                                        
                                     {{ consultarAlmacenes }}
                                 </label>
                             </div>
@@ -157,11 +160,11 @@
 
                     <div class="row">
                         <div class="col-md-4">
-                            <button type="button" @click="abrirModal('precioss', 'registrar')" class="btn btn-secondary">
+                           <button type="button" @click="abrirModal('precioss', 'registrar')" class="btn btn-secondary">
                                 <i class="icon-plus"></i>&nbsp;Nuevo Precio
                             </button>
                         </div>
-                    </div>
+                    </div> 
 
                     <div v-for="precio in precios" :key="precio.id" class="row">
                         <div class="col-md-4">
@@ -176,8 +179,7 @@
                         <div class="col-md-4">
                             <label>Etiqueta Nro de Precio:</label>
                             <div class="input-group" style="width: 200px">
-                                <input type="text" class="form-control" placeholder="Porcentaje"
-                                    :value="precio.nombre_precio">
+                                <input type="text" class="form-control" placeholder="Porcentaje" :value="precio.nombre_precio">
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -186,7 +188,7 @@
                                 <input type="number" class="form-control" :value="precio.porcentage">
                             </div>
                         </div>
-                    </div>
+                    </div>                
 
                     <div class="row">
                         <div class="col">
@@ -229,14 +231,6 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="opcion1">Tiempo mínimo de caducidad del producto (meses)</label>
-                                <input type="number" class="form-control" :value="tiempoMinCaducidadArticulo">
-                            </div>
-                        </div>
-                    </div>
 
 
                     <!-- <div class="row">
@@ -261,7 +255,7 @@
                                 </select>
                             </div>
                         </div> -->
-                    <!--
+<!--
                         <div class="col">
                             <div class="form-group">
                                 <label for="opcion1">Editar Nro Doc:</label>
@@ -403,9 +397,8 @@
                 <!-- fin del contenido 3-->
             </div>
         </div>
-        <!--Inicio del modal agregar/actualizar-->
-        <div class="modal fade" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
-            style="display: none;" aria-hidden="true">
+         <!--Inicio del modal agregar/actualizar-->
+         <div class="modal fade" tabindex="-1" :class="{'mostrar': modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
@@ -413,27 +406,24 @@
                             <div class="form-group row">
                                 <label class="col-md-3 form-control-label" for="text-input">Nombre Precio(*)</label>
                                 <div class="col-md-9">
-                                    <input type="text" v-model="nombre_precio" class="form-control"
-                                        placeholder="Nombre Precio">
+                                    <input type="text" v-model="nombre_precio" class="form-control" placeholder="Nombre Precio"> 
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-md-3 form-control-label" for="text-input">Porcentaje(*)</label>
                                 <div class="col-md-9">
-                                    <input type="text" v-model="porcentage" class="form-control"
-                                        placeholder="Valor de porcentaje">
+                                    <input type="text" v-model="porcentage" class="form-control" placeholder="Valor de porcentaje"> 
                                 </div>
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                        <button type="button" v-if="tipoAccion == 1" class="btn btn-primary"
-                            @click="registrarPrecio()">Guardar</button>
+                        <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarPrecio()">Guardar</button>
                     </div>
                 </div>
             </div>
-        </div>
+        </div>       
 
     </main>
 </template>
@@ -476,19 +466,17 @@ export default {
             buscarClientePorCodigo: '',
             mensajeCheckBox: '',
             activeTab: 0, // Inicialmente, se muestra el contenido de la primera pestaña
-            opcion1: '',
-            opcion2: '',
-            opcion3: '',
-            precios: [],
+            opcion1:'',
+            opcion2:'',
+            opcion3:'',
+            precios:[],
             // modal: 0,
-            modal: 0,
-            tituloModal: '',
-            tipoAccion: 0,
-            nombre_precio: '',
-            porcentage: '',
-            condicion: 1,
-            tiempoMinCaducidadArticulo: '',
-
+            modal : 0,
+            tituloModal : '',
+            tipoAccion : 0,
+            nombre_precio : '',
+            porcentage : '',
+            condicion : 1,
         };
     },
     methods: {
@@ -498,7 +486,7 @@ export default {
 
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                console.log('/configuracion/editar', respuesta);
+                console.log(respuesta);
                 me.id = respuesta.configuracionTrabajo.id;
                 me.selectedYear = respuesta.configuracionTrabajo.gestion;
                 me.codigoProducto = respuesta.configuracionTrabajo.codigoProductos;
@@ -520,14 +508,14 @@ export default {
                 me.editarNroDoc = respuesta.configuracionTrabajo.editarNroDoc;
                 me.registroClienteObligatorio = respuesta.configuracionTrabajo.registroClienteObligatorio;
                 me.buscarClientePorCodigo = respuesta.configuracionTrabajo.buscarClientePorCodigo;
-                me.tiempoMinCaducidadArticulo = respuesta.configuracionTrabajo.tiempoMinCaducidadArticulo;
+                
             })
-                .catch(function (error) {
-                    console.log(error);
-                });
+            .catch(function (error) {
+                console.log(error);
+            });
         },
         guardar() {
-
+            
             this.precios.forEach(precio => {
                 this.guardarCambios(precio);
             });
@@ -535,7 +523,6 @@ export default {
             let me = this;
 
             axios.put('/configuracion/actualizar', {
-                'tiempoMinCaducidadArticulo': this.tiempoMinCaducidadArticulo,
                 'selectedYear': this.selectedYear,
                 'codigoProducto': this.codigoProducto,
                 'consultarAlmacenes': this.consultarAlmacenes,
@@ -563,27 +550,29 @@ export default {
                 console.log(error);
             });
         },
-        sacarBackupBaseDatos() {
+        sacarBackupBaseDatos()
+        {
             //window.open('/backup', '_blank');
-            axios.get('/backup').then(function (response) {
-                // alert(response.data.exito);
-                if (response.data.exito) {
+            axios.get('/backup').then(function(response) {
+               // alert(response.data.exito);
+                if(response.data.exito)
+                {
                     swal(
-                        'Exito!',
-                        response.data.exito,
-                        'success'
-                    )
-                } else {
+                            'Exito!',
+                            response.data.exito,
+                            'success'
+                        )
+                }else{
                     swal(
-                        'Error!',
-                        response.data.error,
-                        'error'
-                    )
+                            'Error!',
+                            response.data.error,
+                            'error'
+                        )
                 }
             })
-                .catch(function (error) {
-                    alert(error);
-                });
+            .catch(function(error) {
+                alert(error);
+            });
         },
         cancelar() {
             // Lógica para cancelar la acción
@@ -591,20 +580,20 @@ export default {
         listarPrecio() {
             let me = this;
             var url = '/preciosactivos';
-            axios.get(url).then(function (response) {
+            axios.get(url).then(function(response) {
                 var respuesta = response.data;
                 me.precios = respuesta.precio.data.map(precio => ({
-                    ...precio,
-                    habilitado: precio.habilitado === 1 // Convertir el valor numérico en un booleano
+                ...precio,
+                habilitado: precio.habilitado === 1 // Convertir el valor numérico en un booleano
                 }));
-            }).catch(function (error) {
+            }).catch(function(error) {
                 console.log(error);
             });
         },
-        registrarPrecio() {
+        registrarPrecio(){
             let me = this;
 
-            axios.post('/precios/registrar', {
+            axios.post('/precios/registrar',{
                 'nombre_precio': this.nombre_precio,
                 'porcentage': this.porcentage,
             }).then(function (response) {
@@ -622,33 +611,33 @@ export default {
             let accion = precio.condicion ? 'activar' : 'desactivar';
             axios.put(`/precios/${precio.id}/${accion}`)
         },
-        abrirModal(modelo, accion, data = []) {
-            switch (modelo) {
+        abrirModal(modelo, accion, data = []){
+            switch(modelo){
                 case "precioss":
-                    {
-                        switch (accion) {
-                            case 'registrar':
-                                {
-                                    this.modal = 1;
-                                    this.tituloModal = 'Registrar Precio';
-                                    this.tipoAccion = 1;
-                                    this.nombre_precio = '';
-                                    this.porcentage = '';
-                                    break;
-                                }
-                            case 'actualizar':
-                                {
-                                    break;
-                                }
+                {
+                    switch(accion){
+                        case 'registrar':
+                        {
+                            this.modal = 1;
+                            this.tituloModal = 'Registrar Precio';
+                            this.tipoAccion = 1;
+                            this.nombre_precio = '';
+                            this.porcentage = '';
+                            break;
+                        }
+                        case 'actualizar':
+                        {
+                            break;
                         }
                     }
+                }
             }
         },
-        cerrarModal() {
-            this.modal = 0;
-            this.tituloModal = '';
-            this.nombre_precio = '';
-            this.porcentage = '';
+        cerrarModal(){
+        this.modal=0;
+        this.tituloModal='';
+        this.nombre_precio='';
+        this.porcentage='';
         },
     },
     mounted() {
@@ -659,14 +648,14 @@ export default {
 </script>
 
 <style>
-.nav-link.active {
-    background-color: #f8f9fa;
-}
 
-.mostrar {
+    .nav-link.active {
+        background-color: #f8f9fa;
+    }
+    .mostrar{
     display: list-item !important;
     opacity: 1 !important;
     position: absolute !important;
     background-color: #3c29297a !important;
-}
+    }
 </style>

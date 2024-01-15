@@ -12,6 +12,12 @@
                 <button type="button" @click="abrirModal('grupos','registrar')" class="btn btn-secondary">
                     <i class="icon-plus"></i>&nbsp;Nuevo
                 </button>
+                <button type="button" @click="cargarExcel()" class="btn btn-info">
+                    <i class="icon-doc"></i>&nbsp;Exportar
+                </button>
+                <button type="button" @click="abrirModalImportGrup()" class="btn btn-success">
+                    <i class="icon-plus"></i>&nbsp;Importar
+                </button>
             </div>
             <div class="card-body">
                 <div class="form-group row">
@@ -117,6 +123,46 @@
         <!-- /.modal-dialog -->
     </div>
     <!--Fin del modal-->
+    <div class="modal fade" tabindex="-1" :class="{ 'mostrar': modalImportar }" role="dialog"
+        aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-primary modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Importar Grupos</h4>
+                    <button type="button" class="close" @click="cerrarModalImportar()" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="mainFormUsers">
+                        <div class="form-group">
+                            <table class="table">
+                                <tr>                                            
+                                    <label class="btn btn-primary" style="margin: 5px;" v-if="showUpload">Cargar_Archivo
+                                        <input type="submit" style="display: none;" name="upload" @click.prevent="saveExecelUser"> 
+                                    </label>
+                                    <div class="border border-dashed border-3 p-3 text-center" style="cursor: pointer">
+                                        <label class="custom-file">
+                                            <i class="fa fa-cloud-upload fa-2x" aria-hidden="true"></i>
+                                            <p class="custom-file-label">Seleccionar archivo CSV</p>
+                                            <input type="file" class="custom-file-input"
+                                                @change="showUploadButton" name="select_users_file">
+                                        </label>
+                                    </div>                                      
+                                </tr>
+                            </table>
+                        </div>
+                    </form>
+                    
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="cerrarModalImportar()">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </main>
 </template>
 
@@ -142,7 +188,9 @@ data (){
         },
         offset : 3,
         criterio : 'nombre_grupo',
-        buscar : ''
+        buscar : '',
+        modalImportar: 0,
+        showUpload: false,
     }
 },
 computed:{
@@ -175,6 +223,39 @@ computed:{
     }
 },
 methods : {
+    //---------------- Exportar de excel----
+    cargarExcel() {
+        window.open('/grupo/exportexcel', '_blank');
+    },
+    abrirModalImportGrup() {
+        this.modalImportar = 1;
+    },
+    cerrarModalImportar() {
+        this.modalImportar = 0;
+        this.showUpload = false;
+    },
+    showUploadButton(event) {
+      // Verifica si se ha seleccionado un archivo
+      this.showUpload = event.target.files.length > 0;
+    },
+    //----------importar-------
+    saveExecelUser(){
+        var $mainFormUsers = $('#mainFormUsers')
+        var data = new FormData(mainFormUsers)
+        axios.post('/grupo/import_excel',data)
+        .then((res)=>{
+            console.log("Importado");
+            swal(
+                'IMPORTADO!',
+                'Lista de Grupo.',
+                'success'
+            );
+            this.cerrarModalImportar();
+            this.listarGrupo(1,'','nombre_grupo');
+        }).catch(function (error) {
+            console.log(error);
+        });
+    },
     listarGrupo (page,buscar,criterio){
         let me=this;
         //var url= '/industria?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;

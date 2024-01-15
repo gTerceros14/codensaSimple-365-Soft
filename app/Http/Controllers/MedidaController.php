@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\MedidaExport;
+use App\Imports\MedidaImport;
 use Illuminate\Http\Request;
 use App\Medida;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MedidaController extends Controller
 {
@@ -21,7 +25,7 @@ class MedidaController extends Controller
         $criterio = $request->criterio;
         
         if ($buscar==''){
-            $medidas = Medida::orderBy('id', 'desc')->paginate(5);
+            $medidas = Medida::orderBy('id', 'asc')->paginate(5);
         }
         else{
             $medidas = Medida::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(5);
@@ -59,15 +63,9 @@ class MedidaController extends Controller
         if (!$request->ajax()) return redirect('/');
         $medida = new Medida();
         $medida->descripcion_medida = $request->descripcion_medida;
-        $medida->descripcion_corta = $request->descripcion_corta;
+        $medida->codigoClasificador = $request->codigoClasificador;
         $medida->estado = $request->estado ? '1' : '0';
-        Log::info('DATOS ACTUALIZADOS DE ARTICULO:', [
-            'descripcion_medida' => $request->descripcion_medida,
-            'descripcion_corta' => $request->descripcion_corta,
-            'estado' => $request->estado,
-
-        ]);
-        //$medida->save();
+        $medida->save();
     }
   
 
@@ -83,7 +81,7 @@ class MedidaController extends Controller
         if (!$request->ajax()) return redirect('/');
         $medida = Medida::findOrFail($request->id);
         $medida->descripcion_medida = $request->descripcion_medida;
-        $medida->descripcion_corta = $request->descripcion_corta;
+        $medida->codigoClasificador = $request->codigoClasificador;
         $medida->estado = 1;
 
         $medida->save();
@@ -103,5 +101,20 @@ class MedidaController extends Controller
         $medida = Medida::findOrFail($request->id);
         $medida->estado = '1';
         $medida->save();
+    }
+    //---exportar---
+    public function excelMedida()
+    {
+        $fechaActual = Carbon::now()->format('Y-m-d_H-i-s'); // Obtiene la fecha actual en el formato deseado
+        $nombreArchivo = 'Medidas_' . $fechaActual;
+
+        // Puedes elegir entre 'xlsx' o 'csv' según el formato deseado
+        return Excel::download(new MedidaExport, $nombreArchivo . '.xlsx');
+        //return Excel::download(new LineaExport, $nombreArchivo . '.csv');
+    }
+    //---importacion--
+    public function importsaveExecelUser(Request $request){
+        $path = $request->file('select_users_file')->getRealPath();
+        Excel::import(new MedidaImport, $path);
     }
 }

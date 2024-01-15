@@ -12,6 +12,12 @@
           <button type="button" @click="abrirModal('medida', 'registrar')" class="btn btn-secondary">
             <i class="icon-plus"></i>&nbsp;Nuevo
           </button>
+          <button type="button" @click="cargarExcel()" class="btn btn-info">
+              <i class="icon-doc"></i>&nbsp;Exportar
+          </button>
+          <button type="button" @click="abrirModalImportMedida()" class="btn btn-success">
+              <i class="icon-plus"></i>&nbsp;Importar
+          </button>
         </div>
         <div class="card-body">
           <div class="form-group row">
@@ -19,7 +25,7 @@
               <div class="input-group">
                 <select class="form-control col-md-3" v-model="criterio">
                   <option value="descripcion_medida">Descripción</option>
-                  <option value="descripcion_corta">Descripción Corta</option>
+                  <option value="codigoClasificador">Código Clasificador</option>
                 </select>
                 <input type="text" v-model="buscar" @keyup.enter="listarMedidas(1, buscar, criterio)" class="form-control" placeholder="Texto a buscar">
                 <button type="submit" @click="listarMedidas(1, buscar, criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
@@ -32,7 +38,7 @@
               <tr>
                 <th>Opciones</th>
                 <th>Descripción</th>
-                <th>Descripción Corta</th>
+                <th>Código Clasificador</th>
                 <th>Estado</th>
               </tr>
             </thead>
@@ -54,7 +60,7 @@
                   </template>
                 </td>
                 <td v-text="medida.descripcion_medida"></td>
-                <td v-text="medida.descripcion_corta"></td>
+                <td v-text="medida.codigoClasificador"></td>
                 <td>
                   <div v-if="medida.estado">
                     <span class="badge badge-success">Activo</span>
@@ -107,7 +113,7 @@
                 </div>
               </div>
               <div class="form-group row">
-                <label class="col-md-3 form-control-label" for="text-input">Descripción Corta</label>
+                <label class="col-md-3 form-control-label" for="text-input">Código Clasificador</label>
                 <div class="col-md-9">
                   <input type="text" v-model="descripcionCorta" class="form-control" placeholder="Descripción corta de la medida">
                 </div>
@@ -128,6 +134,46 @@
       </div>
     </div>
     <!-- Fin del modal -->
+    <div class="modal fade" tabindex="-1" :class="{ 'mostrar': modalImportar }" role="dialog"
+        aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-primary modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Importar Medidas</h4>
+                    <button type="button" class="close" @click="cerrarModalImportar()" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="mainFormUsers">
+                        <div class="form-group">
+                            <table class="table">
+                                <tr>                                            
+                                    <label class="btn btn-primary" style="margin: 5px;" v-if="showUpload">Cargar_Archivo
+                                        <input type="submit" style="display: none;" name="upload" @click.prevent="saveExecelUser"> 
+                                    </label>
+                                    <div class="border border-dashed border-3 p-3 text-center" style="cursor: pointer">
+                                        <label class="custom-file">
+                                            <i class="fa fa-cloud-upload fa-2x" aria-hidden="true"></i>
+                                            <p class="custom-file-label">Seleccionar archivo CSV</p>
+                                            <input type="file" class="custom-file-input"
+                                                @change="showUploadButton" name="select_users_file">
+                                        </label>
+                                    </div>                                      
+                                </tr>
+                            </table>
+                        </div>
+                    </form>
+                    
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="cerrarModalImportar()">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
   </main>
 </template>
 
@@ -139,7 +185,7 @@ export default {
     return {
       medida_id: 0,
       descripcionMedida: '',
-      descripcionCorta: '',
+      codigoClasificador: '',
       arrayMedida: [],
       modal: 0,
       tituloModal: '',
@@ -157,6 +203,8 @@ export default {
       offset: 3,
       criterio: 'descripcion_medida',
       buscar: '',
+      modalImportar: 0,
+      showUpload: false,
     };
   },
   computed: {
@@ -187,6 +235,39 @@ export default {
     },
   },
   methods: {
+    //---------------- Exportar de excel----
+    cargarExcel() {
+      window.open('/medida/exportexcel', '_blank');
+    },
+    abrirModalImportMedida() {
+        this.modalImportar = 1;
+    },
+    cerrarModalImportar() {
+        this.modalImportar = 0;
+        this.showUpload = false;
+    },
+    showUploadButton(event) {
+      // Verifica si se ha seleccionado un archivo
+      this.showUpload = event.target.files.length > 0;
+    },
+       //----------importar-------
+       saveExecelUser(){
+        var $mainFormUsers = $('#mainFormUsers')
+        var data = new FormData(mainFormUsers)
+        axios.post('/medida/import_excel',data)
+        .then((res)=>{
+            console.log("Importado");
+            swal(
+                'IMPORTADO!',
+                'Lista de Medidas.',
+                'success'
+            );
+            this.cerrarModalImportar();
+            this.listarMedidas(1,'','descripcion_medida');
+        }).catch(function (error) {
+            console.log(error);
+        });
+    },
     listarMedidas(page, buscar, criterio) {
       let me = this;
       var url = '/medida?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
@@ -215,7 +296,7 @@ export default {
       axios
         .post('/medida/registrar', {
           descripcion_medida: this.descripcionMedida,
-          descripcion_corta: this.descripcionCorta,
+          codigoClasificador: this.codigoClasificador,
         })
         .then(function (response) {
           me.cerrarModal();
@@ -234,7 +315,7 @@ export default {
       axios
         .put('/medida/actualizar', {
           descripcion_medida: this.descripcionMedida,
-          descripcion_corta: this.descripcionCorta,
+          codigoClasificador: this.codigoClasificador,
           id: this.medida_id,
         })
         .then(function (response) {
@@ -329,7 +410,7 @@ export default {
       this.errorMostrarMsjMedida = [];
 
       if (!this.descripcionMedida) this.errorMostrarMsjMedida.push('La descripción de la medida no puede estar vacía.');
-      if (!this.descripcionCorta) this.errorMostrarMsjMedida.push('La descripción corta de la medida no puede estar vacía.');
+      if (!this.codigoClasificador) this.errorMostrarMsjMedida.push('El código clasificador no puede estar vacío.');
 
       if (this.errorMostrarMsjMedida.length) this.errorMedida = 1;
 
@@ -339,7 +420,7 @@ export default {
       this.modal = 0;
       this.tituloModal = '';
       this.descripcionMedida = '';
-      this.descripcionCorta = '';
+      this.codigoClasificador = '';
     },
     abrirModal(modelo, accion, data = []) {
       switch (modelo) {
@@ -349,7 +430,7 @@ export default {
               this.modal = 1;
               this.tituloModal = 'Registrar Medida';
               this.descripcionMedida = '';
-              this.descripcionCorta = '';
+              this.codigoClasificador = '';
               this.tipoAccion = 1;
               break;
             }
@@ -359,7 +440,7 @@ export default {
               this.tipoAccion = 2;
               this.medida_id = data['id'];
               this.descripcionMedida = data['descripcion_medida'];
-              this.descripcionCorta = data['descripcion_corta'];
+              this.codigoClasificador = data['codigoClasificador'];
               break;
             }
           }

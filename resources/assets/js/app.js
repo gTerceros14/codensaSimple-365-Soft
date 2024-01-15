@@ -6,11 +6,7 @@
  */
 
 import Vue from 'vue'
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
 
-// import '../sass/app.scss'
 require('./bootstrap');
 
 window.$ = window.jQuery = require('jquery');
@@ -78,27 +74,22 @@ Vue.component('puntoventa', require('./components/PuntoVenta.vue'));
 Vue.component('rolventa', require('./components/RegistroVentas.vue'));
 Vue.component('devoluciones', require('./components/Devoluciones.vue'));
 
-Vue.component('TransaccionErgeso', require('./components/Tables/TransaccionEgreso.vue'))
-Vue.component('TransaccionIngreso', require('./components/Tables/TransaccionIngreso.vue'))
-Vue.component('TransaccionExtra', require('./components/Tables/TransaccionExtra.vue'))
-
-Vue.use(BootstrapVue)
 
 const app = new Vue({
     el: '#app',
-    data: {
-        menu: 0,
+    data :{
+        menu : 0,
         notifications: [],
     },
-    mounted() {
+    mounted(){
         console.log('Vue app mounted');
     },
     created() {
         let me = this;
-        axios.post('notification/get').then(function (response) {
+        axios.post('notification/get').then(function(response){
             //console.log(response.data);
-            me.notifications = response.data;
-        }).catch(function (error) {
+            me.notifications=response.data;
+        }).catch(function(error){
             console.log(error);
         });
 

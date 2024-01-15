@@ -47,11 +47,9 @@
                                         <th>Usuario</th>
                                         <th>Cliente</th>
                                         <th>Tipo Comprobante</th>
-                                        <th>Serie Comprobante</th>
                                         <th>Número Comprobante</th>
                                         <th>Fecha Hora</th>
                                         <th>Total</th>
-                                        <th>Impuesto</th>
                                         <th>Estado</th>
                                     </tr>
                                 </thead>
@@ -75,11 +73,9 @@
                                         <td v-text="venta.usuario"></td>
                                         <td v-text="venta.nombre"></td>
                                         <td v-text="venta.tipo_comprobante"></td>
-                                        <td v-text="venta.serie_comprobante"></td>
                                         <td v-text="venta.num_comprobante"></td>
                                         <td v-text="venta.fecha_hora"></td>
                                         <td v-text="venta.total"></td>
-                                        <td v-text="venta.impuesto"></td>
                                         <td v-text="venta.estado"></td>
                                     </tr>
                                 </tbody>
@@ -126,7 +122,7 @@
 
                             <input type="hidden" id="idcliente" class="form-control" v-model="idcliente" ref="idRef"
                                 readonly>
-                            <input type="text" id="tipo_documento" class="form-control" v-model="tipo_documento"
+                            <input type="hidden" id="tipo_documento" class="form-control" v-model="tipo_documento"
                                 ref="tipoDocumentoRef" readonly>
                             <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id"
                                 ref="complementoIdRef" readonly>
@@ -217,7 +213,7 @@
                                 <div class="form-group">
                                     <label>Precios(*)</label>
                                     <select class="form-control" v-model="precioseleccionado" @change="mostrarSeleccion" :disabled="precioBloqueado">
-        
+                                        <option>Selecciona un precio: </option>
                                         <option :value="precio_uno" v-if="arrayPrecios[0]">{{ arrayPrecios[0].nombre_precio }}</option>
                                         <option :value="precio_dos" v-if="arrayPrecios[1]">{{arrayPrecios[1].nombre_precio}}</option>
                                         <option :value="precio_tres" v-if="arrayPrecios[2]">{{arrayPrecios[2].nombre_precio}}</option>
@@ -229,19 +225,13 @@
                             <input type="hidden" id="codigo" class="form-control" v-model="codigo" readonly>
                             <input type="hidden" id="codigoProductoSin" class="form-control" v-model="codigoProductoSin"
                                 readonly>
-
-                          <!-- <div class="col-md-2">
-                                <div class="form-group">
-                                    <label>Unidad Medida</label>
-                                    <input type="text" id="medida" class="form-control" v-model="medida" readonly>
-                                </div>
-                            </div> 
-
-                        -->
+                            <input type="hidden" id="medida" class="form-control" v-model="medida" readonly>
+                            <input type="hidden" id="codigoClasificador" class="form-control" v-model="codigoClasificador" readonly>
+                                
                             <div class="col-md-2">
                                  <div class="form-group"> 
                                     <label>Precio</label> 
-                                    <input type="number" id="precio" value="0"  class="form-control" v-model="precioFinal" readonly>
+                                    <input type="number" id="precio" value="0"  class="form-control" v-model="precioFinal">
                                     
                                     </div> 
                             </div>
@@ -260,6 +250,7 @@
                                     <label>Unidad Medida <span style="color: red;" v-show="cantidad == 0"></span></label>
                                    
                                     <select class="form-control" v-model="paquni" @change="preciounid">
+                                        <option>Selecciona una Medida: </option>
                                         <option :value="unidad_envase" >paquete</option>
                                         <option :value="1" >unidad</option>
                                      </select>
@@ -370,7 +361,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col" for="">Tipo de Pago</label>
+                            <label class="col" for=""><strong>Tipo de Pago</strong></label>
                             <div class="col-md-12">
                                 <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
                                 <button type="button" class="btn btn-primary" @click="registrarAbrilModal()">Contado</button>
@@ -655,7 +646,7 @@
 
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Tiempo Diaz</label>
+                                    <label class="form-control-label" for="text-input">Tiempo Días</label>
                                     <div class="input-group">
                                         <input type="number" v-model="tiempo_diaz">
                                     </div>
@@ -747,7 +738,7 @@ export default {
             tipo_documento: '',
             complemento_id: '',
             descuentoAdicional: 0.00,
-            tipo_comprobante: 'BOLETA',
+            tipo_comprobante: 'FACTURA',
             serie_comprobante: '',
             last_comprobante: 0,
             num_comprob: "",
@@ -783,6 +774,7 @@ export default {
             codigo: '',
             articulo: '',
             medida: '',
+            codigoClasificador: '',
             codigoProductoSin: '',
             precio: 0,
             unidad_envase:0,
@@ -1093,6 +1085,7 @@ export default {
                         me.precio = me.arrayArticulo[0]['precio_venta'];
                         me.stock = me.arrayArticulo[0]['saldo_stock'];
                         me.medida = me.arrayArticulo[0]['medida'];
+                        me.codigoClasificador = me.arrayArticulo[0]['codigoClasificador'];
                         me.codigoProductoSin = me.arrayArticulo[0]['codigoProductoSin'];
 
                         //----precios---
@@ -1151,7 +1144,7 @@ export default {
             let codigoProducto = document.getElementById("codigo").value;
             let descripcion = document.getElementById("nombre_producto").value;
             let cantidad = document.getElementById("cantidad").value;
-            let unidadMedida = 57;
+            let unidadMedida = document.getElementById("codigoClasificador").value;
             let precioUnitario = document.getElementById("precio").value;
             let montoDescuento = document.getElementById("descuento").value;
             let subTotalValor = document.getElementById("sTotal");
@@ -1370,7 +1363,14 @@ export default {
                     me.cerrarModal2();
                     me.cerrarModal3();
                     me.idproveedor = 0;
-                    me.tipo_comprobante = 'BOLETA';
+                    me.tipo_comprobante = 'FACTURA';
+                    me.nombreCliente = '';
+                    me.idcliente = 0;
+                    me.tipo_documento = 0;
+                    me.complemento_id = '';
+                    me.documento = '';
+                    me.email = '';
+                    me.imagen = '';
                     me.serie_comprobante = '';
                     me.num_comprob = '';
                     me.impuesto = 0.18;
@@ -1464,7 +1464,8 @@ export default {
             let fechaEmision = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
             let id_cliente = document.getElementById("idcliente").value;
             let nombreRazonSocial = document.getElementById("nombreCliente").value;
-            let tipoDocumentoIdentidad = document.getElementById("tipo_documento").value;
+            //let tipoDocumentoIdentidad = document.getElementById("tipo_documento").value;
+            let tipoDocumentoIdentidad = 1;
             let numeroDocumento = document.getElementById("documento").value;
             let complemento = document.getElementById("complemento_id").value;
             let montoTotalValor = document.getElementById("montoTotal");
@@ -1472,8 +1473,8 @@ export default {
             let descuentoAdicional = document.getElementById("descuentoAdicional").value;
             let leyenda = "Ley N° 453: El proveedor de servicios debe habilitar medios e instrumentos para efectuar consultas y reclamaciones.";
             let usuario = document.getElementById("usuarioAutenticado").value;
-            let codigoPuntoVenta = this.puntoVentaAutenticado;
-            //let codigoPuntoVenta = 0;
+            //let codigoPuntoVenta = this.puntoVentaAutenticado;
+            let codigoPuntoVenta = 0;
 
             console.log("El tipo de documento es: " + tipoDocumentoIdentidad);
 
@@ -1531,6 +1532,8 @@ export default {
                             'success'
                         )
                         me.arrayProductos = [];
+                        me.cerrarModal2();
+                        me.cerrarModal3();
                         me.listarVenta(1, '', 'id');
                     }else{
                             swal(
@@ -1554,7 +1557,7 @@ export default {
             me.listado = 0;
 
             me.idproveedor = 0;
-            me.tipo_comprobante = 'BOLETA';
+            me.tipo_comprobante = 'FACTURA';
             me.serie_comprobante = '';
             me.nextNumber();
             //me.num_comprobante = '';
@@ -1702,16 +1705,17 @@ export default {
             console.log('USUARIO LLEGA:', this.cliente);
             this.tituloModal2 = 'PAGO AL CONTADO ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion2 = 1;
-            this.idtipo_pago = 1
+            this.idtipo_pago = 1;
             console.log('idtipo_pago LLEGA:', this.idtipo_pago);
         },
+
         registrarAbrilModal2() {
             this.modal3 = 1;
             this.cliente = this.nombreCliente;
             console.log('USUARIO LLEGA:', this.cliente);
             this.tituloModal3 = 'CREDITOS ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion3 = 1;
-            this.idtipo_pago = 2
+            this.idtipo_pago = 2;
             console.log('idtipo_pago LLEGA:', this.idtipo_pago);
         },
         cerrarModal2() {
@@ -1928,3 +1932,4 @@ export default {
         font-weight: bold;
     } */
 </style>
+  

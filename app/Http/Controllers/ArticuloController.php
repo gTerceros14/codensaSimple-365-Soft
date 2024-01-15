@@ -273,17 +273,17 @@ class ArticuloController extends Controller
         $articulos = Articulo::join('medidas', 'articulos.idmedida', '=', 'medidas.id')
             ->join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
             ->join('inventarios', 'inventarios.idarticulo', '=', 'articulos.id')
-            ->select('articulos.id', 'articulos.nombre', 'articulos.stock', 'articulos.precio_costo_unid', 'articulos.precio_costo_paq', 'medidas.descripcion_medida as medida', 'articulos.precio_venta', 'categorias.codigoProductoSin', 'articulos.codigo',
-                'articulos.precio_uno',
-                'articulos.precio_dos',
-                'articulos.precio_tres',
-                'articulos.precio_cuatro',
-                'articulos.fotografia',
-                'articulos.condicion',
-                'categorias.nombre as nombre_categoria',
-                'unidad_envase',
-                'inventarios.fecha_vencimiento',
-                DB::raw('(SELECT SUM(inventarios.saldo_stock) FROM inventarios WHERE inventarios.idarticulo = articulos.id AND inventarios.fecha_vencimiento > NOW()) as saldo_stock')
+            ->select('articulos.id', 'articulos.nombre','articulos.stock','articulos.precio_costo_unid', 'articulos.precio_costo_paq', 'medidas.descripcion_medida as medida', 'medidas.codigoClasificador as codigoClasificador','articulos.precio_venta','categorias.codigoProductoSin', 'articulos.codigo',
+                    'articulos.precio_uno',
+                    'articulos.precio_dos',
+                    'articulos.precio_tres',
+                    'articulos.precio_cuatro',
+                    'articulos.fotografia',
+                    'articulos.condicion',
+                    'categorias.nombre as nombre_categoria',
+                    'unidad_envase',
+                    'inventarios.fecha_vencimiento',
+                    DB::raw('(SELECT SUM(inventarios.saldo_stock) FROM inventarios WHERE inventarios.idarticulo = articulos.id AND inventarios.fecha_vencimiento > NOW()) as saldo_stock')
 
             )
             ->where('articulos.codigo', '=', $filtro)

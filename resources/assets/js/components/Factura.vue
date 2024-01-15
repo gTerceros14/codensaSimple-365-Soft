@@ -15,15 +15,13 @@
                 <span class="badge bg-secondary" id="comunicacionSiat" style="color: white;">Desconectado</span>
                 <span class="badge bg-secondary" id="cuis">CUIS: Inexistente</span>
                 <span class="badge bg-secondary" id="cufd">No existe cufd vigente</span>
-                <span class="badge bg-secondary" id="direccion" v-show="mostrarDireccion">No hay dirección registrada</span>
-                <span class="badge bg-primary" id="cufdValor" v-show="mostrarCUFD">No hay CUFD</span>
             </div>
             <div class="table-responsive">
                         
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th>N°</th>
+                                    <th>N° Factura</th>
                                     <th>Fecha</th>
                                     <th>Razón Social</th>
                                     <th>NIT/CI</th>
@@ -44,16 +42,10 @@
                                     <td v-text="factura.montoTotal"></td>
                                     <td v-text="factura.descuentoAdicional"></td>
                                     <td>
-                                        <div v-if="factura.estado">
-                                            <span class="badge badge-success">VALIDADA</span>
-                                        </div>
-                                        <div v-else>
-                                            <span class="badge badge-danger">RECHAZADA</span>
-                                        </div> 
+                                        <a @click="verificarFactura(factura.cuf, factura.numeroFactura)" target="_blank" class="btn btn-info"><i class="icon-note"></i></a>
                                     </td>
                                     <td>
                                         <button class="btn btn-primary" type="button" @click="imprimirFactura(factura.id)"><i class="icon-printer"></i></button>
-                                        <a @click="verificarFactura(factura.cuf, factura.numeroFactura)" target="_blank" class="btn btn-info"><i class="icon-note"></i></a>
                                         <button class="btn btn-danger" type="button" @click="anularFactura(factura.id, factura.cuf)"><i class="icon-close"></i></button>
                                     </td>
                                 </tr>                                                              
@@ -287,11 +279,49 @@
             });
             },
 
-
             imprimirFactura(id) {
-            axios.get('/factura/imprimir/'+id, { responseType: 'blob' })
+            swal({
+                title: 'Selecciona un tamaño de factura',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'CARTA',
+                cancelButtonText: 'ROLLO',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    console.log("El boton CARTA fue presionado");
+                    axios.get('/factura/imprimirCarta/' + id, { responseType: 'blob' })
+                        .then(function (response) {
+                            window.location.href = "docs/facturaCarta.pdf";
+                            console.log("Se generó el factura en Carta correctamente");
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                } else if (result.dismiss === swal.DismissReason.cancel) {
+                    console.log("El boton ROLLO fue presionado");
+                    axios.get('/factura/imprimirRollo/' + id, { responseType: 'blob' })
+                        .then(function (response) {
+                            window.location.href = "docs/facturaRollo.pdf";
+                            console.log("Se generó el la factura en Rollo correctamente");
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
+            }).catch((error) => {
+                console.error('Error al mostrar el diálogo:', error);
+            });
+        },
+
+
+
+            imprimirOpcion1(id) {
+                axios.get('/factura/imprimirCarta/'+id, { responseType: 'blob' })
                 .then(function(response) {
-                window.location.href = "docs/factura.pdf";
+                window.location.href = "docs/facturaCarta.pdf";
                 console.log("Se generó el PDF correctamente");
                 })
                 .catch(function(error) {
@@ -299,6 +329,28 @@
                 });
             },
 
+            imprimirOpcion2(id) {
+                axios.get('/factura/imprimirRollo/'+id, { responseType: 'blob' })
+                .then(function(response) {
+                window.location.href = "docs/facturaRollo.pdf";
+                console.log("Se generó el PDF correctamente");
+                })
+                .catch(function(error) {
+                console.log(error);
+                });
+            },
+
+            /*imprimirFactura(id) {
+            axios.get('/factura/imprimir/'+id, { responseType: 'blob' })
+                .then(function(response) {
+                window.location.href = "docs/facturaRollo.pdf";
+                console.log("Se generó el PDF correctamente");
+                })
+                .catch(function(error) {
+                console.log(error);
+                });
+            },*/
+            
             cerrarModal(){
                 this.modal=0;
                 this.tituloModal='';

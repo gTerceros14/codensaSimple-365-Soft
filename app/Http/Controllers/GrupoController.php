@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\GrupoExport;
 use App\Grupo;
+use App\Imports\GrupoImport;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GrupoController extends Controller
 {
@@ -56,5 +60,20 @@ class GrupoController extends Controller
             'nombre_grupo' => $request->nombre_grupo,
         ]);
         $grupos->save();
+    }
+    //---exportar---
+    public function excelGrupo()
+    {
+        $fechaActual = Carbon::now()->format('Y-m-d_H-i-s'); // Obtiene la fecha actual en el formato deseado
+        $nombreArchivo = 'Grupo_' . $fechaActual;
+
+        // Puedes elegir entre 'xlsx' o 'csv' según el formato deseado
+        return Excel::download(new GrupoExport, $nombreArchivo . '.xlsx');
+        //return Excel::download(new LineaExport, $nombreArchivo . '.csv');
+    }
+    //---importacion--
+    public function importsaveExecelUser(Request $request){
+        $path = $request->file('select_users_file')->getRealPath();
+        Excel::import(new GrupoImport, $path);
     }
 }

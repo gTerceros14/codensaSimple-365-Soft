@@ -97,14 +97,17 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/categoria/desactivar', 'CategoriaController@desactivar');
         Route::put('/categoria/activar', 'CategoriaController@activar');
         Route::get('/categoria/selectCategoria', 'CategoriaController@selectCategoria');
-
+        //----importacion y exportacion--
+        Route::get('/linea/exportexcel', 'CategoriaController@excelLinea')->name('exportar_excel');
+        Route::post('/linea/import_excel', 'CategoriaController@importsaveExecelUser')->name('import_excel');
 
         Route::get('/marca', 'MarcaController@index');
         Route::post('/marca/registrar', 'MarcaController@store');
         Route::put('/marca/actualizar', 'MarcaController@update');
         Route::put('/marca/desactivar', 'MarcaController@desactivar');
         Route::put('/marca/activar', 'MarcaController@activar');
-
+        Route::get('/marca/exportexcel', 'MarcaController@excelMarca')->name('exportar_excel');
+        Route::post('/marca/import_excel', 'MarcaController@saveExecelUser')->name('import_excel');
 
         Route::get('/articulo', 'ArticuloController@index');
         Route::post('/articulo/registrar', 'ArticuloController@store');
@@ -235,7 +238,8 @@ Route::group(['middleware' => ['auth']], function () {
         //FACTURAS
         Route::get('/factura', 'SiatController@index');
         Route::get('/factura/getFactura/{id}', 'SiatController@getFactura');
-        Route::get('/factura/imprimir/{id}', 'VentaController@imprimirFactura');
+        Route::get('/factura/imprimirRollo/{id}', 'VentaController@imprimirFacturaRollo');
+        Route::get('/factura/imprimirCarta/{id}', 'VentaController@imprimirFactura');
         Route::get('/factura/anular/{cuf}/{motivoSeleccionado}', 'VentaController@anulacionFactura');
         Route::get('/factura/sincronizarActividades', 'VentaController@sincronizarActividades');
         Route::get('/factura/sincronizarParametricaTiposFactura', 'VentaController@sincronizarParametricaTiposFactura');
@@ -264,6 +268,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/medida/activar', 'MedidaController@activar');
         Route::get('/medida/selectCategoria', 'MedidaController@selectMedida');
 
+        Route::get('/medida/exportexcel', 'MedidaController@excelMedida')->name('exportar_excel');
+        Route::post('/medida/import_excel', 'MedidaController@importsaveExecelUser')->name('import_excel');
+
         //Obtener último numero de comprobante
         Route::get('/ruta-a-tu-endpoint-laravel-para-obtener-ultimo-comprobante', 'VentaController@obtenerUltimoComprobante');
 
@@ -280,6 +287,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/grupos', 'GrupoController@index');
         Route::post('/grupos/registrar', 'GrupoController@store');
         Route::put('/grupos/actualizar', 'GrupoController@update');
+
+        Route::get('/grupo/exportexcel', 'GrupoController@excelGrupo')->name('exportar_excel');
+        Route::post('/grupo/import_excel', 'GrupoController@importsaveExecelUser')->name('import_excel');
 
         //precio
         Route::get('/precios', 'PrecioController@indexanctivo');

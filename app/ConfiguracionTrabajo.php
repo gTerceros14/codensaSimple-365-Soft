@@ -13,7 +13,6 @@ class ConfiguracionTrabajo extends Model
         'id','gestion','codigoProductos','consultasAlmacenes','limiteDescuento','maximoDescuento','monedaPrincipal','valuacionInventario','backupAutomatico',
         'rutaBackup','saldosNegativos','monedaTrabajo','separadorDecimales','mostrarCostos','mostrarProveedores',
         'mostrarSaldosStock','actualizarIva','vendedorAsignado','permitirDevolucion','editarNroDoc',
-        'registroClienteObligatorio','buscarClientePorCodigo',
-        'tiempoMinCaducidadArticulo',
+        'registroClienteObligatorio','buscarClientePorCodigo'
     ];
 }

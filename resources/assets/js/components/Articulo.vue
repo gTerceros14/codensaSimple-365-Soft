@@ -448,7 +448,7 @@
                                         <th style="display: none;">ID</th>
                                         <th>Opciones</th>
                                         <th>Medida</th>
-                                        <th>Descripción Corta</th>
+                                        <th>Código Clasificador</th>
                                         <th>Estado</th>
                                     </tr>
                                 </thead>
@@ -467,7 +467,7 @@
                                         </td>
                                         <td v-if="mostrarElemento" v-text="arrayelemento.id"></td>
                                         <td v-text="arrayelemento.descripcion_medida"></td>
-                                        <td v-text="arrayelemento.descripcion_corta"></td>
+                                        <td v-text="arrayelemento.codigoClasificador"></td>
                                         <td v-if="tituloModal6 == 'Medidas'">
                                             <div v-if="arrayelemento.estado">
                                                 <span class="badge badge-success">Activo</span>
@@ -1250,7 +1250,7 @@ export default {
             tituloModal7: '',
             medida_id: 0,
             descripcion_medida: '',
-            descripcion_corta: '',
+            codigoClasificador: '',
             medidaseleccionada: [],
         }
     },

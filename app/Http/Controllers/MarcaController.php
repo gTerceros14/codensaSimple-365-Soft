@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 //use Illuminate\Support\Facades\DB;
 use App\Marca;
 use Illuminate\Support\Facades\Log;
+use App\Imports\MarcaImport;
+use App\Exports\MarcaExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon; // Agrega la clase Carbon para manejar fechas
 
 class MarcaController extends Controller
 {
@@ -106,5 +110,27 @@ class MarcaController extends Controller
         $marcas = Marca::where('condicion','=','1')
         ->select('id','nombre')->orderBy('nombre', 'asc')->get();
         return ['marcas' => $marcas];
-    }    
+    }   
+    //-----importar de excel --
+    public function saveExecelUser(Request $request){
+        $path = $request->file('select_users_file')->getRealPath();
+        Excel::import(new MarcaImport, $path);
+    }
+
+    //-------Exportar datos a excel ----
+    // public function excelMarca()
+    // {
+    //     // return Excel::download(new MarcaExport, 'marcas.xlsx');
+    //     // en csv
+    //     return Excel::download(new MarcaExport, 'marcas.csv');
+    // }
+    public function excelMarca()
+    {
+        $fechaActual = Carbon::now()->format('Y-m-d_H-i-s'); // Obtiene la fecha actual en el formato deseado
+        $nombreArchivo = 'marcas_' . $fechaActual;
+
+        // Puedes elegir entre 'xlsx' o 'csv' según el formato deseado
+        // return Excel::download(new MarcaExport, $nombreArchivo . '.xlsx');
+        return Excel::download(new MarcaExport, $nombreArchivo . '.csv');
+    }
 }
