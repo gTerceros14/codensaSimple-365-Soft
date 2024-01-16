@@ -73,7 +73,7 @@ export default {
     },
     created() {
         // this.paginated = this.data.paginated;
-        this.items = this.data.data | [];
+        this.items = this.data.data;
         this.perPage = this.data.per_page;
     },
     components: {
