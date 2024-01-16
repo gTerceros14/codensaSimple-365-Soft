@@ -1,8 +1,6 @@
 
 <template>
     <div class="table-responsive">
-        <!-- <div v-if="items.length <= 0">No hat datos</div>
-        <div v-if="items.length >= 1">{{ items[0].id }}</div> -->
         <table class="table table-bordered table-striped table-sm">
             <thead>
                 <tr>

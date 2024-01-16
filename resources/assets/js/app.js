@@ -7,6 +7,10 @@
 
 import Vue from 'vue'
 
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
 require('./bootstrap');
 
 window.$ = window.jQuery = require('jquery');
@@ -74,6 +78,12 @@ Vue.component('puntoventa', require('./components/PuntoVenta.vue'));
 Vue.component('rolventa', require('./components/RegistroVentas.vue'));
 Vue.component('devoluciones', require('./components/Devoluciones.vue'));
 
+
+Vue.component('TransaccionErgeso', require('./components/Tables/TransaccionEgreso.vue'))
+Vue.component('TransaccionIngreso', require('./components/Tables/TransaccionIngreso.vue'))
+Vue.component('TransaccionExtra', require('./components/Tables/TransaccionExtra.vue'))
+
+Vue.use(BootstrapVue)
 
 const app = new Vue({
     el: '#app',

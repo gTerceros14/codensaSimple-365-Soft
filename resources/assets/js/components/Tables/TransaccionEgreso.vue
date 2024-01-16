@@ -1,7 +1,6 @@
 
 <template>
     <div class="table-responsive">
-
         <TableBase :items="items" :rows="rows" :per-page="perPage" :fields="fields"
             @change-pagination="changePaginationCurrent" />
     </div>
@@ -74,7 +73,7 @@ export default {
     },
     created() {
         // this.paginated = this.data.paginated;
-        this.items = this.data.data;
+        this.items = this.data.data | [];
         this.perPage = this.data.per_page;
     },
     components: {
@@ -106,7 +105,7 @@ export default {
                     // me.pagination = respuesta.pagination;
                     this.items = response.data.ingresos.data;
                     this.perPage = response.data.ingresos.per_page;
-                    console.log('getDatawithPage', response.data.ingresos.data);
+                    // console.log('getDatawithPage', response.data?.ingresos?.data);
                     // this.$forceUpdate();
                 })
                 .catch((error) => {

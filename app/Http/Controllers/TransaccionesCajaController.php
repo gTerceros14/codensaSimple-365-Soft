@@ -22,11 +22,7 @@ class TransaccionesCajaController extends Controller
                 ->join('users', 'transacciones_cajas.idusuario', '=', 'users.id')
                 ->select('transacciones_cajas.id', 'transacciones_cajas.idcaja', 'transacciones_cajas.idusuario', 'users.usuario as usuario', 'transacciones_cajas.fecha', 'transacciones_cajas.transaccion', 'transacciones_cajas.importe', 'cajas.fechaApertura')
                 ->where('transacciones_cajas.idcaja', '=', $id)
-                ->orderBy('transacciones_cajas.id', 'desc')->paginate(6);
-        
-
-
-
+                ->orderBy('transacciones_cajas.id', 'desc')->paginate(8);
         }
 
         $ingresos = Ingreso::join('personas','ingresos.idproveedor','=','personas.id')
@@ -34,7 +30,8 @@ class TransaccionesCajaController extends Controller
         ->select('ingresos.id','ingresos.tipo_comprobante','ingresos.serie_comprobante',
         'ingresos.num_comprobante','ingresos.fecha_hora','ingresos.impuesto','ingresos.total',
         'ingresos.estado','personas.nombre','users.usuario')
-        ->orderBy('ingresos.id', 'desc')->where('idcaja', $id)->get();
+        ->orderBy('ingresos.id', 'desc')->where('idcaja', $id)->paginate(4);
+
         $ventas = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
                 ->join('users', 'ventas.idusuario', '=', 'users.id')
                 ->select(
@@ -49,20 +46,33 @@ class TransaccionesCajaController extends Controller
                     'personas.nombre',
                     'users.usuario'
                 )
-                ->orderBy('ventas.id', 'desc')->where('idcaja', $id)->paginate(3);
+                ->orderBy('ventas.id', 'desc')
+                ->where('idcaja', $id)
+                ->paginate(8);
 
         return [
-            'pagination' => [
-                'total'        => $transaccionesCajas->total(),
-                'current_page' => $transaccionesCajas->currentPage(),
-                'per_page'     => $transaccionesCajas->perPage(),
-                'last_page'    => $transaccionesCajas->lastPage(),
-                'from'         => $transaccionesCajas->firstItem(),
-                'to'           => $transaccionesCajas->lastItem(),
-            ],
+            // 'pagination' => [
+            //     'total'        => $transaccionesCajas->total(),
+            //     'current_page' => $transaccionesCajas->currentPage(),
+            //     'per_page'     => $transaccionesCajas->perPage(),
+            //     'last_page'    => $transaccionesCajas->lastPage(),
+            //     'from'         => $transaccionesCajas->firstItem(),
+            //     'to'           => $transaccionesCajas->lastItem(),
+            // ],
             'transacciones' => $transaccionesCajas,
             'ingresos' =>  $ingresos,
-            'ventas'=> $ventas
+            'ventas'=> $ventas,
+            // 'ventas' => [
+                // 'data'=> $ventas,
+                // 'pagination' => [
+                //     'total'        => $ventas->total(),
+                //     'current_page' => $ventas->currentPage(),
+                //     'per_page'     => $ventas->perPage(),
+                //     'last_page'    => $ventas->lastPage(),
+                //     'from'         => $ventas->firstItem(),
+                //     'to'           => $ventas->lastItem(),
+                // ],
+            // ]
 
         ];
     }
