@@ -448,7 +448,7 @@
                                         <th style="display: none;">ID</th>
                                         <th>Opciones</th>
                                         <th>Medida</th>
-                                        <th>Código Clasificador</th>
+                                        <th>Descripción Corta</th>
                                         <th>Estado</th>
                                     </tr>
                                 </thead>
@@ -467,7 +467,7 @@
                                         </td>
                                         <td v-if="mostrarElemento" v-text="arrayelemento.id"></td>
                                         <td v-text="arrayelemento.descripcion_medida"></td>
-                                        <td v-text="arrayelemento.codigoClasificador"></td>
+                                        <td v-text="arrayelemento.descripcion_corta"></td>
                                         <td v-if="tituloModal6 == 'Medidas'">
                                             <div v-if="arrayelemento.estado">
                                                 <span class="badge badge-success">Activo</span>
@@ -997,7 +997,7 @@
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Importar articulos</h4>
+                        <h4 class="modal-title">Importar productos</h4>
                         <button type="button" class="close" @click="cerrarModalImportar()" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -1005,23 +1005,46 @@
                     <div class="modal-body">
                         <div>
                             <form @submit.prevent="submitForm">
-                                <div class="border border-dashed border-3 p-3 text-center" style="cursor: pointer"
-                                    v-if="!selectedFile">
-                                    <label class="custom-file" for="customFile">
-                                        <i class="fa fa-cloud-upload fa-2x" aria-hidden="true"></i>
-                                        <p class="custom-file-label">Seleccionar archivo CSV</p>
-                                        <input type="file" class="custom-file-input" id="customFile" ref="fileInput"
-                                            @change="handleFileChange" />
-                                    </label>
-                                </div>
-                                <div v-else class="text-center">
-                                    <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
-                                    <p> {{ selectedFile.name }}</p>
-                                    <button @click="removeFile" type="button" class="btn btn-danger">Eliminar
-                                        archivo</button>
+                                <div v-if="pageImportar == 0">
+                                    <div class="border border-dashed border-3 p-3 text-center" style="cursor: pointer"
+                                        v-if="!selectedFile">
+                                        <label class="custom-file" for="customFile">
+                                            <i class="fa fa-cloud-upload fa-2x" aria-hidden="true"></i>
+                                            <p class="custom-file-label">Seleccionar archivo CSV</p>
+                                            <input type="file" class="custom-file-input" id="customFile" ref="fileInput"
+                                                @change="handleFileChange" />
+                                        </label>
+                                    </div>
+                                    <div v-else class="text-center">
+                                        <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
+                                        <p> {{ selectedFile.name }}</p>
+                                        <button @click="removeFile" type="button" class="btn btn-danger">Eliminar
+                                            archivo</button>
+                                        <div class="" style="display:flex;margin-top:10px;">
+                                            <label for="delimiterSelector">Selecciona el delimitador: </label>
+                                            <select class="form-control col-md-3" v-model="selectedDelimiter"
+                                                id="delimiterSelector">
+                                                <option value=";">Punto y coma (;)</option>
+                                                <option value=",">Coma (,)</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-check mt-3">
+                                            <input type="checkbox" id="headerCheckbox" class="form-check-input"
+                                                v-model="includeHeader" />
+                                            <label for="headerCheckbox" class="form-check-label">
+                                                El archivo incluye encabezados
+                                            </label>
+                                        </div>
+                                        <button type="button" @click="confirmCsv" class="btn btn-success">Confirmar</button>
 
+                                    </div>
+                                </div>
+                                <div v-if="pageImportar == 1">
+
+                                    <button @click="selectAllHeaders" type="button" class="btn btn-success mt-2">Seleccionar
+                                        Todos</button>
                                     <div v-if="csvHeaders && csvHeaders.length > 0" class="csv-headers-container">
-                                        <p>Encabezados del archivo:</p>
+                                        <p>Encabezados del archivo: </p>
                                         <ul class="csv-headers-list">
                                             <li v-for="(header, index) in csvHeaders" :key="index" class="csv-header">
                                                 <label>
@@ -1050,19 +1073,96 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        <button @click="assignHeaders" type="button" class="btn btn-success mt-2">Asignar
+                                            Encabezados</button>
                                     </div>
 
+
+                                </div>
+
+                                <div v-if="pageImportar == 2">
                                     <div v-if="previewCsv && previewCsv.length > 0" class="mt-4">
-                                        <p>Vista previa del nuevo CSV:</p>
-                                        <textarea class="form-control" rows="5" :value="previewCsv" readonly></textarea>
-                                        <button @click="downloadCsv" class="btn btn-primary mt-2">Descargar CSV</button>
+                                        <h5>Vista previa:</h5>
+                                        <p>Este contenido se importara en la base de datos</p>
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th v-for="(header, index) in headersArray" :key="index">{{ header
+                                                        }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(row, rowIndex) in parsedPreviewCsv" :key="rowIndex">
+                                                        <td v-for="(value, columnIndex) in row" :key="columnIndex">{{ value
+                                                        }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- <button @click="downloadCsv" class="btn btn-primary mt-2">Descargar CSV</button> -->
                                     </div>
-
-                                    <button @click="assignHeaders" type="button" class="btn btn-primary mt-2">Asignar
-                                        Encabezados</button>
-
-                                    <button v-if="selectedFile" type="submit" class="btn btn-primary mt-2">Importar
+                                    <button v-if="selectedFile" type="submit" class="btn btn-success mt-2">Importar
                                         CSV</button>
+                                </div>
+                                <div v-if="pageImportar == 3">
+                                    <div v-if="errorsImport.length == 0 && erroresNoExiste.length == 0 && !successImport">
+                                        <span class="loader"></span>
+                                        <h5 style="text-align:center;">Importando Datos</h5>
+                                    </div>
+                                    <div v-if="errorsImport.length > 0">
+                                        <div class="card-error">
+                                            <h4 style="text-align: center;">Error</h4>
+                                            <div
+                                                style="background-color: red; height: 2px;margin-bottom: 10px;margin-top: 10px;">
+                                            </div>
+                                            <p>No se pudo realizar la importación, verifique los datos del archivo</p>
+                                        </div>
+                                        <div v-for="(item, index) in errorsImport" :key="index">
+                                            <div class="card-error">
+                                                <i class="fa fa-exclamation-triangle" style="color:red"
+                                                    aria-hidden="true"></i>
+                                                {{ item }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-if="errorsImport.length == 0 && erroresNoExiste.length > 0">
+                                        <h2>Datos no encontrados en la base de datos</h2>
+                                        <table class="table">
+                                            <!-- <thead>
+        <tr>
+          <th scope="col">Elemento</th>
+        </tr>
+      </thead> -->
+                                            <tbody>
+                                                <tr v-for="(item, index) in erroresNoExiste" :key="index">
+                                                    <td
+                                                        v-html="`<span style='font-weight: bold'>${item.split(' ')[0]}</span>: ${item.split(' ').slice(1).join(' ')}`">
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+
+                                        <div v-if="erroresNoExiste.length > 0">
+                                            <p>¿Desea registrar estos datos?</p>
+                                            <button class="btn btn-success" type="button" @click="confirmarRegistro">Confirmar</button>
+                                            <button class="btn btn-danger" type="button" @click="cancelarRegistro">Cancelar</button>
+                                        </div>
+                                    </div>
+                                    <div v-if="erroresNoExiste.length==0 && errorsImport.length == 0 && successImport">
+                                        <div class="success-checkmark">
+  <div class="check-icon">
+    <span class="icon-line line-tip"></span>
+    <span class="icon-line line-long"></span>
+    <div class="icon-circle"></div>
+    <div class="icon-fix"></div>
+  </div>
+</div>
+<h5 style="text-align:center;">Importación exitosa</h5>
+
+
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -1085,15 +1185,25 @@ import VueBarcode from 'vue-barcode';
 export default {
     data() {
         return {
+            successImport:false,
+            registrosSuccess:[],
+            errorsImport: [],
+            erroresNoExiste: [],
+
+            parsedPreviewCsv: [],
+            selectedDelimiter: ';',
+            includeHeader: true,
+
+            pageImportar: 0,
             modalImportar: 0,
             selectedFile: null,
             csvHeaders: null,
-            selectedHeadersFromFile: [], 
-            selectedHeadersToAssign: [], 
+            selectedHeadersFromFile: [],
+            selectedHeadersToAssign: [],
             headersAssigned: false,
             previewCsv: "",
             headersArray: [
-                "Categoria",
+                "Linea",
                 "Grupo",
                 "Proveedor",
                 "Medida",
@@ -1101,16 +1211,16 @@ export default {
                 "Nombre",
                 "Nombre generico",
                 "Unidad envase",
-                "Precio List unid",
-                "Precio costo unid",
-                "Precio costo paq",
-                "precio venta",
+                "Precio List unidad",
+                "Precio costo unidad",
+                "Precio costo paquete",
+                "Precio venta",
                 "Precio uno",
                 "Precio dos",
                 "Precio tres",
                 "Precio cuatro",
                 "Stock minimo",
-                "Descripcion",
+                "Descripciòn",
                 "Estado",
                 "Costo compra",
                 "Marca",
@@ -1250,7 +1360,7 @@ export default {
             tituloModal7: '',
             medida_id: 0,
             descripcion_medida: '',
-            codigoClasificador: '',
+            descripcion_corta: '',
             medidaseleccionada: [],
         }
     },
@@ -1301,12 +1411,131 @@ export default {
             return this.fotoMuestra;
         },
     },
+    watch: {
+        selectedDelimiter: 'updateData',
+        previewCsv: 'parseCsv', // Llama a parseCsv cuando previewCsv cambie
+    },
     methods: {
+        agregarMarca(nombre) {
+            console.log("Se registrara la marca "+nombre)
+            axios.post('/marca/registrar', {
+                'nombre': nombre,
+
+            }).then(function (response) {
+            this.registrosSuccess.push("Se registro la marca "+nombre);
+
+                console.log(response);
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+
+        agregarGrupo(nombre){
+            console.log("Se registrara la marca "+nombre)
+
+        axios.post('/grupos/registrar',{
+            'nombre_grupo': nombre       
+        }).then(function (response) {
+            this.registrosSuccess.push("Se registro el grupo "+nombre);
+
+            console.log(response)
+        }).catch(function (error) {
+            console.log(error);
+        });
+    },
+    agregarLinea(nombre){
+        console.log("Se registrara la linea "+nombre)
+      
+        axios.post('/categoria/registrar',{
+            'nombre': nombre,
+            'descripcion': "",
+            'codigoProductoSin': 0
+            
+        }).then(function (response) {
+            this.registrosSuccess.push("Se registro la linea "+nombre);
+
+            console.log(response)
+        }).catch(function (error) {
+            console.log(error);
+        });
+    },
+    agregarIndustria(nombre){
+        console.log("Se registrara la marca "+nombre)
+
+        axios.post('/industria/registrar',{
+            'nombre': nombre           
+        }).then(function (response) {
+            this.registrosSuccess.push("Se registro la industria "+nombre);
+            console.log(response)
+        }).catch(function (error) {
+            console.log(error);
+        });
+    },
+        confirmarRegistro() {
+            this.erroresNoExiste.forEach((elemento) => {
+  const palabras = elemento.split(' ');
+  const primeraPalabra =palabras.shift();
+  const restoDelString = palabras.join(' '); 
+  console.log(palabras)
+  if ("Linea" === primeraPalabra) {
+    console.log("Se encontro "+restoDelString)
+    this.agregarLinea(restoDelString)
+  } else if ("Marca" === primeraPalabra) {
+    this.agregarMarca(restoDelString)
+    console.log("Se encontro "+restoDelString)
+
+
+  }else if ("Grupo" === primeraPalabra) {
+    this.agregarGrupo(restoDelString)
+    console.log("Se encontro "+restoDelString)
+
+  }else if ("Industria" === primeraPalabra) {
+    this.agregarIndustria(restoDelString)
+    console.log("Se encontro "+restoDelString)
+
+
+
+  }
+
+});
+
+this.submitForm();
+
+            // Puedes realizar alguna acción adicional aquí
+        },
+        cancelarRegistro() {
+            alert("Registro cancelado");
+            // Puedes realizar alguna acción adicional aquí
+        },
+        updateData() {
+            this.extractCSVHeaders(this.selectedFile)
+                .then(headers => {
+                    this.csvHeaders = headers;
+                })
+                .catch(error => {
+                    console.error('Error al extraer encabezados:', error);
+                });
+        },
+        parseCsv() {
+            // Divide la cadena de vista previa en filas y luego cada fila en columnas
+            this.parsedPreviewCsv = this.previewCsv.split('\n').map(row => row.split(this.selectedDelimiter));
+        },
+
+        selectAllHeaders() {
+            // Seleccionar todos los encabezados automáticamente
+            this.selectedHeadersFromFile = [...this.csvHeaders];
+        },
         abrirModalImportar() {
             this.modalImportar = 1;
         },
         cerrarModalImportar() {
             this.modalImportar = 0;
+            this.pageImportar = 0;
+            this.errorsImport = [];
+            this.erroresNoExiste = [];
+            this.successImport=false;
+            this.listarArticulo(1, '', 'nombre');
+
             this.removeFile();
         },
 
@@ -1330,18 +1559,38 @@ export default {
             this.selectedHeadersToAssign = [];
             this.headersAssigned = false;
             this.$refs.fileInput.value = '';
-            this.previewCsv="";
+            this.previewCsv = "";
+        },
+        confirmCsv() {
+            this.pageImportar += 1;
+
+            if (!this.includeHeader) {
+                const mapping = {};
+                this.csvHeaders.forEach((item, index) => {
+                    mapping[item] = (index + 1).toString();
+                });
+                const newArray = this.csvHeaders.map(item => mapping[item]);
+                this.csvHeaders = newArray;
+                console.log(this.csvHeaders);
+            }
+            console.log(this.selectedDelimiter);
         },
         assignHeaders() {
             if (!this.selectedFile) {
                 console.error("No se ha seleccionado un archivo.");
                 return;
             }
+            this.pageImportar += 1;
 
             const reader = new FileReader();
 
             reader.onload = (event) => {
-                const csvContent = event.target.result;
+                let csvContent = event.target.result;
+                if (!this.includeHeader) {
+                    const primeraFila = this.csvHeaders.join(',');
+                    csvContent = `${primeraFila}\n${csvContent}`;
+
+                }
 
                 const newCsvContent = this.getCsvSubset(csvContent, this.selectedHeadersFromFile);
 
@@ -1353,18 +1602,22 @@ export default {
 
         getCsvSubset(csvContent, selectedHeaders) {
             const rows = csvContent.split("\n");
+            const headerIndices = selectedHeaders.map((header) => rows[0].split(this.selectedDelimiter).indexOf(header));
 
-            const headerIndices = selectedHeaders.map((header) => rows[0].split(",").indexOf(header));
+            let newRows;
 
-            const newRows = rows.map((row) => {
-                const columns = row.split(",");
+            newRows = rows.slice(1).map((row) => {
+                const columns = row.split(this.selectedDelimiter);
                 return headerIndices.map((index) => columns[index]).join(",");
             });
 
-            const newCsvContent = newRows.join("\n");
 
+            const newCsvContent = newRows.join("\n");
+            console.log(newCsvContent);
+            console.log(this.includeHeader)
             return newCsvContent;
         },
+
 
         downloadCsv() {
             const blob = new Blob([this.previewCsv], { type: "text/csv" });
@@ -1376,6 +1629,7 @@ export default {
         createNewCsvData() {
             const selectedHeadersFromFile = this.selectedHeadersFromFile;
             const selectedHeadersToAssign = this.selectedHeadersToAssign;
+            console.log("xd")
 
             const newData = this.csvData.map((row) => {
                 const newRow = {};
@@ -1400,13 +1654,14 @@ export default {
             return newCsvContent.join('\n');
         },
         extractCSVHeaders(file) {
+            console.log("XDDD esta por acaaaa")
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
 
                 reader.onload = (e) => {
                     const content = e.target.result;
                     const rows = content.split('\n');
-                    const headers = rows[0].split(',');
+                    const headers = rows[0].split(this.selectedDelimiter);
                     resolve(headers);
                 };
 
@@ -1422,6 +1677,8 @@ export default {
                 alert('No hay un nuevo CSV para importar.');
                 return;
             }
+            this.pageImportar = 3;
+
 
             const blob = new Blob([this.previewCsv], { type: 'text/csv' });
             const newCsvFile = new File([blob], 'nuevo_csv.csv', { type: 'text/csv' });
@@ -1430,19 +1687,28 @@ export default {
             axios.post('/articulos/importar', formData)
                 .then(response => {
                     console.log(response);
-                    alert('Importación exitosa.');
-                    this.cerrarModalImportar();
-                    this.listarArticulo(1, '', 'nombre');
+                    this.erroresNoExiste=[];
+                    this.errorsImport=[];
+                    this.successImport=true;
+
                 })
                 .catch(error => {
                     if (error.response && error.response.status === 422) {
-                        this.errors = error.response;
-                        console.log(error.response.data);
-                        this.errors = error.response.data.errors;
-                        alert('Error de validación durante la importación.');
+                        const datos = error.response.data.errors;
+                        console.log(datos);
+                        this.erroresNoExiste = datos.flatMap(item => {
+                            const match = item.match(/No existe '([^']+)'/);
+                            return match ? [match[1]] : [];
+                        });
+                        console.log("Estos no existen: ",this.erroresNoExiste)
+                        this.errorsImport = datos.filter(item => !item.includes("No existe"));
+                        this.erroresNoExiste = this.erroresNoExiste.filter((valor, indice, array) => array.indexOf(valor) === indice);
+                        // Mostrar el nuevo array con los elementos filtrados
+                        console.log(this.erroresNoExiste);
+                        console.log(this.errorsImport)
+
                     } else {
                         console.error(error);
-                        alert('Error durante la importación.');
                     }
                 });
 
@@ -2773,7 +3039,17 @@ export default {
     }
 }
 </script>
-<style>    .csv-headers-container {
+<style>    .card-error {
+        margin-bottom: 10px;
+        width: 100%;
+        padding: 15px;
+        border-radius: 15px;
+        border: 2px solid #ab7078;
+        background-color: #fec0ca;
+
+    }
+
+    .csv-headers-container {
         margin-top: 10px;
     }
 
@@ -2808,18 +3084,19 @@ export default {
 
     .selected-headers-list {
         list-style-type: none;
-        padding: 0;
+        padding: 10px;
         display: flex;
         flex-wrap: wrap;
     }
 
-    .selected-header {
-        background-color: #4CAF50;
-        color: white;
-        padding: 5px 10px;
-        margin: 5px;
-        border-radius: 5px;
-    }
+    /* .selected-header {
+        box-shadow: 10px 5px 5px black;
+        color: black;
+
+        -webkit-box-shadow: 3px -7px 38px -1px rgba(27, 209, 11, 0.69);
+        -moz-box-shadow: 3px -7px 38px -1px rgba(27, 209, 11, 0.69);
+        box-shadow: 3px -7px 38px -1px rgba(27, 209, 11, 0.69);
+    } */
 
     .modal-content {
         width: 100% !important;
@@ -2845,6 +3122,11 @@ export default {
         font-weight: bold;
     }
 
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+
     .sticky-column {
         position: sticky;
         left: 0;
@@ -2854,4 +3136,196 @@ export default {
 
     .border-red {
         border-color: red !important;
-    }</style>
+    }
+
+    .loader {
+        display: block;
+        position: relative;
+        height: 12px;
+        width: 100%;
+        border: 1px solid #fff;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .loader::after {
+        content: '';
+        width: 40%;
+        height: 100%;
+        background: #FF3D00;
+        position: absolute;
+        top: 0;
+        left: 0;
+        box-sizing: border-box;
+        animation: animloader 2s linear infinite;
+    }
+
+    @keyframes animloader {
+        0% {
+            left: 0;
+            transform: translateX(-100%);
+        }
+
+        100% {
+            left: 100%;
+            transform: translateX(0%);
+        }
+    }
+    /**
+ * Extracted from: SweetAlert
+ * Modified by: Istiak Tridip
+ */
+.success-checkmark {
+    width: 80px;
+    height: 115px;
+    margin: 0 auto;
+    
+    .check-icon {
+        width: 80px;
+        height: 80px;
+        position: relative;
+        border-radius: 50%;
+        box-sizing: content-box;
+        border: 4px solid #4CAF50;
+        
+        &::before {
+            top: 3px;
+            left: -2px;
+            width: 30px;
+            transform-origin: 100% 50%;
+            border-radius: 100px 0 0 100px;
+        }
+        
+        &::after {
+            top: 0;
+            left: 30px;
+            width: 60px;
+            transform-origin: 0 50%;
+            border-radius: 0 100px 100px 0;
+            animation: rotate-circle 4.25s ease-in;
+        }
+        
+        &::before, &::after {
+            content: '';
+            height: 100px;
+            position: absolute;
+            background: #FFFFFF;
+            transform: rotate(-45deg);
+        }
+        
+        .icon-line {
+            height: 5px;
+            background-color: #4CAF50;
+            display: block;
+            border-radius: 2px;
+            position: absolute;
+            z-index: 10;
+            
+            &.line-tip {
+                top: 46px;
+                left: 14px;
+                width: 25px;
+                transform: rotate(45deg);
+                animation: icon-line-tip 0.75s;
+            }
+            
+            &.line-long {
+                top: 38px;
+                right: 8px;
+                width: 47px;
+                transform: rotate(-45deg);
+                animation: icon-line-long 0.75s;
+            }
+        }
+        
+        .icon-circle {
+            top: -4px;
+            left: -4px;
+            z-index: 10;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            position: absolute;
+            box-sizing: content-box;
+            border: 4px solid rgba(76, 175, 80, .5);
+        }
+        
+        .icon-fix {
+            top: 8px;
+            width: 5px;
+            left: 26px;
+            z-index: 1;
+            height: 85px;
+            position: absolute;
+            transform: rotate(-45deg);
+            background-color: #FFFFFF;
+        }
+    }
+}
+
+@keyframes rotate-circle {
+    0% {
+        transform: rotate(-45deg);
+    }
+    5% {
+        transform: rotate(-45deg);
+    }
+    12% {
+        transform: rotate(-405deg);
+    }
+    100% {
+        transform: rotate(-405deg);
+    }
+}
+
+@keyframes icon-line-tip {
+    0% {
+        width: 0;
+        left: 1px;
+        top: 19px;
+    }
+    54% {
+        width: 0;
+        left: 1px;
+        top: 19px;
+    }
+    70% {
+        width: 50px;
+        left: -8px;
+        top: 37px;
+    }
+    84% {
+        width: 17px;
+        left: 21px;
+        top: 48px;
+    }
+    100% {
+        width: 25px;
+        left: 14px;
+        top: 45px;
+    }
+}
+
+@keyframes icon-line-long {
+    0% {
+        width: 0;
+        right: 46px;
+        top: 54px;
+    }
+    65% {
+        width: 0;
+        right: 46px;
+        top: 54px;
+    }
+    84% {
+        width: 55px;
+        right: 0px;
+        top: 35px;
+    }
+    100% {
+        width: 47px;
+        right: 8px;
+        top: 38px;
+    }
+}
+    </style>

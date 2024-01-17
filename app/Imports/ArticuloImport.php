@@ -68,97 +68,114 @@ class ArticuloImport implements ToCollection
     public function collection(Collection $rows)
     {
         $rowNumber = 1;
-        foreach ($rows as $row) {
-            Log::info('Nombre de categoría en CSV: ' . $row[0]);
-            Log::info('Nombre de grupo en CSV: ' . $row[1]);
-            Log::info('Nombre de proveedor en CSV: ' . $row[2]);
-            Log::info('Descripción de medida en CSV: ' . $row[3]);
-            Log::info('Nombre de marca en CSV: ' . $row[20]);
-            Log::info('Nombre de industria en CSV: ' . $row[21]);
+        $importacionExitosa = true; // Bandera para seguir si la importación es exitosa
 
-            $idCategoria = $this->getCategoriaId($row[0]);
-            Log::info('ID de categoría obtenido: ' . $idCategoria);
+        try {
+            \DB::beginTransaction();
 
-            $idGrupo = $this->getGrupoId($row[1]);
-            Log::info('ID de grupo obtenido: ' . $idGrupo);
+            foreach ($rows as $row) {
+                Log::info('Nombre de categoría en CSV: ' . $row[0]);
+                Log::info('Nombre de grupo en CSV: ' . $row[1]);
+                Log::info('Nombre de proveedor en CSV: ' . $row[2]);
+                Log::info('Descripción de medida en CSV: ' . $row[3]);
+                Log::info('Nombre de marca en CSV: ' . $row[20]);
+                Log::info('Nombre de industria en CSV: ' . $row[21]);
 
-            $idProveedor = $this->getProveedorId($row[2]);
-            Log::info('ID de proveedor obtenido: ' . $idProveedor);
+                $idCategoria = $this->getCategoriaId($row[0]);
+                Log::info('ID de categoría obtenido: ' . $idCategoria);
 
-            $idMedida = $this->getMedidaId($row[3]);
-            Log::info('ID de medida obtenido: ' . $idMedida);
+                $idGrupo = $this->getGrupoId($row[1]);
+                Log::info('ID de grupo obtenido: ' . $idGrupo);
 
-            $idMarca = $this->getMarcaId($row[20]);
-            Log::info('ID de marca obtenido: ' . $idMarca);
+                $idProveedor = $this->getProveedorId($row[2]);
+                Log::info('ID de proveedor obtenido: ' . $idProveedor);
 
-            $idIndustria = $this->getIndustriaId($row[21]);
-            Log::info('ID de industria obtenido: ' . $idIndustria);
+                $idMedida = $this->getMedidaId($row[3]);
+                Log::info('ID de medida obtenido: ' . $idMedida);
 
-            try {
-                Articulo::create([
-                    'idcategoria' => $idCategoria,
-                    'idgrupo' => $idGrupo,
-                    'idproveedor' => $idProveedor,
-                    'idmedida' => $idMedida,
-                    'codigo' => $row[4],
-                    'nombre' => $row[5],
-                    'nombre_generico' => $row[6],
-                    'unidad_envase' => $row[7],
-                    'precio_list_unid' => $row[8],
-                    'precio_costo_unid' => $row[9],
-                    'precio_costo_paq' => $row[10],
-                    'precio_venta' => $row[11],
-                    'precio_uno' => $row[12],
-                    'precio_dos' => $row[13],
-                    'precio_tres' => $row[14],
-                    'precio_cuatro' => $row[15],
-                    'stock' => $row[16],
-                    'descripcion' => $row[17],
-                    'condicion' => $row[18],
-                    'costo_compra' => $row[19],
-                    'fotografia' => null, // Puedes ajustar esta columna según tus necesidades
-                    'idmarca' => $idMarca,
-                    'idindustria' => $idIndustria,
-                    // ... agrega otras columnas según sea necesario
-                ]);
-            } catch (Exception $e) {
-                if (!$idCategoria) {
-                    $this->errors[] = "Error fila $rowNumber: La categoria no se encuentra registrada";
-                } else if (!$idGrupo) {
-                    $this->errors[] = "Error fila $rowNumber: El grupo no se encuentra registrado";
-                } else if (!$idProveedor) {
-                    $this->errors[] = "Error fila $rowNumber: El proveedor no existe";
-                } else if (!$idMedida) {
-                    $this->errors[] = "Error fila $rowNumber: La medida no existe";
-                } else if (!$idMarca) {
-                    $this->errors[] = "Error fila $rowNumber: La marca no existe";
-                } else if (!$idIndustria) {
-                    $this->errors[] = "Error fila $rowNumber: La industria no se encontro en la base de datos";
-                } else if (strpos($e->getMessage(), "Integrity constraint violation: 1062") !== false) {
-                    $this->errors[] = "Error fila $rowNumber: El producto '$row[5]' ya existe";
+                $idMarca = $this->getMarcaId($row[20]);
+                Log::info('ID de marca obtenido: ' . $idMarca);
 
-                } else {
-                    $this->errors[] = "Error al procesar fila: " . $e->getMessage();
+                $idIndustria = $this->getIndustriaId($row[21]);
+                Log::info('ID de industria obtenido: ' . $idIndustria);
 
+                try {
+                    Articulo::create([
+                        'idcategoria' => $idCategoria,
+                        'idgrupo' => $idGrupo,
+                        'idproveedor' => $idProveedor,
+                        'idmedida' => $idMedida,
+                        'codigo' => $row[4],
+                        'nombre' => $row[5],
+                        'nombre_generico' => $row[6],
+                        'unidad_envase' => $row[7],
+                        'precio_list_unid' => $row[8],
+                        'precio_costo_unid' => $row[9],
+                        'precio_costo_paq' => $row[10],
+                        'precio_venta' => $row[11],
+                        'precio_uno' => $row[12],
+                        'precio_dos' => $row[13],
+                        'precio_tres' => $row[14],
+                        'precio_cuatro' => $row[15],
+                        'stock' => $row[16],
+                        'descripcion' => $row[17],
+                        'condicion' => $row[18],
+                        'costo_compra' => $row[19],
+                        'fotografia' => null,
+                        'idmarca' => $idMarca,
+                        'idindustria' => $idIndustria,
+                    ]);
+                } catch (Exception $e) {
+                    if (!$idCategoria) {
+                        $this->errors[] = "Error fila $rowNumber: No existe 'Linea $row[0]' ";
+                    } else if (!$idGrupo) {
+                        $this->errors[] = "Error fila $rowNumber: No existe 'Grupo $row[1]'";
+                    } else if (!$idProveedor) {
+                        $this->errors[] = "Error fila $rowNumber: El proveedor '$row[2]' no está registrado";
+                    } else if (!$idMedida) {
+                        $this->errors[] = "Error fila $rowNumber: La medida '$row[3]' no está registrado en la base de datos";
+                    } else if (!$idMarca) {
+                        $this->errors[] = "Error fila $rowNumber: No existe 'Marca $row[21]'";
+                    } else if (!$idIndustria) {
+                        $this->errors[] = "Error fila $rowNumber: No existe 'Industria $row[22]'";
+                    } else if (strpos($e->getMessage(), "Integrity constraint violation: 1062") !== false) {
+                        $this->errors[] = "Error fila $rowNumber: El producto '$row[5]' ya existe";
+                    } else {
+                        $this->errors[] = "Error al procesar fila: " . $e->getMessage();
+                    }
+
+                    $importacionExitosa = false; // Si hay un error, la importación no es exitosa
                 }
+
+                $rowNumber++;
             }
-            $rowNumber++;
+
+            if ($importacionExitosa) {
+                \DB::commit(); // Confirmar la transacción si no hay errores
+            } else {
+                \DB::rollBack(); // Revertir la transacción en caso de error
+            }
+        } catch (Exception $e) {
+            \DB::rollBack(); // Revertir la transacción en caso de error
+            $importacionExitosa = false;
+            $this->errors[] = "Error al procesar fila: " . $e->getMessage();
         }
 
-        return $this->getErrorsResponse();
+        return $this->getErrorsResponse($importacionExitosa);
     }
+
     public function getErrors()
     {
         return $this->errors ?? [];
     }
 
-    private function getErrorsResponse()
+    private function getErrorsResponse($importacionExitosa)
     {
-        if (!empty($this->errors)) {
+        if (!$importacionExitosa) {
             return response()->json(['errors' => $this->errors], 422);
+        } else {
+            return response()->json(['mensaje' => 'Importación exitosa'], 200);
         }
-
-        return response()->json(['mensaje' => 'Importación exitosa'], 200);
     }
 
     private function getCategoriaId($nombreCategoria)

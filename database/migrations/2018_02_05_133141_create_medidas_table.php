@@ -16,7 +16,7 @@ class CreateMedidasTable extends Migration
         Schema::create('medidas', function (Blueprint $table) {
             $table->increments('id');
             $table->string('descripcion_medida', 100);
-            $table->string('descripcion_corta', 8);
+            $table->string('codigoClasificador', 8);
             $table->boolean('estado')->default(1);
             $table->timestamps();
         });
