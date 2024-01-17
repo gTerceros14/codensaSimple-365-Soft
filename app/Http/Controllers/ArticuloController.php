@@ -166,72 +166,51 @@ class ArticuloController extends Controller
         return ['articulos' => $articulos];
     }
 
-    /*public function listarArticuloVenta(Request $request)
-    {
-        if (!$request->ajax())
-            return redirect('/');
-
-        $buscar = $request->buscar;
-        $criterio = $request->criterio;
-
-        if ($buscar == '') {
-            $articulos = Articulo::join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
-                ->select('articulos.id', 'articulos.idcategoria', 'articulos.codigo', 'articulos.nombre', 'categorias.nombre as nombre_categoria', 'articulos.precio_venta', 'articulos.stock', 'articulos.descripcion', 'articulos.fecha_vencimiento', 'articulos.condicion')
-                ->where('articulos.stock', '>', '0')
-                ->orderBy('articulos.id', 'desc')->paginate(10);
-        } else {
-            $articulos = Articulo::join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
-                ->select('articulos.id', 'articulos.idcategoria', 'articulos.codigo', 'articulos.nombre', 'categorias.nombre as nombre_categoria', 'articulos.precio_venta', 'articulos.stock', 'articulos.descripcion', 'articulos.fecha_vencimiento', 'articulos.condicion')
-                ->where('articulos.' . $criterio, 'like', '%' . $buscar . '%')
-                ->where('articulos.stock', '>', '0')
-                ->orderBy('articulos.id', 'desc')->paginate(10);
-        }
-
-
-        return ['articulos' => $articulos];
-    }*/
-
     public function listarArticuloVenta(Request $request)
     {
         if (!$request->ajax()) {
             return redirect('/');
         }
-
+    
         $buscar = $request->buscar;
         $criterio = $request->criterio;
         $idAlmacen = $request->idAlmacen;
         $fechaActual = now();
-
+    
         $query = Articulo::join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
             ->join('medidas', 'articulos.idmedida', '=', 'medidas.id')
             ->select('articulos.id', 'medidas.descripcion_medida', 'articulos.idcategoria', 'articulos.codigo', 'articulos.nombre', 'categorias.nombre as nombre_categoria', 'articulos.precio_venta', 'articulos.descripcion', 'articulos.condicion',
                 'articulos.precio_uno',
                 'articulos.precio_dos',
                 'articulos.precio_tres',
-                'articulos.precio_cuatro'
+                'articulos.precio_cuatro',
+                'articulos.fotografia',
+                'articulos.unidad_envase',
+                // 'articulos.precio_costo_unid',
+                // 'articulos.precio_costo_paq',
             )
             ->where('articulos.stock', '>', '0');
-
+    
         if ($buscar != '') {
             $query->where('articulos.' . $criterio, 'like', '%' . $buscar . '%');
         }
-
+    
         $articulos = $query->get();
-
+    
         $articulosConSaldo = [];
-
+    
         foreach ($articulos as $articulo) {
             $saldoStock = Inventario::where('idarticulo', $articulo->id)
                 ->where('idalmacen', $idAlmacen)
                 ->where('fecha_vencimiento', '>', $fechaActual)
                 ->sum('saldo_stock');
-
+            
             if ($saldoStock > 0) {
                 $articulo->saldo_stock = $saldoStock;
                 $articulosConSaldo[] = $articulo;
             }
         }
-
+    
         return ['articulos' => $articulosConSaldo];
     }
 

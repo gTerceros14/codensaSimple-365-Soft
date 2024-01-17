@@ -54,7 +54,11 @@ Vue.component('linea', require('./components/Linea.vue'));
 Vue.component('industria', require('./components/Industria.vue'));
 Vue.component('configuracion', require('./components/Configuracion.vue'));
 Vue.component('cotizacioncompras', require('./components/CotizacionCompras.vue'));
-Vue.component('cotizacionventas', require('./components/CotizacionVentas.vue'));
+// Vue.component('cotizacionventas', require('./components/CotizacionVentas.vue'));
+Vue.component('cotizacionventas', require('./components/cotizacion/listacotizacion/CotizacionVentas.vue'));
+//Vue.component('registrarcompra', require('./components/cotizacion/registrocotizacion/RegistrarCompra.vue'));
+Vue.component('detallecotizacionventa', require('./components/cotizacion/detallecotizacion/DetalleCotizacionVenta.vue'));
+
 Vue.component('almacenes', require('./components/Almacens.vue'));
 Vue.component('inventarios', require('./components/Inventario.vue'));
 Vue.component('grupos', require('./components/Grupo.vue'));

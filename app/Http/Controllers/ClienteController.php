@@ -43,7 +43,7 @@ class ClienteController extends Controller
         $filtro = $request->filtro;
         $clientes = Persona::where('nombre', 'like', '%'. $filtro . '%')
         ->orWhere('num_documento', 'like', '%'. $filtro . '%')
-        ->select('id','nombre','num_documento','email')
+        ->select('id','nombre','num_documento','email','telefono')
         ->orderBy('nombre', 'asc')->get();
  
         return ['clientes' => $clientes];

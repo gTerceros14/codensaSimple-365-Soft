@@ -170,6 +170,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/cotizacionventa/pdf/{id}', 'CotizacionVentaController@pdf')->name('venta_pdf');
         Route::put('/cotizacionventa/activar', 'CotizacionVentaController@activar');
         Route::put('/cotizacionventa/eliminar', 'CotizacionVentaController@delete');
+        Route::get('/cotizacionventa/obtenerDetalles', 'CotizacionVentaController@obtenerDetalles');
+        Route::put('cotizacionventa/editar', 'CotizacionVentaController@editar');
 
         Route::get('/rol', 'RolController@index');
         Route::get('/rol/selectRol', 'RolController@selectRol');
