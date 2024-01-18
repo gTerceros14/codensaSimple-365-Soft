@@ -16,13 +16,13 @@ class AddNuevasColumnasSucursales extends Migration
         Schema::table('sucursales', function (Blueprint $table) {
             //
             $table->string('responsable', 50)->nullable();
-            $table->string('sigla', 20);
+            // $table->string('sigla', 20);
             $table->string('nro_auth', 20)->nullable();
-            $table->enum('facturacion', ['W','N'])->default('W');
-            $table->enum('fac3ros', ['S','N'])->default('N');
+            $table->enum('facturacion', ['W', 'N'])->default('W');
+            $table->enum('fac3ros', ['S', 'N'])->default('N');
             $table->string('nit3ros', 20)->nullable();
             $table->string('empresa3ros', 20)->nullable();
-            $table->enum('casamatriz', ['S','N'])->default('N');
+            $table->enum('casamatriz', ['S', 'N'])->default('N');
             $table->text('leyenda')->nullable();
             $table->string('cuenta', 50)->nullable();
         });
