@@ -23,10 +23,11 @@ class EmpresaController extends Controller
      */
     public function index(Request $request)
     {
-        if(!$request->ajax()) return redirect('/');
+        if (!$request->ajax())
+            return redirect('/');
 
         $empresa = Empresa::first();
-    
+
         return ['empresa' => $empresa];
     }
 
@@ -82,9 +83,11 @@ class EmpresaController extends Controller
      */
     public function update(Request $request)
     {
-        if (!$request->ajax()) return redirect('/'); 
+        if (!$request->ajax()) {
+            return redirect('/');
+        }
 
-        try{
+        try {
             DB::beginTransaction();
 
             $empresa = Empresa::findOrFail($request->id);
@@ -92,20 +95,18 @@ class EmpresaController extends Controller
             $empresa->direccion = $request->direccion;
             $empresa->telefono = $request->telefono;
             $empresa->email = $request->email;
-            $empresa->monedaPrincipal = $request->monedaPrincipal;
-            $empresa->valorMaximoDescuento = $request->valorMaximoDescuento;
-            $empresa->tipoCambio1 = $request->tipoCambio1;
-            $empresa->tipoCambio2 = $request->tipoCambio2;
-            $empresa->tipoCambio3 = $request->tipoCambio3;
+            $empresa->nit = $request->nit;
             $empresa->licencia = $request->licencia;
 
             $empresa->save();
 
             DB::commit();
-        } catch (Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
+            throw $e;
         }
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -114,10 +115,12 @@ class EmpresaController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function selectEmpresa(Request $request){
-        
-        if (!$request->ajax()) return redirect('/');
-        $empresas = Empresa::select('id','nombre')->orderBy('nombre', 'asc')->get();
+    public function selectEmpresa(Request $request)
+    {
+
+        if (!$request->ajax())
+            return redirect('/');
+        $empresas = Empresa::select('id', 'nombre')->orderBy('nombre', 'asc')->get();
         return ['empresas' => $empresas];
     }
 }
