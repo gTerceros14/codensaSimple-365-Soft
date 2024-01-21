@@ -220,6 +220,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/moneda/activar', 'MonedaController@activar');
         Route::put('/moneda/desactivar', 'MonedaController@desactivar');
         Route::put('/moneda/actualizar', 'MonedaController@update');
+        Route::get('/moneda/selectMoneda', 'MonedaController@selectMoneda');
+
 
         //APERTURA/CIERRE CAJA
         //Listar

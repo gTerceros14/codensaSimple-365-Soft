@@ -19,8 +19,7 @@ class CreateMonedasTable extends Migration
             $table->string('nombre', 50)->unique();
             $table->string('pais', 30);
             $table->string('simbolo', 5);
-            $table->decimal('compra', 10, 2);
-            $table->decimal('venta', 10, 2);
+            $table->decimal('tipo_cambio', 10, 2);
             $table->boolean('activo')->default(1);
             $table->timestamps();
 
