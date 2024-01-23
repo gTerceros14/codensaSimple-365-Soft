@@ -109,5 +109,21 @@ class MonedaController extends Controller
 
         return ['monedas' => $monedas];
     }
+    public function getMonedaById(Request $request)
+    {
+        if (!$request->ajax()) {
+            return redirect('/');
+        }
+
+        $id = $request->id;
+
+        $moneda = Moneda::join('empresas', 'monedas.idempresa', '=', 'empresas.id')
+            ->select('monedas.id', 'monedas.idempresa', 'empresas.nombre as nombre_empresa', 'monedas.nombre', 'monedas.pais', 'monedas.simbolo', 'monedas.tipo_cambio', 'monedas.activo', 'monedas.updated_at')
+            ->where('monedas.id', '=', $id)
+            ->first();
+
+        return ['moneda' => $moneda];
+    }
+
 
 }

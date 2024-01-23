@@ -90,6 +90,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/configuracion/iva', 'ConfiguracionTrabajoController@obtenerIva');
         Route::get('/configuracion/editar', 'ConfiguracionTrabajoController@edit');
         Route::put('/configuracion/actualizar', 'ConfiguracionTrabajoController@update');
+        Route::get('/configuracion', 'ConfiguracionTrabajoController@index');
+
         Route::get('/backup', 'BackupDbController@createBackup');
         Route::get('/categoria', 'CategoriaController@index');
         Route::post('/categoria/registrar', 'CategoriaController@store');
@@ -221,7 +223,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/moneda/desactivar', 'MonedaController@desactivar');
         Route::put('/moneda/actualizar', 'MonedaController@update');
         Route::get('/moneda/selectMoneda', 'MonedaController@selectMoneda');
+        Route::get('/moneda/selectMoneda', 'MonedaController@selectMoneda');
 
+        Route::get('/moneda/{id}', 'MonedaController@getMonedaById');
 
         //APERTURA/CIERRE CAJA
         //Listar

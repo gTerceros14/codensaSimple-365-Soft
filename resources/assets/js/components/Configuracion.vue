@@ -137,6 +137,8 @@
                                 </select>
                             </div>
                         </div>
+
+
                         <!-- <div class="col">
                             <div class="form-group">
                                 <label for="opcion2">Moneda de trabajo:</label>
@@ -158,58 +160,41 @@
                         </div> -->
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-4">
-                           <button type="button" @click="abrirModal('precioss', 'registrar')" class="btn btn-secondary">
-                                <i class="icon-plus"></i>&nbsp;Nuevo Precio
-                            </button>
-                        </div>
-                    </div> 
+               
 
-                    <div v-for="precio in precios" :key="precio.id" class="row">
-                        <div class="col-md-4">
-                            <label>Mostrar:</label>
-                            <div class="input-group" style="width: 150px">
-                                <select class="form-control" v-model="precio.condicion">
-                                    <option :value=1>Sí</option>
-                                    <option :value=0>No</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label>Etiqueta Nro de Precio:</label>
-                            <div class="input-group" style="width: 200px">
-                                <input type="text" class="form-control" placeholder="Porcentaje" :value="precio.nombre_precio">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label>% Margen:</label>
-                            <div class="input-group" style="width: 60px">
-                                <input type="number" class="form-control" :value="precio.porcentage">
-                            </div>
-                        </div>
-                    </div>                
-
-                    <div class="row">
+<div class="row">
                         <div class="col">
                             <div class="form-group">
-                                <label for="opcion1">Mostrar costos:</label>
-                                <select id="opcion1" class="form-control" v-model="mostrarCostos">
-                                    <option value="0">No</option>
-                                    <option value="1">Si</option>
+                                <label for="" class="font-weight-bold">Moneda principal <span class="text-danger">*</span></label>
+
+                                <select class="form-control" v-model="idMonedaPrincipal" >
+                                    <option disabled value="-1">Selecciona una moneda</option>
+                                    <option v-for="moneda in arrayMonedas" :key="moneda.id" :value="moneda.id">{{ moneda.nombre }}</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
-                                <label for="opcion2">Mostrar proveedor:</label>
-                                <select id="opcion2" class="form-control" v-model="mostrarProveedor">
-                                    <option value="0">No</option>
-                                    <option value="1">Si</option>
+                                <label for="" class="font-weight-bold">Moneda Ventas <span class="text-danger">*</span></label>
+
+                                <select class="form-control" v-model="idMonedaVenta" >
+                                    <option disabled value="-1">Selecciona una moneda</option>
+                                    <option v-for="moneda in arrayMonedas" :key="moneda.id" :value="moneda.id">{{ moneda.nombre }}</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col">
+                            <div class="form-group">
+                                <label for="" class="font-weight-bold">Moneda Compras <span class="text-danger">*</span></label>
+
+                                <select class="form-control" v-model="idMonedaCompra" >
+                                    <option disabled value="-1">Selecciona una moneda</option>
+                                    <option v-for="moneda in arrayMonedas" :key="moneda.id" :value="moneda.id">{{ moneda.nombre }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col">
+
                             <label for="opcion3">Mostrar saldos stock:</label>
 
                             <div class="form-group">
@@ -230,62 +215,51 @@
                             </div>
                         </div>
                     </div>
+<hr/>
 
+<div class="row">
+    <div class="col-md-4">
 
-
-                    <!-- <div class="row">
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="opcion1">Vendedor asignado:</label>
-                                <select id="opcion1" class="form-control" v-model="vendedorAsignado">
-                                    <option value="No permite cambiar el vendedor">No permite cambiar el vendedor</option>
-                                    <option value="opcion1_valor2">Valor 2</option>
-                                    <option value="opcion1_valor3">Valor 3</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div> -->
-                    <!-- <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="opcion1">Permitir devolución:</label>
-                                <select id="opcion1" class="form-control" v-model="devolucion">
-                                    <option value="1">Si</option>
-                                    <option value="0">No</option>
-                                </select>
-                            </div>
+<label>Configuración de precios</label>
+<br/>
+    </div>
+                        <!-- <div class="col-md-4">
+                           <button type="button" @click="abrirModal('precioss', 'registrar')" class="btn btn-success">
+                                <i class="icon-plus"></i>&nbsp;Nuevo Precio
+                            </button>
                         </div> -->
-<!--
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="opcion1">Editar Nro Doc:</label>
-                                <select id="opcion1" class="form-control" v-model="editarNroDoc">
-                                    <option value="0">No</option>
-                                    <option value="1">Si</option>
+                    </div> 
+                    <div v-for="precio in precios" :key="precio.id" class="row ">
+          
+                        <div class="col-md-4">
+                            <label>Etiqueta de Precio:</label>
+                            <div class="input-group" style="width: 100%">
+                                <input type="text" class="form-control" placeholder="Porcentaje" :value="precio.nombre_precio">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label>% Margen:</label>
+                            <div class="input-group" style="width: 100%">
+                                <input type="number" class="form-control" :value="precio.porcentage">
+                            </div>
+                        </div>
+                                      <div class="col-md-4">
+                            <label>Mostrar:</label>
+                            <div class="input-group" style="width: 100%">
+                                <select class="form-control" v-model="precio.condicion">
+                                    <option :value=1>Sí</option>
+                                    <option :value=0>No</option>
                                 </select>
                             </div>
                         </div>
+                        <br/>
+                        <br/>
+                        <br/>
 
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="opcion1">Registro de cliente obligatorio:</label>
-                                <select id="opcion1" class="form-control" v-model="registroClienteObligatorio">
-                                    <option value="0">No</option>
-                                    <option value="1">Si</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="opcion1">Buscar cliente por codigo:</label>
-                                <select id="opcion1" class="form-control" v-model="buscarClientePorCodigo">
-                                    <option value="0">No</option>
-                                    <option value="1">Si</option>
-                                </select>
-                            </div>
-                        </div>
--->
-                    <!-- </div>  -->
+
+                    </div>                
+
+
 
 
                     <div class="row">
@@ -349,49 +323,7 @@
                 <!-- fin del contenido 2-->
                 <!-- contenido 3 -->
                 <div class="card-body" v-show="activeTab === 2">
-                    <!-- 
-               <div class="row">
-                   <div class="col">
-                       <div class="form-group">
-                       <label for="opcion1">Opción 1:</label>
-                       <select id="opcion1" class="form-control" v-model="opcion1">
-                           <option value="">Seleccionar</option>
-                           <option value="opcion1_valor1">Valor 1</option>
-                           <option value="opcion1_valor2">Valor 2</option>
-                           <option value="opcion1_valor3">Valor 3</option>
-                       </select>
-                       </div>
-                   </div>
-                   <div class="col">
-                       <div class="form-group">
-                       <label for="opcion2">Opción 2:</label>
-                       <select id="opcion2" class="form-control" v-model="opcion2">
-                           <option value="">Seleccionar</option>
-                           <option value="opcion2_valor1">Valor 1</option>
-                           <option value="opcion2_valor2">Valor 2</option>
-                           <option value="opcion2_valor3">Valor 3</option>
-                       </select>
-                       </div>
-                   </div>
-                   <div class="col">
-                       <div class="form-group">
-                       <label for="opcion3">Opción 3:</label>
-                       <select id="opcion3" class="form-control" v-model="opcion3">
-                           <option value="">Seleccionar</option>
-                           <option value="opcion3_valor1">Valor 1</option>
-                           <option value="opcion3_valor2">Valor 2</option>
-                           <option value="opcion3_valor3">Valor 3</option>
-                       </select>
-                       </div>
-                   </div>
-                </div>
-                
-                <div class="row">
-                   <div class="col">
-                       <button class="btn btn-primary" @click="guardar">Guardar</button>
-                       <button class="btn btn-secondary" @click="cancelar">Cancelar</button>
-                   </div>
-                </div> -->
+                   
                 </div>
 
                 <!-- fin del contenido 3-->
@@ -431,6 +363,15 @@
 export default {
     data() {
         return {
+            idMonedaVenta:-1,
+            idMonedaCompra:1,
+            idMonedaPrincipal:-1,
+
+         
+            
+            arrayMonedas:'',
+            monedaSeleccionada:-1,
+
             id: 0,
             selectedYear: '',
             codigoProducto: '',
@@ -479,15 +420,39 @@ export default {
             condicion : 1,
         };
     },
+    computed: {
+    idMonedaSeleccionada() {
+      const monedaSeleccionada = this.arrayMonedas.find(moneda => moneda.nombre === this.monedaSeleccionada);
+      return monedaSeleccionada ? monedaSeleccionada.id : null;
+    }
+  },
     methods: {
+
+
+        listarMonedas() {
+            let me = this;
+            var url = '/moneda/selectMoneda';
+            axios.get(url).then(function (response) {
+                let respuesta = response.data;
+                me.arrayMonedas = respuesta.monedas;
+                console.log(respuesta)
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
         datosConfiguracion() {
             let me = this;
             var url = '/configuracion/editar';
 
             axios.get(url).then(function (response) {
-                var respuesta = response.data;
+                let respuesta = response.data;
                 console.log(respuesta);
                 me.id = respuesta.configuracionTrabajo.id;
+                me.idMonedaCompra=respuesta.configuracionTrabajo.idMonedaCompra;
+                me.idMonedaVenta=respuesta.configuracionTrabajo.idMonedaVenta;
+                me.idMonedaPrincipal=respuesta.configuracionTrabajo.idMonedaPrincipal;
+
                 me.selectedYear = respuesta.configuracionTrabajo.gestion;
                 me.codigoProducto = respuesta.configuracionTrabajo.codigoProductos;
                 me.consultarAlmacenes = respuesta.configuracionTrabajo.consultasAlmacenes;
@@ -523,6 +488,9 @@ export default {
             let me = this;
 
             axios.put('/configuracion/actualizar', {
+                'idMonedaCompra':this.idMonedaCompra,
+                'idMonedaVenta':this.idMonedaVenta,
+                'idMonedaPrincipal':this.idMonedaPrincipal,
                 'selectedYear': this.selectedYear,
                 'codigoProducto': this.codigoProducto,
                 'consultarAlmacenes': this.consultarAlmacenes,
@@ -545,7 +513,7 @@ export default {
                 'buscarClientePorCodigo': this.buscarClientePorCodigo,
                 'id': this.id
             }).then(function (response) {
-                alert('Datos de configuracion actualizado')
+                alert('Datos de configuracion actualizados')
             }).catch(function (error) {
                 console.log(error);
             });
@@ -641,8 +609,10 @@ export default {
         },
     },
     mounted() {
-        this.datosConfiguracion();
+        this.listarMonedas();
         this.listarPrecio();
+
+        this.datosConfiguracion();
     },
 };
 </script>

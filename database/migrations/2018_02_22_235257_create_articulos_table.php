@@ -25,15 +25,15 @@ class CreateArticulosTable extends Migration
             $table->string('nombre', 100)->unique(); //Nombre comercial
             $table->string('nombre_generico', 100); //aumente 5_julio
             $table->integer('unidad_envase'); //aumente
-            $table->decimal('precio_list_unid', 11, 2)->nullable(); //aumente
-            $table->decimal('precio_costo_unid', 11, 2); //aumente
-            $table->decimal('precio_costo_paq', 11, 2); //aumente
-            $table->decimal('precio_venta', 11, 2); //precio presio2
+            $table->decimal('precio_list_unid', 15, 4)->nullable(); //aumente
+            $table->decimal('precio_costo_unid', 15, 4); //aumente
+            $table->decimal('precio_costo_paq', 15, 4); //aumente
+            $table->decimal('precio_venta', 15, 4); //precio presio2
 
-            $table->decimal('precio_uno', 11, 2)->nullable();//AUMENTE 19/9/2023
-            $table->decimal('precio_dos', 11, 2)->nullable();//AUMENTE 19/9/2023
-            $table->decimal('precio_tres', 11, 2)->nullable();//AUMENTE 19/9/2023
-            $table->decimal('precio_cuatro', 11, 2)->nullable();//AUMENTE 19/9/2023
+            $table->decimal('precio_uno', 15, 4)->nullable();//AUMENTE 19/9/2023
+            $table->decimal('precio_dos', 15, 4)->nullable();//AUMENTE 19/9/2023
+            $table->decimal('precio_tres', 15, 4)->nullable();//AUMENTE 19/9/2023
+            $table->decimal('precio_cuatro', 15, 4)->nullable();//AUMENTE 19/9/2023
 
             $table->integer('stock'); //stock minimo
             $table->string('descripcion', 256)->nullable(); //stock maximo

@@ -25,6 +25,16 @@ class CreateMonedasTable extends Migration
 
             $table->foreign('idempresa')->references('id')->on('empresas');
         });
+        DB::table('monedas')->insert(
+            array(
+                'id' => '1',
+                'idempresa' => '1',
+                'nombre' => 'Dolar estadounidense',
+                'pais' => 'Estados unidos',
+                'simbolo' => 'USD',
+                'tipo_cambio' => '1'
+            )
+        );
     }
 
     /**

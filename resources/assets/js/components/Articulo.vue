@@ -93,21 +93,43 @@
                                     <td v-text="articulo.nombre"></td>
                                     <td v-text="articulo.nombre_generico"></td>
                                     <td v-text="articulo.unidad_envase"></td>
-                                    <td v-text="articulo.precio_costo_unid"></td>
-                                    <td v-text="articulo.precio_costo_paq"></td>
+                                    <td >
+                                    {{(articulo.precio_costo_unid *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                    </td>
+                                    <td >
+                                        {{(articulo.precio_costo_paq *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                    
+                                    </td>
                                     <!-- <td v-text="articulo.precio1"></td> -->
                                     <!-- <td>{{ articulo.precio1 ? articulo.precio1 : '0.00' }}</td> -->
                                     <!-- <td v-for="precio in precios" :key="precio.id">{{ precio.porcentage }}</td> -->
                                     <td v-for="(precio, index) in precios" :key="precio.id">
                                         <!-- Mostrar el precio correspondiente según el índice -->
-                                        <span v-if="index === 0">{{ articulo.precio_uno }}</span>
-                                        <span v-if="index === 1">{{ articulo.precio_dos }}</span>
-                                        <span v-if="index === 2">{{ articulo.precio_tres }}</span>
-                                        <span v-if="index === 3">{{ articulo.precio_cuatro }}</span>
+                                        <span v-if="index === 0">
+                                            
+                                            {{(articulo.precio_uno *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                        
+                                        </span>
+                                        <span v-if="index === 1">
+                                            {{(articulo.precio_dos *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                            
+                                        </span>
+                                        <span v-if="index === 2">
+                                            {{(articulo.precio_tres *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                            
+                                        
+                                        </span>
+                                        <span v-if="index === 3">
+                                            {{(articulo.precio_cuatro*parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                            
+                                        </span>
                                     </td>
 
                                     <!-- <td v-if="rolUsuario === 1" v-text="articulo.precio_venta"></td> -->
-                                    <td v-if="rolUsuario === 1 && mostrarCostos === 1" v-text="articulo.precio_venta"></td>
+                                    <td v-if="rolUsuario === 1 && mostrarCostos === 1">
+                                        {{(articulo.precio_venta*parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                    
+                                    </td>
 
                                     <td v-text="articulo.nombre_categoria"></td>
                                     <td v-text="articulo.nombre_industria"></td>
@@ -1185,6 +1207,8 @@ import VueBarcode from 'vue-barcode';
 export default {
     data() {
         return {
+            monedaPrincipal:[],
+
             successImport:false,
             registrosSuccess:[],
             errorsImport: [],
@@ -1416,6 +1440,16 @@ export default {
         previewCsv: 'parseCsv', // Llama a parseCsv cuando previewCsv cambie
     },
     methods: {
+        obtenerConfiguracionTrabajo() {
+      // Utiliza Axios para realizar la solicitud al backend
+      axios.get('/configuracion')
+        .then(response => {
+          console.log("Esta es la configuracion: ",response.data.configuracionTrabajo)
+        })
+        .catch(error => {
+          console.error('Error al obtener configuración de trabajo:', error);
+        });
+    },
         agregarMarca(nombre) {
             console.log("Se registrara la marca "+nombre)
             axios.post('/marca/registrar', {
@@ -2148,6 +2182,13 @@ this.submitForm();
             }
             reader.readAsDataURL(file);
         },
+        calcularPrecioValorMoneda(precio){
+            console.log(precio)
+            return ((precio*parseFloat(this.monedaPrincipal)).toFixed(2))
+        },
+        convertDolar(precio){
+            return (precio/parseFloat(this.monedaPrincipal))
+        },  
         registrarArticulo() {
             this.nombreProductoVacio = !this.nombre_producto;
             this.codigoVacio = !this.codigo;
@@ -2179,26 +2220,26 @@ this.submitForm();
             formData.append('idproveedor', this.proveedorseleccionada.id);
             formData.append('idgrupo', this.gruposeleccionada.id);//AUMENtE 5 julio
 
-            formData.append('precio_costo_unid', this.precio_costo_unid);
-            formData.append('precio_costo_paq', this.precio_costo_paq);
+            formData.append('precio_costo_unid', this.convertDolar( this.precio_costo_unid));
+            formData.append('precio_costo_paq', this.convertDolar(this.precio_costo_paq));
 
             formData.append('codigo', this.codigo);
             formData.append('nombre', this.nombre_producto);
             formData.append('nombre_generico', this.nombre_generico);//AUMENtE 5 julio
             formData.append('unidad_envase', this.unidad_envase);
             formData.append('stock', this.stock);
-            formData.append('precio_venta', this.precio_venta);
+            formData.append('precio_venta', this.convertDolar(this.precio_venta));
 
-            formData.append('precio_uno', this.precio_uno);
-            formData.append('precio_dos', this.precio_dos);
-            formData.append('precio_tres', this.precio_tres);
-            formData.append('precio_cuatro', this.precio_cuatro);
+            formData.append('precio_uno',this.convertDolar( this.precio_uno));
+            formData.append('precio_dos', this.convertDolar(this.precio_dos));
+            formData.append('precio_tres', this.convertDolar(this.precio_tres));
+            formData.append('precio_cuatro', this.convertDolar(this.precio_cuatro));
 
             formData.append('descripcion', this.descripcion);
             formData.append('fotografia', this.fotografia);
 
             formData.append('idmedida', this.medidaseleccionada.id);
-            formData.append('costo_compra', this.costo_compra);
+            formData.append('costo_compra', this.convertDolar(this.costo_compra));
 
             axios.post('/articulo/registrar', formData, {
                 headers: {
@@ -2242,17 +2283,17 @@ this.submitForm();
             formData.append('nombre', this.nombre_producto);
             formData.append('nombre_generico', this.nombre_generico);
             formData.append('stock', this.stock);
-            formData.append('precio_venta', this.precio_venta);
+            formData.append('precio_venta', this.convertDolar(this.precio_venta));
 
-            formData.append('precio_uno', this.precio_uno);
-            formData.append('precio_dos', this.precio_dos);
-            formData.append('precio_tres', this.precio_tres);
-            formData.append('precio_cuatro', this.precio_cuatro);
+            formData.append('precio_uno',this.convertDolar(this.precio_uno));
+            formData.append('precio_dos', this.convertDolar(this.precio_dos));
+            formData.append('precio_tres', this.convertDolar(this.precio_tres));
+            formData.append('precio_cuatro', this.convertDolar(this.precio_cuatro));
 
             formData.append('descripcion', this.descripcion);
             formData.append('fotografia', this.fotografia);
 
-            formData.append('costo_compra', this.costo_compra);
+            formData.append('costo_compra', this.convertDolar(this.costo_compra));
             formData.append('idmedida', this.medidaseleccionada.id);
             //formData.append('id', this.articulo_id);
 
@@ -2270,6 +2311,7 @@ this.submitForm();
                 //console.log("datos actuales",formData);
                 me.cerrarModal();
                 me.listarArticulo(1, '', 'nombre');
+                console.log(response)
             }).catch(function (error) {
                 console.log(error);
             });
@@ -2665,14 +2707,17 @@ this.submitForm();
                                     this.nombre_producto = data['nombre'];
                                     this.nombre_generico = data['nombre_generico'];
                                     this.unidad_envase = data['unidad_envase'];
-                                    this.precio_costo_unid = data['precio_costo_unid'];
+                                    this.precio_costo_unid = this.calcularPrecioValorMoneda(data['precio_costo_unid']);
+                                    
                                     this.stock = data['stock'];
-                                    this.precio_costo_paq = data['precio_costo_paq'];
-                                    this.costo_compra = data['costo_compra'];
+                                    this.precio_costo_paq = this.calcularPrecioValorMoneda(data['precio_costo_paq']);
+                                    this.costo_compra = this.calcularPrecioValorMoneda(data['costo_compra']);
                                     this.idmedida = data['idmedida']; // new
                                     // this.precio1=data['precio1'];
 
-                                    this.precio_venta = data['precio_venta'];
+                                    this.precio_venta = this.calcularPrecioValorMoneda(data['precio_venta']);
+                                    console.log("PRECIO: ",data['precio_venta'])
+                                    console.log("Precio ",this.calcularPrecioValorMoneda(data['precio_venta']));
                                     // this.precio2=data['precio2'];
                                     // this.precio3=data['precio3'];
                                     this.descripcion = data['descripcion'];
@@ -2691,10 +2736,10 @@ this.submitForm();
                                     this.gruposeleccionada = { nombre_grupo: data['nombre_grupo'], id: data['idgrupo'] };
                                     this.medidaseleccionada = { descripcion_medida: data['descripcion_medida'], id: data['idmedida'] };
 
-                                    this.precio_uno = data['precio_uno'];
-                                    this.precio_dos = data['precio_dos'];
-                                    this.precio_tres = data['precio_tres'];
-                                    this.precio_cuatro = data['precio_cuatro'];
+                                    this.precio_uno = this.calcularPrecioValorMoneda(data['precio_uno']);
+                                    this.precio_dos = this.calcularPrecioValorMoneda(data['precio_dos']);
+                                    this.precio_tres = this.calcularPrecioValorMoneda(data['precio_tres']);
+                                    this.precio_cuatro = this.calcularPrecioValorMoneda(data['precio_cuatro']);
                                     // this.precios.forEach((precio) => {
                                     //     this.calcularPrecio(precio);
                                     // });
@@ -3007,15 +3052,18 @@ this.submitForm();
             }
         },
 
+
         datosConfiguracion() {
             let me = this;
-            var url = '/configuracion/editar';
+            var url = '/configuracion';
 
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.mostrarSaldosStock = respuesta.configuracionTrabajo.mostrarSaldosStock;
                 me.mostrarCostos = respuesta.configuracionTrabajo.mostrarCostos;
                 me.mostrarProveedores = respuesta.configuracionTrabajo.mostrarProveedores;
+
+                me.monedaPrincipal=[respuesta.configuracionTrabajo.valor_moneda_principal,respuesta.configuracionTrabajo.simbolo_moneda_principal]
                 console.log("MostrarCostos: " + me.mostrarCostos);
                 console.log("ProveedorEstado: " + me.mostrarProveedores);
                 console.log("MostrarSaldosStock: " + me.mostrarSaldosStock);
@@ -3034,6 +3082,7 @@ this.submitForm();
     mounted() {
         this.recuperarIdRol();
         this.datosConfiguracion();
+        this.obtenerConfiguracionTrabajo();
         this.listarArticulo(1, this.buscar, this.criterio);
         this.listarPrecio();//aumenTe 6julio
     }

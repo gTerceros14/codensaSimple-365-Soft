@@ -75,7 +75,10 @@
                                         <td v-text="venta.tipo_comprobante"></td>
                                         <td v-text="venta.num_comprobante"></td>
                                         <td v-text="venta.fecha_hora"></td>
-                                        <td v-text="venta.total"></td>
+                                        <td >
+                            {{((venta.total) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+                                        
+                                        </td>
                                         <td v-text="venta.estado"></td>
                                     </tr>
                                 </tbody>
@@ -231,7 +234,7 @@
                             <div class="col-md-2">
                                  <div class="form-group"> 
                                     <label>Precio</label> 
-                                    <input type="number" id="precio" value="0"  class="form-control" v-model="precioFinal">
+                                    <input disabled type="number" id="precio" value="0"  class="form-control" :value="(precioFinal*parseFloat(monedaVenta[0])).toFixed(2)">
                                     
                                     </div> 
                             </div>
@@ -305,7 +308,9 @@
                                             </td>
                                             <td>{{unidad_envase}}
                                             </td>
-                                            <td v-text="detalle.precioseleccionado">
+                                            <td >
+                            {{(detalle.precioseleccionado *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+
                                             </td>
                                             <td> {{ detalle.cantidad % unidad_envase}} </td>  
     
@@ -313,7 +318,9 @@
                                              
                                             
                                              <td >
-                                                {{(detalle.precioseleccionado * detalle.cantidad).toFixed(2)}} 
+
+                            {{((detalle.precioseleccionado * detalle.cantidad) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+
 
                                             </td>
                                             
@@ -327,12 +334,16 @@
 
 
                                             <td>
-                                                {{ ((detalle.precioseleccionado * detalle.cantidad) - (detalle.precioseleccionado * detalle.cantidad * detalle.descuento / 100)).toFixed(2) }}
+                            {{(((detalle.precioseleccionado * detalle.cantidad) - (detalle.precioseleccionado * detalle.cantidad * detalle.descuento / 100)) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="9" align="right"><strong>Sub Total: Bs.</strong></td>
-                                            <td id="subTotal">{{ totalParcial=(calcularSubTotal).toFixed(2) }}</td>
+                                            <td id="subTotal">
+                            {{((totalParcial=(calcularSubTotal)) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+                                                
+                                            </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="9" align="right"><strong>Descuento Adicional: Bs.</strong></td>
@@ -341,7 +352,10 @@
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="9" align="right"><strong>Total Neto: Bs.</strong></td>
-                                            <td id="montoTotal">{{ total=(calcularTotal).toFixed(2) }}</td>
+                                            <td id="montoTotal">
+                            {{((total=(calcularTotal)) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+                                                
+                                            </td>
                                         </tr>
                                     </tbody>
                                     <tbody v-else>
@@ -422,27 +436,40 @@
                                             </td>
                                             <td v-text="detalle.medida">
                                             </td>
-                                            <td v-text="detalle.precio">
+                                            <td >
+                            {{((detalle.precio) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+
                                             </td>
                                             <td v-text="detalle.cantidad">
                                             </td>
                                             <td v-text="detalle.descuento">
                                             </td>
                                             <td>
-                                                {{ detalle.precio * detalle.cantidad - detalle.descuento }}
+                            {{((detalle.precio * detalle.cantidad - detalle.descuento) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
-                                            <td colspan="4" align="right"><strong>Total Parcial:</strong></td>
-                                            <td>$ {{ totalParcial=(total - totalImpuesto).toFixed(2) }}</td>
+                                            <td colspan="4" align="right"><strong>Total Parcial:</strong>
+                                            </td>
+                                            <td>
+                            {{((totalParcial=(total - totalImpuesto)) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+                                            </td>
+                                                
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
-                                            <td>$ {{ totalImpuesto=(total * impuesto).toFixed(2) }}</td>
+                                            <td>
+                            {{((totalImpuesto=(total * impuesto)) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+                                                
+                                            </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="4" align="right"><strong>Total Neto:</strong></td>
-                                            <td>$ {{ total }}</td>
+                                            <td>
+                            {{((total) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+                                                
+                                            </td>
                                         </tr>
                                     </tbody>
                                     <tbody v-else>
@@ -527,7 +554,10 @@
                                         <td v-text="articulo.codigo"></td>
                                         <td v-text="articulo.nombre"></td>
                                         <td v-text="articulo.nombre_categoria"></td>
-                                        <td v-text="articulo.precio_venta"></td>
+                                        <td >
+                            {{((articulo.precio_venta) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+                                        
+                                        </td>
                                         <td v-text="articulo.saldo_stock"></td>
                                         <td>
                                             <div v-if="articulo.condicion">
@@ -567,11 +597,12 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
+
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                   <label class="form-control-label" for="text-input">Recibido BS(*)</label>
+                                   <label class="form-control-label" for="text-input">Recibido {{monedaVenta[1]}}(*)</label>
                                    <div class="input-group">
                                        <input type="number" v-model="recibido" >
                                     </div>                                      
@@ -583,31 +614,35 @@
                                    </div>
                                 </div>
                             </div>
+
+
                             <div class="col-md-6"> 
                                <div class="form-group">
                                    <label class="form-control-label" for="text-input">ToTal(*)</label>
                                    <div class="input-group">
-                                    <input type="number"  v-model="total" class="font-weight-bold">
+                                    <input type="number" :value="((total) *parseFloat(monedaVenta[0])).toFixed(2)"  class="font-weight-bold">
                                        <!-- <input type="number"  v-model="totalprue" class="negrita-input"> -->
                                     </div>   
                                </div>
+                    <!-- {{((articulo.precio_venta) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }} -->
+
                                <div class="form-group">
                                    <label class="form-control-label" for="text-input">Efec(*)</label>
                                    <div class="input-group">
-                                       <input type="number"  v-model="efectivo">
+                                       <input type="number" disabled :value="(efectivo *parseFloat(monedaVenta[0])).toFixed(2)">
                                    </div>
                                </div>
                                <div class="form-group">
                                    <label class="form-control-label" for="text-input">Cambio(*)</label>
                                    <div class="input-group">
-                                       <input type="number"  v-model="cambio">
+                                       <input type="number" disabled :value="(cambio *parseFloat(monedaVenta[0])).toFixed(2)">
                                     </div>
                                        
                                </div>
                                <div class="form-group">
                                    <label class="form-control-label" for="text-input">Faltante(*)</label>
                                    <div class="input-group">
-                                       <input type="number"  v-model="faltante">
+                                       <input type="number" disabled :value="(faltante *parseFloat(monedaVenta[0])).toFixed(2)">
                                    </div>
                                </div>
                             </div>
@@ -690,9 +725,18 @@
                                     <tbody>
                                         <tr v-for="(cuota, index) in cuotas" :key="index">
                                             <td>{{ cuota.fechaPago }}</td>
-                                            <td>{{ cuota.precioCuota }}</td>
-                                            <td>{{ cuota.totalCancelado}}</td>
-                                            <td>{{ cuota.saldo }}</td>
+                                            <td>
+                            {{(cuota.precioCuota *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+                                            
+                                            </td>
+                                            <td>
+                            {{(cuota.totalCancelado *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+
+                                            </td>
+                                            <td>
+                            {{(cuota.saldo*parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }}
+                                                
+                                            </td>
                                             <td>{{ cuota.fechaCancelado}}</td>
                                             <td>{{ cuota.estadocuocre }}</td>                                       
                                         </tr>
@@ -725,6 +769,8 @@ import vSelect from 'vue-select';
 export default {
     data() {
         return {
+            monedaVenta:[],
+
             permitirDevolucion: '',
             saldosNegativos: null,
             venta_id: 0,
@@ -909,6 +955,7 @@ export default {
 
     },
     methods: {
+
         ejecutarFunciones() {
             this.obtenerSaldosNegativos();
             this.mostrarDetalle();
@@ -1293,11 +1340,13 @@ export default {
         },
         datosConfiguracion() {
             let me = this;
-            var url = '/configuracion/editar';
+            var url = '/configuracion';
 
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.permitirDevolucion = respuesta.configuracionTrabajo.permitirDevolucion;
+                me.monedaVenta=[respuesta.configuracionTrabajo.valor_moneda_venta,respuesta.configuracionTrabajo.simbolo_moneda_venta]
+
                 console.log("PermitirDevolucion: " + me.permitirDevolucion);
 
             })
@@ -1776,7 +1825,8 @@ export default {
         // },
         calcularCambio() {
             // Convierte this.recibido a un número
-            const recibidoNumero = parseFloat(this.recibido);
+            // cambio /parseFloat(monedaVenta[0])).toFixed(2)
+            const recibidoNumero = parseFloat(this.recibido/parseFloat(this.monedaVenta[0]));
             if (recibidoNumero === 0) {
             this.efectivo = recibidoNumero;
             console.log('EFECTIVO', this.efectivo);
@@ -1884,9 +1934,10 @@ export default {
 
 
     mounted() {
+        this.datosConfiguracion();
+
         this.listarVenta(1, this.buscar, this.criterio);
         window.addEventListener('keydown', this.atajoButton);
-        this.datosConfiguracion();
         this.verificarComunicacion();
         this.cuis();
         this.cufd();
