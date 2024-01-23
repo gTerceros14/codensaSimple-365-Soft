@@ -19,13 +19,22 @@ class CreateMonedasTable extends Migration
             $table->string('nombre', 50)->unique();
             $table->string('pais', 30);
             $table->string('simbolo', 5);
-            $table->decimal('compra', 10, 2);
-            $table->decimal('venta', 10, 2);
+            $table->decimal('tipo_cambio', 10, 2);
             $table->boolean('activo')->default(1);
             $table->timestamps();
 
             $table->foreign('idempresa')->references('id')->on('empresas');
         });
+        DB::table('monedas')->insert(
+            array(
+                'id' => '1',
+                'idempresa' => '1',
+                'nombre' => 'Dolar estadounidense',
+                'pais' => 'Estados unidos',
+                'simbolo' => 'USD',
+                'tipo_cambio' => '1'
+            )
+        );
     }
 
     /**

@@ -15,9 +15,31 @@ class ConfiguracionTrabajoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        //
+        try {
+            $configuracionTrabajo = ConfiguracionTrabajo::select(
+                'configuracion_trabajos.*',
+                'monedas_venta.simbolo as simbolo_moneda_venta',
+                'monedas_compra.simbolo as simbolo_moneda_compra',
+                'monedas_principal.simbolo as simbolo_moneda_principal',
+
+                'monedas_venta.tipo_cambio as valor_moneda_venta',
+                'monedas_compra.tipo_cambio as valor_moneda_compra',
+                'monedas_principal.tipo_cambio as valor_moneda_principal'
+            )
+                ->join('monedas as monedas_venta', 'configuracion_trabajos.idMonedaVenta', '=', 'monedas_venta.id')
+                ->join('monedas as monedas_compra', 'configuracion_trabajos.idMonedaCompra', '=', 'monedas_compra.id')
+                ->join('monedas as monedas_principal', 'configuracion_trabajos.idMonedaPrincipal', '=', 'monedas_principal.id')
+
+
+                ->first();
+
+            return response()->json(['configuracionTrabajo' => $configuracionTrabajo]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener configuración de trabajo: ' . $e->getMessage());
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
     }
 
     /**
@@ -60,14 +82,15 @@ class ConfiguracionTrabajoController extends Controller
      */
     public function edit(Request $request)
     {
-        if(!$request->ajax()) return redirect('/');
+        if (!$request->ajax())
+            return redirect('/');
 
         $configuracionTrabajo = ConfiguracionTrabajo::first();
 
         /*Log::info('coniguracion', [
             'data' => $configuracionTrabajo 
         ]);*/
-    
+
         return ['configuracionTrabajo' => $configuracionTrabajo];
     }
 
@@ -80,39 +103,42 @@ class ConfiguracionTrabajoController extends Controller
      */
     public function update(Request $request)
     {
-        if(!$request->ajax()) return redirect('/');
+        if (!$request->ajax())
+            return redirect('/');
 
-        try{
+        try {
             DB::beginTransaction();
             Log::info('coniguracion', [
-                'saldoNegativo' => $request->saldosNegativos
+                'saldoNegativo' => $request->idMonedaCompra
             ]);
             $configuracionTrabajo = ConfiguracionTrabajo::findOrFail($request->id);
+            $configuracionTrabajo->idMonedaCompra = $request->idMonedaCompra;
+            $configuracionTrabajo->idMonedaVenta = $request->idMonedaVenta;
+            $configuracionTrabajo->idMonedaPrincipal = $request->idMonedaPrincipal;
+            Log::info($configuracionTrabajo);
+
             $configuracionTrabajo->gestion = $request->selectedYear;
             $configuracionTrabajo->codigoProductos = $request->codigoProducto;
-            $configuracionTrabajo->consultasAlmacenes = $request->consultarAlmacenes;
-            $configuracionTrabajo->limiteDescuento = $request->limiteDescuento;
             $configuracionTrabajo->maximoDescuento = $request->maximoDescuento;
-            $configuracionTrabajo->valuacionInventario = $request->valuacionInventario;
+            // $configuracionTrabajo->valuacionInventario = $request->valuacionInventario;
             $configuracionTrabajo->backupAutomatico = $request->backupAutomatico;
             $configuracionTrabajo->rutaBackup = $request->rutaBackup;
             $configuracionTrabajo->saldosNegativos = $request->saldosNegativos;
-            $configuracionTrabajo->monedaTrabajo = $request->monedaTrabajo;
             $configuracionTrabajo->separadorDecimales = $request->separadorDecimales;
             $configuracionTrabajo->mostrarCostos = $request->mostrarCostos;
             $configuracionTrabajo->mostrarProveedores = $request->mostrarProveedor;
             $configuracionTrabajo->mostrarSaldosStock = $request->mostrarSaldosStock;
             $configuracionTrabajo->actualizarIva = $request->actualizarIVA;
-            $configuracionTrabajo->vendedorAsignado = $request->vendedorAsignado;
             $configuracionTrabajo->permitirDevolucion = $request->devolucion;
             $configuracionTrabajo->editarNroDoc = $request->editarNroDoc;
             $configuracionTrabajo->registroClienteObligatorio = $request->registroClienteObligatorio;
             $configuracionTrabajo->buscarClientePorCodigo = $request->buscarClientePorCodigo;
-        
+
             $configuracionTrabajo->save();
             DB::commit();
-        }catch(Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
+            Log::error('Error al actualizar configuración: ' . $e->getMessage());
         }
     }
     public function obtenerSaldosNegativos()

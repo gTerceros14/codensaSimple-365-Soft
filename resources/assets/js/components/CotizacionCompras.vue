@@ -84,7 +84,10 @@
 
                                         <td v-text="pedprov.nombre_proveedor"></td>
                                         <td v-text="pedprov.nombre_almacen"></td>
-                                        <td v-text="pedprov.total"></td>
+                                        <td >
+                                    {{(pedprov.total  *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                        
+                                        </td>
                                         <!-- <td>{{ Math.floor((new Date(pedprov.fecha_entrega) - new Date()) / (1000 * 60 * 60 * 24))+1 }} dias</td> -->
                                         <td>{{ new Intl.DateTimeFormat('es-ES').format(new Date(pedprov.fecha_entrega)) }}</td>
 
@@ -275,14 +278,20 @@
                             <div class="col-md-2" v-if="arrayArticuloSeleccionado.length > 0">
                                 <div class="form-group">
                                     <label>Costo Paquete:</label>
-                                    <p class="h5">{{ precio_costo_paq }}</p>
+                                    <p class="h5">
+                                    {{(precio_costo_paq *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                        
+                                    </p>
                                     <!-- <label for="">Shift + T</label> -->
                                 </div>
                             </div>
                             <div class="col-md-2" v-if="arrayArticuloSeleccionado.length > 0">
                                 <div class="form-group">
                                     <label>Costo unitario:</label>
-                                    <p class="h5">{{ precio }}</p>
+                                    <p class="h5">
+                                    {{(precio *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+
+                                    </p>
                                     <!-- <label for="">Shift + T</label> -->
                                 </div>
                             </div>
@@ -312,7 +321,12 @@
                                     <div class="input-group-append">
                                         <small class="font-weight-bold">Precio total:&nbsp</small>
                                     </div>
-                                    <input type="number"  value="0" step="any" class="form-control font-weight-bold  form-control-lg" v-model="Sumatotal" readonly>
+                                   
+                                    <input type="number"   step="any" class="form-control font-weight-bold  form-control-lg" :value="(Sumatotal*parseFloat(monedaPrincipal[0])).toFixed(2)" readonly>
+                                    <p class="h5">
+                                     {{ monedaPrincipal[1] }}
+
+                                    </p>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -371,7 +385,9 @@
                                                 {{ detalle.articulo }}
                                             </td>
                                             <td>
-                                                {{ detalle.precio }}
+                                                
+                                    {{(detalle.precio  *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+
                                             </td>
                                             <td>
                                                 {{ detalle.unidad_x_paquete }}
@@ -383,7 +399,9 @@
 
                                             </td>
                                             <td>
-                                                {{ detalle.cantidad * detalle.precio }}
+                                    {{((detalle.cantidad * detalle.precio)  *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+
+
                                             </td>
 
                                         </tr>
@@ -392,7 +410,10 @@
                                                 <h6 class="text-right font-weight-bold ">Total</h6>
                                             </td>
                                             <td >
-                                                <h6 class="font-weight-bold ">{{ Totales }}</h6>
+                                                <h6 class="font-weight-bold ">
+                                    {{(Totales  *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                                    
+                                                </h6>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -609,9 +630,9 @@
             </div>
             <!-- /.modal-dialog -->
         </div>
-        <detallepedidosproveedor v-if="showModalDetalle" @cerrar="cerrarModalDetalles" @abrirCompra="abrirFormularioCompra" :arrayPedidoSeleccionado="arrayPedidoSeleccionado" :arrayPedidoProvDet="arrayPedidoProvDet"></detallepedidosproveedor>
+        <detallepedidosproveedor v-if="showModalDetalle" @cerrar="cerrarModalDetalles" @abrirCompra="abrirFormularioCompra" :arrayPedidoSeleccionado="arrayPedidoSeleccionado" :arrayPedidoProvDet="arrayPedidoProvDet" :monedaPrincipal="monedaPrincipal"></detallepedidosproveedor>
         <div v-if="showRegistrarCompra" class="mx-3">
-            <registrarcompra @editarEstadoPedido="editarPedidoComprado"   @cerrar="cerrarFormularioCompra" :arrayDetallePedido="arrayDetallesAComprar" :arrayPedidoSeleccionado="arrayPedidoSeleccionado" @listarArticuloProveedor="listarArticuloProveedor" @abrirModalArticulos="abrirModalArticulos" :arrayArticuloSeleccionado="arrayArticuloSeleccionadoModal"></registrarcompra>
+            <registrarcompra @editarEstadoPedido="editarPedidoComprado"   @cerrar="cerrarFormularioCompra" :arrayDetallePedido="arrayDetallesAComprar" :arrayPedidoSeleccionado="arrayPedidoSeleccionado" @listarArticuloProveedor="listarArticuloProveedor" @abrirModalArticulos="abrirModalArticulos" :arrayArticuloSeleccionado="arrayArticuloSeleccionadoModal" :monedaCompra="monedaPrincipal"></registrarcompra>
 
         </div>
         <div v-if="showModalArticulos">
@@ -626,6 +647,8 @@ import vSelect from 'vue-select';
 export default {
     data() {
         return {
+            monedaPrincipal:[],
+
             titulo:'Pedidos a proveedor',
             estadoPedido:'En espera',
             showModalArticulos:false,
@@ -1328,11 +1351,29 @@ export default {
         listarArticuloProveedor(dato){
             this.idproveedor=dato.idproveedor;
         },
+        datosConfiguracion() {
+            let me = this;
+            var url = '/configuracion';
+
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+
+                me.monedaPrincipal=[respuesta.configuracionTrabajo.valor_moneda_compra,respuesta.configuracionTrabajo.simbolo_moneda_compra]
+                console.log("MostrarCostos: " + me.mostrarCostos);
+                console.log("ProveedorEstado: " + me.mostrarProveedores);
+                console.log("MostrarSaldosStock: " + me.mostrarSaldosStock);
+
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
     },
     mounted() {
         this.listarPedidoProv(1, this.buscar, this.criterio);
         //this.verPedidoDet();
         this.selectAlmacen();
+        this.datosConfiguracion();
         window.addEventListener('keydown', this.atajoButton);
     }
 }

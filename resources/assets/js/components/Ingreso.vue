@@ -68,7 +68,10 @@
                                         <td v-text="ingreso.serie_comprobante"></td>
                                         <td v-text="ingreso.num_comprobante"></td>
                                         <td v-text="ingreso.fecha_hora"></td>
-                                        <td v-text="ingreso.total"></td>
+                                        <td >
+                            {{( ingreso.total *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+                                        
+                                        </td>
                                         <td v-text="ingreso.impuesto"></td>
                                         <td v-text="ingreso.estado"></td>
                                     </tr>
@@ -141,25 +144,37 @@
                                         <tr v-for="detalle in arrayDetalle" :key="detalle.id">
                                             <td v-text="detalle.articulo">
                                             </td>
-                                            <td v-text="detalle.precio">
+                                            <td >
+                            {{( detalle.precio *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+
                                             </td>
                                             <td v-text="detalle.cantidad">
                                             </td>
                                             <td>
-                                                {{ detalle.precio * detalle.cantidad }}
+                            {{( ( detalle.precio * detalle.cantidad ) *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="3" align="right"><strong>Total Parcial:</strong></td>
-                                            <td>$ {{ totalParcial=(total - totalImpuesto).toFixed(2) }}</td>
+                                            <td>
+                            {{( (totalParcial=(total - totalImpuesto)) *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+                                            
+                                            </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="3" align="right"><strong>Total Impuesto:</strong></td>
-                                            <td>$ {{ totalImpuesto=(total * impuesto).toFixed(2) }}</td>
+                                            <td>
+                            {{( (totalImpuesto=(total * impuesto)) *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+                                            
+                                            </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="3" align="right"><strong>Total Neto:</strong></td>
-                                            <td>$ {{ total }}</td>
+                                            <td>
+                            {{(total *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+                                            
+                                                </td>
                                         </tr>
                                     </tbody>
                                     <tbody v-else>
@@ -182,11 +197,11 @@
             </div>
         </div>
         <div v-if="showModalArticulos">
-            <modalagregarproductos @cerrar="cerrarModal" @agregarArticulo="agregarArticuloSeleccionado" :idproveedor="idproveedor"></modalagregarproductos>
+            <modalagregarproductos @cerrar="cerrarModal" @agregarArticulo="agregarArticuloSeleccionado" :idproveedor="idproveedor" :monedaPrincipal="monedaCompra"></modalagregarproductos>
         </div>
         <div v-if="listado ==0" class="mx-3">
 
-        <registrarcompra  @cerrar="ocultarDetalle" @listarArticuloProveedor="listarArticuloProveedor" @abrirModalArticulos="abrirModal" @listarIngreso="listarIngresosTabla" :arrayArticuloSeleccionado="arrayArticuloSeleccionado" ></registrarcompra>
+        <registrarcompra  @cerrar="ocultarDetalle" @listarArticuloProveedor="listarArticuloProveedor" @abrirModalArticulos="abrirModal" @listarIngreso="listarIngresosTabla" :arrayArticuloSeleccionado="arrayArticuloSeleccionado" :monedaCompra="monedaCompra"></registrarcompra>
 </div>
     </main>
 </template>
@@ -195,6 +210,7 @@ import vSelect from 'vue-select';
 export default {
     data() {
         return {
+            monedaCompra:[],
             showModalArticulos:false,
             tipoUnidadSeleccionada: "Unidades",
             arrayArticuloSeleccionado:{},
@@ -285,7 +301,23 @@ export default {
         }
     },
     methods: {
+        datosConfiguracion() {
+            let me = this;
+            var url = '/configuracion';
 
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+
+                me.monedaCompra=[respuesta.configuracionTrabajo.valor_moneda_compra,respuesta.configuracionTrabajo.simbolo_moneda_compra]
+                console.log("MostrarCostos: " + me.mostrarCostos);
+                console.log("ProveedorEstado: " + me.mostrarProveedores);
+                console.log("MostrarSaldosStock: " + me.mostrarSaldosStock);
+
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
         selectAlmacen() {
             let me = this;
             var url = '/almacen/selectAlmacen';
@@ -704,6 +736,7 @@ export default {
 
     },
     mounted() {
+        this.datosConfiguracion();
         this.listarIngreso(1, this.buscar, this.criterio);
         window.addEventListener('keydown', this.atajoButton);
     }

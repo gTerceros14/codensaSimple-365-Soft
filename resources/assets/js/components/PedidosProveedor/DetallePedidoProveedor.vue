@@ -77,15 +77,24 @@
                                         <td v-text="pedprovdet.articulo"></td>
                                         <td >Unidades</td>
                                         <td v-text="pedprovdet.cantidad"></td>
-                                        <td v-text="pedprovdet.precio"></td>
-                                        <td >{{ pedprovdet.cantidad*pedprovdet.precio }}</td>
+                                        <td >
+                                    {{(pedprovdet.precio  *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                        
+                                        </td>
+                                        <td >
+                                    {{((pedprovdet.cantidad*pedprovdet.precio)  *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                        
+                                        </td>
                                     </tr>
                                     <tr>
                                             <td colspan="5">
                                                 <h6 class="text-right font-weight-bold ">Total</h6>
                                             </td>
                                             <td >
-                                                <h6 class="font-weight-bold ">{{ arrayPedidoSeleccionado.total }}</h6>
+                                                <h6 class="font-weight-bold ">
+                                    {{(arrayPedidoSeleccionado.total  *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                                    
+                                                </h6>
                                             </td>
                                         </tr>
                                 </tbody>
@@ -114,7 +123,11 @@ export default {
     arrayPedidoSeleccionado: {
       type: Object, // Indica que esperas un array
       required: true // Opcional: indica si la prop es obligatoria o no
-    }
+    },
+    monedaPrincipal: {
+      type: Array, // Indica que esperas un array
+      required: true // Opcional: indica si la prop es obligatoria o no
+    },
   },
   data() {
     return {

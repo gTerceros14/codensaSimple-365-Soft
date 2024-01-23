@@ -135,9 +135,9 @@ class ArticuloImport implements ToCollection
                     } else if (!$idMedida) {
                         $this->errors[] = "Error fila $rowNumber: La medida '$row[3]' no está registrado en la base de datos";
                     } else if (!$idMarca) {
-                        $this->errors[] = "Error fila $rowNumber: No existe 'Marca $row[21]'";
+                        $this->errors[] = "Error fila $rowNumber: No existe 'Marca $row[20]'";
                     } else if (!$idIndustria) {
-                        $this->errors[] = "Error fila $rowNumber: No existe 'Industria $row[22]'";
+                        $this->errors[] = "Error fila $rowNumber: No existe 'Industria $row[21]'";
                     } else if (strpos($e->getMessage(), "Integrity constraint violation: 1062") !== false) {
                         $this->errors[] = "Error fila $rowNumber: El producto '$row[5]' ya existe";
                     } else {
