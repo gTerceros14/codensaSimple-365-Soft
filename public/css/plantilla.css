@@ -3475,6 +3475,8 @@ button.close {
   line-height: 1.5; }
 
 .modal-body {
+  max-height:70vh;
+  overflow-y: auto;
   position: relative;
   -ms-flex: 1 1 auto;
       flex: 1 1 auto;
