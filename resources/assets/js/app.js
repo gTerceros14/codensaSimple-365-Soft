@@ -6,9 +6,6 @@
 
 import Vue from "vue";
 
-import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
 import Toasted from "vue-toasted";
 require("./bootstrap");
 
@@ -151,7 +148,6 @@ Vue.component(
   require("./components/Tables/TransaccionExtra.vue")
 );
 
-Vue.use(BootstrapVue);
 Vue.use(Toasted);
 const app = new Vue({
   el: "#app",
