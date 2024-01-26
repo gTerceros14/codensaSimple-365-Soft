@@ -47,6 +47,8 @@ class CreateArticulosTable extends Migration
             //new
             $table->decimal('costo_compra', 10, 2);
             $table->foreign('idmedida')->references('id')->on('medidas');
+            $table->integer('codigo_alfanumerico')->nullable();// aumente el 23-01-2024
+            $table->string('descripcion_fabrica', 50)->nullable();// aumente el 23-01-2024
         });
     }
 

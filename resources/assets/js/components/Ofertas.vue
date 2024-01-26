@@ -34,7 +34,7 @@
                     <th>Descripción</th>
                     <th>Descuento</th>
                     <th>Cantidad en stock</th>
-                    <th>Fecha limite</th>
+                    <th>Fecha vencimiento</th>
                     <th>Estado</th>
                   </tr>
                 </thead>
