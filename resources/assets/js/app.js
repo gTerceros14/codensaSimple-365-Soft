@@ -5,7 +5,6 @@
  */
 
 import Vue from "vue";
-
 import Toasted from "vue-toasted";
 require("./bootstrap");
 
@@ -17,6 +16,8 @@ window.Vue = require("vue");
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+
+Vue.component("icon-button", require("./components/buttons/IconButton.vue"));
 
 Vue.component("empresa", require("./components/Empresa.vue"));
 Vue.component("sucursal", require("./components/Sucursal.vue"));
