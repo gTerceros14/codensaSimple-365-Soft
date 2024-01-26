@@ -29,12 +29,11 @@
                                         class="fa fa-search"></i> Buscar</button>
                             </div>
                         </div>
-                        <div class="col-md-2  align-items-center ms-auto">
+                        <div class="col-md-2 mt-1 mx-auto">
                             <small class="text-muted">Mostrar:&nbsp;</small>
 
                             <select class="custom-select bg-light" v-model="itemsPerPage" @change="cambiarNumeroElementos">
                                 <option value="5">5</option>
-
                                 <option value="10">10</option>
                                 <option value="20">20</option>
                                 <option value="50">50</option>
@@ -42,7 +41,7 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <div class="col-md-5  align-items-center ms-auto">
+                        <div class="col-md-5  align-items-center ">
 
                             <label class="form-control-label" for="text-input"><b>Moneda de Referencia:</b> Dólar
                                 Estadounidense (USD)</label>
@@ -53,7 +52,7 @@
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th>Opciones</th>
+                                    <th>Acciones</th>
                                     <th>Empresa</th>
                                     <th>Nombre de la moneda</th>
                                     <th>Codigo</th>
@@ -145,21 +144,27 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
+                    <form @submit.prevent="enviarFormulario">
+
+                        <div class="modal-body">
+
                             <div class="form-group row">
                                 <div class="col-md-6">
                                     <label for="" class="font-weight-bold">Nombre de la moneda <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" v-model="nombre" class="form-control"
-                                        placeholder="Ej. Dolar estadounidense">
+                                    <input type="text" v-model="datosFormulario.nombre" class="form-control"
+                                        placeholder="Ej. Dolar estadounidense" :class="{ 'is-invalid': errores.nombre }"
+                                        @input="validarCampo('nombre')">
+                                    <p class="text-danger" v-if="errores.nombre">{{ errores.nombre }}</p>
+
                                 </div>
                                 <div class="col-md-6">
                                     <label for="" class="font-weight-bold">Pais <span class="text-danger">*</span></label>
 
                                     <input class="form-control" type="text" id="country" v-model="selectedCountry"
-                                        @input="filterCountries" @keydown.enter="selectClosestCountry"
-                                        placeholder="Buscar país" />
+                                        @input="filterCountries" 
+                                        @keydown.enter="selectClosestCountry" placeholder="Buscar país"
+                                        :class="{ 'is-invalid': errores.pais }" />
 
                                     <ul class="ulAutocomplete" v-if="showDropdown">
                                         <li class="liAutocomplete" v-for="(country, code) in filteredCountries" :key="code"
@@ -167,6 +172,8 @@
                                             {{ country }}
                                         </li>
                                     </ul>
+                                    <p class="text-danger" v-if="errores.pais">{{ errores.pais }}</p>
+
                                 </div>
                             </div>
 
@@ -176,30 +183,30 @@
                                     <label for="" class="font-weight-bold">Tipo cambio <span
                                             class="text-danger">*</span></label>
 
-                                    <input type="number" v-model="tipo_cambio" class="form-control" step=".01"
-                                        placeholder="">
+                                    <input type="number" v-model="datosFormulario.tipo_cambio" class="form-control"
+                                        step=".01" placeholder="" :class="{ 'is-invalid': errores.tipo_cambio }"
+                                        @input="validarCampo('tipo_cambio')">
+                                    <p class="text-danger" v-if="errores.tipo_cambio">{{ errores.tipo_cambio }}</p>
+
                                 </div>
                                 <div class="col-md-6">
                                     <label for="" class="font-weight-bold">Codigo de la moneda <span
                                             class="text-danger">*</span></label>
 
-                                    <input type="text" v-model="simbolo" class="form-control" placeholder="Ej. USD">
+                                    <input type="text" v-model="datosFormulario.simbolo" class="form-control"
+                                        placeholder="Ej. USD" :class="{ 'is-invalid': errores.simbolo }"
+                                        @input="validarCampo('simbolo')">
+                                    <p class="text-danger" v-if="errores.simbolo">{{ errores.simbolo }}</p>
+
                                 </div>
                             </div>
-
-
-
-
-
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
-                        <button type="button" v-if="tipoAccion == 1" class="btn btn-success"
-                            @click="registrarMoneda()">Guardar</button>
-                        <button type="button" v-if="tipoAccion == 2" class="btn btn-success"
-                            @click="actualizarMoneda()">Actualizar</button>
-                    </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
+                            <button type="submit" v-if="tipoAccion == 1" class="btn btn-success">Guardar</button>
+                            <button type="submit" v-if="tipoAccion == 2" class="btn btn-success">Actualizar</button>
+                        </div>
+                    </form>
                 </div>
                 <!-- /.modal-content -->
             </div>
@@ -212,22 +219,24 @@
 <script>
 import VueBarcode from 'vue-barcode';
 import { countries } from './../constants/countries.js';
+import { esquemaMoneda } from '../constants/validations';
 export default {
     data() {
         return {
+            datosFormulario: {
+                nombre: '',
+                pais: '',
+                simbolo: '',
+                tipo_cambio: 0,
+            },
+            errores: {},
+
             itemsPerPage: 5,
 
             countries: countries,
             selectedCountry: "",
             filteredCountries: {},
             showDropdown: false,
-            moneda_id: 0,
-            idempresa: 0,
-            nombre_empresa: '',
-            nombre: '',
-            pais: 0,
-            simbolo: 0,
-            tipo_cambio: '',
             arrayMoneda: [],
             modal: 0,
             tituloModal: '',
@@ -250,23 +259,22 @@ export default {
         isActived: function () {
             return this.pagination.current_page;
         },
-        //Calcula los elementos de la paginación
         pagesNumber: function () {
             if (!this.pagination.to) {
                 return [];
             }
 
-            var from = this.pagination.current_page - this.offset;
+            let from = this.pagination.current_page - this.offset;
             if (from < 1) {
                 from = 1;
             }
 
-            var to = from + (this.offset * 2);
+            let to = from + (this.offset * 2);
             if (to >= this.pagination.last_page) {
                 to = this.pagination.last_page;
             }
 
-            var pagesArray = [];
+            let pagesArray = [];
             while (from <= to) {
                 pagesArray.push(from);
                 from++;
@@ -276,6 +284,33 @@ export default {
         }
     },
     methods: {
+        async validarCampo(campo) {
+            try {
+                await esquemaMoneda.validateAt(campo, this.datosFormulario);
+                this.errores[campo] = null;
+            } catch (error) {
+                this.errores[campo] = error.message;
+            }
+        },
+        async enviarFormulario() {
+
+            await esquemaMoneda.validate(this.datosFormulario, { abortEarly: false })
+                .then(() => {
+                    if (this.tipoAccion == 2) {
+                        this.actualizarMoneda(this.datosFormulario);
+                    } else {
+                        this.registrarMoneda(this.datosFormulario);
+                    }
+                })
+                .catch((error) => {
+                    const erroresValidacion = {};
+                    error.inner.forEach((e) => {
+                        erroresValidacion[e.path] = e.message;
+                    });
+
+                    this.errores = erroresValidacion;
+                });
+        },
         cambiarNumeroElementos() {
             this.listarMoneda(1, this.buscar, this.criterio);
 
@@ -305,17 +340,23 @@ export default {
             return null;
         },
         filterCountries() {
+
             const query = this.selectedCountry.toLowerCase();
             const filteredEntries = Object.entries(this.countries).filter(([code, country]) =>
                 country.toLowerCase().includes(query)
             );
             this.filteredCountries = Object.fromEntries(filteredEntries.slice(0, 5));
             this.showDropdown = filteredEntries.length > 0;
+
         },
         selectCountry(code) {
             this.selectedCountry = this.countries[code];
             this.showDropdown = false;
             this.pais = this.selectedCountry;
+            this.datosFormulario.pais=this.pais;  
+            this.validarCampo('pais');
+
+
         },
         selectClosestCountry() {
             const firstCountryCode = Object.keys(this.filteredCountries)[0];
@@ -325,9 +366,9 @@ export default {
         },
         listarMoneda(page, buscar, criterio) {
             let me = this;
-            var url = '/moneda?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio + '&per_page=' + this.itemsPerPage;
+            let url = '/moneda?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio + '&per_page=' + this.itemsPerPage;
             axios.get(url).then(function (response) {
-                var respuesta = response.data;
+                let respuesta = response.data;
                 me.arrayMoneda = respuesta.monedas.data;
                 me.pagination = respuesta.pagination;
             })
@@ -337,62 +378,37 @@ export default {
         },
         cambiarPagina(page, buscar, criterio) {
             let me = this;
-            //Actualiza la página actual
             me.pagination.current_page = page;
-            //Envia la petición para visualizar la data de esa página
             me.listarMoneda(page, buscar, criterio);
         },
-        registrarMoneda() {
-            console.log(this.selectedCountry)
-            if (!this.validarMoneda()) {
-                return;
+        registrarMoneda(datos) {
+    axios.post('/moneda/registrar', datos)
+        .then((response) => {
+            this.cerrarModal();
+            this.listarMoneda(1, '', 'nombre');
+            this.toastSuccess("Moneda registrada correctamente");
+        })
+        .catch((error) => {
+            if (error.response) {
+                this.toastError(`${error.response.data.error}`);
+                console.error("Error al registrar la moneda: ", error.response.data.error);
+            } else if (error.request) {
+                this.toastError("No se recibió respuesta del servidor.");
+                console.error("No se recibió respuesta del servidor.");
+            } else {
+                this.toastError("Error al realizar la solicitud.");
+                console.error("Error al realizar la solicitud: ", error.message);
             }
+        });
+},
 
-            let me = this;
-            let formData = new FormData();
+        actualizarMoneda(datos) {
 
-            formData.append('nombre', this.nombre);
-            formData.append('pais', this.selectedCountry);
-            formData.append('simbolo', this.simbolo);
-            formData.append('tipo_cambio', this.tipo_cambio);
-
-            axios.post('/moneda/registrar', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-
-            }).then((response) => {
-                me.cerrarModal();
-                me.listarMoneda(1, '', 'nombre');
-                this.toastSuccess("Moneda registrada correctamente")
-            }).catch((error) => {
-                this.toastError("Hubo un error al registrar la moneda")
-
-                console.error("Error al registrar la moneda: ", error);
-            });
-
-        },
-        actualizarMoneda() {
-            if (!this.validarMoneda()) {
-                return;
-            }
-
-            let me = this;
-
-            axios.put('/moneda/actualizar', {
-                'idempresa': this.idempresa,
-                'nombre_empresa': this.nombre_empresa,
-                'nombre': this.nombre,
-                'pais': this.selectedCountry,
-                'simbolo': this.simbolo,
-                'tipo_cambio': this.tipo_cambio,
-                'activo': this.activo,
-                'id': this.moneda_id
-            }).then((response) => {
-                me.cerrarModal();
+            axios.put('/moneda/actualizar', datos).then((response) => {
+                this.cerrarModal();
                 this.toastSuccess("Moneda actualizada correctamente")
 
-                me.listarMoneda(1, '', 'nombre');
+                this.listarMoneda(1, '', 'nombre');
             }).catch((error) => {
                 console.error("Error al actualizar la moneda: ", error);
                 this.toastError("Hubo un error al actualizar la moneda")
@@ -431,7 +447,6 @@ export default {
 
 
                 } else if (
-                    // Read more about handling dismissals
                     result.dismiss === swal.DismissReason.cancel
                 ) {
 
@@ -470,44 +485,17 @@ export default {
 
 
                 } else if (
-                    // Read more about handling dismissals
                     result.dismiss === swal.DismissReason.cancel
                 ) {
 
                 }
             })
         },
-        validarPais() { },
-        validarMoneda() {
-            if (this.nombre.length == 0) {
-                this.toastError("El nombre de la moneda no puede estar vacio")
-                return false
-            }
-            if (this.selectedCountry.length == 0) {
-                this.toastError("Seleccione un pais valido")
-                return false
-            }
-            if (this.tipo_cambio <= 0) {
-                this.toastError("El tipo de cambio debe ser mayor a cero")
-                return false
-            }
-            if (this.simbolo.length == 0) {
-                this.toastError("El codigo de la moneda no puede estar vacio")
-                return false
-            }
-            return true;
-        },
         cerrarModal() {
             this.selectedCountry = '';
             this.showDropdown = false;
             this.modal = 0;
             this.tituloModal = '';
-            this.idempresa = 0;
-            this.nombre_empresa = '';
-            this.nombre = '';
-            this.pais = '';
-            this.simbolo = '';
-            this.tipo_cambio = 0;
         },
         abrirModal(modelo, accion, data = []) {
             switch (modelo) {
@@ -518,11 +506,14 @@ export default {
                                 {
                                     this.modal = 1;
                                     this.tituloModal = 'Registrar Moneda';
-                                    this.nombre = '';
-                                    this.pais = '';
-                                    this.simbolo = '';
-                                    this.tipo_cambio = 0;
                                     this.tipoAccion = 1;
+                                    this.datosFormulario = {
+                                        nombre: '',
+                                        pais: '',
+                                        simbolo: '',
+                                        tipo_cambio: 0,
+                                    };
+                                    this.errores = {};
                                     break;
                                 }
                             case 'actualizar':
@@ -530,13 +521,19 @@ export default {
                                     this.modal = 1;
                                     this.tituloModal = 'Actualizar Moneda';
                                     this.tipoAccion = 2;
-                                    this.moneda_id = data['id'];
-                                    this.idempresa = data['idempresa'];
-                                    this.nombre = data['nombre'];
-                                    this.pais = data['pais'];
+
+                                    this.datosFormulario = {
+                                        id: data['id'],
+                                        idempresa: data['idempresa'],
+                                        nombre: data['nombre'],
+                                        pais: data['pais'],
+                                        simbolo: data['simbolo'],
+                                        tipo_cambio: data['tipo_cambio'],
+                                        activo: data['activo'],
+
+                                    };
+                                    this.errores = {};
                                     this.selectedCountry = data['pais'];
-                                    this.simbolo = data['simbolo'];
-                                    this.tipo_cambio = data['tipo_cambio'];
 
                                     break;
                                 }
@@ -574,7 +571,6 @@ export default {
 </script>
 <style>   .flag-img {
        width: 30px;
-       /* Ajusta el tamaño según tus necesidades */
        height: auto;
    }
 

@@ -180,28 +180,7 @@
 </template>
   
 <script>
-import * as yup from 'yup';
- const esquema = yup.object().shape({
-        nombre: yup
-          .string()
-          .required('El nombre de la sucursal es obligatorio')
-          .max(50, 'El nombre no puede tener más de 50 caracteres')
-          .matches(/^[a-zA-Z0-9\s]+$/, 'El nombre no puede contener caracteres especiales'),
-
-        direccion: yup.string().required('La dirección es obligatoria'),
-
-        correo: yup
-          .string()
-          .email('Ingrese una dirección de correo electrónico válida')
-          .required('El correo es obligatorio'),
-
-        telefono: yup
-          .string()
-          .required('El teléfono es obligatorio')
-          .matches(/^[0-9]{8}$/, 'El teléfono debe contener exactamente 8 números'),
-
-        departamento: yup.string().required('El departamento es obligatorio'),
-      });
+import { esquemaSucursal } from '../constants/validations'; 
 export default {
   data() {
     return {
@@ -266,7 +245,7 @@ export default {
   methods: {
     async validarCampo(campo) {
       try {
-        await esquema.validateAt(campo, this.datosFormulario);
+        await esquemaSucursal.validateAt(campo, this.datosFormulario);
         this.errores[campo] = null;
       } catch (error) {
         this.errores[campo] = error.message;
@@ -274,7 +253,7 @@ export default {
     },
     async enviarFormulario() {
      
-      await esquema.validate(this.datosFormulario, { abortEarly: false })
+      await esquemaSucursal.validate(this.datosFormulario, { abortEarly: false })
         .then(() => {
           if (this.tipoAccion == 2) {
             this.actualizarSucursal(this.datosFormulario);
