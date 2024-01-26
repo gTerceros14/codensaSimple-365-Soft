@@ -9,9 +9,7 @@
             <div class="card">
                 <div class="card-header">
                     <i class="fa fa-align-justify"></i> Moneda
-                    <button type="button" @click="abrirModal('moneda', 'registrar')" class="btn btn-secondary">
-                        <i class="icon-plus"></i>&nbsp;Nuevo
-                    </button>
+                    <icon-button icon="icon-plus" size="small" color="secondary" @click="abrirModal('moneda', 'registrar')" label="Nuevo"/>
                 </div>
                 <div class="card-body">
                     <div class="form-group row">
@@ -66,22 +64,12 @@
                             <tbody>
                                 <tr v-for="moneda in arrayMoneda" :key="moneda.id">
                                     <td>
-                                        <button type="button" @click="abrirModal('moneda', 'actualizar', moneda)"
-                                            class="btn btn-warning btn-sm">
-                                            <i class="icon-pencil"></i>
-                                        </button> &nbsp;
-                                        <template v-if="moneda.activo">
-                                            <button type="button" class="btn btn-danger btn-sm"
-                                                @click="desactivarMoneda(moneda.id)">
-                                                <i class="icon-trash"></i>
-                                            </button>
-                                        </template>
-                                        <template v-else>
-                                            <button type="button" class="btn btn-info btn-sm"
-                                                @click="activarMoneda(moneda.id)">
-                                                <i class="icon-check"></i>
-                                            </button>
-                                        </template>
+                              <icon-button icon="icon-pencil" size="small" color="warning" @click="abrirModal('moneda', 'actualizar', moneda)" />
+                              <icon-button v-if="moneda.activo" icon="icon-trash" size="small" color="danger" @click="desactivarMoneda(moneda.id)" />
+                    <icon-button v-else icon="icon-check" size="small" color="info" @click="activarMoneda(moneda.id)"/>
+
+
+        
                                     </td>
                                     <td v-text="moneda.nombre_empresa"></td>
                                     <td v-text="moneda.nombre"></td>
@@ -218,6 +206,7 @@
 
 <script>
 import VueBarcode from 'vue-barcode';
+
 import { countries } from './../constants/countries.js';
 import { esquemaMoneda } from '../constants/validations';
 export default {
