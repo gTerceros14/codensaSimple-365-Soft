@@ -8,7 +8,6 @@ use App\Moneda;
 
 class MonedaController extends Controller
 {
-    //Listar monedas
     public function index(Request $request)
     {
         if (!$request->ajax())
@@ -22,14 +21,14 @@ class MonedaController extends Controller
             $monedas = Moneda::join('empresas', 'monedas.idempresa', '=', 'empresas.id')
                 ->select('monedas.id', 'monedas.idempresa', 'empresas.nombre as nombre_empresa', 'monedas.nombre', 'monedas.pais', 'monedas.simbolo', 'monedas.tipo_cambio', 'monedas.activo', 'monedas.updated_at')
                 ->orderBy('monedas.id', 'desc')
-                ->paginate($perPage); // Mover el paginate(4) aquí
+                ->paginate($perPage);
 
         } else {
             $monedas = Moneda::join('empresas', 'monedas.idempresa', '=', 'empresas.id')
                 ->select('monedas.id', 'monedas.idempresa', 'empresas.nombre as nombre_empresa', 'monedas.nombre', 'monedas.pais', 'monedas.simbolo', 'monedas.tipo_cambio', 'monedas.activo', 'monedas.updated_at')
                 ->where('monedas.' . $criterio, 'like', '%' . $buscar . '%')
                 ->orderBy('monedas.id', 'desc')
-                ->paginate($perPage); // Mover el paginate(4) aquí
+                ->paginate($perPage);
 
         }
 
@@ -49,18 +48,31 @@ class MonedaController extends Controller
 
     public function store(Request $request)
     {
-        if (!$request->ajax())
+        if (!$request->ajax()) {
             return redirect('/');
-        $moneda = new Moneda();
-        $moneda->idempresa = Empresa::first()->id;
-        $moneda->nombre = $request->nombre;
-        $moneda->pais = $request->pais;
-        $moneda->simbolo = $request->simbolo;
-        $moneda->tipo_cambio = $request->tipo_cambio;
+        }
 
-        $moneda->activo = '1';
-        $moneda->save();
+        try {
+            $nombreDuplicado = Moneda::where('nombre', $request->nombre)->exists();
+            if ($nombreDuplicado) {
+                return response()->json(['error' => 'El nombre ya está en uso.'], 422);
+            }
+
+            $moneda = new Moneda();
+            $moneda->idempresa = Empresa::first()->id;
+            $moneda->nombre = $request->nombre;
+            $moneda->pais = $request->pais;
+            $moneda->simbolo = $request->simbolo;
+            $moneda->tipo_cambio = $request->tipo_cambio;
+            $moneda->activo = '1';
+            $moneda->save();
+
+            return response()->json(['message' => 'Moneda guardada correctamente.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
+
 
     public function update(Request $request)
     {
@@ -72,11 +84,9 @@ class MonedaController extends Controller
         $moneda->pais = $request->pais;
         $moneda->simbolo = $request->simbolo;
         $moneda->tipo_cambio = $request->tipo_cambio;
-        $moneda->activo = '1';
+        $moneda->activo = $request->activo;
         $moneda->save();
     }
-    //-----------hasta aqui
-    //---desactivar registro
 
     public function desactivar(Request $request)
     {
@@ -102,7 +112,7 @@ class MonedaController extends Controller
         }
 
         $monedas = Moneda::join('empresas', 'monedas.idempresa', '=', 'empresas.id')
-            ->where('monedas.activo', 1) // Filtrar por la columna 'activo'
+            ->where('monedas.activo', 1)
             ->select('monedas.id', 'monedas.nombre', 'monedas.simbolo')
             ->orderBy('monedas.nombre', 'asc')
             ->get();
