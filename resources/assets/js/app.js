@@ -26,6 +26,9 @@ Vue.component("caja", require("./components/Caja.vue"));
 Vue.component("categoria", require("./components/Categoria.vue"));
 Vue.component("articulo", require("./components/Articulo.vue"));
 
+Vue.component("ofertas", require("./components/Ofertas.vue"));
+Vue.component("kits", require("./components/Kits.vue"));
+
 Vue.component("ingreso", require("./components/Ingreso.vue"));
 Vue.component("cliente", require("./components/Cliente.vue"));
 Vue.component("proveedor", require("./components/Proveedor.vue"));

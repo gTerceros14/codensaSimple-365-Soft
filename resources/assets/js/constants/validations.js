@@ -44,3 +44,25 @@ export const esquemaMoneda = yup.object().shape({
     .required("El tipo de cambio es obligatorio")
     .min(1, "El tipo de cambio no puede ser igual o menor a cero"),
 });
+
+export const esquemaKits = yup.object().shape({
+  nombre: yup
+    .string()
+    .required("El nombre de la moneda es obligatorio")
+    .max(50, "El nombre no puede tener más de 50 caracteres")
+    .matches(
+      /^[a-zA-Z0-9\s]+$/,
+      "El nombre no puede contener caracteres especiales"
+    ),
+});
+
+export const esquemaOfertas = yup.object().shape({
+  nombre: yup
+    .string()
+    .required("El nombre de la moneda es obligatorio")
+    .max(50, "El nombre no puede tener más de 50 caracteres")
+    .matches(
+      /^[a-zA-Z0-9\s]+$/,
+      "El nombre no puede contener caracteres especiales"
+    ),
+});
