@@ -15,11 +15,11 @@ class CreatePromocionesArticulosTable extends Migration
     {
         Schema::create('promociones_articulos', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('idpromociones')->unsigned(); 
+            $table->integer('idpromociones')->unsigned();
             $table->integer('idarticulos')->unsigned();
             $table->foreign('idpromociones')->references('id')->on('promociones');
             $table->foreign('idarticulos')->references('id')->on('articulos');
-            $table->string('estado')->default("Activo");
+            $table->integer('cantidad');
             $table->timestamps();
         });
     }

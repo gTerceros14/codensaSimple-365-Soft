@@ -352,6 +352,18 @@ Route::group(['middleware' => ['auth']], function () {
         //-----seleccionar usuario , roles REGISTROS DE VENTAS
         Route::get('/roles/selectRoles', 'VentaController@selectRoles');
 
+        // OFERTAS
+        Route::get('/ofertas', 'OfertaController@index');
+        Route::post('/ofertas/registrar', 'OfertaController@store');
+        Route::put('/ofertas/actualizar', 'OfertaController@update');
+        Route::get('/ofertas/id', 'OfertaController@obtenerDatosPromocion');
+        Route::put('/ofertas/estado', 'OfertaController@modificarEstado');
+
+
+
+
+
+
 
 
     });
