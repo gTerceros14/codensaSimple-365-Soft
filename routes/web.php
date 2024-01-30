@@ -359,6 +359,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/ofertas/id', 'OfertaController@obtenerDatosPromocion');
         Route::put('/ofertas/estado', 'OfertaController@modificarEstado');
 
+        Route::get('/kits', 'OfertaController@indexKits');
+
+
 
 
 

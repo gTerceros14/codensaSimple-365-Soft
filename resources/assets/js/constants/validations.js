@@ -48,19 +48,25 @@ export const esquemaMoneda = yup.object().shape({
 export const esquemaKits = yup.object().shape({
   nombre: yup
     .string()
-    .required("El nombre de la moneda es obligatorio")
-    .max(50, "El nombre no puede tener más de 50 caracteres")
-    .matches(
-      /^[a-zA-Z0-9\s]+$/,
-      "El nombre no puede contener caracteres especiales"
-    ),
+    .required("El nombre es obligatorio")
+    .max(80, "El nombre no puede tener más de 80 caracteres"),
+  codigo: yup
+    .string()
+    .required("El codigo es obligatorio")
+    .max(100, "El codigo no puede tener más de 100 caracteres"),
+  precio: yup
+    .number()
+    .required("El precio es obligatorio")
+    .min(1, "El precio no puede ser menor o igual que 0")
+    .typeError("Debe ser un número"),
+  fecha_final: yup.string().required("La fecha final es obligatoria"),
 });
 
 export const esquemaOfertas = yup.object().shape({
   nombre: yup
     .string()
     .required("El nombre es obligatorio")
-    .max(50, "El nombre no puede tener más de 50 caracteres"),
+    .max(80, "El nombre no puede tener más de 80 caracteres"),
   porcentaje: yup
     .number()
     .required("El porcentaje es obligatorio")
