@@ -2898,7 +2898,12 @@ tbody.collapse.show {
     content: ""; }
 
 .breadcrumb-item {
-  float: left; }
+  float: left;
+  padding-top:7px; 
+  padding-bottom:7px;
+  padding-left: 7px;
+
+}
   .breadcrumb-item + .breadcrumb-item::before {
     display: inline-block;
     padding-right: 0.5rem;

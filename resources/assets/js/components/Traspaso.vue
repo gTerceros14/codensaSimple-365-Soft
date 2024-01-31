@@ -1,7 +1,7 @@
 <template>
     <main class="main">
         <ol class="breadcrumb">
-             <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
+             <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
         </ol>
         <div class="container-fluid">
             <div class="card">
@@ -88,7 +88,7 @@
             </div>
         </div><!--Listado -->>
         <!--Modelo de Registro de traspaso y muesTra de lo agregado-->
-        <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal " tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header"><!--muesTra la vista verde-->
@@ -310,7 +310,7 @@
             <!-- /.modal-dialog -->
         </div><!--finaliza aqui el modal de traspaso registro-->          
         <!--#####################################-LIStADO DE INvENtARIO PARA SELECCIONAR-#################-->
-        <div class="modal fade" tabindex="-1" :class="{ 'mostrar': modal2 }" role="dialog" aria-labelledby="myModalLabel"
+        <div class="modal " tabindex="-1" :class="{ 'mostrar': modal2 }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">

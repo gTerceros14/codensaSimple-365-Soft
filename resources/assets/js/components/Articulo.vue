@@ -2,7 +2,7 @@
     <main class="main">
         <!-- Breadcrumb -->
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
+            <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
         </ol>
         <div class="container-fluid">
 
@@ -191,7 +191,7 @@
         <!-- contenido del modal -->
 
         <!--Inicio del modal agregar/actualizar-->
-        <div class="modal fade" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
+        <div class="modal" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
@@ -440,7 +440,7 @@
         </div>
 
         <!-- MODAL PARA LA LISTA DE MEDIDA -->
-        <div class="modal fade" tabindex="-1" :class="{ 'mostrar': modal6 }" role="dialog" aria-labelledby="myModalLabel"
+        <div class="modal " tabindex="-1" :class="{ 'mostrar': modal6 }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
@@ -531,7 +531,7 @@
         </div>
         <!-- HASTA AQUI EL MODAL DE LISTA MEDIDA -->
 
-        <div class="modal fade" tabindex="-1" :class="{ 'mostrar': modal2 }" role="dialog" aria-labelledby="myModalLabel"
+        <div class="modal " tabindex="-1" :class="{ 'mostrar': modal2 }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
@@ -791,7 +791,7 @@
         </div>
         <!--Fin del modal-->
         <!--######################################-aqui registro de industria,Marca,Linea#####################-->
-        <div class="modal fade" tabindex="-1" :class="{ 'mostrar': modal3 }" role="dialog" aria-labelledby="myModalLabel"
+        <div class="modal " tabindex="-1" :class="{ 'mostrar': modal3 }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
@@ -959,7 +959,7 @@
         <!--######################################hasta aqui registro de industria#####################-->
 
         <!--######################################-aqui registro de medida#####################-->
-        <div class="modal fade" tabindex="-1" :class="{ 'mostrar': modal7 }" role="dialog" aria-labelledby="myModalLabel"
+        <div class="modal " tabindex="-1" :class="{ 'mostrar': modal7 }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
@@ -1014,7 +1014,7 @@
             </div>
             <!-- /.modal-dialog -->
         </div>
-        <div class="modal fade" tabindex="-1" :class="{ 'mostrar': modalImportar }" role="dialog"
+        <div class="modal " tabindex="-1" :class="{ 'mostrar': modalImportar }" role="dialog"
             aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
