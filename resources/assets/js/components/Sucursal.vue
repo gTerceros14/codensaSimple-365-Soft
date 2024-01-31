@@ -2,7 +2,7 @@
   <main class="main">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
+      <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
     </ol>
     <div class="container-fluid">
       <!-- Ejemplo de tabla Listado -->
@@ -88,7 +88,7 @@
       <!-- Fin ejemplo de tabla Listado -->
     </div>
     <!-- Inicio del modal agregar/actualizar -->
-    <div class="modal fade" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
+    <div class="modal" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
       style="display: none;" aria-hidden="true">
       <div class="modal-dialog modal-primary modal-lg" role="document">
         <div class="modal-content">

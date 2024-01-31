@@ -6,6 +6,9 @@
 
 import Vue from "vue";
 import Toasted from "vue-toasted";
+import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
 require("./bootstrap");
 
 window.$ = window.jQuery = require("jquery");
@@ -152,6 +155,7 @@ Vue.component(
   require("./components/Tables/TransaccionExtra.vue")
 );
 
+Vue.use(BootstrapVue);
 Vue.use(Toasted);
 const app = new Vue({
   el: "#app",
@@ -159,9 +163,7 @@ const app = new Vue({
     menu: 0,
     notifications: [],
   },
-  mounted() {
-    console.log("Vue app mounted");
-  },
+  mounted() {},
   created() {
     let me = this;
     axios

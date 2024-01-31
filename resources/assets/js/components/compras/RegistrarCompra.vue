@@ -82,7 +82,7 @@
         </div>
         <div class="card">
 
-            <div class="row no-gutters">
+            <div class="row ">
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="" class="font-weight-bold">Seleccione producto<span class="text-danger">*</span></label>

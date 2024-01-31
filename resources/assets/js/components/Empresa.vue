@@ -2,7 +2,7 @@
     <main class="main">
         <!-- Breadcrumb -->
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
+            <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
         </ol>
         <div class="container-fluid">
             <div class="card">
@@ -18,9 +18,9 @@
                     <label class="col-md-3 form-control-label font-weight-bold" for="text-input">&nbsp; Logo de la
                         Empresa:</label>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="row">
-                            <figure class="col-md-6">
+                            <figure class="col-md-4">
                                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3bz1rSR914Qj3-mmNDyf-MhhLkdq3GzsVNKUZYXTJaQ&s"
                                     width="129" height="129" alt="Foto usuario">
                             </figure>
@@ -31,11 +31,11 @@
                 <div class="form-group row">
                     <label class="col-md-3 form-control-label font-weight-bold" for="text-input">&nbsp; Nombre de la
                         Empresa:</label>
-                    <div v-if="!estadoInputs" class="col-md-6 mx-2">
+                    <div v-if="!estadoInputs" class="col-md-4 mx-2">
                         <input type="text" v-model="nombre" class="form-control"
                             placeholder="Ingrese el nombre de la empresa" :readonly="this.estadoInputs" maxlength="50">
                     </div>
-                    <div v-else class="col-md-6 mx-2">
+                    <div v-else class="col-md-4 mx-2">
                         {{ nombre }}
                     </div>
                 </div>
@@ -44,11 +44,11 @@
                 <div class="form-group row">
                     <label class="col-md-3 form-control-label font-weight-bold" for="email-input">&nbsp; Dirección de la
                         Empresa</label>
-                    <div v-if="!estadoInputs" class="col-md-6 mx-2">
+                    <div v-if="!estadoInputs" class="col-md-4 mx-2">
                         <input type="text" v-model="direccion" maxlength="50" class="form-control" placeholder="Ingrese la direccion"
                             :readonly="this.estadoInputs">
                     </div>
-                    <div v-else class="col-md-6 mx-2">
+                    <div v-else class="col-md-4 mx-2">
                         {{ direccion }}
                     </div>
                 </div>
@@ -56,11 +56,11 @@
                 <div class="form-group row">
                     <label class="col-md-3 form-control-label font-weight-bold" for="email-input">&nbsp; Teléfono de la
                         Empresa</label>
-                    <div v-if="!estadoInputs" class="col-md-6 mx-2">
+                    <div v-if="!estadoInputs" class="col-md-4 mx-2">
                         <input type="number" v-model="telefono" class="form-control" placeholder="Ingrese el telefono"
                             :readonly="this.estadoInputs">
                     </div>
-                    <div v-else class="col-md-6 mx-2">
+                    <div v-else class="col-md-4 mx-2">
                         {{ telefono }}
                     </div>
                 </div>
@@ -68,11 +68,11 @@
                 <div class="form-group row">
                     <label class="col-md-3 form-control-label font-weight-bold" for="email-input">&nbsp; NIT de la
                         Empresa</label>
-                    <div v-if="!estadoInputs" class="col-md-6 mx-2">
+                    <div v-if="!estadoInputs" class="col-md-4 mx-2">
                         <input type="number" v-model="nit" class="form-control" placeholder="Ingrese el telefono"
                             :readonly="this.estadoInputs">
                     </div>
-                    <div v-else class="col-md-6 mx-2">
+                    <div v-else class="col-md-4 mx-2">
                         {{ nit }}
                     </div>
                 </div>
@@ -80,12 +80,12 @@
                 <div class="form-group row">
                     <label class="col-md-3 form-control-label font-weight-bold" for="email-input">&nbsp; Email de la
                         Empresa</label>
-                    <div v-if="!estadoInputs" class="col-md-6 mx-2">
+                    <div v-if="!estadoInputs" class="col-md-4 mx-2">
                         <input type="email" v-model="email" class="form-control" placeholder="Ingrese el email"
                             :readonly="this.estadoInputs">
                         <!-- <p :style="{color:'red'}" v-if="validEmail === false">Por favor, ingrese un correo electronico de la empresa valido</p> -->
                     </div>
-                    <div v-else class="col-md-6 mx-2">
+                    <div v-else class="col-md-4 mx-2">
                         {{ email }}
                     </div>
 
