@@ -15,7 +15,7 @@ class CreatePromocionesTable extends Migration
     {
         Schema::create('promociones', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('codigo')->nullable();
+            $table->string('codigo', 11)->nullable();
             $table->decimal('precio', 15, 4)->nullable();
             $table->decimal('porcentaje', 11, 2)->nullable();
             $table->datetime('fecha_final')->nullable();
