@@ -346,6 +346,19 @@ Route::group(['middleware' => ['auth']], function () {
         //-----seleccionar usuario , roles REGISTROS DE VENTAS
         Route::get('/roles/selectRoles', 'VentaController@selectRoles');
 
+<<<<<<< Updated upstream
+=======
+        //REPORTES
+        Route::get('/ventas-diarias', 'VentaController@reporteVentasDiarias');
+
+        //VARIABLES TEMPORALES
+        Route::post('/variables/registrarVariable', 'VentasInstitucionalesController@registrarVariable');
+        Route::post('/variables/registrarArticuloVariable', 'VentasInstitucionalesController@registrarArticuloVariable');
+        Route::post('/variables/registrarArticuloVariable2', 'VentasInstitucionalesController@registrarArticuloVariable2');
+        Route::get('/variables/listarArticulosVariable', 'VentasInstitucionalesController@obtenerArticulosPorVariableTemporal');    
+        Route::delete('/variables/excluirArticulo', 'VentasInstitucionalesController@excluirArticulo');
+
+>>>>>>> Stashed changes
 
 
     });

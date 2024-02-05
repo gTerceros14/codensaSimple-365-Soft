@@ -10,7 +10,6 @@ class Venta extends Model
         'idcliente', 
         'idusuario',
         'tipo_comprobante',
-        'serie_comprobante',
         'num_comprobante',
         'fecha_hora',
         'impuesto',

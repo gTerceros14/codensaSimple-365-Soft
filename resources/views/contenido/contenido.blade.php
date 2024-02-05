@@ -151,6 +151,12 @@
             <template v-if="menu==41">
                 <puntoventa></puntoventa>
             </template>
+            <template v-if="menu==45">
+                <reporteventas></reporteventas>
+            </template>
+            <template v-if="menu==48">
+                <ventasinstitucionales></ventasinstitucionales>
+            </template>
 
             @elseif (Auth::user()->idrol == 2)
             <template v-if="menu==0">

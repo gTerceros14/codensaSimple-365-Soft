@@ -1593,4 +1593,36 @@ class VentaController extends Controller
             ->select('id', 'nombre')->orderBy('nombre', 'asc')->get();
         return ['roles' => $roles];
     }
+
+    public function reporteVentasDiarias(Request $request)
+    {
+        // Validar la presencia de la fecha en la solicitud
+        $request->validate([
+            'fecha' => 'required|date',
+        ]);
+
+        // Obtener las ventas para la fecha dada
+        $ventas = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
+        ->join('users', 'ventas.idusuario', '=', 'users.id')
+        ->select(
+            'personas.nombre as cliente',
+            'ventas.total',
+            'ventas.num_comprobante',
+            'users.usuario as usuario'
+        )
+        ->whereDate('ventas.created_at', $request->input('fecha'))
+        ->get();
+
+        if ($ventas->isEmpty()) {
+            return response()->json(['mensaje' => 'Ninguna Venta Realizada en la Fecha Indicada']);
+        }
+
+        $totalGanado = $ventas->sum('total');
+
+        // Devolver las ventas como JSON
+        return response()->json([
+            'ventas' => $ventas,
+            'totalGanado' => $totalGanado
+        ]);
+    }
 }

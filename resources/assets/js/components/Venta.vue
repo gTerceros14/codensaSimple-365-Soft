@@ -10,7 +10,7 @@
                 <div class="card-header">
                     <i class="fa fa-align-justify"></i> Ventas
                     <button type="button" @click="ejecutarFunciones" class="btn btn-secondary">
-                        <i class="icon-plus"></i>&nbsp;Nuevo
+                        <i class="icon-plus"></i>&nbsp;Nueva Venta
                     </button>
                     <button v-if="permitirDevolucion === 1" type="button" @click="listado = 3" class="btn btn-secondary">Devoluciones
                     </button>
@@ -285,9 +285,9 @@
                                             <th>Precio Unidad </th>
                                             <th>Unidades</th>
                                             <th>Cantidad Paquetes</th>
-                                            <th>Total S/Descueto</th>
+                                            <th>Total S/Descuento</th>
                                             <th>Descuento %</th>
-                                            <th>Total C/Descueto</th>
+                                            <th>Total C/Descuento</th>
                                 
                                         </tr>
                                     </thead>
@@ -726,7 +726,7 @@ export default {
     data() {
         return {
             permitirDevolucion: '',
-            saldosNegativos: null,
+            saldosNegativos: 1,
             venta_id: 0,
             idcliente: 0,
             usuarioAutenticado: null,
@@ -781,7 +781,6 @@ export default {
             cantidad: 1,
             paquni:'',
             precioBloqueado: false,
-
             descuento: 0,
             sTotal: 0,
             stock: 0,
@@ -910,7 +909,7 @@ export default {
     },
     methods: {
         ejecutarFunciones() {
-            this.obtenerSaldosNegativos();
+            //this.obtenerSaldosNegativos();
             this.mostrarDetalle();
         },
         atajoButton: function (event) {
@@ -1328,10 +1327,7 @@ export default {
 
             let me = this;
 
-            for (let i = 0; i < me.cuotas.length; i++) {
-                // console.log('INvENtARIO',me.cuotas[i].idinventario);
-                // console.log('ARtICULOID',me.cuotas[i].idarticulo);
-                // console.log(me.cuotas[i].cantidad_traspaso);                 
+            for (let i = 0; i < me.cuotas.length; i++) {                 
                 console.log('LLEGA ARRAYDATA!',me.cuotas[i]);
             }
 
@@ -1622,6 +1618,7 @@ export default {
         },
         abrirModal() {
             if (this.idAlmacen == 0) {
+                swal("Ningún Almacén Seleccionado", "Debe seleccionar un almacén para continuar", "info");
                 return;
             }
             this.listarArticulo('', 'nombre');

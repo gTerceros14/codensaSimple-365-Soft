@@ -1913,6 +1913,7 @@ this.submitForm();
                     console.log(error);
                 });
         },
+        
         listarMarca(page, buscar, criterio) {
             let me = this;
             console.log("Listano");

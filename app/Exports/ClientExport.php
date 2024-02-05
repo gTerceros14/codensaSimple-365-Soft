@@ -54,3 +54,4 @@ class ClientExport implements FromCollection, WithHeadings, WithColumnWidths, Wi
         ];
     }
 }
+
