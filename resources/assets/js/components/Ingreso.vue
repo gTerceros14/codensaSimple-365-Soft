@@ -1,11 +1,13 @@
 <template>
     <main class="main">
         <!-- Breadcrumb -->
-        <ol class="breadcrumb bg-light rounded px-3 shadow-sm">
-            <li class="breadcrumb-item"><a class="text-primary text-decoration-none" href="/">Escritorio</a></li>
-            <li class="breadcrumb-item active text-primary" aria-current="page">Compras</li>
-            <li class="breadcrumb-item active text-primary" aria-current="page">Ingresos</li>
+        <ol class="breadcrumb ">
+            <li class="breadcrumb-item"><a class=" text-decoration-none" href="/">Escritorio</a></li>
+            <li class="breadcrumb-item"><a class=" text-decoration-none" href="/">Compras</a></li>
+            <li class="breadcrumb-item active " aria-current="page">Ingresos</li>
         </ol>
+        
+
         <div class="container-fluid">
             <!-- Ejemplo de tabla Listado -->
             <div class="card" v-if="listado!=0">
