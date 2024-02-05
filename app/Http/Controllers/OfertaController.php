@@ -122,7 +122,7 @@ class OfertaController extends Controller
             return response()->json(['message' => 'Oferta y artículos asociados creados correctamente']);
         } catch (\Exception $e) {
             DB::rollBack();
-
+            \Log::info('Error al crear oferta: ' . $e->getMessage());
             return response()->json(['errors' => $e->getMessage()], 422);
         }
     }
@@ -204,5 +204,38 @@ class OfertaController extends Controller
 
         $oferta->save();
     }
+
+
+    public function obtenerPromocionPorIdArticulo(Request $request)
+    {
+        if (!$request->ajax()) {
+            return redirect('/');
+        }
+
+        try {
+            $idArticulo = $request->idArticulo;
+
+            // Busca la fila en la tabla promociones_articulos por el idarticulos
+            $promocionArticulo = PromocionArticulo::where('idarticulos', $idArticulo)
+                ->where('cantidad', 0)
+                ->first();
+
+            if (!$promocionArticulo) {
+                return response()->json(['message' => 'No se encontró ninguna promoción para el artículo.']);
+            }
+
+            // Obtiene la fila correspondiente en la tabla promociones usando el idpromociones
+            $idPromocion = $promocionArticulo->idpromociones;
+            $promocion = Promocion::where('id', $idPromocion)
+                ->where('tipo_promocion', 1)
+                ->first();
+
+
+            return response()->json(['promocion' => $promocion]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 
 }

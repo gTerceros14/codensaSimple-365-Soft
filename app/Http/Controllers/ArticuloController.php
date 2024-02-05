@@ -285,6 +285,8 @@ class ArticuloController extends Controller
                     'articulos.precio_cuatro',
                     'articulos.fotografia',
                     'articulos.condicion',
+                    'articulos.descripcion',
+
                     'categorias.nombre as nombre_categoria',
                     'unidad_envase',
                     'inventarios.fecha_vencimiento',

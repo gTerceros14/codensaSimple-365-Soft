@@ -86,7 +86,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/empresa/selectEmpresa', 'EmpresaController@selectEmpresa');
 
         //Rutas de configuracion de trabajo
-        Route::get('/configuracion/saldos-negativos', 'ConfiguracionTrabajoController@obtenerSaldosNegativos');
+        // Route::get('/configuracion/saldos-negativos', 'ConfiguracionTrabajoController@obtenerSaldosNegativos');
         Route::get('/configuracion/iva', 'ConfiguracionTrabajoController@obtenerIva');
         Route::get('/configuracion/editar', 'ConfiguracionTrabajoController@edit');
         Route::put('/configuracion/actualizar', 'ConfiguracionTrabajoController@update');
@@ -358,6 +358,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/ofertas/actualizar', 'OfertaController@update');
         Route::get('/ofertas/id', 'OfertaController@obtenerDatosPromocion');
         Route::put('/ofertas/estado', 'OfertaController@modificarEstado');
+
+        Route::get('/promocion/id', 'OfertaController@obtenerPromocionPorIdArticulo');
+
 
         Route::get('/kits', 'OfertaController@indexKits');
 
