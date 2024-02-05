@@ -141,16 +141,17 @@ class ConfiguracionTrabajoController extends Controller
             Log::error('Error al actualizar configuración: ' . $e->getMessage());
         }
     }
-    public function obtenerSaldosNegativos()
-    {
-        try {
-            $saldosNegativos = ConfiguracionTrabajo::value('saldosNegativos');
-            return response()->json(['saldosNegativos' => $saldosNegativos]);
-        } catch (\Exception $e) {
-            Log::error('Error al obtener saldos negativos: ' . $e->getMessage());
-            return response()->json(['error' => 'Error interno del servidor'], 500);
-        }
-    }
+    // FUNCION INNECESARIA 
+    // public function obtenerSaldosNegativos()
+    // {
+    //     try {
+    //         $saldosNegativos = ConfiguracionTrabajo::value('saldosNegativos');
+    //         return response()->json(['saldosNegativos' => $saldosNegativos]);
+    //     } catch (\Exception $e) {
+    //         Log::error('Error al obtener saldos negativos: ' . $e->getMessage());
+    //         return response()->json(['error' => 'Error interno del servidor'], 500);
+    //     }
+    // }
 
     public function obtenerIva()
     {
