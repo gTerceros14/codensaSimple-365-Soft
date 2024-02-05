@@ -86,10 +86,12 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/empresa/selectEmpresa', 'EmpresaController@selectEmpresa');
 
         //Rutas de configuracion de trabajo
-        Route::get('/configuracion/saldos-negativos', 'ConfiguracionTrabajoController@obtenerSaldosNegativos');
+        // Route::get('/configuracion/saldos-negativos', 'ConfiguracionTrabajoController@obtenerSaldosNegativos');
         Route::get('/configuracion/iva', 'ConfiguracionTrabajoController@obtenerIva');
         Route::get('/configuracion/editar', 'ConfiguracionTrabajoController@edit');
         Route::put('/configuracion/actualizar', 'ConfiguracionTrabajoController@update');
+        Route::get('/configuracion', 'ConfiguracionTrabajoController@index');
+
         Route::get('/backup', 'BackupDbController@createBackup');
         Route::get('/categoria', 'CategoriaController@index');
         Route::post('/categoria/registrar', 'CategoriaController@store');
@@ -220,6 +222,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/moneda/activar', 'MonedaController@activar');
         Route::put('/moneda/desactivar', 'MonedaController@desactivar');
         Route::put('/moneda/actualizar', 'MonedaController@update');
+        Route::get('/moneda/selectMoneda', 'MonedaController@selectMoneda');
+        Route::get('/moneda/selectMoneda', 'MonedaController@selectMoneda');
+
+        Route::get('/moneda/{id}', 'MonedaController@getMonedaById');
 
         //APERTURA/CIERRE CAJA
         //Listar
@@ -345,6 +351,24 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('/pedido/proveedor', 'PedidoProvController@eliminar');
         //-----seleccionar usuario , roles REGISTROS DE VENTAS
         Route::get('/roles/selectRoles', 'VentaController@selectRoles');
+
+        // OFERTAS
+        Route::get('/ofertas', 'OfertaController@index');
+        Route::post('/ofertas/registrar', 'OfertaController@store');
+        Route::put('/ofertas/actualizar', 'OfertaController@update');
+        Route::get('/ofertas/id', 'OfertaController@obtenerDatosPromocion');
+        Route::put('/ofertas/estado', 'OfertaController@modificarEstado');
+
+        Route::get('/promocion/id', 'OfertaController@obtenerPromocionPorIdArticulo');
+
+
+        Route::get('/kits', 'OfertaController@indexKits');
+
+
+
+
+
+
 
 <<<<<<< Updated upstream
 =======

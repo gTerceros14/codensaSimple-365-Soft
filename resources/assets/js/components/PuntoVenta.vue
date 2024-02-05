@@ -2,7 +2,7 @@
     <main class="main">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
+        <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
     </ol>
     <div class="container-fluid">
         <!-- Ejemplo de tabla Listado -->
@@ -28,6 +28,7 @@
                             </div>
                         </div>
                         </div>
+                        <div class="table-responsive">
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
@@ -61,6 +62,8 @@
                                 </tr>                                                              
                             </tbody>
                         </table>
+                        </div>
+
                         <nav>
                             <ul class="pagination">
                                 <li class="page-item" v-if="pagination.current_page > 1">
@@ -79,7 +82,7 @@
         </div>
         <!-- Fin ejemplo de tabla Listado -->
         <!--Inicio del modal agregar/actualizar-->
-        <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal " tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
                 <div class="modal-dialog modal-primary modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">

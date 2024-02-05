@@ -77,6 +77,10 @@ class ArticuloController extends Controller
                     'articulos.descripcion',
                     'articulos.condicion',
                     'articulos.fotografia',
+                    // agregado el 26.01,2024
+                    
+                    'articulos.codigo_alfanumerico',
+                    'articulos.descripcion_fabrica'
                 )
                 ->orderBy('articulos.id', 'desc')->paginate(3);
         } else {
@@ -114,6 +118,10 @@ class ArticuloController extends Controller
                     'articulos.descripcion',
                     'articulos.condicion',
                     'articulos.fotografia',
+                     // agregado el 26.01,2024
+                    
+                     'articulos.codigo_alfanumerico',
+                     'articulos.descripcion_fabrica'
                 )
                 ->where('articulos.' . $criterio, 'like', '%' . $buscar . '%')
                 ->orderBy('articulos.id', 'desc')->paginate(3);
@@ -150,14 +158,32 @@ class ArticuloController extends Controller
             $articulos = Articulo::join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
                 ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
                 ->join('personas', 'proveedores.id', '=', 'personas.id')
-                ->select('articulos.id', 'articulos.idcategoria', 'articulos.codigo', 'articulos.nombre', 'categorias.nombre as nombre_categoria', 'articulos.precio_costo_unid', 'articulos.stock', 'personas.nombre as nombre_proveedor', 'articulos.descripcion', 'articulos.condicion', 'articulos.unidad_envase', 'articulos.fotografia')
+                ->select('articulos.id', 'articulos.idcategoria',
+                'articulos.codigo', 'articulos.nombre',
+                'categorias.nombre as nombre_categoria',
+                'articulos.precio_costo_unid', 'articulos.stock',
+                'personas.nombre as nombre_proveedor', 
+                'articulos.descripcion', 'articulos.condicion', 
+                'articulos.unidad_envase', 'articulos.fotografia',
+                 // agregado el 26.01,2024
+                 'articulos.codigo_alfanumerico',
+                 'articulos.descripcion_fabrica')
                 ->where('proveedores.id', '=', $idProveedor)
                 ->orderBy('articulos.id', 'desc')->paginate(10);
         } else {
             $articulos = Articulo::join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
                 ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
                 ->join('personas', 'proveedores.id', '=', 'personas.id')
-                ->select('articulos.id', 'articulos.idcategoria', 'articulos.codigo', 'articulos.nombre', 'categorias.nombre as nombre_categoria', 'articulos.precio_costo_unid', 'articulos.stock', 'personas.nombre as nombre_proveedor', 'articulos.descripcion', 'articulos.condicion', 'articulos.unidad_envase', 'articulos.fotografia')
+                ->select('articulos.id', 'articulos.idcategoria',
+                'articulos.codigo', 'articulos.nombre',
+                'categorias.nombre as nombre_categoria',
+                'articulos.precio_costo_unid', 'articulos.stock',
+                'personas.nombre as nombre_proveedor',
+                'articulos.descripcion', 'articulos.condicion',
+                'articulos.unidad_envase', 'articulos.fotografia',
+                 // agregado el 26.01,2024
+                 'articulos.codigo_alfanumerico',
+                 'articulos.descripcion_fabrica')
                 ->where('articulos.' . $criterio, 'like', '%' . $buscar . '%')
                 ->orderBy('articulos.id', 'desc')->paginate(10);
         }
@@ -259,6 +285,8 @@ class ArticuloController extends Controller
                     'articulos.precio_cuatro',
                     'articulos.fotografia',
                     'articulos.condicion',
+                    'articulos.descripcion',
+
                     'categorias.nombre as nombre_categoria',
                     'unidad_envase',
                     'inventarios.fecha_vencimiento',

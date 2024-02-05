@@ -12,6 +12,13 @@
  * Copyright 2011-2017 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
+
+/* Asignar Colores Aqui */
+:root {
+  --color-sidebar: #529535;
+  --color-top-bar:rgb(98, 182, 62);
+}
+
 @media print {
   *,
   *::before,
@@ -2891,7 +2898,12 @@ tbody.collapse.show {
     content: ""; }
 
 .breadcrumb-item {
-  float: left; }
+  float: left;
+  padding-top:7px; 
+  padding-bottom:7px;
+  padding-left: 7px;
+
+}
   .breadcrumb-item + .breadcrumb-item::before {
     display: inline-block;
     padding-right: 0.5rem;
@@ -3469,6 +3481,8 @@ button.close {
   line-height: 1.5; }
 
 .modal-body {
+  max-height:70vh;
+  overflow-y: auto;
   position: relative;
   -ms-flex: 1 1 auto;
       flex: 1 1 auto;
@@ -7603,11 +7617,11 @@ base-chart.chart {
   background: #20a8d8; }
 
 .modal-primary .modal-content {
-  border-color: #71AB57; }
+  border-color: var(--color-top-bar); }
 
 .modal-primary .modal-header {
   color: #fff;
-  background-color: #71AB57; }
+  background-color: var(--color-top-bar); }
 
 .modal-secondary .modal-content {
   border-color: #a4b7c1; }
@@ -7688,7 +7702,7 @@ base-chart.chart {
   height: 55px;
   padding: 0;
   margin: 0;
-  background-color: #71AB57;
+  background-color: var(--color-top-bar);
   border-bottom: 1px solid #c2cfd6; }
   .app-header.navbar .navbar-brand {
     display: inline-block;
@@ -7814,7 +7828,7 @@ base-chart.chart {
   padding: 0;
   color: #fff;
   font-size: 14px;
-  background: #48852E;
+  background:var(--color-sidebar);
  }
   .sidebar .sidebar-close {
     position: absolute;

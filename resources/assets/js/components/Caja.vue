@@ -2,7 +2,7 @@
     <main class="main">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
+        <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
     </ol>
     <div class="container-fluid">
         <!-- Ejemplo de tabla Listado -->
@@ -132,7 +132,7 @@
         <!-- Fin ejemplo de tabla Listado -->
     </div>
     <!--Inicio del modal aperturar caja-->
-    <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal " tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
                 <div class="modal-dialog modal-primary modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -170,7 +170,7 @@
             </div>
     <!--Fin del modal-->
     <!--Inicio del modal Depósitos-->
-    <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal2}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal " tabindex="-1" :class="{'mostrar' : modal2}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
                 <div class="modal-dialog modal-primary modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -217,7 +217,7 @@
             <!--Fin del modal-->
 
             <!--Inicio del modal Salidas-->
-    <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal3}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal " tabindex="-1" :class="{'mostrar' : modal3}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
                 <div class="modal-dialog modal-primary modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -262,7 +262,7 @@
             <!--Fin del modal-->
 
             <!--Inicio del modal Ver Transacciones-->
-            <div class="modal fade" tabindex="-1" :class="{ 'mostrar': modal4 }" role="dialog" aria-labelledby="myModalLabel"
+            <div class="modal " tabindex="-1" :class="{ 'mostrar': modal4 }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none; overflow-y: auto" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content m-2">
@@ -395,7 +395,7 @@
             <!--Fin del modal-->
 
             <!--Inicio del modal Arqueo de Caja-->
-    <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal5}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal " tabindex="-1" :class="{'mostrar' : modal5}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
                 <div class="modal-dialog modal-primary modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">

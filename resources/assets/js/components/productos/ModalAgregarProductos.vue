@@ -1,5 +1,5 @@
 <template>
-            <div class="modal fade" tabindex="-1" :class="{ 'mostrar': true }" role="dialog" aria-labelledby="myModalLabel"
+            <div class="modal " tabindex="-1" :class="{ 'mostrar': true }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
@@ -47,8 +47,14 @@
                                         </td>
                                         <td v-text="articulo.codigo"></td>
                                         <td v-text="articulo.nombre"></td>
-                                        <td v-text="articulo.precio_costo_unid"></td>
-                                        <td v-text="articulo.precio_costo_unid*articulo.unidad_envase"></td>
+                                        <td >
+{{(articulo.precio_costo_unid *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                        
+                                        </td>
+                                        <td >
+{{((articulo.precio_costo_unid*articulo.unidad_envase) *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                        
+                                        </td>
                                         <td v-text="articulo.nombre_proveedor"></td>
                                         <td>
                                             <div v-if="articulo.condicion">
@@ -82,7 +88,11 @@
 
 export default {
         props: {
-      idproveedor: Number
+      idproveedor: Number,
+      monedaPrincipal: {
+            type: Array,
+            required: true
+        }
     },
     created(){
         this.listarArticulo("","");

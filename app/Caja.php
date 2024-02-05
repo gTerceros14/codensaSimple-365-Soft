@@ -22,7 +22,8 @@ class Caja extends Model
         'saldoFaltante', 
         'saldoSobrante', 
         'saldoCaja', 
-        'estado'
+        'estado',
+        'cuotasventasCredito'
     ];
 
     public function sucursal(){
