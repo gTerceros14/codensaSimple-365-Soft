@@ -141,11 +141,15 @@ Vue.component(
 Vue.component("puntoventa", require("./components/PuntoVenta.vue"));
 Vue.component("rolventa", require("./components/RegistroVentas.vue"));
 Vue.component("devoluciones", require("./components/Devoluciones.vue"));
-<<<<<<< Updated upstream
-=======
-Vue.component('reporteventas', require('./components/ReporteVentasDiarias.vue'));
-Vue.component('ventasinstitucionales', require('./components/VentasInstitucionales.vue'));
->>>>>>> Stashed changes
+
+Vue.component(
+  "reporteventas",
+  require("./components/ReporteVentasDiarias.vue")
+);
+Vue.component(
+  "ventasinstitucionales",
+  require("./components/VentasInstitucionales.vue")
+);
 
 Vue.component(
   "TransaccionErgeso",
