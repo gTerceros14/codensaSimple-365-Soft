@@ -152,7 +152,7 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte
                             Ventas Diarias</a>
                             </li>
-                            <li @click="menu=10" class="nav-item">
+                            <li @click="menu=49" class="nav-item">
                                 <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Inventarios</a>
                     </li>
                     <li @click="menu=10" class="nav-item">

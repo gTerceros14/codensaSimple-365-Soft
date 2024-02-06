@@ -181,7 +181,7 @@ methods : {
 
     const startRow = 5;
 
-    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: this.arrayVentas.length } }];
+    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
     worksheet['A1'] = { t: 's', v: 'REPORTE DE VENTAS DIARIAS', s: { 
         font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
         alignment: { horizontal: 'center', vertical: 'center' },
@@ -191,13 +191,13 @@ methods : {
     const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
     worksheet['A2'] = { t: 's', v: `Fecha: ${this.fecha}`, s: fechaStyle };
 
-    worksheet['!merges'].push({ s: { r: 1, c: 0 }, e: { r: 2, c: this.arrayVentas.length } });
+    worksheet['!merges'].push({ s: { r: 1, c: 0 }, e: { r: 2, c: 3 } });
 
     const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
     const headers = ['Cliente', 'Monto', 'Número Factura', 'Usuario'];
 
     headers.forEach((header, index) => {
-        worksheet[XLSX.utils.encode_cell({ r: 3, c: index })] = { t: 's', v: header, s: headerStyle };
+        worksheet[XLSX.utils.encode_cell({ r: 3, c: 3 })] = { t: 's', v: header, s: headerStyle };
     });
 
     for (let i = 0; i < this.arrayVentas.length; i++) {

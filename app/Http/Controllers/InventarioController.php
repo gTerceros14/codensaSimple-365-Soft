@@ -517,6 +517,37 @@ class InventarioController extends Controller
             return ['invenstock' => []];
         }
     }
+    public function reporteAlmacenes(Request $request)
+    {
+        if (!$request->ajax())
+            return redirect('/');
+        $idAlmacen = $request->idAlmacen;
+
+        $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
+            ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
+            ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
+            ->join('personas', 'proveedores.id', '=', 'personas.id')
+            ->select(
+                'articulos.nombre as nombre_producto',
+                'articulos.unidad_envase',
+                'almacens.nombre_almacen',
+                DB::raw('SUM(inventarios.saldo_stock) as saldo_stock_total')
+            )
+            ->where('inventarios.idalmacen', '=', $idAlmacen)
+            ->groupBy('articulos.nombre', 'almacens.nombre_almacen','articulos.unidad_envase')
+            ->orderBy('articulos.nombre')
+            ->orderBy('almacens.nombre_almacen');
+            //->get();
+        //---------------------------------------
+        
+        $inventarios = $inventarios->get();
+
+        if ($inventarios->isEmpty()) {
+            return response()->json(['mensaje' => 'No existe articulos en el almacen seleccionado']);
+        }
+        //---------------------------------
+        return  response()->json(['inventarios' => $inventarios]);
+    }
     // public function store(Request $request)
     // {
     //     if (!$request->ajax()) {
