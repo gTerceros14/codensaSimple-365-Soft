@@ -75,3 +75,62 @@ export const esquemaOfertas = yup.object().shape({
     .typeError("Debe ser un número"),
   fecha_final: yup.string().required("La fecha final es obligatoria"),
 });
+export const esquemaArticulos = yup.object().shape({
+  nombre: yup
+    .string()
+    .required("El nombre es obligatorio")
+    .max(80, "El nombre no puede tener más de 80 caracteres"),
+  descripcion: yup.string().required("La descripción es obligatoria"),
+  nombre_generico: yup.string().required("El nombre generico es obligatorio"),
+  unidad_envase: yup
+    .number()
+    .required("La cantidad de unidades por paquete es obligatoria")
+    .typeError("Debe ingresar un número válido")
+    .min(
+      0.01,
+      "El cantidad de unidades por paquete no puede ser menor o igual a 0"
+    ),
+
+  precio_costo_unid: yup
+    .number()
+    .required("El precio por unidad es obligatorio")
+    .typeError("Debe ingresar un número válido")
+    .min(0.01, "El precio por unidad no puede ser menor o igual a 0"),
+
+  precio_costo_paq: yup
+    .number()
+    .required("El precio por paquete es obligatorio")
+    .typeError("Debe ingresar un número válido")
+    .min(0.01, "El precio por paquete no puede ser menor o igual a 0"),
+
+  precio_venta: yup
+    .number()
+    .required("El precio de venta es obligatorio")
+    .typeError("Debe ingresar un número válido")
+    .min(0.01, "El precio de venta no puede ser menor o igual a 0"),
+  precio_uno: yup.number().typeError("Debe ingresar un número válido"),
+  precio_dos: yup.number().typeError("Debe ingresar un número válido"),
+  precio_tres: yup.number().typeError("Debe ingresar un número válido"),
+  precio_cuatro: yup.number().typeError("Debe ingresar un número válido"),
+  stock: yup
+    .number()
+    .required("El stock es obligatorio")
+    .typeError("Debe ingresar un número válido")
+    .min(0.01, "El stock minimo no puede ser menor o igual a 0"),
+
+  costo_compra: yup
+    .number()
+    .required("El costo de compra es obligatorio")
+    .typeError("Debe ingresar un número válido")
+    .min(0.01, "El costo de compra no puede ser menor o igual a 0"),
+
+  codigo: yup.string().required("El código es obligatorio"),
+  codigo_alfanumerico: yup.string(),
+  descripcion_fabrica: yup.string(),
+  idcategoria: yup.number().required("El campo Línea es obligatorio"),
+  idmarca: yup.number().required("El campo Marca es obligatorio"),
+  idindustria: yup.number().required("El campo Industria es obligatorio"),
+  idgrupo: yup.number().required("El campo Grupo o Familia es obligatorio"),
+  idproveedor: yup.number().required("El campo Proveedor es obligatorio"),
+  idmedida: yup.number().required("El campo Medida es obligatorio"),
+});
