@@ -141,6 +141,8 @@ Vue.component(
 Vue.component("puntoventa", require("./components/PuntoVenta.vue"));
 Vue.component("rolventa", require("./components/RegistroVentas.vue"));
 Vue.component("devoluciones", require("./components/Devoluciones.vue"));
+Vue.component('reporteventas', require('./components/ReporteVentasDiarias.vue'));
+Vue.component('ventasinstitucionales', require('./components/VentasInstitucionales.vue'));
 
 Vue.component(
   "reporteventas",
