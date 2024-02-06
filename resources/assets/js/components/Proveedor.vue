@@ -52,7 +52,7 @@
                                         </button>
                                     </td>
                                     <td v-text="persona.nombre"></td>
-                                    <td v-text="persona.tipo_documento"></td>
+                                    <td v-text="getTipoDocumentoText(persona.tipo_documento)"></td>
                                     <td v-text="persona.num_documento"></td>
                                     <td v-text="persona.direccion"></td>
                                     <td v-text="persona.telefono"></td>
@@ -102,9 +102,10 @@
                                     <label class="col-md-3 form-control-label" for="text-input">Tipo Documento</label>
                                     <div class="col-md-9">
                                         <select v-model="tipo_documento" class="form-control">
-                                            <option value="DNI">DNI</option>
-                                            <option value="RUC">RUC</option>
-                                            <option value="PASS">PASS</option>
+                                            <option value="1">CI - CEDULA DE IDENTIDAD</option>
+                                            <option value="2">CEX - CEDULA DE IDENTIDAD DE EXTRANJERO</option>
+                                            <option value="4">NIT - NÚMERO DE IDENTIFICACIÓN TRIBUTARIA</option>
+                                            <option value="3">PAS - PASAPORTE</option>
                                         </select>                                    
                                     </div>
                                 </div>
@@ -231,6 +232,20 @@
             }
         },
         methods : {
+            getTipoDocumentoText(value) {
+        switch(value) {
+            case '1':
+                return 'CI';
+            case '2':
+                return 'CEX';
+            case '4':
+                return 'NIT';
+            case '3':
+                return 'PAS';
+            default:
+                return '';
+            }
+        },
             listarPersona (page,buscar,criterio){
                 let me=this;
                 var url= '/proveedor?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
