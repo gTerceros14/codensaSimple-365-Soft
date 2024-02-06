@@ -78,7 +78,7 @@ class ArticuloController extends Controller
                     'articulos.condicion',
                     'articulos.fotografia',
                     // agregado el 26.01,2024
-                    
+
                     'articulos.codigo_alfanumerico',
                     'articulos.descripcion_fabrica'
                 )
@@ -118,10 +118,10 @@ class ArticuloController extends Controller
                     'articulos.descripcion',
                     'articulos.condicion',
                     'articulos.fotografia',
-                     // agregado el 26.01,2024
-                    
-                     'articulos.codigo_alfanumerico',
-                     'articulos.descripcion_fabrica'
+                    // agregado el 26.01,2024
+
+                    'articulos.codigo_alfanumerico',
+                    'articulos.descripcion_fabrica'
                 )
                 ->where('articulos.' . $criterio, 'like', '%' . $buscar . '%')
                 ->orderBy('articulos.id', 'desc')->paginate(3);
@@ -158,32 +158,46 @@ class ArticuloController extends Controller
             $articulos = Articulo::join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
                 ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
                 ->join('personas', 'proveedores.id', '=', 'personas.id')
-                ->select('articulos.id', 'articulos.idcategoria',
-                'articulos.codigo', 'articulos.nombre',
-                'categorias.nombre as nombre_categoria',
-                'articulos.precio_costo_unid', 'articulos.stock',
-                'personas.nombre as nombre_proveedor', 
-                'articulos.descripcion', 'articulos.condicion', 
-                'articulos.unidad_envase', 'articulos.fotografia',
-                 // agregado el 26.01,2024
-                 'articulos.codigo_alfanumerico',
-                 'articulos.descripcion_fabrica')
+                ->select(
+                    'articulos.id',
+                    'articulos.idcategoria',
+                    'articulos.codigo',
+                    'articulos.nombre',
+                    'categorias.nombre as nombre_categoria',
+                    'articulos.precio_costo_unid',
+                    'articulos.stock',
+                    'personas.nombre as nombre_proveedor',
+                    'articulos.descripcion',
+                    'articulos.condicion',
+                    'articulos.unidad_envase',
+                    'articulos.fotografia',
+                    // agregado el 26.01,2024
+                    'articulos.codigo_alfanumerico',
+                    'articulos.descripcion_fabrica'
+                )
                 ->where('proveedores.id', '=', $idProveedor)
                 ->orderBy('articulos.id', 'desc')->paginate(10);
         } else {
             $articulos = Articulo::join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
                 ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
                 ->join('personas', 'proveedores.id', '=', 'personas.id')
-                ->select('articulos.id', 'articulos.idcategoria',
-                'articulos.codigo', 'articulos.nombre',
-                'categorias.nombre as nombre_categoria',
-                'articulos.precio_costo_unid', 'articulos.stock',
-                'personas.nombre as nombre_proveedor',
-                'articulos.descripcion', 'articulos.condicion',
-                'articulos.unidad_envase', 'articulos.fotografia',
-                 // agregado el 26.01,2024
-                 'articulos.codigo_alfanumerico',
-                 'articulos.descripcion_fabrica')
+                ->select(
+                    'articulos.id',
+                    'articulos.idcategoria',
+                    'articulos.codigo',
+                    'articulos.nombre',
+                    'categorias.nombre as nombre_categoria',
+                    'articulos.precio_costo_unid',
+                    'articulos.stock',
+                    'personas.nombre as nombre_proveedor',
+                    'articulos.descripcion',
+                    'articulos.condicion',
+                    'articulos.unidad_envase',
+                    'articulos.fotografia',
+                    // agregado el 26.01,2024
+                    'articulos.codigo_alfanumerico',
+                    'articulos.descripcion_fabrica'
+                )
                 ->where('articulos.' . $criterio, 'like', '%' . $buscar . '%')
                 ->orderBy('articulos.id', 'desc')->paginate(10);
         }
@@ -197,15 +211,24 @@ class ArticuloController extends Controller
         if (!$request->ajax()) {
             return redirect('/');
         }
-    
+
         $buscar = $request->buscar;
         $criterio = $request->criterio;
         $idAlmacen = $request->idAlmacen;
         $fechaActual = now();
-    
+
         $query = Articulo::join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
             ->join('medidas', 'articulos.idmedida', '=', 'medidas.id')
-            ->select('articulos.id', 'medidas.descripcion_medida', 'articulos.idcategoria', 'articulos.codigo', 'articulos.nombre', 'categorias.nombre as nombre_categoria', 'articulos.precio_venta', 'articulos.descripcion', 'articulos.condicion',
+            ->select(
+                'articulos.id',
+                'medidas.descripcion_medida',
+                'articulos.idcategoria',
+                'articulos.codigo',
+                'articulos.nombre',
+                'categorias.nombre as nombre_categoria',
+                'articulos.precio_venta',
+                'articulos.descripcion',
+                'articulos.condicion',
                 'articulos.precio_uno',
                 'articulos.precio_dos',
                 'articulos.precio_tres',
@@ -216,27 +239,27 @@ class ArticuloController extends Controller
                 // 'articulos.precio_costo_paq',
             )
             ->where('articulos.stock', '>', '0');
-    
+
         if ($buscar != '') {
             $query->where('articulos.' . $criterio, 'like', '%' . $buscar . '%');
         }
-    
+
         $articulos = $query->get();
-    
+
         $articulosConSaldo = [];
-    
+
         foreach ($articulos as $articulo) {
             $saldoStock = Inventario::where('idarticulo', $articulo->id)
                 ->where('idalmacen', $idAlmacen)
                 ->where('fecha_vencimiento', '>', $fechaActual)
                 ->sum('saldo_stock');
-            
+
             if ($saldoStock > 0) {
                 $articulo->saldo_stock = $saldoStock;
                 $articulosConSaldo[] = $articulo;
             }
         }
-    
+
         return ['articulos' => $articulosConSaldo];
     }
 
@@ -278,19 +301,29 @@ class ArticuloController extends Controller
         $articulos = Articulo::join('medidas', 'articulos.idmedida', '=', 'medidas.id')
             ->join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
             ->join('inventarios', 'inventarios.idarticulo', '=', 'articulos.id')
-            ->select('articulos.id', 'articulos.nombre','articulos.stock','articulos.precio_costo_unid', 'articulos.precio_costo_paq', 'medidas.descripcion_medida as medida', 'medidas.codigoClasificador as codigoClasificador','articulos.precio_venta','categorias.codigoProductoSin', 'articulos.codigo',
-                    'articulos.precio_uno',
-                    'articulos.precio_dos',
-                    'articulos.precio_tres',
-                    'articulos.precio_cuatro',
-                    'articulos.fotografia',
-                    'articulos.condicion',
-                    'articulos.descripcion',
+            ->select(
+                'articulos.id',
+                'articulos.nombre',
+                'articulos.stock',
+                'articulos.precio_costo_unid',
+                'articulos.precio_costo_paq',
+                'medidas.descripcion_medida as medida',
+                'medidas.codigoClasificador as codigoClasificador',
+                'articulos.precio_venta',
+                'categorias.codigoProductoSin',
+                'articulos.codigo',
+                'articulos.precio_uno',
+                'articulos.precio_dos',
+                'articulos.precio_tres',
+                'articulos.precio_cuatro',
+                'articulos.fotografia',
+                'articulos.condicion',
+                'articulos.descripcion',
 
-                    'categorias.nombre as nombre_categoria',
-                    'unidad_envase',
-                    'inventarios.fecha_vencimiento',
-                    DB::raw('(SELECT SUM(inventarios.saldo_stock) FROM inventarios WHERE inventarios.idarticulo = articulos.id AND inventarios.fecha_vencimiento > NOW()) as saldo_stock')
+                'categorias.nombre as nombre_categoria',
+                'unidad_envase',
+                'inventarios.fecha_vencimiento',
+                DB::raw('(SELECT SUM(inventarios.saldo_stock) FROM inventarios WHERE inventarios.idarticulo = articulos.id AND inventarios.fecha_vencimiento > NOW()) as saldo_stock')
 
             )
             ->where('articulos.codigo', '=', $filtro)
@@ -337,8 +370,13 @@ class ArticuloController extends Controller
         $articulo->precio_costo_unid = $request->precio_costo_unid;
         $articulo->precio_costo_paq = $request->precio_costo_paq;
         $articulo->descripcion = $request->descripcion;
+        $articulo->codigo_alfanumerico = $request->codigo_alfanumerico;
+        $articulo->descripcion_fabrica = $request->descripcion_fabrica;
+
+
         //$articulo->fecha_vencimiento = $request->fecha_vencimiento;
         $articulo->condicion = '1';
+        $nombreimagen = '';
         if ($request->hasFile('fotografia')) {
             if ($request->hasFile('fotografia')) {
                 $imagen = $request->file("fotografia");
@@ -410,6 +448,8 @@ class ArticuloController extends Controller
             $articulo->idproveedor = $request->idproveedor;
             $articulo->idmedida = $request->idmedida;
             //$articulo->condicion = '1';
+            $articulo->codigo_alfanumerico = $request->codigo_alfanumerico;
+            $articulo->descripcion_fabrica = $request->descripcion_fabrica;
 
             $nombreimagen = " ";
             if ($request->hasFile('fotografia')) {
