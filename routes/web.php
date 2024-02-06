@@ -370,8 +370,6 @@ Route::group(['middleware' => ['auth']], function () {
 
 
 
-<<<<<<< Updated upstream
-=======
         //REPORTES
         Route::get('/ventas-diarias', 'VentaController@reporteVentasDiarias');
 
@@ -382,7 +380,6 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/variables/listarArticulosVariable', 'VentasInstitucionalesController@obtenerArticulosPorVariableTemporal');    
         Route::delete('/variables/excluirArticulo', 'VentasInstitucionalesController@excluirArticulo');
 
->>>>>>> Stashed changes
 
 
     });
