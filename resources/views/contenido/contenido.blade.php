@@ -164,6 +164,9 @@
             <template v-if="menu==48">
                 <ventasinstitucionales></ventasinstitucionales>
             </template>
+<template v-if="menu==49">
+    <reporteinventario></reporteinventario>
+</template>
 
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">

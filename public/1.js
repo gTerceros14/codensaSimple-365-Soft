@@ -1,5 +1,6 @@
 webpackJsonp([1],{
 
+<<<<<<< HEAD
 /***/ 681:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -180,6 +181,10 @@ function offscreen() {
     }
 
   };
+=======
+/***/ 691:
+/***/ (function(module, exports, __webpack_require__) {
+>>>>>>> 14e055632d458a1a44ca86494286c45889e48aaa
 
   if (typeof DOMParser !== 'undefined' || typeof DOMParserFallback === 'undefined') {
     Reflect.deleteProperty(preset, 'DOMParser');

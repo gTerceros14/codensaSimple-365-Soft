@@ -372,7 +372,8 @@ Route::group(['middleware' => ['auth']], function () {
 
         //REPORTES
         Route::get('/ventas-diarias', 'VentaController@reporteVentasDiarias');
-
+        Route::get('/reporte-almacen','InventarioController@reporteAlmacenes');
+        
         //VARIABLES TEMPORALES
         Route::post('/variables/registrarVariable', 'VentasInstitucionalesController@registrarVariable');
         Route::post('/variables/registrarArticuloVariable', 'VentasInstitucionalesController@registrarArticuloVariable');

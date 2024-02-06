@@ -144,6 +144,17 @@ Vue.component("devoluciones", require("./components/Devoluciones.vue"));
 Vue.component('reporteventas', require('./components/ReporteVentasDiarias.vue'));
 Vue.component('ventasinstitucionales', require('./components/VentasInstitucionales.vue'));
 
+Vue.component('reporteinventario', require('./components/ReporteInventario.vue'));
+
+Vue.component(
+  "reporteventas",
+  require("./components/ReporteVentasDiarias.vue")
+);
+Vue.component(
+  "ventasinstitucionales",
+  require("./components/VentasInstitucionales.vue")
+);
+
 Vue.component(
   "TransaccionErgeso",
   require("./components/Tables/TransaccionEgreso.vue")

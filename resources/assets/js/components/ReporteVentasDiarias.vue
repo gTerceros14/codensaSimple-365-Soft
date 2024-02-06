@@ -68,7 +68,7 @@
 
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 
 export default {
 data (){
@@ -175,41 +175,60 @@ methods : {
     },
 
     exportarExcel() {
-    // Crea un libro de Excel
     const workbook = XLSX.utils.book_new();
-    
-    // Convierte los datos de la tabla a un formato compatible con Excel
-    const worksheet = XLSX.utils.json_to_sheet(this.arrayVentas);
 
-    // Añade el título centrado en la hoja de trabajo
-    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: this.arrayVentas.length + 3 } }];
-    worksheet['A1'].t = 's'; // Establece el tipo de datos de la celda como 'texto'
-    worksheet['A1'].v = 'REPORTE DE VENTAS DIARIAS';
-    worksheet['A1'].s = { font: { sz: 16, bold: true }, alignment: { horizontal: 'center' } };
+    const worksheet = XLSX.utils.aoa_to_sheet([]);
 
-    /*worksheet['A2'].t = 's';
-    worksheet['A2'].v = `Fecha: ${this.fecha}`;
-    worksheet['A2'].s = { font: { bold: true }, alignment: { horizontal: 'center' } };*/
+    const startRow = 5;
 
-    // Agrega el encabezado a la hoja de trabajo y aplica formato en negrita
-    const header = [['Cliente', 'Monto', 'Número Factura', 'Usuario']];
-    XLSX.utils.sheet_add_aoa(worksheet, header, { origin: 'A2' });
+    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+    worksheet['A1'] = { t: 's', v: 'REPORTE DE VENTAS DIARIAS', s: { 
+        font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
+        alignment: { horizontal: 'center', vertical: 'center' },
+        fill: { fgColor: { rgb: '3669a8' } } } };
 
-    // Aplica formato de negrita al encabezado
-    const boldCellStyle = { font: { bold: true } };
-    const range = XLSX.utils.decode_range(worksheet['!ref']);
-    for (let C = range.s.c; C <= range.e.c; ++C) {
-        const address = XLSX.utils.encode_col(C) + '3'; // Suponiendo que el encabezado está en la fila 2
-        if (!worksheet[address]) continue;
-        worksheet[address].s = boldCellStyle;
+
+    const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
+    worksheet['A2'] = { t: 's', v: `Fecha: ${this.fecha}`, s: fechaStyle };
+
+    worksheet['!merges'].push({ s: { r: 1, c: 0 }, e: { r: 2, c: 3 } });
+
+    const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
+    const headers = ['Cliente', 'Monto', 'Número Factura', 'Usuario'];
+
+    headers.forEach((header, index) => {
+        worksheet[XLSX.utils.encode_cell({ r: 3, c: 3 })] = { t: 's', v: header, s: headerStyle };
+    });
+
+    for (let i = 0; i < this.arrayVentas.length; i++) {
+        const rowData = Object.values(this.arrayVentas[i]);
+        XLSX.utils.sheet_add_aoa(worksheet, [rowData], { origin: `A${startRow + i}` });
     }
 
-    // Agrega la hoja de trabajo al libro
+    const totalGanado = this.totalGanado;
+
+    const totalRow = [`Total Ganado: Bs. ${totalGanado}`];
+
+    worksheet['!merges'].push({ s: { r: startRow + this.arrayVentas.length, c: 0 }, e: { r: startRow + this.arrayVentas.length, c: 3 } });
+
+    XLSX.utils.sheet_add_aoa(worksheet, [totalRow], {
+        origin: `A${startRow + this.arrayVentas.length + 1}`
+    });
+
+    const columnWidths = [
+        { wch: 27.8 },
+        { wch: 16.0 },   
+        { wch: 18.6 },
+        { wch: 15.2 }
+    ];
+    worksheet['!cols'] = columnWidths;
+
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte Ventas');
 
-    // Guarda el libro de Excel
     XLSX.writeFile(workbook, 'reporte_ventas_diarias.xlsx');
     },
+
+    
 
 
 
