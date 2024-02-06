@@ -53,7 +53,7 @@
                                         </button>
                                     </td>
                                     <td v-text="persona.nombre"></td>
-                                    <td v-text="persona.tipo_documento"></td>
+                                    <td v-text="getTipoDocumentoText(persona.tipo_documento)"></td>
                                     <td v-text="persona.num_documento"></td>
                                     <td v-text="persona.direccion"></td>
                                     <td v-text="persona.telefono"></td>
@@ -105,9 +105,9 @@
                                             <option value="" disabled>Selecciona una tipo de documento</option>
                                             <option value="1">CI - CEDULA DE IDENTIDAD</option>
                                             <option value="2">CEX - CEDULA DE IDENTIDAD DE EXTRANJERO</option>
-                                            <option value="5">NIT - NÚMERO DE IDENTIFICACIÓN TRIBUTARIA</option>
+                                            <option value="4">NIT - NÚMERO DE IDENTIFICACIÓN TRIBUTARIA</option>
                                             <option value="3">PAS - PASAPORTE</option>
-                                            <option value="4">PAS - PASAPORTE</option>     
+                                                
                                         </select>                                    
                                     </div>
                                 </div>
@@ -219,6 +219,7 @@
             }
         },
         methods : {
+            
             listarPersona (page,buscar,criterio){
                 let me=this;
                 var url= '/cliente?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
@@ -343,8 +344,23 @@
             cargarReporteExcel()
             {
                 window.open('/cliente/listarReporteClienteExcel', '_blank');
-            }
+            },
+            getTipoDocumentoText(value) {
+            switch(value) {
+                case '1':
+                    return 'CI';
+                case '2':
+                    return 'CEX';
+                case '4':
+                    return 'NIT';
+                case '3':
+                    return 'PAS';
+                default:
+                    return '';
+                }
+            },
         },
+        
         mounted() {
             this.listarPersona(1,this.buscar,this.criterio);
         }
