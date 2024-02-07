@@ -41,31 +41,31 @@
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th>Opciones</th>
-                                    <th>Código</th>
-                                    <th>Nombre Comercial</th>
-                                    <th>Nombre_Generico</th>
-                                    <th>Unidad X Paquete</th>
-                                    <th>Costo unitario</th>
-                                    <th>Costo paquete</th>
+                                    <th>ACCIONES</th>
+                                    <th>CODIGO</th>
+                                    <th>NOMBRE COMERCIAL</th>
+                                    <th>NOMBRE GENERICO</th>
+                                    <th>UNIDADES POR PAQUETE</th>
+                                    <th>COSTO UNITARIO</th>
+                                    <th>COSTO PAQUETE</th>
                                     <!-- <th>Presio1</th> -->
-                                    <th v-for="precio in precios" :key="precio.id">{{ precio.nombre_precio }}</th>
+                                    <th v-for="precio in precios" :key="precio.id">PRECIO {{ precio.nombre_precio }}</th>
 
                                     <!-- <th v-if="rolUsuario === 1">Presio venta</th> -->
-                                    <th v-if="rolUsuario === 1 && mostrarCostos === 1">Precio venta</th>
+                                    <th v-if="rolUsuario === 1 && mostrarCostos === 1">PRECIO VENTA</th>
 
-                                    <th>Linea</th>
-                                    <th>Industria</th>
-                                    <th>Marca</th>
+                                    <th>LINEA</th>
+                                    <th>INDUSTRIA</th>
+                                    <th>MARCA</th>
 
                                     <!-- <th v-if="rolUsuario === 1""v-if="rolusuario !=1"">Stock minimo</th> -->
-                                    <th v-if="rolUsuario === 1 && mostrarSaldosStock === 1">Stock minimo</th>
+                                    <th v-if="rolUsuario === 1 && mostrarSaldosStock === 1">STOCK MINIMO</th>
                                     <!-- <th v-if="rolUsuario === 1">Proveedor</th> -->
-                                    <th v-if="rolUsuario === 1 && mostrarProveedores === 1">Proveedor</th>
-                                    <th>Descripción</th>
-                                    <th>Controlado</th>
-                                    <th>Grupo/Familia</th>
-                                    <th>Foto</th>
+                                    <th v-if="rolUsuario === 1 && mostrarProveedores === 1">PROVEEDOR</th>
+                                    <th>DESCRIPCION</th>
+                                    <th>CONTROLADO</th>
+                                    <th>GRUPO/FAMILIA</th>
+                                    <th>FOTO</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -93,12 +93,14 @@
                                     <td v-text="articulo.nombre"></td>
                                     <td v-text="articulo.nombre_generico"></td>
                                     <td v-text="articulo.unidad_envase"></td>
-                                    <td >
-                                    {{(articulo.precio_costo_unid *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                    <td>
+                                        {{ (articulo.precio_costo_unid * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                                            monedaPrincipal[1] }}
                                     </td>
-                                    <td >
-                                        {{(articulo.precio_costo_paq *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
-                                    
+                                    <td>
+                                        {{ (articulo.precio_costo_paq * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                                            monedaPrincipal[1] }}
+
                                     </td>
                                     <!-- <td v-text="articulo.precio1"></td> -->
                                     <!-- <td>{{ articulo.precio1 ? articulo.precio1 : '0.00' }}</td> -->
@@ -106,29 +108,34 @@
                                     <td v-for="(precio, index) in precios" :key="precio.id">
                                         <!-- Mostrar el precio correspondiente según el índice -->
                                         <span v-if="index === 0">
-                                            
-                                            {{(articulo.precio_uno *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
-                                        
+
+                                            {{ (articulo.precio_uno * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                                                monedaPrincipal[1] }}
+
                                         </span>
                                         <span v-if="index === 1">
-                                            {{(articulo.precio_dos *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
-                                            
+                                            {{ (articulo.precio_dos * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                                                monedaPrincipal[1] }}
+
                                         </span>
                                         <span v-if="index === 2">
-                                            {{(articulo.precio_tres *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
-                                            
-                                        
+                                            {{ (articulo.precio_tres * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                                                monedaPrincipal[1] }}
+
+
                                         </span>
                                         <span v-if="index === 3">
-                                            {{(articulo.precio_cuatro*parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
-                                            
+                                            {{ (articulo.precio_cuatro * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                                                monedaPrincipal[1] }}
+
                                         </span>
                                     </td>
 
                                     <!-- <td v-if="rolUsuario === 1" v-text="articulo.precio_venta"></td> -->
                                     <td v-if="rolUsuario === 1 && mostrarCostos === 1">
-                                        {{(articulo.precio_venta*parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
-                                    
+                                        {{ (articulo.precio_venta * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                                            monedaPrincipal[1] }}
+
                                     </td>
 
                                     <td v-text="articulo.nombre_categoria"></td>
@@ -201,241 +208,341 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
+                    <form @submit.prevent="enviarFormulario">
+
+                        <div class="modal-body">
                             <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input"
-                                    style="color: blue;">Código</label>
-                                <div class="col-md-4">
-                                    <input type="text" v-model="codigo" class="form-control"
-                                        :class="{ 'border-red': codigoVacio }" @input="codigoVacio = false"
-                                        placeholder="Código de barras">
-                                </div>
-                                <div class="col-md-12 order-md-2">
-                                    <div class="barcode-container">
-                                        <barcode :value="codigo" :options="{ format: 'EAN-13' }"></barcode>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Nombre_Generico(*)</label>
-                                        <input type="text" v-model="nombre_generico" class="form-control"
-                                            :class="{ 'border-red': nombre_genericoVacio }"
-                                            @input="nombre_genericoVacio = false" placeholder="Uidad">
+                                    <div>
+                                        <label for="" class="font-weight-bold">Nombre del Producto <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" v-model="datosFormulario.nombre" class="form-control"
+                                            placeholder="Ej. Ibuprofeno 400 mg (20 comprimidos)"
+                                            :class="{ 'is-invalid': errores.nombre }" @input="validarCampo('nombre')" />
+                                        <p class="text-danger" v-if="errores.nombre">{{ errores.nombre }}</p>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Unid.X Envase(*)</label>
-                                        <input type="text" v-model="unidad_envase" class="form-control"
-                                            :class="{ 'border-red': unidad_envaseVacio }"
-                                            @input="unidad_envaseVacio = false" placeholder="Unid X Envase">
+                                    <div>
+
+                                        <label for="" class="font-weight-bold">Nombre Genérico
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" v-model="datosFormulario.nombre_generico" class="form-control"
+                                            placeholder="Ej. Ibuprofeno" :class="{ 'is-invalid': errores.nombre_generico }"
+                                            @input="validarCampo('nombre_generico')" />
+                                        <p class="text-danger" v-if="errores.nombre_generico">{{ errores.nombre_generico }}
+                                        </p>
+
+
+
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="email-input">Precio Costo(Unid*.)</label>
-                                        <div class="input-group">
-                                            <input type="text" v-model="precio_costo_unid" class="form-control"
-                                                :class="{ 'border-red': precio_costo_unidVacio }"
-                                                @input="precio_costo_unidVacio = false" placeholder="Unidad">
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-primary"
-                                                    @click="calcularPrecioCostoUnid">Calcular</button>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="container ">
+                                        <div class="row">
+                                            <div class="d-flex justify-content-center">
+                                                <div v-if="!imagen" class="bg-light p-5 rounded">
+                                                    <i class="fa fa-camera fa-2x" style="color:#6e6e6e"
+                                                        aria-hidden="true"></i>
+                                                </div>
+                                                <figure v-else>
+                                                    <img :src="imagen" width="140" height="140" alt="Foto articulo">
+                                                </figure>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="email-input">Precio Costo(paq*.)</label>
-                                        <div class="input-group">
-                                            <input type="text" v-model="precio_costo_paq" class="form-control"
-                                                :class="{ 'border-red': precio_costo_paqVacio }"
-                                                @input="precio_costo_paqVacio = false" placeholder="paquete">
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-primary"
-                                                    @click="calcularPrecioCostoPaq">Calcular</button>
-                                            </div>
-                                        </div>
+                                    <div class="input-group mt-2">
+                                        <input type="file" @change="obtenerFotografia" class="form-control"
+                                            placeholder="fotografia" ref="fotografiaInput">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6">
+
+                                    <label for="" class="font-weight-bold">Descripción del Producto <span
+                                            class="text-danger">*</span></label>
+                                    <textarea rows="3" type="text" v-model="datosFormulario.descripcion"
+                                        class="form-control"
+                                        placeholder="Ej. Alivio rápido para el dolor de cabeza y fiebre"
+                                        :class="{ 'is-invalid': errores.descripcion }"
+                                        @input="validarCampo('descripcion')" />
+                                    <p class="text-danger" v-if="errores.descripcion">{{ errores.descripcion }}</p>
+                                    <label for="" class="font-weight-bold">Código Alfanumérico
+                                        <span class="font-weight-normal text-sm text-secondary">(Opcional)</span>
+
+                                    </label>
+                                    <input type="text" v-model="datosFormulario.codigo_alfanumerico" class="form-control"
+                                        placeholder="Ej. ABC123" :class="{ 'is-invalid': errores.codigo_alfanumerico }"
+                                        @input="validarCampo('codigo_alfanumerico')" />
+                                    <p class="text-danger" v-if="errores.codigo_alfanumerico">{{ errores.codigo_alfanumerico
+                                    }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Código del Producto <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" v-model="datosFormulario.codigo" class="form-control"
+                                        placeholder="Ej. SKU123" :class="{ 'is-invalid': errores.codigo }"
+                                        @input="validarCampo('codigo')" />
+                                    <p class="text-danger" v-if="errores.codigo">{{ errores.codigo }}</p>
+
+                                    <div class="d-flex mt-4 justify-content-center" style="width:250px;overflow-x: auto;">
+                                        <barcode :value="datosFormulario.codigo" :options="{ format: 'EAN-13' }"></barcode>
                                     </div>
 
                                 </div>
-                                <!---DERECHA-->
+
+                            </div>
+                            <div class="form-group row">
+
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Nombre Comercial(*)</label>
-                                        <input type="text" v-model="nombre_producto" class="form-control"
-                                            :class="{ 'border-red': nombreProductoVacio }"
-                                            @input="nombreProductoVacio = false" placeholder="Nombre de artículo">
+                                    <label for="" class="font-weight-bold">Descripción de Fabricación
+                                        <span class="font-weight-normal text-sm text-secondary">(Opcional)</span>
+
+                                    </label>
+                                    <textarea rows="3" type="text" v-model="datosFormulario.descripcion_fabrica"
+                                        class="form-control" placeholder="Ej. Producto fabricado por Laboratorios XYZ"
+                                        :class="{ 'is-invalid': errores.descripcion_fabrica }"
+                                        @input="validarCampo('descripcion_fabrica')" />
+                                    <p class="text-danger" v-if="errores.descripcion_fabrica">{{ errores.descripcion_fabrica
+                                    }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Proveedor <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" placeholder="Seleccione un proveedor"
+                                            disabled v-model="proveedorseleccionada.nombre"
+                                            :class="{ 'is-invalid': errores.idproveedor }" @input="validarCampo('codigo')">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button"
+                                                @click="abrirModal2('Proveedors')">...</button>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Precio Venta(*)</label>
-                                        <input type="number" v-model="precio_venta" class="form-control"
-                                            :class="{ 'border-red': precio_ventaVacio }" @input="precio_ventaVacio = false"
-                                            placeholder="">
+                                    <p class="text-danger" v-if="errores.idproveedor">{{ errores.idproveedor }}</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Linea <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" placeholder="Seleccione una linea" disabled
+                                            v-model="lineaseleccionada.nombre"
+                                            :class="{ 'is-invalid': errores.idcategoria }" @input="validarCampo('codigo')">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button"
+                                                @click="abrirModal2('Lineas')">...</button>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Costo Compra(*)</label>
-                                        <input type="number" v-model="costo_compra" class="form-control"
-                                            :class="{ 'border-red': costo_compraVacio }" @input="costo_compraVacio = false"
-                                            placeholder="">
+                                    <p class="text-danger" v-if="errores.idcategoria">{{ errores.idcategoria }}</p>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Marca <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" placeholder="Seleccione una marca" disabled
+                                            v-model="marcaseleccionada.nombre" :class="{ 'is-invalid': errores.idmarca }"
+                                            @input="validarCampo('idmarca')">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button"
+                                                @click="abrirModal2('Marcas')">...</button>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Stock Minimo(*)</label>
-                                        <input type="number" v-model="stock" class="form-control"
-                                            :class="{ 'border-red': stockVacio }" @input="stockVacio = false"
-                                            placeholder="Ingrese estock minimo">
+                                    <p class="text-danger" v-if="errores.idmarca">{{ errores.idmarca }}</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Industria <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" placeholder="Seleccione una industria"
+                                            disabled v-model="industriaseleccionada.nombre"
+                                            :class="{ 'is-invalid': errores.idindustria }" @input="validarCampo('codigo')">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button"
+                                                @click="abrirModal2('Industrias')">...</button>
+                                        </div>
                                     </div>
+                                    <p class="text-danger" v-if="errores.idindustria">{{ errores.idindustria }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Grupo <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" placeholder="Seleccione un grupo" disabled
+                                            v-model="gruposeleccionada.nombre_grupo"
+                                            :class="{ 'is-invalid': errores.idgrupo }" @input="validarCampo('codigo')">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button"
+                                                @click="abrirModal2('Grupos')">...</button>
+                                        </div>
+                                    </div>
+                                    <p class="text-danger" v-if="errores.idgrupo">{{ errores.idgrupo }}</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-4">
+                                    <label for="" class="font-weight-bold">Stock minimo(Unidades) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" v-model="datosFormulario.stock" class="form-control"
+                                        placeholder="Ej. 123456789" :class="{ 'is-invalid': errores.stock }"
+                                        @input="validarCampo('stock')" />
+                                    <p class="text-danger" v-if="errores.stock">{{ errores.stock }}
+                                    </p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="" class="font-weight-bold">Unidades por paquete <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" v-model="datosFormulario.unidad_envase" class="form-control"
+                                        placeholder="Ej. unidad_envase@dominio.com"
+                                        :class="{ 'is-invalid': errores.unidad_envase }"
+                                        @input="validarCampo('unidad_envase')" />
+                                    <p class="text-danger" v-if="errores.unidad_envase">{{ errores.unidad_envase }}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="" class="font-weight-bold">Medida <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" placeholder="Seleccione un medida" disabled
+                                            v-model="medidaseleccionada.descripcion_medida"
+                                            :class="{ 'is-invalid': errores.idmedida }" @input="validarCampo('codigo')">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button"
+                                                @click="abrirModal6('Medidas')">...</button>
+                                        </div>
+                                    </div>
+                                    <p class="text-danger" v-if="errores.idmedida">{{ errores.idmedida }}</p>
                                 </div>
                             </div>
 
 
-                            <div v-for="(precio, index) in precios" :key="precio.id" class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input" style="color: blue;">{{
-                                    precio.nombre_precio }}</label>
-                                <div class="col-md-4">
-                                    <input v-if="index === 0" type="text" class="form-control" placeholder="Precio"
-                                        v-model="precio_uno">
-                                    <input v-if="index === 1" type="text" class="form-control" placeholder="Precio"
-                                        v-model="precio_dos">
-                                    <input v-if="index === 2" type="text" class="form-control" placeholder="Precio"
-                                        v-model="precio_tres">
-                                    <input v-if="index === 3" type="text" class="form-control" placeholder="Precio"
-                                        v-model="precio_cuatro">
+
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Precio unitario <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group ">
+                                        <input type="number" v-model="datosFormulario.precio_costo_unid"
+                                            class="form-control" placeholder="Ej. 123456789"
+                                            :class="{ 'is-invalid': errores.precio_costo_unid }"
+                                            @input="validarCampo('precio_costo_unid')" />
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" @click="calcularPrecioCostoUnid"
+                                                type="button">Calcular</button>
+                                        </div>
+                                    </div>
+                                    <p class="text-danger" v-if="errores.precio_costo_unid">{{ errores.precio_costo_unid }}
+                                    </p>
                                 </div>
-                                <div class=" input-group" style="width: 90px">
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Precio paquete <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group ">
+                                        <input type="number" v-model="datosFormulario.precio_costo_paq" class="form-control"
+                                            placeholder="Ej. precio_costo_paq@dominio.com"
+                                            :class="{ 'is-invalid': errores.precio_costo_paq }"
+                                            @input="validarCampo('precio_costo_paq')" />
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" @click="calcularPrecioCostoPaq"
+                                                type="button">Calcular</button>
+                                        </div>
+                                    </div>
+
+
+
+                                    <p class="text-danger" v-if="errores.precio_costo_paq">{{ errores.precio_costo_paq }}
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Costo compra <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" v-model="datosFormulario.costo_compra" class="form-control"
+                                        placeholder="Ej. costo_compra@dominio.com"
+                                        :class="{ 'is-invalid': errores.costo_compra }"
+                                        @input="validarCampo('costo_compra')" />
+                                    <p class="text-danger" v-if="errores.costo_compra">{{ errores.costo_compra }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Precio venta <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" v-model="datosFormulario.precio_venta" class="form-control"
+                                        placeholder="Ej. 123456789" :class="{ 'is-invalid': errores.precio_venta }"
+                                        @input="validarCampo('precio_venta')" />
+                                    <p class="text-danger" v-if="errores.precio_venta">{{ errores.precio_venta }}</p>
+                                </div>
+                            </div>
+
+
+
+
+                            <div v-for="(precio, index) in precios" :key="precio.id" class="d-flex form-group row">
+
+                                <label for="" class="font-weight-bold col-md-3 form-control-label">{{ precio.nombre_precio
+                                }} :
+                                </label>
+                                <div class="col-md-4">
+                                    <div v-if="index === 0" class=" input-group" style="width: 150px">
+
+                                        <input type="text" class="form-control" placeholder="Precio" v-model="precio_uno">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">{{ monedaPrincipal[1] }}</span>
+                                        </div>
+                                    </div>
+                                    <div v-if="index === 1" class=" input-group" style="width: 150px">
+
+                                        <input type="text" class="form-control" placeholder="Precio" v-model="precio_dos">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">{{ monedaPrincipal[1] }}</span>
+                                        </div>
+                                    </div>
+                                    <div v-if="index === 2" class=" input-group" style="width: 150px">
+
+                                        <input type="text" class="form-control" placeholder="Precio" v-model="precio_tres">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">{{ monedaPrincipal[1] }}</span>
+                                        </div>
+                                    </div>
+                                    <div v-if="index === 3" class=" input-group" style="width: 150px">
+
+                                        <input type="text" class="form-control" placeholder="Precio"
+                                            v-model="precio_cuatro">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">{{ monedaPrincipal[1] }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cold-md-3 input-group" style="width: 150px">
                                     <input type="text" class="form-control" placeholder="Porcentaje"
                                         :value="precio.porcentage">
                                     <div class="input-group-append">
                                         <span class="input-group-text">%</span>
                                     </div>
                                 </div>
-                                <div class="col-md-1">
+                                <div class="col-md-2">
                                     <button type="button" class="btn btn-primary"
                                         @click="calcularPrecio(precio, index)">Calcular</button>
                                 </div>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Descripción</label>
-                                        <input type="email" v-model="descripcion" class="form-control"
-                                            :class="{ 'border-red': descripcionVacio }" @input="descripcionVacio = false"
-                                            placeholder="Ingrese descripción">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Fotografia(*)</label>
-                                        <div class="input-group">
-
-                                            <input type="file" @change="obtenerFotografia" class="form-control"
-                                                :class="{ 'border-red': fotografiaVacio }" @input="fotografiaVacio = false"
-                                                placeholder="fotografia usuario" ref="fotografiaInput">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <figure>
-                                            <img :src="imagen" width="60" height="60" alt="Foto articulo">
-                                        </figure>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-show="errorArticulo" class="form-group row div-error">
-                                <div class="text-center text-error">
-                                    <div v-for="error in errorMostrarMsjArticulo" :key="error" v-text="error">
-
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                        <div class="row">
-                            <div class="col-md-4">
-
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Linea(*)</label>
-                                    <div class="input-group">
-                                        <input type="text" disabled v-model="lineaseleccionada.nombre"
-                                            :class="{ 'border-red': lineaseleccionadaVacio }">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button"
-                                                @click="abrirModal2('Lineas')">...</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Marca(*)</label>
-                                    <div class="input-group">
-                                        <input type="text" disabled v-model="marcaseleccionada.nombre"
-                                            :class="{ 'border-red': marcaseleccionadaVacio }">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button"
-                                                @click="abrirModal2('Marcas')">...</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Industria(*)</label>
-                                    <div class="input-group">
-                                        <input type="text" disabled v-model="industriaseleccionada.nombre"
-                                            :class="{ 'border-red': industriaseleccionadaVacio }" />
-                                        <div class="input-group-append">
-                                            <button @click="abrirModal2('Industrias')" class="btn btn-primary">...</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Proveedor(*)</label>
-                                    <div class="input-group">
-                                        <input type="text" disabled v-model="proveedorseleccionada.nombre"
-                                            :class="{ 'border-red': proveedorseleccionadaVacio }" />
-                                        <div class="input-group-append">
-                                            <button @click="abrirModal2('Proveedors')" class="btn btn-primary">...</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Grupo O Familia(*)</label>
-                                    <div class="input-group">
-                                        <input type="text" disabled v-model="gruposeleccionada.nombre_grupo"
-                                            :class="{ 'border-red': gruposeleccionadaVacio }" />
-                                        <div class="input-group-append">
-                                            <button @click="abrirModal2('Grupos')" class="btn btn-primary">...</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Medida(*)</label>
-                                    <div class="input-group">
-                                        <input type="text" disabled v-model="medidaseleccionada.descripcion_medida"
-                                            :class="{ 'border-red': medidaseleccionadaVacio }" />
-                                        <div class="input-group-append">
-                                            <button @click="abrirModal6('Medidas')" class="btn btn-primary">...</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-                    </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
+                            <button type="submit" v-if="tipoAccion == 1" class="btn btn-success">Guardar</button>
+                            <button type="submit" v-if="tipoAccion == 2" class="btn btn-success">Actualizar</button>
+                        </div>
+                    </form>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                        <button type="button" v-if="tipoAccion == 1" class="btn btn-primary"
-                            @click="registrarArticulo()">Guardar</button>
-                        <button type="button" v-if="tipoAccion == 2" class="btn btn-primary"
-                            @click="actualizarArticulo()">Actualizar</button>
-                    </div>
                 </div>
                 <!-- /.modal-content -->
             </div>
+
+
             <!-- /.modal-dialog -->
         </div>
 
@@ -1014,8 +1121,8 @@
             </div>
             <!-- /.modal-dialog -->
         </div>
-        <div class="modal " tabindex="-1" :class="{ 'mostrar': modalImportar }" role="dialog"
-            aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal " tabindex="-1" :class="{ 'mostrar': modalImportar }" role="dialog" aria-labelledby="myModalLabel"
+            style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -1168,20 +1275,22 @@
 
                                         <div v-if="erroresNoExiste.length > 0">
                                             <p>¿Desea registrar estos datos?</p>
-                                            <button class="btn btn-success" type="button" @click="confirmarRegistro">Confirmar</button>
-                                            <button class="btn btn-danger" type="button" @click="cancelarRegistro">Cancelar</button>
+                                            <button class="btn btn-success" type="button"
+                                                @click="confirmarRegistro">Confirmar</button>
+                                            <button class="btn btn-danger" type="button"
+                                                @click="cancelarRegistro">Cancelar</button>
                                         </div>
                                     </div>
-                                    <div v-if="erroresNoExiste.length==0 && errorsImport.length == 0 && successImport">
+                                    <div v-if="erroresNoExiste.length == 0 && errorsImport.length == 0 && successImport">
                                         <div class="success-checkmark">
-  <div class="check-icon">
-    <span class="icon-line line-tip"></span>
-    <span class="icon-line line-long"></span>
-    <div class="icon-circle"></div>
-    <div class="icon-fix"></div>
-  </div>
-</div>
-<h5 style="text-align:center;">Importación exitosa</h5>
+                                            <div class="check-icon">
+                                                <span class="icon-line line-tip"></span>
+                                                <span class="icon-line line-long"></span>
+                                                <div class="icon-circle"></div>
+                                                <div class="icon-fix"></div>
+                                            </div>
+                                        </div>
+                                        <h5 style="text-align:center;">Importación exitosa</h5>
 
 
                                     </div>
@@ -1203,14 +1312,42 @@
 </template>
 
 <script>
+import { esquemaArticulos } from '../constants/validations';
+
 import VueBarcode from 'vue-barcode';
 export default {
     data() {
         return {
-            monedaPrincipal:[],
+            datosFormulario: {
+                nombre: '',
+                descripcion: '',
+                nombre_generico: '',
+                unidad_envase: 0,
+                precio_costo_unid: 0,
+                precio_costo_paq: 0,
+                precio_venta: 0,
+                precio_uno: 0,
+                precio_dos: 0,
+                precio_tres: 0,
+                precio_cuatro: 0,
+                stock: 0,
+                costo_compra: 0,
+                codigo: '',
+                codigo_alfanumerico: '',
+                descripcion_fabrica: '',
+                idcategoria: null,
+                idmarca: null,
+                idindustria: null,
+                idgrupo: null,
+                idproveedor: null,
+                idmedida: null
+            },
+            errores: {},
 
-            successImport:false,
-            registrosSuccess:[],
+            monedaPrincipal: [],
+
+            successImport: false,
+            registrosSuccess: [],
             errorsImport: [],
             erroresNoExiste: [],
 
@@ -1335,7 +1472,7 @@ export default {
             nombre_persona: '',
             descripcion: '',
             fotografia: '',
-            fotoMuestra: 'img/articulo/defecto.jpg',
+            fotoMuestra: null,
             arrayArticulo: [],
             arrayBuscador: [],
             modal: 0,
@@ -1401,30 +1538,7 @@ export default {
         isActivedMar: function () {
             return this.pagination.current_page;
         },
-        //Calcula los elementos de la paginación
-        // pagesNumber: function () {
-        //     if (!this.pagination.to) {
-        //         return [];
-        //     }
 
-        //     var from = this.pagination.current_page - this.offset;
-        //     if (from < 1) {
-        //         from = 1;
-        //     }
-
-        //     var to = from + (this.offset * 2);
-        //     if (to >= this.pagination.last_page) {
-        //         to = this.pagination.last_page;
-        //     }
-
-        //     var pagesArray = [];
-        //     while (from <= to) {
-        //         pagesArray.push(from);
-        //         from++;
-        //     }
-        //     return pagesArray;
-
-        // },
         pagesNumber: function () {
             return this.calculatePages(this.pagination, this.offset.pagination);
         },
@@ -1432,6 +1546,7 @@ export default {
             return this.calculatePages(this.paginationMedida, this.offset.paginationMedida);
         },
         imagen() {
+            console.log(this.fotoMuestra);
             return this.fotoMuestra;
         },
     },
@@ -1440,23 +1555,98 @@ export default {
         previewCsv: 'parseCsv', // Llama a parseCsv cuando previewCsv cambie
     },
     methods: {
+        toastSuccess(mensaje){
+            this.$toasted.show(`
+    <div style="height: 60px;font-size:16px;">
+        <br>
+        `+mensaje+`.<br>
+    </div>`, {
+                    type: "success",
+                    position: "bottom-right",
+                    duration: 4000
+                });
+        },
+        toastError(mensaje){
+            this.$toasted.show(`
+    <div style="height: 60px;font-size:16px;">
+        <br>
+        `+mensaje+`<br>
+    </div>`, {
+                    type: "error",
+                    position: "bottom-right",
+                    duration: 4000
+                });
+        },
+        asignarCampos() {
+            this.datosFormulario.idcategoria = this.lineaseleccionada.id
+            this.datosFormulario.idmarca = this.marcaseleccionada.id
+            this.datosFormulario.idproveedor = this.proveedorseleccionada.id
+            this.datosFormulario.idindustria = this.industriaseleccionada.id
+            this.datosFormulario.idmedida = this.medidaseleccionada.id
+            this.datosFormulario.idgrupo = this.gruposeleccionada.id
+
+
+
+            this.datosFormulario.precio_costo_unid = this.convertDolar(this.datosFormulario.precio_costo_unid);
+            this.datosFormulario.precio_costo_paq = this.convertDolar(this.datosFormulario.precio_costo_paq);
+            this.datosFormulario.precio_venta = this.convertDolar(this.datosFormulario.precio_venta);
+
+            this.datosFormulario.precio_uno = this.convertDolar(this.precio_uno);
+            this.datosFormulario.precio_dos = this.convertDolar(this.precio_dos);
+            this.datosFormulario.precio_tres = this.convertDolar(this.precio_tres);
+            this.datosFormulario.precio_cuatro = this.convertDolar(this.precio_cuatro);
+            this.datosFormulario.costo_compra = this.convertDolar(this.datosFormulario.costo_compra);
+        },
+        async validarCampo(campo) {
+            this.asignarCampos();
+            try {
+                await esquemaArticulos.validateAt(campo, this.datosFormulario);
+                this.errores[campo] = null;
+            } catch (error) {
+                this.errores[campo] = error.message;
+            }
+        },
+        async enviarFormulario() {
+            this.asignarCampos();
+
+            await esquemaArticulos.validate(this.datosFormulario, { abortEarly: false })
+                .then(() => {
+                    this.datosFormulario.fotografia = this.fotografia
+
+                    console.log(this.datosFormulario)
+                    if (this.tipoAccion == 2) {
+                        this.actualizarArticulo(this.datosFormulario)
+                    } else {
+                        this.registrarArticulo(this.datosFormulario)
+
+                    }
+                })
+                .catch((error) => {
+                    const erroresValidacion = {};
+                    error.inner.forEach((e) => {
+                        erroresValidacion[e.path] = e.message;
+                    });
+
+                    this.errores = erroresValidacion;
+                });
+        },
         obtenerConfiguracionTrabajo() {
-      // Utiliza Axios para realizar la solicitud al backend
-      axios.get('/configuracion')
-        .then(response => {
-          console.log("Esta es la configuracion: ",response.data.configuracionTrabajo)
-        })
-        .catch(error => {
-          console.error('Error al obtener configuración de trabajo:', error);
-        });
-    },
+            // Utiliza Axios para realizar la solicitud al backend
+            axios.get('/configuracion')
+                .then(response => {
+                    console.log("Esta es la configuracion: ", response.data.configuracionTrabajo)
+                })
+                .catch(error => {
+                    console.error('Error al obtener configuración de trabajo:', error);
+                });
+        },
         agregarMarca(nombre) {
-            console.log("Se registrara la marca "+nombre)
+            console.log("Se registrara la marca " + nombre)
             axios.post('/marca/registrar', {
                 'nombre': nombre,
 
             }).then(function (response) {
-            this.registrosSuccess.push("Se registro la marca "+nombre);
+                this.registrosSuccess.push("Se registro la marca " + nombre);
 
                 console.log(response);
             }).catch(function (error) {
@@ -1464,76 +1654,76 @@ export default {
             });
         },
 
-        agregarGrupo(nombre){
-            console.log("Se registrara la marca "+nombre)
+        agregarGrupo(nombre) {
+            console.log("Se registrara la marca " + nombre)
 
-        axios.post('/grupos/registrar',{
-            'nombre_grupo': nombre       
-        }).then(function (response) {
-            this.registrosSuccess.push("Se registro el grupo "+nombre);
+            axios.post('/grupos/registrar', {
+                'nombre_grupo': nombre
+            }).then(function (response) {
+                this.registrosSuccess.push("Se registro el grupo " + nombre);
 
-            console.log(response)
-        }).catch(function (error) {
-            console.log(error);
-        });
-    },
-    agregarLinea(nombre){
-        console.log("Se registrara la linea "+nombre)
-      
-        axios.post('/categoria/registrar',{
-            'nombre': nombre,
-            'descripcion': "",
-            'codigoProductoSin': 0
-            
-        }).then(function (response) {
-            this.registrosSuccess.push("Se registro la linea "+nombre);
+                console.log(response)
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        agregarLinea(nombre) {
+            console.log("Se registrara la linea " + nombre)
 
-            console.log(response)
-        }).catch(function (error) {
-            console.log(error);
-        });
-    },
-    agregarIndustria(nombre){
-        console.log("Se registrara la marca "+nombre)
+            axios.post('/categoria/registrar', {
+                'nombre': nombre,
+                'descripcion': "",
+                'codigoProductoSin': 0
 
-        axios.post('/industria/registrar',{
-            'nombre': nombre           
-        }).then(function (response) {
-            this.registrosSuccess.push("Se registro la industria "+nombre);
-            console.log(response)
-        }).catch(function (error) {
-            console.log(error);
-        });
-    },
+            }).then(function (response) {
+                this.registrosSuccess.push("Se registro la linea " + nombre);
+
+                console.log(response)
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        agregarIndustria(nombre) {
+            console.log("Se registrara la marca " + nombre)
+
+            axios.post('/industria/registrar', {
+                'nombre': nombre
+            }).then(function (response) {
+                this.registrosSuccess.push("Se registro la industria " + nombre);
+                console.log(response)
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
         confirmarRegistro() {
             this.erroresNoExiste.forEach((elemento) => {
-  const palabras = elemento.split(' ');
-  const primeraPalabra =palabras.shift();
-  const restoDelString = palabras.join(' '); 
-  console.log(palabras)
-  if ("Linea" === primeraPalabra) {
-    console.log("Se encontro "+restoDelString)
-    this.agregarLinea(restoDelString)
-  } else if ("Marca" === primeraPalabra) {
-    this.agregarMarca(restoDelString)
-    console.log("Se encontro "+restoDelString)
+                const palabras = elemento.split(' ');
+                const primeraPalabra = palabras.shift();
+                const restoDelString = palabras.join(' ');
+                console.log(palabras)
+                if ("Linea" === primeraPalabra) {
+                    console.log("Se encontro " + restoDelString)
+                    this.agregarLinea(restoDelString)
+                } else if ("Marca" === primeraPalabra) {
+                    this.agregarMarca(restoDelString)
+                    console.log("Se encontro " + restoDelString)
 
 
-  }else if ("Grupo" === primeraPalabra) {
-    this.agregarGrupo(restoDelString)
-    console.log("Se encontro "+restoDelString)
+                } else if ("Grupo" === primeraPalabra) {
+                    this.agregarGrupo(restoDelString)
+                    console.log("Se encontro " + restoDelString)
 
-  }else if ("Industria" === primeraPalabra) {
-    this.agregarIndustria(restoDelString)
-    console.log("Se encontro "+restoDelString)
+                } else if ("Industria" === primeraPalabra) {
+                    this.agregarIndustria(restoDelString)
+                    console.log("Se encontro " + restoDelString)
 
 
 
-  }
+                }
 
-});
+            });
 
-this.submitForm();
+            this.submitForm();
 
             // Puedes realizar alguna acción adicional aquí
         },
@@ -1567,7 +1757,7 @@ this.submitForm();
             this.pageImportar = 0;
             this.errorsImport = [];
             this.erroresNoExiste = [];
-            this.successImport=false;
+            this.successImport = false;
             this.listarArticulo(1, '', 'nombre');
 
             this.removeFile();
@@ -1721,9 +1911,9 @@ this.submitForm();
             axios.post('/articulos/importar', formData)
                 .then(response => {
                     console.log(response);
-                    this.erroresNoExiste=[];
-                    this.errorsImport=[];
-                    this.successImport=true;
+                    this.erroresNoExiste = [];
+                    this.errorsImport = [];
+                    this.successImport = true;
 
                 })
                 .catch(error => {
@@ -1734,7 +1924,7 @@ this.submitForm();
                             const match = item.match(/No existe '([^']+)'/);
                             return match ? [match[1]] : [];
                         });
-                        console.log("Estos no existen: ",this.erroresNoExiste)
+                        console.log("Estos no existen: ", this.erroresNoExiste)
                         this.errorsImport = datos.filter(item => !item.includes("No existe"));
                         this.erroresNoExiste = this.erroresNoExiste.filter((valor, indice, array) => array.indexOf(valor) === indice);
                         // Mostrar el nuevo array con los elementos filtrados
@@ -1780,15 +1970,15 @@ this.submitForm();
             }
         },
         calcularPrecioCostoUnid() {
-            if (this.unidad_envase && this.precio_costo_paq) {
-                this.precio_costo_unid = this.precio_costo_paq / this.unidad_envase;
-                this.precio_costo_unidVacio = false;
+            if (this.datosFormulario.unidad_envase && this.datosFormulario.precio_costo_paq) {
+                this.datosFormulario.precio_costo_unid = this.datosFormulario.precio_costo_paq / this.datosFormulario.unidad_envase;
+                this.datosFormulario.precio_costo_unidVacio = false;
             }
         },
         calcularPrecioCostoPaq() {
-            if (this.unidad_envase && this.precio_costo_unid) {
-                this.precio_costo_paq = this.precio_costo_unid * this.unidad_envase;
-                this.precio_costo_paqVacio = false;
+            if (this.datosFormulario.unidad_envase && this.datosFormulario.precio_costo_unid) {
+                this.datosFormulario.precio_costo_paq = this.datosFormulario.precio_costo_unid * this.datosFormulario.unidad_envase;
+                this.datosFormulario.precio_costo_paqVacio = false;
             }
         },
         calcularPrecioP(precio_costo_unid, porcentage) {
@@ -1802,6 +1992,8 @@ this.submitForm();
                 this.marcaseleccionadaVacio = false;
                 if (selected.condicion == 1) {
                     this.marcaseleccionada = selected;
+                    this.validarCampo("idmarca");
+
                 } else if (selected.condicion == 0) {
                     this.advertenciaInactiva('Marcas');
                 }
@@ -1809,23 +2001,29 @@ this.submitForm();
                 this.industriaseleccionadaVacio = false;
                 if (selected.estado == 1) {
                     this.industriaseleccionada = selected;
+                    this.validarCampo("idindustria");
+
                 } else if (selected.estado == 0) {
                     this.advertenciaInactiva('Industrias');
                 }
             } else if (this.tituloModal2 == "Lineas") {
-                this.lineaseleccionadaVacio = false;
                 if (selected.condicion == 1) {
                     this.lineaseleccionada = selected;
+                    this.validarCampo("idcategoria");
+
                 } else if (selected.condicion == 0) {
                     this.advertenciaInactiva('Lineas');
                 }
             } else if (this.tituloModal2 == "Proveedors") {
-                this.proveedorseleccionadaVacio = false;
                 // this.proveedorseleccionada.id = selected.id;
                 // this.proveedorseleccionada.nombre = selected.nombre;
                 this.proveedorseleccionada = selected;
+                this.validarCampo("idproveedor");
+
             } else if (this.tituloModal2 == "Grupos") {
                 this.gruposeleccionada = selected;
+                this.validarCampo("idgrupo");
+
             }
             // if (this.marcaseleccionada.condicion == 1 ){
             //     console.log("selcciona", selected);
@@ -1842,6 +2040,8 @@ this.submitForm();
                 this.medidaseleccionadaVacio = false;
                 if (selected.estado == 1) {
                     this.medidaseleccionada = selected;
+                    this.validarCampo("idmedida");
+
                 } else if (selected.estado == 0) {
                     this.advertenciaInactiva('Medidas');
                 }
@@ -1948,7 +2148,7 @@ this.submitForm();
                     console.log(error);
                 });
         },
-        
+
         listarMarca(page, buscar, criterio) {
             let me = this;
             console.log("Listano");
@@ -2184,145 +2384,46 @@ this.submitForm();
             }
             reader.readAsDataURL(file);
         },
-
-        calcularPrecioValorMoneda(precio){
+        calcularPrecioValorMoneda(precio) {
             console.log(precio)
-            return ((precio*parseFloat(this.monedaPrincipal)).toFixed(2))
+            return ((precio * parseFloat(this.monedaPrincipal)).toFixed(2))
         },
-
-        convertDolar(precio){
-            return (precio/parseFloat(this.monedaPrincipal))
-        },  
-
-        registrarArticulo() {
-            this.nombreProductoVacio = !this.nombre_producto;
-            this.codigoVacio = !this.codigo;
-            this.unidad_envaseVacio = !this.unidad_envase;
-            this.nombre_genericoVacio = !this.nombre_generico;
-            this.precio_costo_unidVacio = !this.precio_costo_unid;
-            this.precio_costo_paqVacio = !this.precio_costo_paq;
-            this.precio_ventaVacio = !this.precio_venta;
-            this.costo_compraVacio = !this.costo_compra;
-            this.stockVacio = !this.stock;
-            this.descripcionVacio = !this.descripcion;
-            this.fotografiaVacio = !this.fotografia;
-            this.lineaseleccionadaVacio = !this.lineaseleccionada.nombre;
-            this.marcaseleccionadaVacio = !this.marcaseleccionada.nombre;
-            this.industriaseleccionadaVacio = !this.industriaseleccionada.nombre;
-            this.proveedorseleccionadaVacio = !this.proveedorseleccionada.nombre;
-            this.gruposeleccionadaVacio = !this.gruposeleccionada.nombre_grupo;
-            this.medidaseleccionadaVacio = !this.medidaseleccionada.descripcion_medida;
-            if (this.validarArticulo()) {
-                return;
-            }
-
+        convertDolar(precio) {
+            return (precio / parseFloat(this.monedaPrincipal))
+        },
+        registrarArticulo(data) {
             let me = this;
-            let formData = new FormData();
 
-            formData.append('idcategoria', this.lineaseleccionada.id);
-            formData.append('idindustria', this.industriaseleccionada.id);
-            formData.append('idmarca', this.marcaseleccionada.id);
-            formData.append('idproveedor', this.proveedorseleccionada.id);
-            formData.append('idgrupo', this.gruposeleccionada.id);//AUMENtE 5 julio
-
-            formData.append('precio_costo_unid', this.convertDolar( this.precio_costo_unid));
-            formData.append('precio_costo_paq', this.convertDolar(this.precio_costo_paq));
-
-            formData.append('codigo', this.codigo);
-            formData.append('nombre', this.nombre_producto);
-            formData.append('nombre_generico', this.nombre_generico);//AUMENtE 5 julio
-            formData.append('unidad_envase', this.unidad_envase);
-            formData.append('stock', this.stock);
-            formData.append('precio_venta', this.convertDolar(this.precio_venta));
-
-            formData.append('precio_uno',this.convertDolar( this.precio_uno));
-            formData.append('precio_dos', this.convertDolar(this.precio_dos));
-            formData.append('precio_tres', this.convertDolar(this.precio_tres));
-            formData.append('precio_cuatro', this.convertDolar(this.precio_cuatro));
-
-            formData.append('descripcion', this.descripcion);
-            formData.append('fotografia', this.fotografia);
-
-            formData.append('idmedida', this.medidaseleccionada.id);
-            formData.append('costo_compra', this.convertDolar(this.costo_compra));
-
-            axios.post('/articulo/registrar', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-
-            }).then(function (response) {
+            axios.post('/articulo/registrar', data).then(function (response) {
+                console.log("Registro")
                 me.cerrarModal();
                 me.listarArticulo(1, '', 'nombre');
+                me.toastSuccess("Articulo registrado correctamente")
+
             }).catch(function (error) {
                 console.log(error);
+                me.toastError("Hubo un error al registrar el articulo")
             });
 
         },
 
         //---actuslizar articulo
-        actualizarArticulo() {
-            this.nombreProductoVacio = !this.nombre_producto;
-            this.codigoVacio = !this.codigo;
-            this.unidad_envaseVacio = !this.unidad_envase;
-            this.nombre_genericoVacio = !this.nombre_generico;
-            this.precio_costo_unidVacio = !this.precio_costo_unid;
-            this.precio_costo_paqVacio = !this.precio_costo_paq;
-            this.precio_ventaVacio = !this.precio_venta;
-            this.costo_compraVacio = !this.costo_compra;
-            this.stockVacio = !this.stock;
-            this.descripcionVacio = !this.descripcion;
-            this.fotografiaVacio = !this.fotografia;
-            if (this.validarArticulo()) {
-                return;
-            }
+        actualizarArticulo(data) {
+
             let me = this;
-            let precio = me.precio_venta;
-            console.log(precio);
 
-            let formData = new FormData();
-            formData.append('id', this.articulo_id);
-            formData.append('idcategoria', this.lineaseleccionada.id);
-            formData.append('idindustria', this.industriaseleccionada.id);
-            formData.append('idmarca', this.marcaseleccionada.id);
-            formData.append('idproveedor', this.proveedorseleccionada.id);
-            formData.append('idgrupo', this.gruposeleccionada.id);//AUMENtE 5 julio
 
-            formData.append('codigo', this.codigo);
-            formData.append('nombre', this.nombre_producto);
-            formData.append('nombre_generico', this.nombre_generico);
-            formData.append('stock', this.stock);
-            formData.append('precio_venta', this.convertDolar(this.precio_venta));
 
-            formData.append('precio_uno',this.convertDolar(this.precio_uno));
-            formData.append('precio_dos', this.convertDolar(this.precio_dos));
-            formData.append('precio_tres', this.convertDolar(this.precio_tres));
-            formData.append('precio_cuatro', this.convertDolar(this.precio_cuatro));
-
-            formData.append('descripcion', this.descripcion);
-            formData.append('fotografia', this.fotografia);
-
-            formData.append('costo_compra', this.convertDolar(this.costo_compra));
-            formData.append('idmedida', this.medidaseleccionada.id);
-            //formData.append('id', this.articulo_id);
-
-            /*for (let [key, value] of formData.entries()) 
-            {
-                console.log(key, value);
-            }*/
-
-            axios.post('/articulo/actualizar', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }).then(function (response) {
+            axios.post('/articulo/actualizar', data).then(function (response) {
                 //alert("Datos actualizados con éxito");
                 //console.log("datos actuales",formData);
                 me.cerrarModal();
                 me.listarArticulo(1, '', 'nombre');
+                me.toastSuccess("Articulo actualizado correctamente")
                 console.log(response)
             }).catch(function (error) {
                 console.log(error);
+                me.toastError("No se puedo actualizar el articulo")
             });
         },
         desactivarArticulo(id) {
@@ -2643,7 +2744,7 @@ this.submitForm();
             this.stock = 5;
             this.descripcion = '';
             this.fotografia = ''; //Pasando el valor limpio de la referencia
-            this.fotoMuestra = 'img/articulo/defecto.jpg';
+            this.fotoMuestra = null;
             this.lineaseleccionada.nombre = '';
             this.marcaseleccionada.nombre = '';
             this.industriaseleccionada.nombre = '';
@@ -2687,22 +2788,35 @@ this.submitForm();
                                 {
                                     this.modal = 1;
                                     this.tituloModal = 'Registrar Artículo';
-                                    this.idcategoria = 0;
-                                    this.nombre_categoria = '';
-                                    this.nombre_proveedor = '';
-                                    this.codigo = '';
-                                    this.nombre_producto = '';
-                                    this.nombre_generico = '';
-                                    this.unidad_envase = 0;
-                                    this.precio_costo_unid = 0;
-                                    this.precio_costo_paq = 0;
-                                    this.precio_venta = 0;
-                                    this.stock = 5;
-                                    this.descripcion = '';
+
                                     this.tipoAccion = 1;
                                     this.fotografia = '';
 
-                                    this.idmedida = 0; // new
+                                    this.datosFormulario = {
+                                        nombre: '',
+                                        descripcion: '',
+                                        nombre_generico: '',
+                                        unidad_envase: 0,
+                                        precio_costo_unid: 0,
+                                        precio_costo_paq: 0,
+                                        precio_venta: 0,
+                                        precio_uno: 0,
+                                        precio_dos: 0,
+                                        precio_tres: 0,
+                                        precio_cuatro: 0,
+                                        stock: 0,
+                                        costo_compra: 0,
+                                        codigo: '',
+                                        codigo_alfanumerico: '',
+                                        descripcion_fabrica: '',
+                                        idcategoria: null,
+                                        idmarca: null,
+                                        idindustria: null,
+                                        idgrupo: null,
+                                        idproveedor: null,
+                                        idmedida: null
+                                    };
+                                    this.errores = {};
                                     break;
                                 }
                             case 'actualizar':
@@ -2711,27 +2825,36 @@ this.submitForm();
                                     this.modal = 1;
                                     this.tituloModal = 'Actualizar Artículo';
                                     this.tipoAccion = 2;
-                                    this.articulo_id = data['id'];
-                                    this.codigo = data['codigo'];
-                                    this.nombre_producto = data['nombre'];
-                                    this.nombre_generico = data['nombre_generico'];
-                                    this.unidad_envase = data['unidad_envase'];
-                                    this.precio_costo_unid = this.calcularPrecioValorMoneda(data['precio_costo_unid']);
-                                    
-                                    this.stock = data['stock'];
-                                    this.precio_costo_paq = this.calcularPrecioValorMoneda(data['precio_costo_paq']);
-                                    this.costo_compra = this.calcularPrecioValorMoneda(data['costo_compra']);
-                                    this.idmedida = data['idmedida']; // new
-                                    // this.precio1=data['precio1'];
+                                    this.datosFormulario = {
+                                        nombre: data['nombre'],
+                                        descripcion: data['descripcion'],
+                                        nombre_generico: data['nombre_generico'],
+                                        unidad_envase: data['unidad_envase'],
+                                        precio_costo_unid: this.calcularPrecioValorMoneda(data['precio_costo_unid']),
+                                        precio_costo_paq: this.calcularPrecioValorMoneda(data['precio_costo_paq']),
+                                        precio_venta: this.calcularPrecioValorMoneda(data['precio_venta']),
+                                        precio_uno: 0,
+                                        precio_dos: 0,
+                                        precio_tres: 0,
+                                        precio_cuatro: 0,
+                                        stock: data['stock'],
+                                        costo_compra: this.calcularPrecioValorMoneda(data['costo_compra']),
+                                        codigo: data['codigo'],
+                                        codigo_alfanumerico: data['codigo_alfanumerico'],
+                                        descripcion_fabrica: data['descripcion_fabrica'],
+                                        idcategoria: null,
+                                        idmarca: null,
+                                        idindustria: null,
+                                        idgrupo: null,
+                                        idproveedor: null,
+                                        idmedida: data['idmedida'],
+                                        id: data['id']
+                                    };
+                                    this.errores = {};
+                                    this.idmedida = data['idmedida'];
 
-                                    this.precio_venta = this.calcularPrecioValorMoneda(data['precio_venta']);
-                                    console.log("PRECIO: ",data['precio_venta'])
-                                    console.log("Precio ",this.calcularPrecioValorMoneda(data['precio_venta']));
-                                    // this.precio2=data['precio2'];
-                                    // this.precio3=data['precio3'];
-                                    this.descripcion = data['descripcion'];
                                     this.fotografia = data['fotografia'];
-                                    this.fotoMuestra = data['fotografia'] ? 'img/articulo/' + data['fotografia'] : 'img/articulo/defecto.jpg';
+                                    this.fotoMuestra = data['fotografia'] ? 'img/articulo/' + data['fotografia'] : null;
                                     //this.industriaseleccionada = { nombre: data['industriaseleccionada.nombre'] };
 
                                     //this.industriaseleccionada = {nombre: data['nombre_industria']};
@@ -2770,14 +2893,12 @@ this.submitForm();
         },
 
         calcularPrecio(precio, index) {
-            console.log("PRECIO_COSTO", this.precio_costo_unid);
-            console.log("PRECIO_PORCENTAGE", precio.porcentage);
-            if (isNaN(this.precio_costo_unid) || isNaN(parseFloat(precio.porcentage))) {
+            if (isNaN(this.datosFormulario.precio_costo_unid) || isNaN(parseFloat(precio.porcentage))) {
                 console.log('El valor de precio_costo_unid o porcentaje no es válido');
                 return;
             }
-            const margen_ganancia = parseFloat(this.precio_costo_unid) * (parseFloat(precio.porcentage) / 100);
-            const precio_publico = parseFloat(this.precio_costo_unid) + margen_ganancia;
+            const margen_ganancia = parseFloat(this.datosFormulario.precio_costo_unid) * (parseFloat(precio.porcentage) / 100);
+            const precio_publico = parseFloat(this.datosFormulario.precio_costo_unid) + margen_ganancia;
 
             if (index === 0) {
                 this.precio_uno = precio_publico.toFixed(2);
@@ -3072,7 +3193,7 @@ this.submitForm();
                 me.mostrarCostos = respuesta.configuracionTrabajo.mostrarCostos;
                 me.mostrarProveedores = respuesta.configuracionTrabajo.mostrarProveedores;
 
-                me.monedaPrincipal=[respuesta.configuracionTrabajo.valor_moneda_principal,respuesta.configuracionTrabajo.simbolo_moneda_principal]
+                me.monedaPrincipal = [respuesta.configuracionTrabajo.valor_moneda_principal, respuesta.configuracionTrabajo.simbolo_moneda_principal]
                 console.log("MostrarCostos: " + me.mostrarCostos);
                 console.log("ProveedorEstado: " + me.mostrarProveedores);
                 console.log("MostrarSaldosStock: " + me.mostrarSaldosStock);
@@ -3162,7 +3283,6 @@ this.submitForm();
     }
 
     .mostrar {
-        overflow-y: scroll;
 
         display: list-item !important;
         opacity: 1 !important;
@@ -3229,161 +3349,173 @@ this.submitForm();
             transform: translateX(0%);
         }
     }
+
     /**
  * Extracted from: SweetAlert
  * Modified by: Istiak Tridip
  */
-.success-checkmark {
-    width: 80px;
-    height: 115px;
-    margin: 0 auto;
-    
-    .check-icon {
+    .success-checkmark {
         width: 80px;
-        height: 80px;
-        position: relative;
-        border-radius: 50%;
-        box-sizing: content-box;
-        border: 4px solid #4CAF50;
-        
-        &::before {
-            top: 3px;
-            left: -2px;
-            width: 30px;
-            transform-origin: 100% 50%;
-            border-radius: 100px 0 0 100px;
-        }
-        
-        &::after {
-            top: 0;
-            left: 30px;
-            width: 60px;
-            transform-origin: 0 50%;
-            border-radius: 0 100px 100px 0;
-            animation: rotate-circle 4.25s ease-in;
-        }
-        
-        &::before, &::after {
-            content: '';
-            height: 100px;
-            position: absolute;
-            background: #FFFFFF;
-            transform: rotate(-45deg);
-        }
-        
-        .icon-line {
-            height: 5px;
-            background-color: #4CAF50;
-            display: block;
-            border-radius: 2px;
-            position: absolute;
-            z-index: 10;
-            
-            &.line-tip {
-                top: 46px;
-                left: 14px;
-                width: 25px;
-                transform: rotate(45deg);
-                animation: icon-line-tip 0.75s;
-            }
-            
-            &.line-long {
-                top: 38px;
-                right: 8px;
-                width: 47px;
-                transform: rotate(-45deg);
-                animation: icon-line-long 0.75s;
-            }
-        }
-        
-        .icon-circle {
-            top: -4px;
-            left: -4px;
-            z-index: 10;
+        height: 115px;
+        margin: 0 auto;
+
+        .check-icon {
             width: 80px;
             height: 80px;
+            position: relative;
             border-radius: 50%;
-            position: absolute;
             box-sizing: content-box;
-            border: 4px solid rgba(76, 175, 80, .5);
+            border: 4px solid #4CAF50;
+
+            &::before {
+                top: 3px;
+                left: -2px;
+                width: 30px;
+                transform-origin: 100% 50%;
+                border-radius: 100px 0 0 100px;
+            }
+
+            &::after {
+                top: 0;
+                left: 30px;
+                width: 60px;
+                transform-origin: 0 50%;
+                border-radius: 0 100px 100px 0;
+                animation: rotate-circle 4.25s ease-in;
+            }
+
+            &::before,
+            &::after {
+                content: '';
+                height: 100px;
+                position: absolute;
+                background: #FFFFFF;
+                transform: rotate(-45deg);
+            }
+
+            .icon-line {
+                height: 5px;
+                background-color: #4CAF50;
+                display: block;
+                border-radius: 2px;
+                position: absolute;
+                z-index: 10;
+
+                &.line-tip {
+                    top: 46px;
+                    left: 14px;
+                    width: 25px;
+                    transform: rotate(45deg);
+                    animation: icon-line-tip 0.75s;
+                }
+
+                &.line-long {
+                    top: 38px;
+                    right: 8px;
+                    width: 47px;
+                    transform: rotate(-45deg);
+                    animation: icon-line-long 0.75s;
+                }
+            }
+
+            .icon-circle {
+                top: -4px;
+                left: -4px;
+                z-index: 10;
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                position: absolute;
+                box-sizing: content-box;
+                border: 4px solid rgba(76, 175, 80, .5);
+            }
+
+            .icon-fix {
+                top: 8px;
+                width: 5px;
+                left: 26px;
+                z-index: 1;
+                height: 85px;
+                position: absolute;
+                transform: rotate(-45deg);
+                background-color: #FFFFFF;
+            }
         }
-        
-        .icon-fix {
-            top: 8px;
-            width: 5px;
-            left: 26px;
-            z-index: 1;
-            height: 85px;
-            position: absolute;
+    }
+
+    @keyframes rotate-circle {
+        0% {
             transform: rotate(-45deg);
-            background-color: #FFFFFF;
+        }
+
+        5% {
+            transform: rotate(-45deg);
+        }
+
+        12% {
+            transform: rotate(-405deg);
+        }
+
+        100% {
+            transform: rotate(-405deg);
         }
     }
-}
 
-@keyframes rotate-circle {
-    0% {
-        transform: rotate(-45deg);
-    }
-    5% {
-        transform: rotate(-45deg);
-    }
-    12% {
-        transform: rotate(-405deg);
-    }
-    100% {
-        transform: rotate(-405deg);
-    }
-}
+    @keyframes icon-line-tip {
+        0% {
+            width: 0;
+            left: 1px;
+            top: 19px;
+        }
 
-@keyframes icon-line-tip {
-    0% {
-        width: 0;
-        left: 1px;
-        top: 19px;
-    }
-    54% {
-        width: 0;
-        left: 1px;
-        top: 19px;
-    }
-    70% {
-        width: 50px;
-        left: -8px;
-        top: 37px;
-    }
-    84% {
-        width: 17px;
-        left: 21px;
-        top: 48px;
-    }
-    100% {
-        width: 25px;
-        left: 14px;
-        top: 45px;
-    }
-}
+        54% {
+            width: 0;
+            left: 1px;
+            top: 19px;
+        }
 
-@keyframes icon-line-long {
-    0% {
-        width: 0;
-        right: 46px;
-        top: 54px;
+        70% {
+            width: 50px;
+            left: -8px;
+            top: 37px;
+        }
+
+        84% {
+            width: 17px;
+            left: 21px;
+            top: 48px;
+        }
+
+        100% {
+            width: 25px;
+            left: 14px;
+            top: 45px;
+        }
     }
-    65% {
-        width: 0;
-        right: 46px;
-        top: 54px;
+
+    @keyframes icon-line-long {
+        0% {
+            width: 0;
+            right: 46px;
+            top: 54px;
+        }
+
+        65% {
+            width: 0;
+            right: 46px;
+            top: 54px;
+        }
+
+        84% {
+            width: 55px;
+            right: 0px;
+            top: 35px;
+        }
+
+        100% {
+            width: 47px;
+            right: 8px;
+            top: 38px;
+        }
     }
-    84% {
-        width: 55px;
-        right: 0px;
-        top: 35px;
-    }
-    100% {
-        width: 47px;
-        right: 8px;
-        top: 38px;
-    }
-}
-    </style>
+</style>

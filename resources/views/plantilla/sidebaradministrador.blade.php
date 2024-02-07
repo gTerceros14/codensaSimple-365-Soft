@@ -33,7 +33,8 @@
                 </ul>
             </li>
             <li class="nav-item nav-dropdown">
-                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-list-alt"></i> Ventas</a>
+                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                    Ventas</a>
                 <ul class="nav-dropdown-items">
                     <li @click="menu=5" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas</a>
@@ -42,9 +43,10 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Registro
                             Ventas</a>
                     </li>
-                            <li @click="menu=48" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Institucionales</a>
-                            </li>
+                    <li @click="menu=48" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas
+                            Institucionales</a>
+                    </li>
                     <li @click="menu=6" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Clientes</a>
                     </li>
@@ -66,7 +68,8 @@
             </li>
 
             <li class="nav-item nav-dropdown">
-                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-shopping-cart"></i> Compras</a>
+                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-shopping-bag" aria-hidden="true"></i>
+                    Compras</a>
                 <ul class="nav-dropdown-items">
                     <li @click="menu=3" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ingresos</a>
@@ -99,12 +102,7 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Monitoreo
                             productos</a>
                     </li>
-                    <li @click="menu=42" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ofertas</a>
-                    </li>
-                    <li @click="menu=43" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kits</a>
-                    </li>
+
                 </ul>
             </li>
             <li class="nav-item nav-dropdown">
@@ -112,6 +110,12 @@
                 <ul class="nav-dropdown-items">
                     <li @click="menu=2" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Productos</a>
+                    </li>
+                    <li @click="menu=42" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ofertas</a>
+                    </li>
+                    <li @click="menu=43" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kits</a>
                     </li>
 
                     <li @click="menu=18" class="nav-item">
@@ -151,9 +155,10 @@
                     <li @click="menu=45" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte
                             Ventas Diarias</a>
-                            </li>
-                            <li @click="menu=49" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Inventarios</a>
+                    </li>
+                    <li @click="menu=49" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte
+                            Inventarios</a>
                     </li>
                     <li @click="menu=10" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte

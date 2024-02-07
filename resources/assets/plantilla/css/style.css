@@ -15,8 +15,8 @@
 
 /* Asignar Colores Aqui */
 :root {
-  --color-sidebar: #529535;
-  --color-top-bar:rgb(98, 182, 62);
+  --color-sidebar: #044b7b;
+  --color-top-bar:#fff;
 }
 
 @media print {
@@ -7617,11 +7617,11 @@ base-chart.chart {
   background: #20a8d8; }
 
 .modal-primary .modal-content {
-  border-color: var(--color-top-bar); }
+  border-color: var(--color-sidebar); }
 
 .modal-primary .modal-header {
   color: #fff;
-  background-color: var(--color-top-bar); }
+  background-color: var(--color-sidebar); }
 
 .modal-secondary .modal-content {
   border-color: #a4b7c1; }
@@ -9417,7 +9417,7 @@ hr.transparent {
   .container-input input{
       width: 100%;
       border: none;
-      border-bottom: 1px solid rgb(101, 192, 79);
+      border-bottom: 1px solid var(--color-sidebar);
       height: 35px;
   }
   
@@ -9425,7 +9425,7 @@ hr.transparent {
       padding: 5px;
       width: 100%;
       height: 35px;
-      background-color: rgb(101, 192, 79);
+      background-color: var(--color-sidebar);
       border: none;
       color: white;
   }
