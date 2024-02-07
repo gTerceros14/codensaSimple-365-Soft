@@ -174,6 +174,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/cotizacionventa/eliminar', 'CotizacionVentaController@delete');
         Route::get('/cotizacionventa/obtenerDetalles', 'CotizacionVentaController@obtenerDetalles');
         Route::put('cotizacionventa/editar', 'CotizacionVentaController@editar');
+        Route::get('/cotizacionventa/imprimir/{id}', 'CotizacionVentaController@imprimirTicket');
+
 
         Route::get('/rol', 'RolController@index');
         Route::get('/rol/selectRol', 'RolController@selectRol');

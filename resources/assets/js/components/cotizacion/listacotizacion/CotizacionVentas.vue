@@ -1193,6 +1193,20 @@ export default {
                     console.log(error);
                 });
         },
+
+        imprimirTicket(id) {
+            axios.get('/cotizacionventa/imprimir/'+id, { responseType: 'blob' })
+                .then(function(response) {
+                //window.location.href = "docs/ticket.pdf";  esto sirve para ver lo que se va a imprimir
+                //const fileURL = 'docs/ticket.pdf';         pero si esta comentado, no aparece, se imprime automaticamente
+                //window.open(fileURL, '_blank');            bueno, eso suponemos. Att: los practicantes
+                console.log("Se generó el Ticket correctamente");
+                })
+                .catch(function(error) {
+                console.log(error);
+                });
+            },
+
         registrarCotizacion() {
             if (this.validarCotizacion()) {
                 console.log("Rellene todos los campos");
@@ -1221,7 +1235,7 @@ export default {
 
             }).then(function (response) {
                 console.log("cotizacion_Ventas_Registraado");
-
+                me.imprimirTicket(response.data.id);
                 //console.log(response.data.id);
                 if (response.data.id > 0) {
                     console.log("cotizacionREgistraado" + me.listado);
