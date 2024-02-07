@@ -597,6 +597,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" @click="cerrarModal()">Guardar</button>
+                        <button type="button" class="btn btn-danger" @click="cerrarModal()">Cancelar</button>
                     </div>
                 </div>
             </div>
@@ -1993,7 +1994,8 @@ export default {
             })
 
             var datos = { factura };
-
+            console.log("Datos de la Factura: "+ datos);
+            
             axios.post('/venta/emitirFactura', {
                 factura: datos,
                 id_cliente: id_cliente

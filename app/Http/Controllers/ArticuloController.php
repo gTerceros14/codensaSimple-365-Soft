@@ -211,7 +211,7 @@ class ArticuloController extends Controller
                 'articulos.precio_tres',
                 'articulos.precio_cuatro',
                 'articulos.fotografia',
-                'articulos.unidad_envase',
+                'articulos.unidad_envase'
                 // 'articulos.precio_costo_unid',
                 // 'articulos.precio_costo_paq',
             )

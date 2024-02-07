@@ -1942,6 +1942,7 @@ this.submitForm();
                 var respuesta = response.data;
                 me.arrayArticulo = respuesta.articulos.data;
                 me.pagination = respuesta.pagination;
+                console.log(me.arrayArticulo);
             })
                 .catch(function (error) {
                     console.log(error);
@@ -2183,13 +2184,16 @@ this.submitForm();
             }
             reader.readAsDataURL(file);
         },
+
         calcularPrecioValorMoneda(precio){
             console.log(precio)
             return ((precio*parseFloat(this.monedaPrincipal)).toFixed(2))
         },
+
         convertDolar(precio){
             return (precio/parseFloat(this.monedaPrincipal))
         },  
+
         registrarArticulo() {
             this.nombreProductoVacio = !this.nombre_producto;
             this.codigoVacio = !this.codigo;
@@ -2255,6 +2259,7 @@ this.submitForm();
             });
 
         },
+
         //---actuslizar articulo
         actualizarArticulo() {
             this.nombreProductoVacio = !this.nombre_producto;
@@ -2272,6 +2277,9 @@ this.submitForm();
                 return;
             }
             let me = this;
+            let precio = me.precio_venta;
+            console.log(precio);
+
             let formData = new FormData();
             formData.append('id', this.articulo_id);
             formData.append('idcategoria', this.lineaseleccionada.id);
