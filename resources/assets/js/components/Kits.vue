@@ -124,6 +124,9 @@
                     placeholder="Ej. 10 (sin símbolo de %)" :class="{ 'is-invalid': errores.precio }"
                     @input="validarCampo('precio')" />
                   <p class="text-danger" v-if="errores.precio">{{ errores.precio }}</p>
+                  <div class="alert alert-success" role="alert">
+                  Precio recomendado {{ total }}  {{ monedaPrincipal[1] }}
+                </div>
                 </div>
 
                 <div class="col-md-6">
@@ -144,7 +147,7 @@
                       <th>Código</th>
                       <th>Nombre comercial</th>
                       <th>Costo unidad</th>
-                      <th>Costo paquete</th>
+                      <!-- <th>Costo paquete</th> -->
                       <th>Cantidad</th>
 
                     </tr>
@@ -159,19 +162,15 @@
                       <td v-text="articulo.codigo"></td>
                       <td v-text="articulo.nombre"></td>
                       <td>
-                        <p>{{ ((articulo.precio_costo_unid * parseFloat(monedaPrincipal[0])) * (1 -
-                          datosFormulario.porcentaje / 100)).toFixed(2) }} {{ monedaPrincipal[1] }} </p>
+                        <p>{{ (articulo.precio_costo_unid*parseFloat(monedaPrincipal[0])) }} {{ monedaPrincipal[1] }} </p>
 
                       </td>
+                      <!-- <td>
+                        <p>{{ (articulo.precio_costo_paq)*parseFloat(monedaPrincipal[0])}} {{ monedaPrincipal[1] }} </p>
+                      </td> -->
                       <td>
-                        <p>{{ (((articulo.precio_costo_paq) * parseFloat(monedaPrincipal[0])) * (1 -
-                          datosFormulario.porcentaje / 100)).toFixed(2) }} {{ monedaPrincipal[1] }} </p>
+                        <input class="form-control" type="number" v-model="articulo.cantidad" @input="calcularTotal" />
                       </td>
-                      <td>
-                        <input class="form-control" type="number" v-model="articulo.cantidad" />
-                      </td>
-
-
                     </tr>
                   </tbody>
                 </table>
@@ -313,13 +312,11 @@
                     <td v-text="articulo.codigo"></td>
                     <td v-text="articulo.nombre"></td>
                     <td>
-                      <p>{{ ((articulo.precio_costo_unid * parseFloat(monedaPrincipal[0])) * (1 -
-                        datosFormulario.porcentaje / 100)).toFixed(2) }} {{ monedaPrincipal[1] }} </p>
+                      <p>{{ (articulo.precio_costo_unid * parseFloat(monedaPrincipal[0])) }} {{ monedaPrincipal[1] }} </p>
 
                     </td>
                     <td>
-                      <p>{{ (((articulo.precio_costo_paq) * parseFloat(monedaPrincipal[0])) * (1 -
-                        datosFormulario.porcentaje / 100)).toFixed(2) }} {{ monedaPrincipal[1] }} </p>
+                      <p>{{ (articulo.precio_costo_paq) * parseFloat(monedaPrincipal[0])  }} {{ monedaPrincipal[1] }} </p>
                     </td>
                     <td>
                       {{ articulo.cantidad }}
@@ -358,6 +355,7 @@ export default {
         tipo_promocion: 0,
         precio: 0
       },
+      total:0,
       errores: {},
 
       arrayKit: [],
@@ -386,6 +384,8 @@ export default {
     }
   },
   computed: {
+
+
     isActived: function () {
       return this.pagination.current_page;
     },
@@ -413,8 +413,13 @@ export default {
 
     }
   },
-
   methods: {
+    calcularTotal() {
+      console.log("Esto se esta ejecutando ")
+      this.total = this.arrayArticulosSeleccionados.reduce((total, producto) => {
+        return total + (producto.cantidad * producto.precio_costo_unid);
+      }, 0);
+    },
     getColorForEstado(estado, fecha_final) {
       const fechaFinal = new Date(fecha_final) < new Date();
 
@@ -478,6 +483,7 @@ export default {
       this.arrayArticulosSeleccionados.splice(indexAEliminar, 1);
     },
     agregarDetalleModal(dato) {
+      dato.cantidad=1;
       const objetoExistente = this.arrayArticulosSeleccionados.find(item => {
         return item.id === dato.id;
       });
@@ -485,9 +491,10 @@ export default {
       if (!objetoExistente) {
         this.arrayArticulosSeleccionados.push(dato);
         this.modalProductos = 0;
+        this.calcularTotal();
 
       } else {
-        this.toastError("Este articulo ya agrego")
+        this.toastError("Este articulo ya se agrego al kit")
 
       }
 
@@ -542,6 +549,12 @@ export default {
 
       await esquemaKits.validate(this.datosFormulario, { abortEarly: false })
         .then(() => {
+          if (this.arrayArticulosSeleccionados.length==0){
+            this.toastError("Seleccione articulos para el kit");
+            return
+          }
+       
+     
           if (this.tipoAccion == 2) {
             this.actualizarKit(this.datosFormulario);
           } else {
@@ -707,7 +720,6 @@ export default {
 
       };
       this.obtenerDatosKit(data['id'])
-
     },
     cerrarModal() {
       this.modal = 0;
@@ -744,6 +756,7 @@ export default {
               case 'registrar':
                 {
                   this.modal = 1;
+                  this.total=0;
                   this.tituloModal = 'Registrar nuevo kit';
                   this.datosFormulario = {
                     codigo: '',
@@ -780,6 +793,8 @@ export default {
 
                   };
                   this.obtenerDatosKit(data['id'])
+                  this.calcularTotal()
+
                   break;
                 }
             }
