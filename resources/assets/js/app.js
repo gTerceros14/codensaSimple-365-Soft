@@ -20,6 +20,17 @@ window.Vue = require("vue");
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+Vue.component("square-item", require("./components/dashboard/squareItem.vue"));
+Vue.component(
+  "TopVendedores",
+  require("./components/dashboard/TopVendedores.vue")
+);
+Vue.component("TopClientes", require("./components/dashboard/TopClientes.vue"));
+Vue.component(
+  "TopArticulos",
+  require("./components/dashboard/TopArticulos.vue")
+);
+
 Vue.component("icon-button", require("./components/buttons/IconButton.vue"));
 
 Vue.component("empresa", require("./components/Empresa.vue"));
@@ -141,10 +152,19 @@ Vue.component(
 Vue.component("puntoventa", require("./components/PuntoVenta.vue"));
 Vue.component("rolventa", require("./components/RegistroVentas.vue"));
 Vue.component("devoluciones", require("./components/Devoluciones.vue"));
-Vue.component('reporteventas', require('./components/ReporteVentasDiarias.vue'));
-Vue.component('ventasinstitucionales', require('./components/VentasInstitucionales.vue'));
+Vue.component(
+  "reporteventas",
+  require("./components/ReporteVentasDiarias.vue")
+);
+Vue.component(
+  "ventasinstitucionales",
+  require("./components/VentasInstitucionales.vue")
+);
 
-Vue.component('reporteinventario', require('./components/ReporteInventario.vue'));
+Vue.component(
+  "reporteinventario",
+  require("./components/ReporteInventario.vue")
+);
 
 Vue.component(
   "reporteventas",
