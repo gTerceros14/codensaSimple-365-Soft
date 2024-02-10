@@ -453,7 +453,6 @@
             {
                 window.open('/cliente/listarReporteClienteExcel', '_blank');
             },
-<<<<<<< Updated upstream
             getTipoDocumentoText(value) {
             switch(value) {
                 case '1':
@@ -468,7 +467,6 @@
                     return '';
                 }
             },
-=======
             //----------
             recuperarIdRol() {
                 this.rolUsuario = window.userData.rol;
@@ -571,7 +569,6 @@
             //         this.listarPersona(1,this.buscar,this.criterio);
             //     }
             // }
->>>>>>> Stashed changes
         },
         
         mounted() {
