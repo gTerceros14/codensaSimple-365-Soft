@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Persona extends Model
 {
-    protected $fillable = ['id','nombre','tipo_documento','num_documento','complemento_id','direccion','telefono','email','fotografia','estado'];
+    protected $fillable = ['id','nombre','usuario','tipo_documento','num_documento','complemento_id','direccion','telefono','email','fotografia','estado'];
 
     public function provedor()
     {

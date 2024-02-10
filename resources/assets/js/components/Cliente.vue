@@ -30,13 +30,38 @@
                                     <button type="submit" @click="listarPersona(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                                 </div>
                             </div>
+                            <div v-if="rolUsuario == 1" class="col-md-5">
+                                <v-select 
+                                    :on-search="selectUsuarioFiltro"  
+                                    label="nombre" 
+                                    :options="arrayUsuarioFiltro"
+                                    placeholder="Buscar Usuario..."
+                                    :onChange="getDatosUsuarioFiltro"
+                                    v-model="usuarioSeleccionadodos"
+                                    @change="limpiarUsuarioSeleccionado"
+                                    >
+                                </v-select>  
+                            </div>
                         </div>
+                        <!-- <div class="form-group row">
+                            <div class="col-md-5">
+                                <v-select 
+                                            :on-search="selectUsuario"  
+                                            label="nombre" 
+                                            :options="arrayUsuarioV"
+                                            placeholder="Buscar Usuario..."
+                                            :onChange="getDatosUsuario"
+                                            v-model="usuarioSeleccionado"
+                                            >
+                                        </v-select>  
+                            </div>
+                        </div> -->
                         <div class="table-responsive">
 
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th>Opciones</th>
+                                    <th v-if="rolUsuario == 1">Opciones</th>
                                     <th>Nombre</th>
                                     <th>Tipo Documento</th>
                                     <th>Número</th>
@@ -47,7 +72,7 @@
                             </thead>
                             <tbody>
                                 <tr v-for="persona in arrayPersona" :key="persona.id">
-                                    <td>
+                                    <td v-if="rolUsuario == 1">
                                         <button type="button" @click="abrirModal('persona','actualizar',persona)" class="btn btn-warning btn-sm">
                                           <i class="icon-pencil"></i>
                                         </button>
@@ -96,6 +121,21 @@
                                     <label class="col-md-3 form-control-label" for="text-input">Nombre (*)</label>
                                     <div class="col-md-9">
                                         <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de la persona">                                        
+                                    </div>
+                                </div>
+                                <div class="form-group row" v-if="activaredit == true">
+                                    <label class="col-md-3 form-control-label" for="text-input">Usuario*</label>
+                                    <div class="col-md-9">
+                                        <v-select 
+                                            :on-search="selectUsuario"  
+                                            label="nombre" 
+                                            :options="arrayUsuarioV"
+                                            placeholder="Buscar Usuario..."
+                                            :onChange="getDatosUsuario"
+                                            v-model="usuarioSeleccionado"
+                                            >
+                                        </v-select>    
+                                        <!-- :onChange="getDatosCliente"                   -->
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -160,9 +200,22 @@
 </template>
 
 <script>
+    import vSelect from 'vue-select';
     export default {
         data (){
             return {
+                rolUsuario: '',
+                arrayUsuarioV :[],
+                usuarioSeleccionado:'',
+                idusuario: '',
+                arrayDetalleUsuario: [],
+                activaredit: false,
+                arrayUsuarioFiltro: [],
+                usuarioSeleccionadodos: '',
+                //usuariodos_id: 3,
+                usuariodos_id: '',
+                role_id : '',
+
                 persona_id: 0,
                 nombre : '',
                 tipo_documento : 'DNI',
@@ -186,8 +239,12 @@
                 },
                 offset : 3,
                 criterio : 'nombre',
+                //criterio : '',
                 buscar : ''
             }
+        },
+        components: {
+            vSelect
         },
         computed:{
             isActived: function(){
@@ -222,16 +279,62 @@
             
             listarPersona (page,buscar,criterio){
                 let me=this;
-                var url= '/cliente?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                console.log('llega??',me.usuariodos_id);
+                var url= '/cliente?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio + '&usuarioid=' + me.usuariodos_id;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayPersona = respuesta.personas.data;
+                    //me.arrayPersona = respuesta.personas.data;
+                    me.arrayPersona = respuesta.usuarios.data;
+                    console.log('LIST',me.arrayPersona);
                     me.pagination= respuesta.pagination;
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
             },
+            //---selecionar busqueda---
+            selectUsuarioFiltro(search, loading) {
+                let me = this;
+                loading(true)
+                //console.log('llega??',me.iduse);
+                var url = '/cliente/usuario/filtro?filtro=' + search;
+                axios.get(url).then(function (response) {
+                    //console.log(response.clientes);
+                    let respuesta = response.data;
+                    console.log('BUSCADO2', respuesta);
+                    q: search
+                    me.arrayUsuarioFiltro = respuesta.usuariodos;
+                    console.log('BUSCADO22', me.arrayUsuarioFiltro);
+                    loading(false)
+                })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            limpiarUsuarioSeleccionado(newValue) {
+                if (newValue === null) {
+                    console.log('ENTRO##');
+                    //this.usuarioSeleccionadodos = null;
+                }
+                // this.usuarioSeleccionadodos = null;
+                // this.usuariodos_id = null;
+               // this.listarPersona(1,this.buscar,this.criterio);
+            },
+             //--SELECCIONAR OSEA AGARRA EL ID DEL USUARIO 
+             getDatosUsuarioFiltro(val1) {
+                let me = this;
+                me.loading = true;
+
+                if (val1 && val1.iduse) {
+                    me.usuariodos_id = val1.iduse;
+                    console.log('ID_USER2', me.usuariodos_id);
+                    me.usuarioSeleccionadodos = val1.nombre;
+                    console.log('NOBRE2', me.usuarioSeleccionadodos);
+                    me.listarPersona(1,this.buscar,this.criterio);
+                }
+                //this.listarPersona(1,this.buscar,this.criterio);
+            },
+            //-------------------
             cambiarPagina(page,buscar,criterio){
                 let me = this;
                 //Actualiza la página actual
@@ -269,6 +372,7 @@
 
                 axios.put('/cliente/actualizar',{
                     'nombre': this.nombre,
+                    'usuariodos_id': this.idusuario,
                     'tipo_documento': this.tipo_documento,
                     'num_documento' : this.num_documento,
                     'direccion' : this.direccion,
@@ -302,6 +406,7 @@
                 this.telefono='';
                 this.email='';
                 this.errorPersona=0;
+                this.activaredit = false;
 
             },
             abrirModal(modelo, accion, data = []){
@@ -324,7 +429,7 @@
                             }
                             case 'actualizar':
                             {
-                                //console.log(data);
+                                console.log(data);
                                 this.modal=1;
                                 this.tituloModal='Actualizar Cliente';
                                 this.tipoAccion=2;
@@ -335,6 +440,9 @@
                                 this.direccion = data['direccion'];
                                 this.telefono = data['telefono'];
                                 this.email = data['email'];
+                                this.activaredit = true;
+                                //this.idusuario = data['usuario'];
+                                this.verUsuario(data);
                                 break;
                             }
                         }
@@ -345,6 +453,7 @@
             {
                 window.open('/cliente/listarReporteClienteExcel', '_blank');
             },
+<<<<<<< Updated upstream
             getTipoDocumentoText(value) {
             switch(value) {
                 case '1':
@@ -359,11 +468,135 @@
                     return '';
                 }
             },
+=======
+            //----------
+            recuperarIdRol() {
+                this.rolUsuario = window.userData.rol;
+                console.log('ID_ROL: ' + this.rolUsuario);
+            },
+            selectUsuario(search, loading) {
+                let me = this;
+                loading(true)
+                var url = '/cliente/selectUusarioVend?filtro=' + search;
+                axios.get(url).then(function (response) {
+                    //console.log(response.clientes);
+                    let respuesta = response.data;
+                    q: search
+                    me.arrayUsuarioV = respuesta.clientes;
+                    console.log('BUSCADO', me.arrayUsuarioV);
+                    loading(false)
+                })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            
+            //--SELECCIONAR OSEA AGARRA EL ID DEL USUARIO 
+            getDatosUsuario(val1) {
+                let me = this;
+                me.loading = true;
+
+                if (val1 && val1.ID_use) {
+                    me.idusuario = val1.ID_use;
+                    console.log('ID_USER', me.idusuario);
+                    me.usuarioSeleccionado = val1.nombre;
+                    console.log('NOBRE', me.usuarioSeleccionado);
+                }
+            },
+            verUsuario(data) {
+                let idusuario = data.usuario; 
+                console.log('RECUPERO!!', idusuario);
+                let me = this;
+
+                //me.arrayPedidoSeleccionado=data;
+
+                var url = '/cliente/usuario?idusuario=' + idusuario;
+                axios.get(url)
+                    .then(function (response) {
+                    var respuesta = response.data;
+                    //me.arrayPedidoProvDet = respuesta.pedidoprov; // Corrección aquí
+                    me.arrayDetalleUsuario = respuesta.usuario;
+                    console.log('ARRAY', me.arrayDetalleUsuario);
+                    me.usuarioSeleccionado = me.arrayDetalleUsuario[0].nombre;
+                    console.log('Nombre del usuario:', me.arrayDetalleUsuario[0].nombre);
+                    
+                    })
+                    .catch(function (error) {
+                    console.log(error);
+                });              
+            },
+            // listarPrueba(page,buscar,criterio){
+            //     let me=this;
+            //     var url= '/cliente/selectUusarioVend?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+            //     axios.get(url).then(function (response) {
+            //         var respuesta= response.data;
+            //         console.log('PRUEVA:',respuesta);
+            //     })
+            //     .catch(function (error) {
+            //         console.log(error);
+            //     });
+            // },
+            listarDatosuser(){
+                axios.get('/user-info')
+                .then(response => {
+                    // Aquí response.data.user contiene la información del usuario, incluido el ID
+                    //const userId = response.data.user.id;
+                    const userData = response.data.user;
+                    console.log('DAtOS RECUPERADO:', userData);
+                    // Puedes almacenar userId en el estado de tu componente Vue.js o utilizarlo según sea necesario
+                    this.usuariodos_id = userData.iduse;
+                    console.log('DAtOS RECUPERADO IS_USE:', this.usuariodos_id);
+                    this.role_id = userData.idrol;
+                    console.log('DAtOS RECUPERADO role_id:', this.role_id);
+                    // this.listarPersona(1,this.buscar,this.criterio);
+                    
+                    if(this.role_id == 1){
+                        this.usuariodos_id = '';
+                        this.listarPersona(1,this.buscar,this.criterio);
+                    } else{
+                        this.listarPersona(1,this.buscar,this.criterio);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al obtener la información del usuario:', error);
+                });
+            },
+            //-----preparar para el listado si es admin o no es---
+            // listIndex(){
+            //     if(this.role_id == 1){
+            //         this.usuariodos_id = '';
+            //         this.listarPersona(1,this.buscar,this.criterio);
+            //     } else{
+            //         this.listarDatosuser();
+            //         this.listarPersona(1,this.buscar,this.criterio);
+            //     }
+            // }
+>>>>>>> Stashed changes
         },
         
         mounted() {
-            this.listarPersona(1,this.buscar,this.criterio);
-        }
+            this.listarDatosuser();
+            //this.listIndex();
+            //this.listarPersona(1,this.buscar,this.criterio);
+            this.recuperarIdRol();
+            //this.listarPrueba();
+        },
+        // created(){
+        //     //--recuperar datos al logearse
+        //     axios.get('/user-info')
+        //     .then(response => {
+        //         // Aquí response.data.user contiene la información del usuario, incluido el ID
+        //         //const userId = response.data.user.id;
+        //         const userData = response.data.user;
+        //         console.log('DAtOS RECUPERADO:', userData);
+        //         // Puedes almacenar userId en el estado de tu componente Vue.js o utilizarlo según sea necesario
+        //         this.usuariodos_id = userData.iduse;
+        //         console.log('DAtOS RECUPERADO NAME:', this.usuariodos_id);
+        //     })
+        //     .catch(error => {
+        //         console.error('Error al obtener la información del usuario:', error);
+        //     });
+        // }
     }
 </script>
 <style>    

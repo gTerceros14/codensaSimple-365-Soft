@@ -12,6 +12,7 @@ use App\User;
 use App\Persona;
 use App\Sucursal;
 use App\Exports\UserExport;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
@@ -59,6 +60,7 @@ class UserController extends Controller
 
             $persona = new Persona();
             $persona->nombre = $request->nombre;
+            $persona->usuario = Auth::user()->id;
             $persona->tipo_documento = $request->tipo_documento;
             $persona->num_documento = $request->num_documento;
             $persona->direccion = $request->direccion;
@@ -93,7 +95,8 @@ class UserController extends Controller
             $user->idsucursal = $request->idsucursal;
             $user->usuario = $request->usuario;
             $user->password = bcrypt( $request->password);
-            $user->condicion = '1';            
+            $user->condicion = '1';  
+            $user->idpuntoventa ='1';
             $user->save();
 
             DB::commit();
