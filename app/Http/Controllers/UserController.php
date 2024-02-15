@@ -19,33 +19,33 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');
+        if (!$request->ajax())
+            return redirect('/');
 
         $buscar = $request->buscar;
         $criterio = $request->criterio;
-        
-        if ($buscar==''){
-            $personas = User::join('personas','users.id','=','personas.id')
-            ->join('roles','users.idrol','=','roles.id')
-            ->join('sucursales','users.idsucursal','=','sucursales.id')
-            ->select('personas.id','personas.nombre','personas.tipo_documento','personas.num_documento','personas.direccion','personas.telefono','personas.email','personas.fotografia','users.usuario','users.password','users.condicion','users.idrol','roles.nombre as rol', 'users.idsucursal', 'sucursales.nombre as sucursal')
-            ->orderBy('personas.id', 'desc')->paginate(3);
+
+        if ($buscar == '') {
+            $personas = User::join('personas', 'users.id', '=', 'personas.id')
+                ->join('roles', 'users.idrol', '=', 'roles.id')
+                ->join('sucursales', 'users.idsucursal', '=', 'sucursales.id')
+                ->select('personas.id', 'personas.nombre', 'personas.tipo_documento', 'personas.num_documento', 'personas.direccion', 'personas.telefono', 'personas.email', 'personas.fotografia', 'users.usuario', 'users.password', 'users.condicion', 'users.idrol', 'roles.nombre as rol', 'users.idsucursal', 'sucursales.nombre as sucursal')
+                ->orderBy('personas.id', 'desc')->paginate(3);
+        } else {
+            $personas = User::join('personas', 'users.id', '=', 'personas.id')
+                ->join('roles', 'users.idrol', '=', 'roles.id')
+                ->select('personas.id', 'personas.nombre', 'personas.tipo_documento', 'personas.num_documento', 'personas.direccion', 'personas.telefono', 'personas.email', 'personas.fotografia', 'users.usuario', 'users.password', 'users.condicion', 'users.idrol', 'roles.nombre as rol', 'users.idsucursal', 'sucursales.nombre as sucursal')
+                ->where('personas.' . $criterio, 'like', '%' . $buscar . '%')->orderBy('id', 'desc')->paginate(3);
         }
-        else{
-            $personas = User::join('personas','users.id','=','personas.id')
-            ->join('roles','users.idrol','=','roles.id')
-            ->select('personas.id','personas.nombre','personas.tipo_documento','personas.num_documento','personas.direccion','personas.telefono','personas.email','personas.fotografia','users.usuario','users.password','users.condicion','users.idrol','roles.nombre as rol', 'users.idsucursal', 'sucursales.nombre as sucursal')
-            ->where('personas.'.$criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(3);
-        }
-        
+
         return [
             'pagination' => [
-                'total'        => $personas->total(),
+                'total' => $personas->total(),
                 'current_page' => $personas->currentPage(),
-                'per_page'     => $personas->perPage(),
-                'last_page'    => $personas->lastPage(),
-                'from'         => $personas->firstItem(),
-                'to'           => $personas->lastItem(),
+                'per_page' => $personas->perPage(),
+                'last_page' => $personas->lastPage(),
+                'from' => $personas->firstItem(),
+                'to' => $personas->lastItem(),
             ],
             'personas' => $personas
         ];
@@ -53,9 +53,10 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');
+        if (!$request->ajax())
+            return redirect('/');
 
-        try{
+        try {
             DB::beginTransaction();
 
             $persona = new Persona();
@@ -66,13 +67,11 @@ class UserController extends Controller
             $persona->direccion = $request->direccion;
             $persona->telefono = $request->telefono;
             $persona->email = $request->email;
-            
-            if($request->hasFile('fotografia'))
-            {
-                if($request->hasFile('fotografia'))
-                {
+
+            if ($request->hasFile('fotografia')) {
+                if ($request->hasFile('fotografia')) {
                     $imagen = $request->file("fotografia");
-                    $nombreimagen = Str::slug($request->nombre).".".$imagen->guessExtension();
+                    $nombreimagen = Str::slug($request->nombre) . "." . $imagen->guessExtension();
                     $ruta = public_path("img/usuarios/");
 
                     // Crear el directorio si no existe
@@ -94,22 +93,23 @@ class UserController extends Controller
             $user->idrol = $request->idrol;
             $user->idsucursal = $request->idsucursal;
             $user->usuario = $request->usuario;
-            $user->password = bcrypt( $request->password);
-            $user->condicion = '1';  
-            $user->idpuntoventa ='1';
+            $user->password = bcrypt($request->password);
+            $user->condicion = '1';
+            $user->idpuntoventa = '1';
             $user->save();
 
             DB::commit();
-        } catch (Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
         }
     }
 
     public function update(Request $request)
     {
-        if (!$request->ajax()) return redirect('/'); 
+        if (!$request->ajax())
+            return redirect('/');
 
-        try{
+        try {
             DB::beginTransaction();
 
             $user = User::findOrFail($request->id);
@@ -121,17 +121,16 @@ class UserController extends Controller
             $persona->telefono = $request->telefono;
             $persona->email = $request->email;
 
-            
+
             $nombreimagen = "";
-            if($request->hasFile('fotografia'))
-            {
+            if ($request->hasFile('fotografia')) {
                 // Eliminar imagen anterior si existe
-                if($persona->fotografia != '' && Storage::exists('public/img/usuarios/' . $persona->fotografia)){
+                if ($persona->fotografia != '' && Storage::exists('public/img/usuarios/' . $persona->fotografia)) {
                     Storage::delete('public/img/usuarios/' . $persona->fotografia);
                 }
 
                 $imagen = $request->file("fotografia");
-                $nombreimagen = Str::slug($request->nombre).".".$imagen->guessExtension();
+                $nombreimagen = Str::slug($request->nombre) . "." . $imagen->guessExtension();
                 $imagen->storeAs('public/img/usuarios', $nombreimagen);
 
                 $ruta = public_path("img/usuarios/");
@@ -142,9 +141,9 @@ class UserController extends Controller
 
                 $persona->fotografia = $nombreimagen;
             }
-            
+
             Log::info('Datos actualizados', [
-                'nombre' => $request->nombre, 
+                'nombre' => $request->nombre,
                 'tipo_documento' => $request->tipo_documento,
                 'num_documento' => $request->num_documento,
                 'direccion' => $request->direccion,
@@ -155,35 +154,36 @@ class UserController extends Controller
                 'password' => $request->password,
                 'idrol' => $request->idrol,
                 'id' => $request->id
-                
+
             ]);
 
 
             $persona->save();
-            
+
             $user->usuario = $request->usuario;
             $user->password = bcrypt($request->password);
             $user->condicion = '1';
-            
-            if($request->idrol != ''){
+
+            if ($request->idrol != '') {
                 $user->idrol = $request->idrol;
             }
 
-            if($request->idsucursal != ''){
+            if ($request->idsucursal != '') {
                 $user->idsucursal = $request->idsucursal;
             }
-            
+
             $user->save();
 
             DB::commit();
-        } catch (Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
         }
     }
 
     public function desactivar(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');
+        if (!$request->ajax())
+            return redirect('/');
         $user = User::findOrFail($request->id);
         $user->condicion = '0';
         $user->save();
@@ -191,7 +191,8 @@ class UserController extends Controller
 
     public function activar(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');
+        if (!$request->ajax())
+            return redirect('/');
         $user = User::findOrFail($request->id);
         $user->condicion = '1';
         $user->save();
@@ -204,14 +205,30 @@ class UserController extends Controller
 
     public function editarPersona(Request $request)
     {
-        if(!$request->ajax()) return redirect('/');
+        if (!$request->ajax())
+            return redirect('/');
 
-        $persona = User::join('personas','users.id','=','personas.id')
-            ->join('roles','users.idrol','=','roles.id')
-            ->join('sucursales','users.idsucursal','=','sucursales.id')
-            ->select('personas.id','personas.nombre','personas.tipo_documento','personas.num_documento','personas.direccion','personas.telefono','personas.email','personas.fotografia','users.usuario','users.password','users.condicion','users.idrol','roles.nombre as rol', 'users.idsucursal', 'sucursales.nombre as sucursal')
+        $persona = User::join('personas', 'users.id', '=', 'personas.id')
+            ->join('roles', 'users.idrol', '=', 'roles.id')
+            ->join('sucursales', 'users.idsucursal', '=', 'sucursales.id')
+            ->select('personas.id', 'personas.nombre', 'personas.tipo_documento', 'personas.num_documento', 'personas.direccion', 'personas.telefono', 'personas.email', 'personas.fotografia', 'users.usuario', 'users.password', 'users.condicion', 'users.idrol', 'roles.nombre as rol', 'users.idsucursal', 'sucursales.nombre as sucursal')
             ->where('personas.id', $request->id);
-    
+
         return ['persona' => $persona->first()];
+    }
+    public function selectUsuarios(Request $request)
+    {
+        if (!$request->ajax())
+            return redirect('/');
+
+        $filtro = $request->filtro;
+
+        $usuarios = User::join('personas', 'users.id', '=', 'personas.id')
+            ->where('personas.nombre', 'like', '%' . $filtro . '%')
+            ->select('users.id', 'personas.nombre as nombre')
+            ->orderBy('personas.nombre', 'asc')
+            ->get();
+
+        return ['usuarios' => $usuarios];
     }
 }
