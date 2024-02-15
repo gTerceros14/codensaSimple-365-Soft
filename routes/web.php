@@ -144,7 +144,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/cliente/usuario', 'ClienteController@indexUsuario');
         Route::get('/cliente/usuario/filtro', 'ClienteController@indexUsuarioFiltro');
         Route::get('/user-info', 'ClienteController@getUserInfo');
-
+        Route::get('/user/selectUser/filter', 'UserController@selectUsuarios');
 
         Route::get('/venta', 'VentaController@index');
         Route::post('/venta/registrar', 'VentaController@store');
@@ -219,7 +219,7 @@ Route::group(['middleware' => ['auth']], function () {
         // actualizar 
         Route::put('/sucursal/actualizar', 'SucursalController@update');
         Route::get('/sucursal/selectSucursal', 'SucursalController@selectSucursal');
-
+        Route::get('/sucursal/selectedSucursal/filter', 'SucursalController@selectedSucursal');
         //Puntos de Venta
         Route::get('/puntoVenta', 'PuntoVentaController@index');
         Route::get('/puntoVenta/obtenerDatosTipoPuntoVenta', 'PuntoVentaController@obtenerDatosTipoPuntoVenta');

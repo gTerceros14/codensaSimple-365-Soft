@@ -160,4 +160,20 @@ class SucursalController extends Controller
 
         return ['sucursales' => $sucursales];
     }
+
+    public function selectedSucursal(Request $request)
+    {
+        if (!$request->ajax())
+            return redirect('/');
+
+        $filtro = $request->filtro;
+        $sucursales = Sucursales::where('nombre', 'like', '%' . $filtro . '%')
+            ->orWhere('codigoSucursal', 'like', '%' . $filtro . '%')
+            ->orderBy('nombre', 'asc')->get();
+
+        return ['sucursales' => $sucursales];
+    }
+
+
+
 }
