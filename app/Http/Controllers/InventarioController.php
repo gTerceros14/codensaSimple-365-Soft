@@ -434,26 +434,40 @@ class InventarioController extends Controller
             ->orderBy('articulos.nombre')
             ->orderBy('almacens.nombre_almacen');
             //->get();
-
-        }elseif ($tipo === 'lote') {
+        }else if ($tipo === 'lote') {
             $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
             ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
-            ->join('detalle_ingresos', 'detalle_ingresos.idarticulo', '=', 'articulos.id')
-            ->join('ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
-            ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
-            ->join('personas', 'proveedores.id', '=', 'personas.id')
             ->select(
                 'articulos.nombre as nombre_producto',
                 'articulos.unidad_envase',
                 'articulos.precio_costo_unid',
                 'inventarios.saldo_stock',
-                \DB::raw('DATE_FORMAT(ingresos.fecha_hora, "%d-%m-%Y") as fecha_ingreso'),
+                DB::raw('DATE_FORMAT(inventarios.created_at, "%Y-%m-%d") as fecha_ingreso'), // Formato deseado
                 'inventarios.fecha_vencimiento',
+                //'inventarios.created_at',
                 'almacens.nombre_almacen',
             )
             ->where('inventarios.idalmacen', '=', $idAlmacen)
-            ->orderBy('almacens.nombre_almacen');
-            //->get();
+            //->orderBy('almacens.nombre_almacen');
+            ->orderBy('articulos.nombre');
+        // }elseif ($tipo === 'lote') {
+        //     $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
+        //     ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
+        //     ->join('detalle_ingresos', 'detalle_ingresos.idarticulo', '=', 'articulos.id')
+        //     ->join('ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
+        //     ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
+        //     ->join('personas', 'proveedores.id', '=', 'personas.id')
+        //     ->select(
+        //         'articulos.nombre as nombre_producto',
+        //         'articulos.unidad_envase',
+        //         'articulos.precio_costo_unid',
+        //         'inventarios.saldo_stock',
+        //         DB::raw('DATE_FORMAT(ingresos.fecha_hora, "%d-%m-%Y") as fecha_ingreso'),
+        //         'inventarios.fecha_vencimiento',
+        //         'almacens.nombre_almacen',
+        //     )
+        //     ->where('inventarios.idalmacen', '=', $idAlmacen)
+        //     ->orderBy('almacens.nombre_almacen');
         }
         //---------------------------------------
         if (!empty($buscar)) {

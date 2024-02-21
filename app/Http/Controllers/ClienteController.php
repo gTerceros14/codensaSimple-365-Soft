@@ -173,7 +173,7 @@ class ClienteController extends Controller
         $persona->direccion = $request->direccion;
         $persona->telefono = $request->telefono;
         $persona->email = $request->email;
-        //$persona->save();
+        $persona->save();
         Log::info('DAtOS ACTU8ALIZAR!!:', [
             'DATOS' => $persona,
         ]);

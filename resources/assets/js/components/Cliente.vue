@@ -72,7 +72,12 @@
                             </thead>
                             <tbody>
                                 <tr v-for="persona in arrayPersona" :key="persona.id">
-                                    <td v-if="rolUsuario == 1">
+                                    <!-- <td v-if="rolUsuario == 1">
+                                        <button type="button" @click="abrirModal('persona','actualizar',persona)" class="btn btn-warning btn-sm">
+                                          <i class="icon-pencil"></i>
+                                        </button>
+                                    </td> -->
+                                    <td>
                                         <button type="button" @click="abrirModal('persona','actualizar',persona)" class="btn btn-warning btn-sm">
                                           <i class="icon-pencil"></i>
                                         </button>
@@ -123,7 +128,7 @@
                                         <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de la persona">                                        
                                     </div>
                                 </div>
-                                <div class="form-group row" v-if="activaredit == true">
+                                <div class="form-group row" v-if="activaredit == true && rolUsuario == 1">
                                     <label class="col-md-3 form-control-label" for="text-input">Usuario*</label>
                                     <div class="col-md-9">
                                         <v-select 
@@ -212,7 +217,6 @@
                 activaredit: false,
                 arrayUsuarioFiltro: [],
                 usuarioSeleccionadodos: '',
-                //usuariodos_id: 3,
                 usuariodos_id: '',
                 role_id : '',
 
@@ -407,6 +411,7 @@
                 this.email='';
                 this.errorPersona=0;
                 this.activaredit = false;
+                this.idusuario = '';
 
             },
             abrirModal(modelo, accion, data = []){
@@ -441,6 +446,8 @@
                                 this.telefono = data['telefono'];
                                 this.email = data['email'];
                                 this.activaredit = true;
+                                // this.usuariodos_id = data['usuario'];
+                                // console.log('Usuario_dos',this.usuariodos_id);
                                 //this.idusuario = data['usuario'];
                                 this.verUsuario(data);
                                 break;
@@ -502,13 +509,14 @@
                 }
             },
             verUsuario(data) {
-                let idusuario = data.usuario; 
-                console.log('RECUPERO!!', idusuario);
+                //let idusuario = data.usuario; 
+                this.idusuario = data.usuario; 
+                console.log('RECUPERO!!', this.idusuario);
                 let me = this;
 
                 //me.arrayPedidoSeleccionado=data;
 
-                var url = '/cliente/usuario?idusuario=' + idusuario;
+                var url = '/cliente/usuario?idusuario=' + this.idusuario;
                 axios.get(url)
                     .then(function (response) {
                     var respuesta = response.data;
@@ -559,16 +567,6 @@
                     console.error('Error al obtener la información del usuario:', error);
                 });
             },
-            //-----preparar para el listado si es admin o no es---
-            // listIndex(){
-            //     if(this.role_id == 1){
-            //         this.usuariodos_id = '';
-            //         this.listarPersona(1,this.buscar,this.criterio);
-            //     } else{
-            //         this.listarDatosuser();
-            //         this.listarPersona(1,this.buscar,this.criterio);
-            //     }
-            // }
         },
         
         mounted() {
@@ -579,20 +577,6 @@
             //this.listarPrueba();
         },
         // created(){
-        //     //--recuperar datos al logearse
-        //     axios.get('/user-info')
-        //     .then(response => {
-        //         // Aquí response.data.user contiene la información del usuario, incluido el ID
-        //         //const userId = response.data.user.id;
-        //         const userData = response.data.user;
-        //         console.log('DAtOS RECUPERADO:', userData);
-        //         // Puedes almacenar userId en el estado de tu componente Vue.js o utilizarlo según sea necesario
-        //         this.usuariodos_id = userData.iduse;
-        //         console.log('DAtOS RECUPERADO NAME:', this.usuariodos_id);
-        //     })
-        //     .catch(error => {
-        //         console.error('Error al obtener la información del usuario:', error);
-        //     });
         // }
     }
 </script>
