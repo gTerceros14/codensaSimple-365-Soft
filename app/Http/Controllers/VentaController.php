@@ -347,6 +347,9 @@ class VentaController extends Controller
                         $venta->idcliente = $request->idcliente;
                         $venta->idusuario = \Auth::user()->id;
                         $venta->idtipo_pago = $request->idtipo_pago;
+                        //  tipo ventas cambiado por tipo ventas
+                        $venta->idtipo_venta = $request->idtipo_venta;
+                        //
                         $venta->tipo_comprobante = $request->tipo_comprobante;
                         $venta->serie_comprobante = $request->serie_comprobante;
                         $venta->num_comprobante = $request->num_comprobante;
@@ -360,6 +363,9 @@ class VentaController extends Controller
                             'idcliente' => $request->idcliente,
                             'idusuario' => $request->id,
                             'idtipo_pago' => $request->idtipo_pago,
+                            //
+                            'idtipo_venta' => $request->idtipo_venta,
+                            //
                             'tipo_comprobante' => $request->tipo_comprobante,
                             'serie_comprobante' => $request->serie_comprobante,
                             'num_comprobante' => $request->num_comprobante,
@@ -370,9 +376,9 @@ class VentaController extends Controller
                             'idcaja' => $request->id,
                         ]);
                         $venta->save();
-                        //-----hasta aqui----
+                        //-----hasta aqui---- cambiando tipo pagos por tipo de venta
 
-                        if ($request->idtipo_pago == 2) {
+                        if ($request->idtipo_venta == 2) {
                             //----REGIStRADO DE CREDITOS_VENTAAS--
                             $creditoventa = new CreditoVenta();
                             $creditoventa->idventa = $venta->id;

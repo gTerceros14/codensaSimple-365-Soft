@@ -824,6 +824,7 @@ export default {
             faltante : 0,
             //-------DEStE AQUI 13-OCTUBRE--
             idtipo_pago :'',
+            idtipo_venta:'',
             tiempo_diaz : '',
             numero_cuotas : '',
             cuotas: [],//---para almacenar las fechas
@@ -1418,6 +1419,7 @@ export default {
                 'impuesto': this.impuesto,
                 'total': this.total,
                 'idAlmacen': this.idAlmacen,
+                'idtipo_ventas':this.idtipo_venta,
                 'idtipo_pago': this.idtipo_pago,
                 //----creditos Ventas----
                 'idpersona' : this.idcliente,
@@ -1790,7 +1792,11 @@ export default {
             this.tituloModal2 = 'PAGO AL CONTADO ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion2 = 1;
             this.idtipo_pago = 1;
+            this.idtipo_venta=1;
             console.log('idtipo_pago LLEGA:', this.idtipo_pago);
+            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
+            
+
         },
         registrarAbrilModal2() {
             this.modal3 = 1;
@@ -1798,8 +1804,10 @@ export default {
             console.log('USUARIO LLEGA:', this.cliente);
             this.tituloModal3 = 'CREDITOS ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion3 = 1;
-            this.idtipo_pago = 2;
+            this.idtipo_pago = 1;
+            this.idtipo_venta=2;
             console.log('idtipo_pago LLEGA:', this.idtipo_pago);
+            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
         },
         cerrarModal2() {
             this.modal2 = 0;
