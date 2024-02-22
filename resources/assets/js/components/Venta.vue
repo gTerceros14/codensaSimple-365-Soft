@@ -495,7 +495,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col" for=""><strong>Forma de Pago</strong></label>
+                            <label class="col" for=""><strong>Tipo de Venta </strong></label>
                             <div class="col-md-12">
                                 <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
                                 <button type="button" class="btn btn-primary"
@@ -802,8 +802,13 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
+                    <div v-if="!tipoPago">
+                            <button type="button" class="btn btn-primary" @click="seleccionarTipoPago('Efectivo')">Efectivo</button>
+                            <button type="button" class="btn btn-primary" @click="seleccionarTipoPago('Bancaria')">Transacion Bancaria</button>
+                            <button type="button" class="btn btn-primary" @click="seleccionarTipoPago('QR')">Transacion QR</button>
+                   </div>
 
-                    <div class="modal-body">
+                   <div v-else class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
