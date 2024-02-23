@@ -922,6 +922,17 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <div class="col-md-3" v-if="primera_cuota">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="select-input">Tipo de Pago</label>
+                                        <select id="select-input" v-model="tipo_pago" @change="seleccionarTipoPago(tipo_pago)">
+                                        <option v-for="(value, key) in tiposPago" :value="value">{{ key }}</option>
+                                        </select>
+
+                                
+                                    </div>
+                           </div>
                         </div>
                         <!--################################-listado de cuotas-#######################-->
                         <div class="form-group row border">
@@ -2392,6 +2403,7 @@ export default {
             console.log('USUARIO LLEGA:', this.cliente);
             this.tituloModal3 = 'CREDITOS ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion3 = 1;
+            this.idtipo_pago = this.tipo_pago;
            // this.idtipo_pago = 1;
             this.idtipo_venta = 2;
             console.log('idtipo_venta LLEGA:', this.idtipo_venta);
