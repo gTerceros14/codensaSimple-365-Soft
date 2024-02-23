@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Persona;
 use App\Exports\ClientExport;
 use App\User;
+use App\Venta;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -288,4 +290,69 @@ class ClienteController extends Controller
     //         'personas' => $personas
     //     ];
     // }
+
+    public function clientesPorVendedor(Request $request)
+    {
+        if (!$request->ajax()) {
+            return redirect('/');
+        }
+
+        $vendedorId = $request->vendedorId;
+        $sucursalId = $request->sucursalId;
+        $fechaInicio = $request->fechaInicio;
+        $fechaFin = $request->fechaFin;
+
+        $ventas = Venta::leftJoin('personas', 'ventas.idcliente', '=', 'personas.id')
+                        ->select('ventas.*', 'personas.nombre as nombre_cliente')
+                        ->where('idusuario', $vendedorId);
+
+        if ($fechaInicio && $fechaFin) {
+            $ventas->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
+        }
+
+        if ($sucursalId) {
+            $ventas->whereExists(function ($query) use ($sucursalId) {
+                $query->select(DB::raw(1))
+                    ->from('cajas')
+                    ->whereColumn('cajas.id', 'ventas.idcaja')
+                    ->where('cajas.idsucursal', $sucursalId);
+            });
+        }
+
+        $ventas = $ventas->paginate(10);
+
+        $clientes = $ventas->groupBy('idcliente')->map(function ($ventasCliente) {
+        $cliente = $ventasCliente->first();
+        $cuotasPendientes = DB::table('cuotas_credito')
+            ->join('credito_ventas', 'cuotas_credito.idcredito', '=', 'credito_ventas.id')
+            ->where('credito_ventas.idpersona', $cliente->idcliente)
+            ->where('cuotas_credito.estado', 'Pendiente')
+            ->get();
+
+        $precioCuota = $cuotasPendientes->sum('precio_cuota');
+        $totalCancelado = $cuotasPendientes->sum('total_cancelado');
+        $saldo = $precioCuota - $totalCancelado;
+
+        if ($saldo === 0) {
+            $totalCancelado = $cliente->total;
+        }
+
+        return [
+            'fecha_venta' => $cliente->fecha_hora,
+            'nombre_cliente' => $cliente->nombre_cliente,
+            'id_cliente' => $cliente->idcliente,
+            'id_vendedor' => $cliente->idusuario,
+            'tipo_comprobante' => $cliente->tipo_comprobante,
+            'total' => $cliente->total,
+            'impuesto' => $cliente->impuesto,
+            'precio_cuota' => $precioCuota,
+            'total_cancelado' => $totalCancelado,
+            'saldo' => $saldo,
+        ];
+        });
+
+        //$clientes = $ventas->paginate(10);
+
+        return ['clientes' => $clientes->values()];
+    }
 }

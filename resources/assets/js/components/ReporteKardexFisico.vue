@@ -16,6 +16,8 @@
                     <button type="button" @click="exportarExcel" class="btn btn-success">
                         <i class="icon-doc"></i>&nbsp;Exportar a Excel
                     </button>
+                    <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
+
                 </div>
                 <div class="card-body">
                     <div style="overflow-x: auto;">
@@ -915,7 +917,8 @@
 
 <script>
 import { esquemaArticulos } from '../constants/validations';
-
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import VueBarcode from 'vue-barcode';
 import * as XLSX from 'xlsx-js-style';
 
@@ -1925,75 +1928,112 @@ export default {
                 });
         },
 
+        exportarPDF() {
+            const pdf = new jsPDF();
+            
+            const titulo = 'Kardex Inventario Fisico';
+            const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
+            const fechaFin = `Fecha Fin: ${this.fechaFin}`;
+            const articulo = `Articulo: ${this.articuloseleccionada.nombre}`;
+            const codigo = `Codigo: ${this.articuloseleccionada.codigo}`;
+            const descripcion = `Descripcion: ${this.articuloseleccionada.descripcion}`;
+
+            pdf.setFont('helvetica');
+            pdf.setFontSize(16); // Tamaño de letra más grande para el título
+            pdf.text(titulo, 15, 10);
+
+            pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
+            pdf.text(fechaInicio, 15, 20);
+            pdf.text(fechaFin, 100, 20);
+            pdf.text(articulo, 150, 20);
+            pdf.text(codigo, 15, 30);
+            pdf.text(descripcion, 100, 30);
+
+            const tableYPosition = 40;
+
+            const columns = ['C.C.', 'Num Comprobante', 'Fecha', 'Detalle', 'Entrada', 'Salida', 'Saldo'];
+            const rows = this.arrayReporte.map(item => [item.tipo,
+                    item.num_comprobante,
+                    item.fecha_hora,
+                    item.tipo_comprobante,
+                    item.tipo === 'Ingreso' ? item.cantidad : '',
+                    item.tipo === 'Venta' ? item.cantidad : '',
+                    item.resultado_operacion,]);
+
+            pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
+
+            pdf.save('reporte_inventarios.pdf');
+        },
+
         exportarExcel() {
             const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.aoa_to_sheet([]);
-    const startRow = 5;
-    
-    // Merge de celdas para el título
-    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
-    // Título del reporte
-    worksheet['A1'] = { t: 's', v: 'REPORTE KARDEX INVENTARIO FISICO VALORADO', s: { 
-        font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
-        alignment: { horizontal: 'center', vertical: 'center' },
-        fill: { fgColor: { rgb: '3669a8' } } } };
+            const worksheet = XLSX.utils.aoa_to_sheet([]);
+            const startRow = 5;
+            
+            // Merge de celdas para el título
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+            // Título del reporte
+            worksheet['A1'] = { t: 's', v: 'REPORTE KARDEX INVENTARIO FISICO VALORADO', s: { 
+                font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
+                alignment: { horizontal: 'center', vertical: 'center' },
+                fill: { fgColor: { rgb: '3669a8' } } } };
 
-    // Estilo para la fecha
-    const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
-    // Fechas de inicio y fin
-    worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
-    worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
-    worksheet['D2'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
-    worksheet['A3'] = { t: 's', v: `Codigo: ${this.articuloseleccionada.codigo}`, s: fechaStyle };
-    worksheet['B3'] = { t: 's', v: `Descripcion: ${this.articuloseleccionada.descripcion}`, s: fechaStyle };
+            // Estilo para la fecha
+            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
+            // Fechas de inicio y fin
+            worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
+            worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+            worksheet['D2'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
+            worksheet['A3'] = { t: 's', v: `Codigo: ${this.articuloseleccionada.codigo}`, s: fechaStyle };
+            worksheet['B3'] = { t: 's', v: `Descripcion: ${this.articuloseleccionada.descripcion}`, s: fechaStyle };
 
 
-    // Estilo para los encabezados
-    const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
-    // Cabeceras de las columnas
-    const headers = ['C.C', 'Num comprobante', 'Fecha', 'Detalle','Entrada','Salida','Saldo','Costo unitario','Ingreso','Egreso','Saldo'];
+            // Estilo para los encabezados
+            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
+            // Cabeceras de las columnas
+            const headers = ['C.C', 'Num comprobante', 'Fecha', 'Detalle','Entrada','Salida','Saldo','Costo unitario','Ingreso','Egreso','Saldo'];
 
-    // Añadir las cabeceras a la hoja de cálculo
-    headers.forEach((header, index) => {
-        worksheet[XLSX.utils.encode_cell({ r: 3, c: index })] = { t: 's', v: header, s: headerStyle };
-    });
+            // Añadir las cabeceras a la hoja de cálculo
+            headers.forEach((header, index) => {
+                worksheet[XLSX.utils.encode_cell({ r: 3, c: index })] = { t: 's', v: header, s: headerStyle };
+            });
 
-    // Añadir los datos al kardex
-    Object.values(this.sortedResultados).forEach((item, rowIndex) => {
-        const rowData = [
-            item.tipo,
-            item.num_comprobante,
-            item.fecha_hora,
-            item.tipo_comprobante,
-            item.tipo === 'Ingreso' ? item.cantidad : '',
-            item.tipo === 'Venta' ? item.cantidad : '',
-            item.resultado_operacion,
-        ];
+            // Añadir los datos al kardex
+            Object.values(this.sortedResultados).forEach((item, rowIndex) => {
+                const rowData = [
+                    item.tipo,
+                    item.num_comprobante,
+                    item.fecha_hora,
+                    item.tipo_comprobante,
+                    item.tipo === 'Ingreso' ? item.cantidad : '',
+                    item.tipo === 'Venta' ? item.cantidad : '',
+                    item.resultado_operacion,
+                ];
 
-        // Añadir la fila al kardex
-        XLSX.utils.sheet_add_aoa(worksheet, [rowData], { origin: `A${startRow + rowIndex}` });
-    });
+                // Añadir la fila al kardex
+                XLSX.utils.sheet_add_aoa(worksheet, [rowData], { origin: `A${startRow + rowIndex}` });
+            });
 
-    // Añadir el total ganado al final del reporte
-    
-    const totalRow = [`Total Ganado: Bs. ${this.total_saldo}`];
-    worksheet['!merges'].push({ s: { r: startRow + Object.values(this.sortedResultados).length, c: 0 }, e: { r: startRow + Object.values(this.sortedResultados).length, c: 3 } });
+            // Añadir el total ganado al final del reporte
+            
+            const totalRow = [`Total Ganado: Bs. ${this.total_saldo}`];
+            worksheet['!merges'].push({ s: { r: startRow + Object.values(this.sortedResultados).length, c: 0 }, e: { r: startRow + Object.values(this.sortedResultados).length, c: 3 } });
 
-    // Establecer el ancho de las columnas
-    const columnWidths = [
-        { wch: 27.8 },
-        { wch: 16.0 },   
-        { wch: 18.6 },
-        { wch: 15.2 }
-    ];
-    worksheet['!cols'] = columnWidths;
+            // Establecer el ancho de las columnas
+            const columnWidths = [
+                { wch: 27.8 },
+                { wch: 16.0 },   
+                { wch: 18.6 },
+                { wch: 15.2 }
+            ];
+            worksheet['!cols'] = columnWidths;
 
-    // Añadir la hoja de cálculo al libro
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte Ventas');
+            // Añadir la hoja de cálculo al libro
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte Ventas');
 
-    // Descargar el archivo
-    XLSX.writeFile(workbook, 'reporte_kardex_fisico_valorado.xlsx');
-},
+            // Descargar el archivo
+            XLSX.writeFile(workbook, 'reporte_kardex_fisico_valorado.xlsx');
+        },
 
         formateaKardex(){
             let saldo = 0;
