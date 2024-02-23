@@ -231,4 +231,20 @@ class UserController extends Controller
 
         return ['usuarios' => $usuarios];
     }
+
+    public function selectUsuariosPorRol(Request $request)
+    {
+        if (!$request->ajax())
+            return redirect('/');
+
+        $filtro = $request->filtro;
+
+        $usuarios = User::join('personas', 'users.id', '=', 'personas.id')
+            ->where('users.idrol', '=', $filtro )
+            ->select('personas.nombre as nombre','personas.id')
+            ->orderBy('personas.nombre', 'asc')
+            ->get();
+
+        return ['usuarios' => $usuarios];
+    }
 }
