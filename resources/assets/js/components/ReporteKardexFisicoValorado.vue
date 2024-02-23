@@ -14,16 +14,11 @@
                     class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros
                     </button>
-<<<<<<< HEAD
                     <button type="button" @click="reporteExcel()" class="btn btn-success">
                         <i class="icon-doc"></i>&nbsp;Reporte Excel
                     </button>
                     <button type="button" @click="reportePDF()" class="btn btn-danger">
                         <i class="icon-doc"></i>&nbsp;Reporte PDF
-=======
-                    <button type="button" @click="cargarPdf()" class="btn btn-success">
-                        <i class="icon-doc"></i>&nbsp;Exportar a Excel
->>>>>>> 55d42512d57921cccf19fe7af4989dbfbe60d427
                     </button>
                 </div>
                 <div class="card-body"  style="max-height: 400px; overflow-y: auto;" >
