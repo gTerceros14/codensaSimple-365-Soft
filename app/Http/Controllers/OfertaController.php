@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use App\PromocionArticulo;
+// use App\Models\Inventario;
 use Illuminate\Http\Request;
 use App\Promocion;
+use App\Inventario;
+use Illuminate\Support\Facades\Log;
 
 class OfertaController extends Controller
 {
@@ -138,7 +141,56 @@ class OfertaController extends Controller
 
         return response()->json(['articulosPorPromocion' => $articulosPorPromocion]);
     }
+    public function obtenerDatosKit(Request $request)
+    {
+        if (!$request->ajax()) {
+            return redirect('/');
+        }
 
+        $idPromocion = $request->idPromocion;
+        $mensajes = [];
+
+        Log::info("ID de promoción: $idPromocion");
+
+        // Obtener los datos de la promoción junto con los detalles de los artículos
+        $articulosPorPromocion = PromocionArticulo::with('articulo')->where('idpromociones', $idPromocion)->get();
+
+        Log::info("Cantidad de artículos en la promoción: " . count($articulosPorPromocion));
+
+        // Verificar el stock de cada artículo en la tabla Inventario
+        foreach ($articulosPorPromocion as $articuloPorPromocion) {
+            $idArticulo = $articuloPorPromocion->idarticulos;
+            $cantidad = $articuloPorPromocion->cantidad;
+
+            Log::info("ID del artículo: $idArticulo, Cantidad: $cantidad");
+
+            // Obtener el stock disponible en la tabla Inventario para el artículo actual
+            $inventario = Inventario::where('idarticulo', $idArticulo)->first();
+
+            if (!$inventario) {
+                Log::info("No se encontró inventario para el artículo con ID: $idArticulo");
+                $mensajes[] = "El artículo {$articuloPorPromocion->articulo->nombre} no tiene stock.";
+            } else {
+                Log::info("Stock disponible para el artículo con ID: $idArticulo - $inventario->saldo_stock");
+
+                if ($cantidad > $inventario->saldo_stock) {
+                    Log::info("Cantidad de artículo mayor que el stock disponible");
+                    $articuloPorPromocion->disponible = false;
+                    $mensajes[] = "El artículo {$articuloPorPromocion->articulo->nombre} no tiene suficiente stock disponible.";
+                } else {
+                    Log::info("Cantidad de artículo menor o igual al stock disponible");
+                    $articuloPorPromocion->disponible = true;
+                }
+            }
+        }
+
+        $respuesta = [
+            'articulosPorPromocion' => $articulosPorPromocion,
+            'mensajes' => $mensajes,
+        ];
+
+        return response()->json($respuesta);
+    }
     public function update(Request $request)
     {
         if (!$request->ajax()) {

@@ -64,6 +64,11 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/cliente/actualizar', 'ClienteController@update');
         Route::get('/cliente/selectCliente', 'ClienteController@selectCliente');
 
+        Route::get('/cliente/usuario', 'ClienteController@indexUsuario');
+        Route::get('/cliente/selectUusarioVend', 'ClienteController@selectUsuarioVendedor');
+        Route::get('/cliente/usuario/filtro', 'ClienteController@indexUsuarioFiltro');
+        Route::get('/user-info', 'ClienteController@getUserInfo');
+
         Route::get('/articulo/buscarArticuloVenta', 'ArticuloController@buscarArticuloVenta');
         Route::get('/articulo/listarArticuloVenta', 'ArticuloController@listarArticuloVenta');
 
@@ -134,6 +139,14 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/cliente/actualizar', 'ClienteController@update');
         Route::get('/cliente/selectCliente', 'ClienteController@selectCliente');
         Route::get('/cliente/listarReporteClienteExcel', 'ClienteController@listarReporteClienteExcel');
+        Route::get('/cliente/clientesPorVendedor', 'ClienteController@clientesPorVendedor');
+
+        Route::get('/cliente/selectUusarioVend', 'ClienteController@selectUsuarioVendedor');
+        Route::get('/cliente/usuario', 'ClienteController@indexUsuario');
+        Route::get('/cliente/usuario/filtro', 'ClienteController@indexUsuarioFiltro');
+        Route::get('/user-info', 'ClienteController@getUserInfo');
+        Route::get('/user/selectUser/filter', 'UserController@selectUsuarios');
+        Route::get('/user/selectUser/rol', 'UserController@selectUsuariosPorRol');
 
         Route::get('/venta', 'VentaController@index');
         Route::post('/venta/registrar', 'VentaController@store');
@@ -174,6 +187,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/cotizacionventa/eliminar', 'CotizacionVentaController@delete');
         Route::get('/cotizacionventa/obtenerDetalles', 'CotizacionVentaController@obtenerDetalles');
         Route::put('cotizacionventa/editar', 'CotizacionVentaController@editar');
+        Route::get('/cotizacionventa/imprimir/{id}', 'CotizacionVentaController@imprimirTicket');
+
 
         Route::get('/rol', 'RolController@index');
         Route::get('/rol/selectRol', 'RolController@selectRol');
@@ -206,7 +221,7 @@ Route::group(['middleware' => ['auth']], function () {
         // actualizar 
         Route::put('/sucursal/actualizar', 'SucursalController@update');
         Route::get('/sucursal/selectSucursal', 'SucursalController@selectSucursal');
-
+        Route::get('/sucursal/selectedSucursal/filter', 'SucursalController@selectedSucursal');
         //Puntos de Venta
         Route::get('/puntoVenta', 'PuntoVentaController@index');
         Route::get('/puntoVenta/obtenerDatosTipoPuntoVenta', 'PuntoVentaController@obtenerDatosTipoPuntoVenta');
@@ -359,6 +374,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/ofertas/id', 'OfertaController@obtenerDatosPromocion');
         Route::put('/ofertas/estado', 'OfertaController@modificarEstado');
 
+        Route::get('/kits/id', 'OfertaController@obtenerDatosKit');
         Route::get('/promocion/id', 'OfertaController@obtenerPromocionPorIdArticulo');
 
 
@@ -372,13 +388,21 @@ Route::group(['middleware' => ['auth']], function () {
 
         //REPORTES
         Route::get('/ventas-diarias', 'VentaController@reporteVentasDiarias');
-        Route::get('/reporte-almacen','InventarioController@reporteAlmacenes');
+        Route::get('/reporte-almacen', 'InventarioController@reporteAlmacenes');
+        Route::get('/reporte-kardex-fisico-valorado','ReporteKardexFisicoInventarioController@generarReporte');
+        Route::get('/reporte-kardex-fisico', 'ReporteKardexFisicoInventarioController@generarReporteFisico');
+        Route::get('/top-vendedores', 'VentaController@topVendedores');
+        Route::get('/top-clientes', 'VentaController@topClientes');
+        Route::get('/top-articulos', 'VentaController@topProductos');
         
+
+
+
         //VARIABLES TEMPORALES
         Route::post('/variables/registrarVariable', 'VentasInstitucionalesController@registrarVariable');
         Route::post('/variables/registrarArticuloVariable', 'VentasInstitucionalesController@registrarArticuloVariable');
         Route::post('/variables/registrarArticuloVariable2', 'VentasInstitucionalesController@registrarArticuloVariable2');
-        Route::get('/variables/listarArticulosVariable', 'VentasInstitucionalesController@obtenerArticulosPorVariableTemporal');    
+        Route::get('/variables/listarArticulosVariable', 'VentasInstitucionalesController@obtenerArticulosPorVariableTemporal');
         Route::delete('/variables/excluirArticulo', 'VentasInstitucionalesController@excluirArticulo');
         Route::post('/variables/registrar-venta-institucional', 'VentasInstitucionalesController@registrarVentaInstitucional');
         Route::post('/variables/ventas_institucionales', 'VentasInstitucionalesController@registrarModificacionVentasInstitucionales');

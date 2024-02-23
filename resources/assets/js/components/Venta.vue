@@ -272,8 +272,7 @@
                                     <img v-if="arraySeleccionado.length > 0 && arraySeleccionado.fotografia"
                                         :src="'img/articulo/' + arraySeleccionado.fotografia + '?t=' + new Date().getTime()"
                                         width="50" height="50" ref="imagen" class="card-img" />
-                                    <img v-else src="img/productoSinImagen.png" alt="Imagen del Card"
-                                        class="card-img">
+                                    <img v-else src="img/productoSinImagen.png" alt="Imagen del Card" class="card-img">
 
 
                                     <div :class="{
@@ -381,20 +380,24 @@
                                             <th>Opciones</th>
                                             <th>Artículo</th>
                                             <th>Unidad Medida</th>
-                                            <th>Unidad Paq.</th>
+                                            <th>Unidades por paquete</th>
                                             <th>Precio Unidad </th>
                                             <th>Unidades</th>
                                             <th>Cantidad Paquetes</th>
                                             <th>Total S/Descuento</th>
                                             <th>Descuento %</th>
                                             <th>Total C/Descuento</th>
-                                
+
                                         </tr>
                                     </thead>
                                     <tbody v-if="arrayDetalle.length">
                                         <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
                                             <td>
-                                                <button @click="eliminarDetalle(index)" type="button"
+                                                <button v-if="detalle.medida != 'KIT'" @click="eliminarDetalle(index)"
+                                                    type="button" class="btn btn-danger btn-sm">
+                                                    <i class="icon-close"></i>
+                                                </button>
+                                                <button v-else @click="eliminarKit(detalle.idkit)" type="button"
                                                     class="btn btn-danger btn-sm">
                                                     <i class="icon-close"></i>
                                                 </button>
@@ -484,7 +487,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col" for=""><strong>Forma de Pago</strong></label>
+                            <label class="col" for=""><strong>Tipo de Venta </strong></label>
                             <div class="col-md-12">
                                 <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
                                 <button type="button" class="btn btn-primary"
@@ -545,7 +548,7 @@
                                         <tr v-for="detalle in arrayDetalle" :key="detalle.id">
                                             <td v-text="detalle.articulo">
                                             </td>
-                                            
+
                                             <td>
                                                 {{ ((detalle.precio) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
                                                     monedaVenta[1] }}
@@ -615,9 +618,7 @@
                 </template>
             </div>
             <!-- HASTA AQUI DEVOLUCIONES -->
-            <!-- Fin ejemplo de tabla Listado -->
         </div>
-        <!--Inicio del modal agregar/actualizar-->
         <div class="modal " tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
@@ -629,64 +630,145 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="form-group row">
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterioA">
-                                        <option value="nombre">Nombre</option>
-                                        <option value="descripcion">Descripción</option>
-                                        <option value="codigo">Código</option>
-                                    </select>
-                                    <input type="text" v-model="buscarA" @keyup="listarArticulo(buscarA, criterioA)"
-                                        class="form-control" placeholder="Texto a buscar">
-                                    <!--button type="submit" @click="listarArticulo(buscarA, criterioA)"
-                                        class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button-->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Opciones</th>
-                                        <th>Código</th>
-                                        <th>Nombre</th>
-                                        <th>Categoría</th>
-                                        <th>Precio Venta</th>
-                                        <th>Stock</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="articulo in arrayArticulo" :key="articulo.id">
-                                        <td>
-                                            <button type="button" @click="agregarDetalleModal(articulo)"
-                                                class="btn btn-success btn-sm">
-                                                <i class="icon-check"></i>
-                                            </button>
-                                        </td>
-                                        <td v-text="articulo.codigo"></td>
-                                        <td v-text="articulo.nombre"></td>
-                                        <td v-text="articulo.nombre_categoria"></td>
-                                        <td>
-                                            {{ ((articulo.precio_venta) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                monedaVenta[1] }}
-
-                                        </td>
-                                        <td v-text="articulo.saldo_stock"></td>
-                                        <td>
-                                            <div v-if="articulo.condicion">
-                                                <span class="badge badge-success">Activo</span>
+                        <div>
+                            <b-tabs content-class="mt-3">
+                                <b-tab title="Articulos" active>
+                                    <template>
+                                        <div class="form-group row">
+                                            <div class="col-md-6">
+                                                <div class="input-group">
+                                                    <select class="form-control col-md-3" v-model="criterioA">
+                                                        <option value="nombre">Nombre</option>
+                                                        <option value="descripcion">Descripción</option>
+                                                        <option value="codigo">Código</option>
+                                                    </select>
+                                                    <input type="text" v-model="buscarA"
+                                                        @keyup="listarArticulo(buscarA, criterioA)" class="form-control"
+                                                        placeholder="Texto a buscar">
+                                                </div>
                                             </div>
-                                            <div v-else>
-                                                <span class="badge badge-danger">Desactivado</span>
-                                            </div>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Opciones</th>
+                                                        <th>Código</th>
+                                                        <th>Nombre</th>
+                                                        <th>Categoría</th>
+                                                        <th>Precio Venta</th>
+                                                        <th>Stock</th>
+                                                        <th>Estado</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="articulo in arrayArticulo" :key="articulo.id">
+                                                        <td>
+                                                            <button type="button" @click="agregarDetalleModal(articulo)"
+                                                                class="btn btn-success btn-sm">
+                                                                <i class="icon-check"></i>
+                                                            </button>
+                                                        </td>
+                                                        <td v-text="articulo.codigo"></td>
+                                                        <td v-text="articulo.nombre"></td>
+                                                        <td v-text="articulo.nombre_categoria"></td>
+                                                        <td>
+                                                            {{ ((articulo.precio_venta) *
+                                                                parseFloat(monedaVenta[0])).toFixed(2) }} {{
+        monedaVenta[1] }}
 
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                                        </td>
+                                                        <td v-text="articulo.saldo_stock"></td>
+                                                        <td>
+                                                            <div v-if="articulo.condicion">
+                                                                <span class="badge badge-success">Activo</span>
+                                                            </div>
+                                                            <div v-else>
+                                                                <span class="badge badge-danger">Desactivado</span>
+                                                            </div>
+
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                    </template>
+
+                                </b-tab>
+                                <b-tab title="Kits">
+                                    <template>
+                                        <div class="form-group row">
+                                            <div class="col-md-6">
+                                                <div class="input-group">
+                                                    <select class="form-control col-md-3" v-model="criterioKit">
+                                                        <option value="nombre">Nombres</option>
+                                                    </select>
+                                                    <input type="text" v-model="buscarKit" class="form-control"
+                                                        placeholder="Texto a buscar"
+                                                        @keyup="listarKits(1, buscarKit, criterioKit)">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Acciones</th>
+                                                        <th>Codigo</th>
+                                                        <th>Nombre kit</th>
+                                                        <th>Precio</th>
+                                                        <th>Fecha limite</th>
+                                                        <th>Articulos Incluidos</th>
+                                                        <th>Estado</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="kit in arrayKit" :key="kit.id">
+                                                        <td>
+                                                            <icon-button icon="icon-check" size="small" color="success"
+                                                                @click="agregarKit(kit)" />
+
+                                                            <!-- <template v-if="new Date(kit.fecha_final) > new Date()">
+                      <icon-button v-if="kit.estado == 'Activo'" icon="icon-trash" size="small" color="danger"
+                        @click="desactivarKit(kit.id)" />
+                      <icon-button v-else icon="icon-check" size="small" color="info" @click="activarKit(kit.id)" />
+                    </template> -->
+                                                            <icon-button icon="icon-eye" size="small" color="primary"
+                                                                @click="abrirModalDetallesKit(kit)" />
+
+
+                                                        </td>
+                                                        <td v-text="kit.codigo"></td>
+                                                        <td v-text="kit.nombre"></td>
+                                                        <td>
+                                                            {{ (kit.precio * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                                                monedaVenta[1]
+                                                            }}
+                                                        </td>
+                                                        <td>
+                                                            {{ new Date(kit.fecha_final).toLocaleDateString('es-ES') }}
+                                                        </td>
+                                                        <td>{{ kit.cantidad_articulos }} articulos</td>
+                                                        <td>
+
+                                                            <i class="fa fa-circle"
+                                                                :style="{ color: getColorForEstado(kit.estado, kit.fecha_final) }"></i>&nbsp;
+                                                            {{ new Date(kit.fecha_final) < new Date() ? 'Inactivo' :
+                                                                kit.estado }} </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </template>
+                                </b-tab>
+                            </b-tabs>
                         </div>
+
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
@@ -712,8 +794,17 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-
-                    <div class="modal-body">
+                    <div v-if="!tipoPago" class="row col-md-12">
+                        <p><strong>Tipo de pago:</strong></p>             
+                        <div class="d-flex flex-column align-items-center">
+                                <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('EFECTIVO')">EFECTIVO</button>
+                                <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('TRANSFERENCIA BANCARIA')">TRANSFERENCIA BANCARIA</button>
+                                <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('QR')">QR</button>
+                        </div>       
+                       
+                  </div>
+                  <div  v-else>
+                   <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -776,6 +867,7 @@
                             @click="registrar()">Cobrar</button>
                         <!-- <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarSucursal()">Actualizar</button> -->
                     </div>
+                  </div>
                 </div>
             </div>
         </div>
@@ -888,6 +980,76 @@
             </div>
         </div>
         <!--#################-------HASTA AQUI MODAL CREDITOS------#################-->
+
+        <div class="modal " tabindex="-1" :class="{ 'mostrar': modalDetalleKit }" role="dialog"
+            aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-primary modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        Detalle del kit
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-md-8">
+                            <label for="" class="font-weight-bold">Nombre del kit: </label>
+                            {{ datosFormularioKit.nombre }}
+                        </div>
+                        <div class="col-md-5">
+                            <label for="" class="font-weight-bold">Codigo: </label>
+                            {{ datosFormularioKit.codigo }}
+                        </div>
+                        <div class="col-md-5">
+                            <label for="" class="font-weight-bold">Precio: </label>
+                            {{ (datosFormularioKit.precio * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                monedaVenta[1]
+                            }}
+                        </div>
+                        <div class="col-md-5">
+                            <label for="" class="font-weight-bold">Fecha final: </label>
+                            {{ datosFormularioKit.fecha_final }}
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Nombre comercial</th>
+                                        <th>Costo unidad</th>
+                                        <th>Costo paquete</th>
+                                        <th>Cantidad</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="articulo in arrayArticulosKit" :key="articulo.id">
+
+                                        <td v-text="articulo.codigo"></td>
+                                        <td v-text="articulo.nombre"></td>
+                                        <td>
+                                            <p>{{ (articulo.precio_costo_unid * parseFloat(monedaVenta[0])) }} {{
+                                                monedaVenta[1] }} </p>
+
+                                        </td>
+                                        <td>
+                                            <p>{{ (articulo.precio_costo_paq) * parseFloat(monedaVenta[0]) }} {{
+                                                monedaVenta[1] }} </p>
+                                        </td>
+                                        <td>
+                                            {{ articulo.cantidad }}
+                                        </td>
+
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" @click="() => modalDetalleKit = 0">Cerrar</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </template>
 
@@ -896,6 +1058,15 @@ import vSelect from 'vue-select';
 export default {
     data() {
         return {
+
+            criterioKit: 'nombre',
+            buscarKit: '',
+
+            mensajesKit: [],
+            arrayArticulosKit: [],
+            datosFormularioKit: [],
+            modalDetalleKit: 0,
+            arrayKit: [],
 
             arrayPromocion: [],
             unidadPaquete: 1,
@@ -1003,12 +1174,20 @@ export default {
             faltante: 0,
             //-------DEStE AQUI 13-OCTUBRE--
             idtipo_pago: '',
+            idtipo_venta:'',
             tiempo_diaz: '',
             numero_cuotas: '',
             cuotas: [],//---para almacenar las fechas
             estadocrevent: 'activo',
             primera_cuota: '',
             habilitarPrimeraCuota: false,
+            tipoPago:'',
+            tiposPago: {
+                        EFECTIVO: 1,
+                       "TRANSFERENCIA BANCARIA": 2,
+                        QR: 3
+                        },
+
         }
     },
     watch: {
@@ -1028,7 +1207,7 @@ export default {
                 return this.precioseleccionado * this.unidadPaquete * this.cantidad;
             }
         },
-
+      
 
         isActived: function () {
             return this.pagination.current_page;
@@ -1080,6 +1259,203 @@ export default {
 
     },
     methods: {
+        GetValidateKit(idPromocion) {
+            return axios.get('/kits/id', {
+                params: {
+                    idPromocion: idPromocion
+                }
+            })
+                .then((response) => {
+                    const datos = response.data;
+                    console.log(datos);
+
+                    this.arrayArticulosKit = datos.articulosPorPromocion.map(item => ({
+                        ...item.articulo,
+                        cantidad: item.cantidad
+                    }));
+                    this.mensajesKit = datos.mensajes;
+                })
+                .catch((error) => {
+                    console.error(error);
+                    throw error; // Re-lanza el error para que pueda ser manejado en agregarKit
+                });
+        },
+        seleccionarTipoPago(tipo) {
+                        // Esta función asigna el tipo de pago y actualiza el título del modal
+                        this.tipoPago = tipo;
+                      
+                        this.tituloModal2 = `TIPO DE PAGO : ${tipo}`; // Usamos '`' para interpolar el nombre del cliente
+                        this.idtipo_pago = this.tiposPago[tipo];
+                        console.log('idtipo_pago:', this.idtipo_pago);
+            },
+
+        agregarKit(kit) {
+            if (new Date(kit.fecha_final) < new Date()) {
+                swal({
+                    type: 'error',
+                    title: 'Error...',
+                    text: 'Este kit ha expirado!',
+                });
+                return;
+            }
+            console.log(kit);
+            //   this.GetValidateKit(kit['id'])
+            this.GetValidateKit(kit['id'])
+                .then(() => {
+
+                    if (this.mensajesKit.length == 0) {
+
+                        const totalKit = this.arrayArticulosKit.reduce((total, producto) => {
+                            return total + (producto.cantidad * producto.precio_costo_unid);
+                        }, 0);
+                        this.arrayArticulosKit.forEach(producto => {
+                            producto.porcentaje = ((producto.cantidad * producto.precio_costo_unid) / totalKit) * 100;
+                        });
+
+                        this.arrayArticulosKit.forEach(producto => {
+                            producto.nuevo_precio = (kit.precio * producto.porcentaje) / 100;
+                        });
+                        console.log("Estos son los articulos: ", this.arrayArticulosKit);
+                        this.arrayArticulosKit.forEach(articulo => {
+                            // Agregar los detalles del artículo al arrayDetalle
+                            this.arrayDetalle.push({
+                                idkit: kit['id'],
+                                idarticulo: articulo.id,
+                                articulo: articulo.nombre,
+                                medida: "KIT",
+                                unidad_envase: articulo.unidad_envase,
+                                cantidad: articulo.cantidad,
+                                cantidad_paquetes: articulo.unidad_envase * articulo.cantidad,
+                                precio: articulo.nuevo_precio,
+                                descuento: (((articulo.precio_costo_unid * articulo.cantidad) - (articulo.nuevo_precio)) / (articulo.precio_costo_unid * articulo.cantidad)) * 100,
+                                // descuento: (((articulo.precio_costo_unid*articulo.cantidad)-articulo.nuevo_precio)/articulo.precio_costo_unid)*100,
+                                stock: articulo.stock,
+                                precioseleccionado: articulo.precio_costo_unid
+                            });
+                            let actividadEconomica = 474110;
+
+                            this.arrayProductos.push({
+
+                                actividadEconomica: actividadEconomica,
+                                codigoProductoSin: articulo.id,
+                                codigoProducto: articulo.codigo,
+                                descripcion: articulo.nombre,
+                                cantidad: articulo.cantidad,
+                                unidadMedida: 25,
+                                precioUnitario: parseFloat(articulo.precio_costo_unid * this.monedaVenta[0]).toFixed(2),
+                                montoDescuento: ((articulo.precio_costo_unid * articulo.cantidad) * this.monedaVenta[0] - articulo.nuevo_precio * this.monedaVenta[0]).toFixed(2),
+                                subTotal: (parseFloat(articulo.nuevo_precio * this.monedaVenta[0])).toFixed(2),
+                                numeroSerie: null,
+                                numeroImei: null
+                            });
+                            this.cerrarModal()
+                            console.log("Esto se facturara ", this.arrayProductos)
+                        });
+                        // this.arrayDetalle.push({
+                        //                 idarticulo: this.arraySeleccionado.id,
+                        //                 articulo: this.arraySeleccionado.nombre,
+                        //                 medida: this.arraySeleccionado.medida,
+                        //                 unidad_envase: this.arraySeleccionado.unidad_envase,
+                        //                 cantidad: this.cantidad * this.unidadPaquete,
+                        //                 cantidad_paquetes: this.arraySeleccionado.unidad_envase,
+                        //                 precio: precioArticulo,
+                        //                 descuento: this.arrayPromocion && this.arrayPromocion.porcentaje !== undefined ? this.arrayPromocion.porcentaje : 0,
+                        //                 stock: this.arraySeleccionado.saldo_stock,
+                        //                 precioseleccionado: this.precioseleccionado
+
+                        //             });
+
+                    } else {
+
+                        swal({
+                            type: 'error',
+                            title: 'Stock insuficiente',
+                            text: this.mensajesKit.join("\n\n"),
+                        })
+
+                    }
+
+                })
+                .catch((error) => {
+                    // Maneja el error aquí
+                    console.error(error);
+                });
+        },
+        abrirModalDetallesKit(data) {
+            this.arrayArticulosSeleccionados = [];
+
+            this.modalDetalleKit = 1;
+            this.datosFormularioKit = {
+                id: data['id'],
+                nombre: data['nombre'],
+                porcentaje: data['porcentaje'],
+                codigo: data['codigo'],
+
+                fecha_final: (new Date(data['fecha_final'])).toISOString().split('T')[0],
+                tipo_promocion: data['tipo_promocion'],
+                estado: data['estado'],
+                precio: data['precio'],
+
+            };
+            this.obtenerDatosKit(data['id'])
+        },
+        obtenerDatosKit(idPromocion) {
+            return axios.get('/ofertas/id', {
+                params: {
+                    idPromocion: idPromocion
+                }
+            })
+                .then((response) => {
+                    const datos = response.data.articulosPorPromocion;
+                    console.log(datos);
+
+                    this.arrayArticulosKit = datos.map(item => ({
+                        ...item.articulo,
+                        cantidad: item.cantidad
+                    }));
+                })
+                .catch((error) => {
+                    console.error(error);
+                    throw error; // Re-lanza el error para que pueda ser manejado en agregarKit
+                });
+        },
+
+        getColorForEstado(estado, fecha_final) {
+            const fechaFinal = new Date(fecha_final) < new Date();
+
+            if (fechaFinal) {
+                return '#ff0000';
+            }
+            switch (estado) {
+                case 'Activo':
+                    return '#5ebf5f';
+                case 'Inactivo':
+                    return '#d76868';
+                case 'Agotado':
+                    return '#ce4444';
+                default:
+                    return '#f9dda6';
+            }
+        },
+
+        listarKits(page, buscar, criterio) {
+            let me = this;
+            let url = '/kits';
+
+            axios.get(url, {
+                params: {
+                    page: page,
+                    buscar: buscar,
+                    criterio: criterio
+                }
+            }).then(function (response) {
+                let respuesta = response.data;
+                me.arrayKit = response.data.ofertas.data;
+                // me.pagination = respuesta.pagination;
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
         scrollToSection() {
             // Utiliza jQuery para animar el desplazamiento hacia la sección objetivo
             $('html, body').animate({
@@ -1342,9 +1718,7 @@ export default {
         },
         cambiarPagina(page, buscar, criterio) {
             let me = this;
-            //Actualiza la página actual
             me.pagination.current_page = page;
-            //Envia la petición para visualizar la data de esa página
             me.listarVenta(page, buscar, criterio);
         },
         encuentra(id) {
@@ -1357,12 +1731,27 @@ export default {
             return sw;
         },
         eliminarDetalle(index) {
-
             let me = this;
             me.arrayDetalle.splice(index, 1);
             me.arrayProductos.splice(index, 1);
-
         },
+        eliminarKit(id) {
+            const indicesEliminar = [];
+            for (let i = 0; i < this.arrayDetalle.length; i++) {
+                if (this.arrayDetalle[i].idkit === id) {
+                    indicesEliminar.push(i);
+                }
+            }
+
+            indicesEliminar.forEach(index => {
+                this.arrayProductos.splice(index, 1);
+            });
+
+            for (let i = indicesEliminar.length - 1; i >= 0; i--) {
+                this.arrayDetalle.splice(indicesEliminar[i], 1);
+            }
+        },
+
         agregarDetalle() {
             let actividadEconomica = 474110;
             // let codigoProductoSin = document.getElementById("codigoProductoSin").value; si hay
@@ -1393,8 +1782,10 @@ export default {
                     return
                 }
 
-                const precioArticulo = this.calcularPrecioConDescuento(this.resultadoMultiplicacion, this.arrayPromocion ? this.arrayPromocion.porcentaje : 0)
+                const precioArticulo = (this.calcularPrecioConDescuento(this.resultadoMultiplicacion, this.arrayPromocion ? this.arrayPromocion.porcentaje : 0)) * this.monedaVenta[0]
+                console.log("Este es el precio del articulo: ", precioArticulo);
                 this.arrayDetalle.push({
+                    idkit: -1,
                     idarticulo: this.arraySeleccionado.id,
                     articulo: this.arraySeleccionado.nombre,
                     medida: this.arraySeleccionado.medida,
@@ -1415,8 +1806,8 @@ export default {
                     descripcion: this.arraySeleccionado.nombre,
                     cantidad: this.cantidad * this.unidadPaquete,
                     unidadMedida: this.arraySeleccionado.codigoClasificador,
-                    precioUnitario: parseFloat(this.precioseleccionado).toFixed(2),
-                    montoDescuento: this.arrayPromocion && this.arrayPromocion.porcentaje ? ((this.arrayPromocion.porcentaje / this.resultadoMultiplicacion) * 100).toFixed(2) : 0,
+                    precioUnitario: (parseFloat(this.precioseleccionado * this.monedaVenta[0])).toFixed(2),
+                    montoDescuento: ((this.precioseleccionado * this.cantidad * this.monedaVenta[0]) - precioArticulo).toFixed(2),
                     subTotal: precioArticulo.toFixed(2),
                     numeroSerie: numeroSerie,
                     numeroImei: numeroImei
@@ -1616,6 +2007,8 @@ export default {
                 'total': this.calcularTotal,
                 'idAlmacen': this.idAlmacen,
                 'idtipo_pago': this.idtipo_pago,
+                'idtipo_venta': this.idtipo_venta,
+                
                 //----creditos Ventas----
                 'idpersona': this.idcliente,
                 'numero_cuotas': this.numero_cuotas,
@@ -1854,6 +2247,10 @@ export default {
             this.nombreCliente = null;
             this.documento = null;
             this.email = null;
+            this.idAlmacen = null;
+            this.arrayProductos = [];
+            this.arrayDetalle = [];
+            this.precioBloqueado = false;
 
         },
         verVenta(id) {
@@ -1867,7 +2264,7 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 arrayVentaT = respuesta.venta;
-                console.log("VIENDO ",respuesta)
+                console.log("VIENDO ", respuesta)
 
                 me.cliente = arrayVentaT[0]['nombre'];
                 me.tipo_comprobante = arrayVentaT[0]['tipo_comprobante'];
@@ -1901,6 +2298,8 @@ export default {
         abrirModal() {
             this.scrollToTop()
             this.listarArticulo('', 'nombre');
+            this.listarKits(1, '', 'nombre');
+
             this.arrayArticulo = [];
             this.modal = 1;
             this.tituloModal = 'Seleccione los articulos que desee';
@@ -1979,9 +2378,11 @@ export default {
             this.modal2 = 1;
             this.cliente = this.nombreCliente;
             console.log('USUARIO LLEGA:', this.cliente);
-            this.tituloModal2 = 'PAGO AL CONTADO ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
+            this.tituloModal2 = 'VENTA  AL CONTADO ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion2 = 1;
-            this.idtipo_pago = 1;
+        //    this.idtipo_pago = 1;
+            this.idtipo_venta = 1;
+            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
             console.log('idtipo_pago LLEGA:', this.idtipo_pago);
         },
 
@@ -1991,12 +2392,16 @@ export default {
             console.log('USUARIO LLEGA:', this.cliente);
             this.tituloModal3 = 'CREDITOS ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion3 = 1;
-            this.idtipo_pago = 2;
+           // this.idtipo_pago = 1;
+            this.idtipo_venta = 2;
+            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
             console.log('idtipo_pago LLEGA:', this.idtipo_pago);
         },
         cerrarModal2() {
             this.modal2 = 0;
             this.tituloModal2 = '';
+            this.idtipo_pago='';
+            this.tipoPago='';
         },
         cerrarModal3() {
             this.modal3 = 0;
@@ -2133,9 +2538,6 @@ export default {
                 console.error('Error al obtener el último comprobante:', error);
             });
     },
-
-
-
     mounted() {
         this.datosConfiguracion();
 
