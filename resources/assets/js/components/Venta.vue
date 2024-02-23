@@ -802,13 +802,17 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <div v-if="!tipoPago">
-                            <button type="button" class="btn btn-primary" @click="seleccionarTipoPago('Efectivo')">Efectivo</button>
-                            <button type="button" class="btn btn-primary" @click="seleccionarTipoPago('Bancaria')">Transacion Bancaria</button>
-                            <button type="button" class="btn btn-primary" @click="seleccionarTipoPago('QR')">Transacion QR</button>
-                   </div>
-
-                   <div v-else class="modal-body">
+                    <div v-if="!tipoPago" class="row col-md-12">
+                        <p><strong>Tipo de pago:</strong></p>             
+                        <div class="d-flex flex-column align-items-center">
+                                <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('EFECTIVO')">EFECTIVO</button>
+                                <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('TRANSFERENCIA BANCARIA')">TRANSFERENCIA BANCARIA</button>
+                                <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('QR')">QR</button>
+                        </div>       
+                       
+                  </div>
+                  <div  v-else>
+                   <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -871,6 +875,7 @@
                             @click="registrar()">Cobrar</button>
                         <!-- <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarSucursal()">Actualizar</button> -->
                     </div>
+                  </div>
                 </div>
             </div>
         </div>
@@ -1182,6 +1187,13 @@ export default {
             estadocrevent: 'activo',
             primera_cuota: '',
             habilitarPrimeraCuota: false,
+            tipoPago:'',
+            tiposPago: {
+                        EFECTIVO: 1,
+                       "TRANSFERENCIA BANCARIA": 2,
+                        QR: 3
+                        },
+
         }
     },
     watch: {
@@ -1201,7 +1213,7 @@ export default {
                 return this.precioseleccionado * this.unidadPaquete * this.cantidad;
             }
         },
-
+      
 
         isActived: function () {
             return this.pagination.current_page;
@@ -1273,6 +1285,15 @@ export default {
                     throw error; // Re-lanza el error para que pueda ser manejado en agregarKit
                 });
         },
+        seleccionarTipoPago(tipo) {
+                        // Esta función asigna el tipo de pago y actualiza el título del modal
+                        this.tipoPago = tipo;
+                      
+                        this.tituloModal2 = `TIPO DE PAGO : ${tipo}`; // Usamos '`' para interpolar el nombre del cliente
+                        this.idtipo_pago = this.tiposPago[tipo];
+                        console.log('idtipo_pago:', this.idtipo_pago);
+            },
+
         agregarKit(kit) {
             if (new Date(kit.fecha_final) < new Date()) {
                 swal({
@@ -2336,9 +2357,9 @@ export default {
             this.modal2 = 1;
             this.cliente = this.nombreCliente;
             console.log('USUARIO LLEGA:', this.cliente);
-            this.tituloModal2 = 'PAGO AL CONTADO ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
+            this.tituloModal2 = 'VENTA  AL CONTADO ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion2 = 1;
-            this.idtipo_pago = 1;
+        //    this.idtipo_pago = 1;
             this.idtipo_venta = 1;
             console.log('idtipo_venta LLEGA:', this.idtipo_venta);
             console.log('idtipo_pago LLEGA:', this.idtipo_pago);
@@ -2350,7 +2371,7 @@ export default {
             console.log('USUARIO LLEGA:', this.cliente);
             this.tituloModal3 = 'CREDITOS ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion3 = 1;
-            this.idtipo_pago = 1;
+           // this.idtipo_pago = 1;
             this.idtipo_venta = 2;
             console.log('idtipo_venta LLEGA:', this.idtipo_venta);
             console.log('idtipo_pago LLEGA:', this.idtipo_pago);
@@ -2358,6 +2379,8 @@ export default {
         cerrarModal2() {
             this.modal2 = 0;
             this.tituloModal2 = '';
+            this.idtipo_pago='';
+            this.tipoPago='';
         },
         cerrarModal3() {
             this.modal3 = 0;

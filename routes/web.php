@@ -139,12 +139,14 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/cliente/actualizar', 'ClienteController@update');
         Route::get('/cliente/selectCliente', 'ClienteController@selectCliente');
         Route::get('/cliente/listarReporteClienteExcel', 'ClienteController@listarReporteClienteExcel');
+        Route::get('/cliente/clientesPorVendedor', 'ClienteController@clientesPorVendedor');
 
         Route::get('/cliente/selectUusarioVend', 'ClienteController@selectUsuarioVendedor');
         Route::get('/cliente/usuario', 'ClienteController@indexUsuario');
         Route::get('/cliente/usuario/filtro', 'ClienteController@indexUsuarioFiltro');
         Route::get('/user-info', 'ClienteController@getUserInfo');
         Route::get('/user/selectUser/filter', 'UserController@selectUsuarios');
+        Route::get('/user/selectUser/rol', 'UserController@selectUsuariosPorRol');
 
         Route::get('/venta', 'VentaController@index');
         Route::post('/venta/registrar', 'VentaController@store');
@@ -388,6 +390,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/ventas-diarias', 'VentaController@reporteVentasDiarias');
         Route::get('/reporte-almacen', 'InventarioController@reporteAlmacenes');
         Route::get('/reporte-kardex-fisico-valorado','ReporteKardexFisicoInventarioController@generarReporte');
+        Route::get('/reporte-kardex-fisico', 'ReporteKardexFisicoInventarioController@generarReporteFisico');
         Route::get('/top-vendedores', 'VentaController@topVendedores');
         Route::get('/top-clientes', 'VentaController@topClientes');
         Route::get('/top-articulos', 'VentaController@topProductos');
