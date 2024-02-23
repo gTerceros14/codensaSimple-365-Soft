@@ -154,4 +154,57 @@ class ReporteKardexFisicoInventarioController extends Controller
             ];
 }
 
+public function generarReporteFisico(Request $request)
+{
+    $idArticulo = $request->articulo;
+    $fechaInicio = $request->fechaInicio;
+    $fechaFin = $request->fechaFin;
+    $sucursal = $request->sucursal;
+
+
+    $ingresos = DB::table('ingresos')
+        ->join('detalle_ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
+        ->join('articulos','detalle_ingresos.idarticulo','=','articulos.id')
+        ->join('almacens','almacens.encargado','=','ingresos.idusuario')
+        ->join('sucursales','sucursales.id','=','almacens.sucursal')
+        ->select(DB::raw("'Ingreso' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante')
+        ->where('articulos.id', $idArticulo)
+        ->where('sucursales.id', $sucursal)
+        ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
+        
+       
+
+    $ventas = DB::table('ventas')
+        ->join('detalle_ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
+        ->join('articulos','detalle_ventas.idarticulo','=','articulos.id')
+        ->join('almacens','almacens.encargado','=','ventas.idusuario')
+        ->join('sucursales','sucursales.id','=','almacens.sucursal')
+        ->select(DB::raw("'Venta' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante')
+        ->where('articulos.id', $idArticulo)
+        ->where('sucursales.id', $sucursal)
+        ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
+        
+    
+    $ingresos = $ingresos->get();
+    $ventas = $ventas->get();
+
+    $resultados = $ingresos->concat($ventas)->sortBy('fecha_hora');
+
+    $saldo = 0;
+
+    foreach ($resultados as &$resultado) {
+        if ($resultado->tipo === 'Ingreso') {
+            $saldo += $resultado->cantidad;
+        } else {
+            $saldo -= $resultado->cantidad;
+        }
+        $resultado->resultado_operacion = $saldo;
+    }
+    $total_saldo = $resultado->resultado_operacion;
+
+
+    return ['resultados' => $resultados,
+    'total_saldo' => $total_saldo
+    ];}
+
 }

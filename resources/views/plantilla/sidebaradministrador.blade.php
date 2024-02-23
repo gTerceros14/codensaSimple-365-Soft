@@ -165,8 +165,11 @@
                             Usuarios</a>
                     </li>
                     <li @click="menu=51" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex 
-                            Fisico Valorado</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex Fisico Valorado</a>
+                    </li>
+                    
+                    <li @click="menu=52" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex Fisico</a>
                     </li>
                 </ul>
             </li>

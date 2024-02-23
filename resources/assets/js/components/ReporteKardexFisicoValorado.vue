@@ -9,13 +9,13 @@
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Artículos
+                    <i class="fa fa-align-justify"></i> Reporte Kardex Inventario Fisico Valorado
                     <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()"
                     class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros
                     </button>
-                    <button type="button" @click="cargarPdf()" class="btn btn-info">
-                        <i class="icon-doc"></i>&nbsp;Reporte
+                    <button type="button" @click="cargarPdf()" class="btn btn-success">
+                        <i class="icon-doc"></i>&nbsp;Exportar a Excel
                     </button>
                 </div>
                 <div class="card-body"  style="max-height: 400px; overflow-y: auto;" >
@@ -58,9 +58,6 @@
                                     <td v-else></td>
                                     <td v-text="articulo.resultado_operacionValorado"></td>
                                     <!-- <td v-text="articulo.precio1"></td> -->
-                                    
-
-
                                 </tr>
                             </tbody>
                         </table>
@@ -2075,10 +2072,10 @@ export default {
     worksheet['!cols'] = columnWidths;
 
     // Añadir la hoja de cálculo al libro
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte Ventas');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Kardex Inventario Fisico');
 
     // Descargar el archivo
-    XLSX.writeFile(workbook, 'reporte_kardex_fisico_valorado.xlsx');
+    XLSX.writeFile(workbook, 'reporte_kardex_fisico.xlsx');
 },
 
         selectMedida() {

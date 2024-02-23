@@ -156,7 +156,10 @@ Vue.component(
   "reporteventas",
   require("./components/ReporteVentasDiarias.vue")
 );
+
 Vue.component("reportekardexfisicovalorado",require("./components/ReporteKardexFisicoValorado.vue"));
+Vue.component("reportekardexfisico",require("./components/ReporteKardexFisico.vue"));
+
 Vue.component(
   "ventasinstitucionales",
   require("./components/VentasInstitucionales.vue")
