@@ -495,7 +495,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col" for=""><strong>Forma de Pago</strong></label>
+                            <label class="col" for=""><strong>Tipo de Venta </strong></label>
                             <div class="col-md-12">
                                 <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
                                 <button type="button" class="btn btn-primary"
@@ -802,8 +802,13 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
+                    <div v-if="!tipoPago">
+                            <button type="button" class="btn btn-primary" @click="seleccionarTipoPago('Efectivo')">Efectivo</button>
+                            <button type="button" class="btn btn-primary" @click="seleccionarTipoPago('Bancaria')">Transacion Bancaria</button>
+                            <button type="button" class="btn btn-primary" @click="seleccionarTipoPago('QR')">Transacion QR</button>
+                   </div>
 
-                    <div class="modal-body">
+                   <div v-else class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -1170,6 +1175,7 @@ export default {
             faltante: 0,
             //-------DEStE AQUI 13-OCTUBRE--
             idtipo_pago: '',
+            idtipo_venta:'',
             tiempo_diaz: '',
             numero_cuotas: '',
             cuotas: [],//---para almacenar las fechas
@@ -1965,6 +1971,8 @@ export default {
                 'total': this.calcularTotal,
                 'idAlmacen': this.idAlmacen,
                 'idtipo_pago': this.idtipo_pago,
+                'idtipo_venta': this.idtipo_venta,
+                
                 //----creditos Ventas----
                 'idpersona': this.idcliente,
                 'numero_cuotas': this.numero_cuotas,
@@ -2331,6 +2339,8 @@ export default {
             this.tituloModal2 = 'PAGO AL CONTADO ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion2 = 1;
             this.idtipo_pago = 1;
+            this.idtipo_venta = 1;
+            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
             console.log('idtipo_pago LLEGA:', this.idtipo_pago);
         },
 
@@ -2340,7 +2350,9 @@ export default {
             console.log('USUARIO LLEGA:', this.cliente);
             this.tituloModal3 = 'CREDITOS ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion3 = 1;
-            this.idtipo_pago = 2;
+            this.idtipo_pago = 1;
+            this.idtipo_venta = 2;
+            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
             console.log('idtipo_pago LLEGA:', this.idtipo_pago);
         },
         cerrarModal2() {

@@ -92,22 +92,31 @@ export const esquemaArticulos = yup.object().shape({
     ),
 
   precio_costo_unid: yup
-    .number()
-    .required("El precio por unidad es obligatorio")
-    .typeError("Debe ingresar un número válido")
-    .min(0.01, "El precio por unidad no puede ser menor o igual a 0"),
+  .number()
+  .required("La cantidad del costo por unidad es obligatoria")
+  .typeError("Debe ingresar un número válido")
+  .min(
+    0.01,
+    "El cantidad del costo por unidad no puede ser menor o igual a 0"
+  ),
 
   precio_costo_paq: yup
-    .number()
-    .required("El precio por paquete es obligatorio")
-    .typeError("Debe ingresar un número válido")
-    .min(0.01, "El precio por paquete no puede ser menor o igual a 0"),
+  .number()
+  .required("La cantidad del costo por paquete es obligatoria")
+  .typeError("Debe ingresar un número válido")
+  .min(
+    0.01,
+    "El cantidad de costo por paquete no puede ser menor o igual a 0"
+  ),
 
   precio_venta: yup
-    .number()
-    .required("El precio de venta es obligatorio")
-    .typeError("Debe ingresar un número válido")
-    .min(0.01, "El precio de venta no puede ser menor o igual a 0"),
+  .number()
+  .required("El precio de venta es obligatoria")
+  .typeError("Debe ingresar un número válido")
+  .min(
+    0.01,
+    "El precio de venta no puede ser menor o igual a 0"
+  ),
   precio_uno: yup.number().typeError("Debe ingresar un número válido"),
   precio_dos: yup.number().typeError("Debe ingresar un número válido"),
   precio_tres: yup.number().typeError("Debe ingresar un número válido"),
