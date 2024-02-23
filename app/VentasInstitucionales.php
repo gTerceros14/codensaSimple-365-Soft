@@ -7,20 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class VentasInstitucionales extends Model
 {
     protected $fillable =[
-        'idcliente', 
-        'idusuario',
-        'tipo_comprobante',
-        'serie_comprobante',
-        'num_comprobante',
-        'fecha_hora',
-        'impuesto',
-        'total',
-        'estado',
-        'idcaja'
+        'idventa',
+        'estado'
     ];
 
-    public function caja(){
-        return $this->belongsTo('App\Caja', 'id');
+    public function venta(){
+        return $this->belongsTo('App\Venta', 'id');
     }
 
     public function variablesTemporales()

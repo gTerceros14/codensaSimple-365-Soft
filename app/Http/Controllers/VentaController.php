@@ -16,6 +16,7 @@ use App\CuotasCredito;
 use App\Empresa;
 use App\Caja;
 use App\Factura;
+use App\FacturaInstitucional;
 use App\Http\Controllers\CifrasEnLetrasController;
 use Illuminate\Support\Facades\Log;
 use App\Notifications\NotifyAdmin;
@@ -471,6 +472,10 @@ class VentaController extends Controller
             }
         } catch (Exception $e) {
             DB::rollBack();
+            return [
+                'id' => -1,
+                'error' => 'Error interno del servidor'
+            ];
         }
     }
 
@@ -704,6 +709,7 @@ class VentaController extends Controller
         $datos['factura'][0]['cabecera']['cuf'] = $cuf;
             
         $temporal = $datos['factura'];
+        //dd($temporal);
         $xml_temporal = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><facturaComputarizadaCompraVenta xsi:noNamespaceSchemaLocation=\"facturaComputarizadaCompraVenta.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"></facturaComputarizadaCompraVenta>");
 
         $this->formato_xml($temporal, $xml_temporal);
@@ -721,6 +727,7 @@ class VentaController extends Controller
         $montoTotalSujetoIva = $valores['montoTotalSujetoIva'];
         $descuentoAdicional = $valores['descuentoAdicional'];
         $productos = file_get_contents(public_path("docs/facturaxml.xml"));
+
             
         $data = $this->insertarFactura($request, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
 
@@ -733,7 +740,102 @@ class VentaController extends Controller
             if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "VALIDADA"){
                 $mensaje = $resFactura->RespuestaServicioFacturacion->codigoDescripcion;
             }else if($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA"){
-                $mensaje = $resFactura->RespuestaServicioFacturacion->mensajesList->descripcion;
+                $mensajes = $resFactura->RespuestaServicioFacturacion->mensajesList;
+                //dd($mensajes);
+                if (is_array($mensajes)) {
+                    $descripciones = array_map(function($mensaje) {
+                        return $mensaje->descripcion;
+                    }, $mensajes);
+                    $mensaje = $descripciones;
+                }
+            }
+            echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
+            
+        } 
+    }
+
+    public function emitirFacturaInstitucional(Request $request){    
+
+        $user = Auth::user();
+        //$puntoVenta = $user->idpuntoventa;
+        $puntoVenta = 0;
+        $sucursal = $user->sucursal;
+        $codSucursal = $sucursal->codigoSucursal;
+
+        $datos = $request->input('factura');
+        $id_cliente = $request->input('id_cliente');
+        $idventainstitucional = $request->input('idventainstitucional');
+            
+        $valores = $datos['factura'][0]['cabecera'];
+        $nitEmisor = str_pad($valores['nitEmisor'], 13, "0", STR_PAD_LEFT);
+            
+        $fechaEmision = $valores['fechaEmision'];
+        $fecha_formato = str_replace("T", "", $fechaEmision);
+        $fecha_formato = str_replace("-", "", $fecha_formato);
+        $fecha_formato = str_replace(":", "", $fecha_formato);
+        $fecha_formato = str_replace(".", "", $fecha_formato);
+        $sucursal = str_pad($codSucursal, 4, "0", STR_PAD_LEFT);
+        $modalidad = 2;
+        $tipoEmision = 1;
+        $tipoFactura = 1;
+        $tipoDocSector = str_pad(1, 2, "0", STR_PAD_LEFT);
+        $numeroFactura = str_pad($valores['numeroFactura'], 10, "0", STR_PAD_LEFT);
+        $puntoVentaCuf = str_pad($puntoVenta, 4, "0", STR_PAD_LEFT);
+        $codigoControl = $_SESSION['scodigoControl'];
+        $cadena = $nitEmisor . $fecha_formato . $sucursal . $modalidad . $tipoEmision . $tipoFactura . $tipoDocSector . $numeroFactura . $puntoVentaCuf;
+        $numDig = 1;
+        $limMult = 9;
+        $x10 = false;
+        $mod11 = CustomHelpers::calculaDigitoMod11($cadena, $numDig, $limMult, $x10);
+        $cadena2 = $cadena . $mod11;
+        
+        $pString = $cadena2;
+        $bas16 = CustomHelpers::base16($pString);
+        
+        $cuf = strtoupper($bas16) . $codigoControl;
+            
+        $datos['factura'][0]['cabecera']['cuf'] = $cuf;
+            
+        $temporal = $datos['factura'];
+        //dd($temporal);
+        $xml_temporal = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><facturaComputarizadaCompraVenta xsi:noNamespaceSchemaLocation=\"facturaComputarizadaCompraVenta.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"></facturaComputarizadaCompraVenta>");
+
+        $this->formato_xml($temporal, $xml_temporal);
+        $xml_temporal->asXML(public_path("docs/facturaxml.xml"));
+        $gzdata = gzencode(file_get_contents(public_path("docs/facturaxml.xml")), 9);
+        $fp = fopen(public_path("docs/facturaxml.xml.zip"), "w");
+        fwrite($fp, $gzdata);
+        fclose($fp);
+        $archivo = $gzdata;
+        $hashArchivo = hash("sha256", file_get_contents(public_path("docs/facturaxml.xml")));
+            
+        $numeroFactura = $valores['numeroFactura'];
+        $codigoMetodoPago = $valores['codigoMetodoPago'];
+        $montoTotal = $valores['montoTotal'];
+        $montoTotalSujetoIva = $valores['montoTotalSujetoIva'];
+        $descuentoAdicional = $valores['descuentoAdicional'];
+        $productos = file_get_contents(public_path("docs/facturaxml.xml"));
+
+            
+        $data = $this->insertarFacturaInstitucional($request, $id_cliente, $idventainstitucional, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
+
+        if ($data) {
+            // Registro exitoso
+            require "SiatController.php";
+            $siat = new SiatController();
+            $resFactura = $siat->recepcionFactura($archivo, $fechaEmision, $hashArchivo, $puntoVenta, $codSucursal);
+            //var_dump($resFactura);
+            if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "VALIDADA"){
+                $mensaje = $resFactura->RespuestaServicioFacturacion->codigoDescripcion;
+            }else if($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA"){
+                $mensajes = $resFactura->RespuestaServicioFacturacion->mensajesList;
+                //dd($mensajes);
+                if (is_array($mensajes)) {
+                    $descripciones = array_map(function($mensaje) {
+                        return $mensaje->descripcion;
+                    }, $mensajes);
+                    $mensaje = $descripciones;
+                }
             }
             echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
             
@@ -743,7 +845,8 @@ class VentaController extends Controller
     public function paqueteFactura(Request $request)
     {
             $user = Auth::user();
-            $puntoVenta = $user->idpuntoventa;
+            //$puntoVenta = $user->idpuntoventa;
+            $puntoVenta = 0;
             $sucursal = $user->sucursal;
             $codSucursal = $sucursal->codigoSucursal;
 
@@ -1060,6 +1163,29 @@ class VentaController extends Controller
         $factura->estado = 1;
         
         $success = $factura->save();
+    
+        return $success;
+    }
+
+    public function insertarFacturaInstitucional(Request $request, $id_cliente, $idventainstitucional, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos){
+        if (!$request->ajax()) {
+            return response()->json(['error' => 'Acceso no autorizado'], 401);
+        }
+
+        $facturaInstitucional = new FacturaInstitucional();
+        $facturaInstitucional->idcliente = $id_cliente;
+        $facturaInstitucional->idventainstitucional  = $idventainstitucional;
+        $facturaInstitucional->numeroFactura = $numeroFactura;
+        $facturaInstitucional->cuf = $cuf;
+        $facturaInstitucional->fechaEmision = $fechaEmision;
+        $facturaInstitucional->codigoMetodoPago = $codigoMetodoPago;
+        $facturaInstitucional->montoTotal = $montoTotal;
+        $facturaInstitucional->montoTotalSujetoIva = $montoTotalSujetoIva;
+        $facturaInstitucional->descuentoAdicional = $descuentoAdicional;
+        $facturaInstitucional->productos = $productos;
+        $facturaInstitucional->estado = 1;
+        
+        $success = $facturaInstitucional->save();
     
         return $success;
     }

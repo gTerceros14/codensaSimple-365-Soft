@@ -15,7 +15,7 @@ class CreateVariableTemporales extends Migration
     {
         Schema::create('variable_temporals', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('idventainstitucional')->unsigned()->nullable();
+            $table->integer('idventainstitucional')->nullable();
             $table->foreign('idventainstitucional')->references('id')->on('venta_institucionales');
             $table->string('nombre', 250);
             $table->timestamps();

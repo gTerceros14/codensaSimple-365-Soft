@@ -380,6 +380,14 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/variables/registrarArticuloVariable2', 'VentasInstitucionalesController@registrarArticuloVariable2');
         Route::get('/variables/listarArticulosVariable', 'VentasInstitucionalesController@obtenerArticulosPorVariableTemporal');    
         Route::delete('/variables/excluirArticulo', 'VentasInstitucionalesController@excluirArticulo');
+        Route::post('/variables/registrar-venta-institucional', 'VentasInstitucionalesController@registrarVentaInstitucional');
+        Route::post('/variables/ventas_institucionales', 'VentasInstitucionalesController@registrarModificacionVentasInstitucionales');
+        Route::get('/variables/facturaInstitucional', 'VentasInstitucionalesController@listarFacturas');
+        Route::post('/variables/emitirFacturaInstitucional', 'VentaController@emitirFacturaInstitucional');
+        Route::post('/variables/insertarFacturaInstitucional', 'VentaController@insertarFacturaInstitucional');
+        Route::get('/variables/imprimirCarta/{id}/{idventainstitucional}', 'VentasInstitucionalesController@imprimirFactura');
+
+
 
 
 

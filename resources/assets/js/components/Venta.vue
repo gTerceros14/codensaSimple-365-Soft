@@ -248,10 +248,10 @@
                                             <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
                                             <b v-else>{{ (calcularPrecioConDescuento(resultadoMultiplicacion,
                                                 arrayPromocion.porcentaje) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-        monedaVenta[1] }}</b>
+                                                monedaVenta[1] }}</b>
                                             <s style="font-size:15px" class="lead">{{
                                                 (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-        monedaVenta[1] }}</s>
+                                                monedaVenta[1] }}</s>
                                         </h3>
 
                                         <h3 v-else style="display:flex;align-items:center;margin:0px;">
@@ -337,21 +337,6 @@
                                     </div>
                                 </div>
 
-
-
-                                <!-- <div class="col-md-2">
-                                <div class="form-group">
-                                    <label>Precio total</label>
-                                    <div class="input-group">
-                                        <input disabled type="number" class="form-control" :value="(resultadoMultiplicacion*parseFloat(monedaVenta[0])).toFixed(2)" >
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                {{ monedaVenta[1] }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> -->
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="" class="font-weight-bold">Cantidad
@@ -427,7 +412,8 @@
 
                                             </td>
                                             <td>
-                                                {{ detalle.cantidad }}
+                                                <input type="number" v-model="detalle.cantidad" min="1" @input="actualizarDetalle(index)" 
+                                                style="border: none; outline: none; width: 50px;" />
                                             </td>
 
                                             <td> {{ (detalle.cantidad / detalle.unidad_envase).toFixed(2) }} </td>
@@ -442,7 +428,9 @@
                                             </td>
 
 
-                                            <td v-text="detalle.descuento">
+                                            <td>
+                                                <input type="number" v-model="detalle.descuento" max="99"
+                                                style="border: none; outline: none; width: 50px;" />
                                             </td>
                                             <!--<span style="color:red;"
                                                     v-show="detalle.descuento > (detalle.precioseleccionado * detalle.cantidad)">Descuento
@@ -457,7 +445,7 @@
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Sub Total: Bs.</strong></td>
+                                            <td colspan="9" align="right"><strong>Sub Total: </strong></td>
                                             <td id="subTotal">
                                                 {{ ((totalParcial = (calcularSubTotal))
                                                     * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
@@ -465,12 +453,17 @@
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Descuento Adicional: Bs.</strong></td>
-                                            <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
-                                                class="form-control">
+                                            <td colspan="9" align="right"><strong>Descuento Adicional: </strong></td>
+                                            <input id="descuentoAdicional" v-model="descuentoAdicional" type="number" class="form-control" @change="validarDescuentoAdicional">
+                                        </tr>
+
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="9" align="right"><strong>Descuento Gift Card: </strong></td>
+                                            <input id="descuentoGiftCard" v-model="descuentoGiftCard" type="number"
+                                                class="form-control" @change="validarDescuentoGiftCard">
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Total Neto: Bs.</strong></td>
+                                            <td colspan="9" align="right"><strong>Total Neto: </strong></td>
                                             <td id="montoTotal">
                                                 {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
                                                     monedaVenta[1] }}
@@ -922,6 +915,7 @@ export default {
             tipo_documento: '',
             complemento_id: '',
             descuentoAdicional: 0.00,
+            descuentoGiftCard: 0.00,
             tipo_comprobante: 'FACTURA',
             serie_comprobante: '',
             last_comprobante: 0,
@@ -964,6 +958,7 @@ export default {
             precio: 0,
             unidad_envase: 0,
             cantidad: 1,
+            paquni:'',
             precioBloqueado: false,
             descuento: 0,
             sTotal: 0,
@@ -1071,6 +1066,7 @@ export default {
 
             }
             resultado -= this.descuentoAdicional;
+            resultado -= this.descuentoGiftCard;
             return resultado;
         },
 
@@ -1108,6 +1104,26 @@ export default {
             const diasRestantes = Math.ceil(diferenciaEnMilisegundos / (1000 * 60 * 60 * 24));
             return diasRestantes;
         },
+        actualizarDetalle(index) {
+            this.arrayDetalle[index].total = (this.arrayDetalle[index].precioseleccionado * this.arrayDetalle[index].cantidad).toFixed(2);
+        },
+        actualizarDetalleDescuento(index) {
+           this.calcularTotal(index);
+        },
+        validarDescuentoAdicional() {
+            
+            if (this.descuentoAdicional >= this.totalParcial) {
+                this.descuentoAdicional = 0;
+                alert("El descuento adicional no puede ser mayor o igual al total.");
+            }
+        }, 
+        validarDescuentoGiftCard() {
+            
+            if (this.descuentoGiftCard >= this.calcularTotal) {
+                this.descuentoGiftCard = 0;
+                alert("El descuento Gift Card no puede ser mayor o igual al total.");
+            }
+        }, 
         buscarPromocion(idArticulo) {
             // Supongamos que el ID del artículo es 1, ajusta según tus necesidades
 
@@ -1639,6 +1655,7 @@ export default {
                     me.codigo = '';
                     me.descuento = 0;
                     me.arrayDetalle = [];
+                    me.recibido = 0;
                     //window.open('/factura/imprimir/' + response.data.id);
                 } else {
                     if (response.data.valorMaximo) {
@@ -1728,8 +1745,10 @@ export default {
             let usuario = document.getElementById("usuarioAutenticado").value;
             //let codigoPuntoVenta = this.puntoVentaAutenticado;
             let codigoPuntoVenta = 0;
+            let montoGiftCard = document.getElementById("descuentoGiftCard").value;
 
             console.log("El tipo de documento es: " + tipoDocumentoIdentidad);
+            console.log("El monto de Descuento de Gift Card es: " + montoGiftCard);
 
             var factura = [];
             factura.push({
@@ -1757,7 +1776,7 @@ export default {
                     codigoMoneda: 1,
                     tipoCambio: 1,
                     montoTotalMoneda: montoTotal,
-                    montoGiftCard: null,
+                    montoGiftCard: montoGiftCard,
                     descuentoAdicional: descuentoAdicional,
                     codigoExcepcion: 0,
                     cafc: null,
@@ -1778,6 +1797,7 @@ export default {
             })
                 .then(function (response) {
                     var data = response.data;
+
                     if (data === "VALIDADA") {
                         swal(
                             'FACTURA ' + data,
@@ -1788,7 +1808,8 @@ export default {
                         me.cerrarModal2();
                         me.cerrarModal3();
                         me.listarVenta(1, '', 'id');
-                    } else {
+                    } else{
+                        me.arrayProductos = [];
                         swal(
                             'FACTURA RECHAZADA',
                             data,
@@ -1797,6 +1818,7 @@ export default {
                     }
                 })
                 .catch(function (error) {
+                    me.arrayProductos = [];
                     swal(
                         'INTENTE DE NUEVO',
                         'Comunicacion con SIAT fallida',
@@ -1943,7 +1965,7 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.arrayPrecios = respuesta.precio.data;
-                console.log('PRECIOS', me.arrayPrecios);
+                console.log('PRECIOS',me.arrayPrecios);
                 //me.precioCount = me.arrayBuscador.length;
             }).catch(function (error) {
                 console.log(error);

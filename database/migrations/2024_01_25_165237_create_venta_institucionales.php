@@ -13,22 +13,11 @@ class CreateVentaInstitucionales extends Migration
      */
     public function up()
     {
-        Schema::create('venta_institucionales', function (Blueprint $table) {
+        Schema::create('ventas_institucionales', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('idcliente')->unsigned();
-            $table->foreign('idcliente')->references('id')->on('personas');
-            $table->integer('idusuario')->unsigned();
-            $table->foreign('idusuario')->references('id')->on('users');
-            $table->integer('idtipo_pago')->unsigned();
-            $table->foreign('idtipo_pago')->references('id')->on('tipo_pagos');
-            $table->string('tipo_comprobante', 20);
-            $table->string('num_comprobante', 10);
-            $table->dateTime('fecha_hora');
-            $table->decimal('impuesto', 4, 2);
-            $table->decimal('total', 11, 2);
+            $table->integer('idventa')->unsigned()->nullable();
+            $table->foreign('idventa')->references('id')->on('ventas');
             $table->string('estado', 20);
-            $table->integer('idcaja')->unsigned();
-            $table->foreign('idcaja')->references('id')->on('cajas');
             $table->timestamps();
         });
     }

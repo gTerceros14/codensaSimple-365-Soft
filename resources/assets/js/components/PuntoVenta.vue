@@ -109,7 +109,7 @@
                                 <div class="form-group row">
                                     <label class="col-md-3 form-control-label" for="email-input"><strong>NIT</strong></label>
                                     <div class="col-md-9">
-                                        <input type="text" v-model="nit" class="form-control" placeholder="Ingrese NIT de la empresa">
+                                        <input type="text" v-model="nit" class="form-control" placeholder="5153610012" readonly>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -160,7 +160,7 @@
                 id: 0,
                 nombre : '',
                 descripcion : '',
-                nit : '',
+                nit : '5153610012',
                 idsucursal : 0,
                 idtipopuntoventa : 0, 
                 arrayPuntoVenta : [],
@@ -316,11 +316,12 @@
                 }
 
                 let me = this;
+                let nit = 5153610012;
 
                 axios.post('/puntoVenta/habilitar', {
                     'nombre' : me.nombre,
                     'descripcion' : me.descripcion,
-                    'nit' : me.nit,
+                    'nit' : nit,
                     'idtipopuntoventa' : me.idtipopuntoventa,
                     'idsucursal' : me.idsucursal,
                 }).then(function(response){
@@ -335,7 +336,7 @@
                         axios.post('/puntoVenta/registrar', {
                         'nombre' : me.nombre,
                         'descripcion' : me.descripcion,
-                        'nit' : me.nit,
+                        'nit' : nit,
                         'idtipopuntoventa' : me.idtipopuntoventa,
                         'idsucursal' : me.idsucursal
                     }).then(function(response) {
