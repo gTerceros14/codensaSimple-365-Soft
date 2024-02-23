@@ -167,6 +167,9 @@
 <template v-if="menu==49">
     <reporteinventario></reporteinventario>
 </template>
+<template v-if="menu==50">
+    <resumenclientes></resumenclientes>
+</template>
 <template v-if="menu==51">
     <reportekardexfisicovalorado></reportekardexfisicovalorado>
 </template>
