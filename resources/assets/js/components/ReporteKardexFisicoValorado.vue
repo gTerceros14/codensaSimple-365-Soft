@@ -14,8 +14,11 @@
                     class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros
                     </button>
-                    <button type="button" @click="cargarPdf()" class="btn btn-success">
-                        <i class="icon-doc"></i>&nbsp;Exportar a Excel
+                    <button type="button" @click="reporteExcel()" class="btn btn-success">
+                        <i class="icon-doc"></i>&nbsp;Reporte Excel
+                    </button>
+                    <button type="button" @click="reportePDF()" class="btn btn-danger">
+                        <i class="icon-doc"></i>&nbsp;Reporte PDF
                     </button>
                 </div>
                 <div class="card-body"  style="max-height: 400px; overflow-y: auto;" >
@@ -931,6 +934,8 @@
 
 <script>
 import { esquemaArticulos } from '../constants/validations';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import * as XLSX from 'xlsx-js-style';
 import VueBarcode from 'vue-barcode';
 export default {
@@ -1156,6 +1161,8 @@ export default {
             //fechas
             fechaInicio:'',
             fechaFin:'',
+            fechaInicioSeleccionado: '',
+            fechaFinSeleccionado: '',
         }
     },
     components: {
@@ -1937,6 +1944,8 @@ export default {
                 me.arrayReporte = respuesta.resultados;
                 console.log("array reporte",me.arrayReporte)
                 console.log ("total saldo fisico ",me.total_saldofisico)
+                me.fechaInicioSeleccionado = me.fechaInicio;
+                me.fechaFinSeleccionado = me.fechaFin;
                 //me.formateaKardex();
             })
                 .catch(function (error) {
@@ -2008,7 +2017,9 @@ export default {
         /*cargarPdf() {
             window.open('/articulo/listarPdf', '_blank');
         },*/
-        cargarPdf() {
+        reporteExcel() {
+        console.log('fecha inicio : ',this.fechaInicio);
+        console.log('fecha fin : ',this.fechaFin);
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.aoa_to_sheet([]);
     const startRow = 5;
@@ -2024,8 +2035,8 @@ export default {
     // Estilo para la fecha
     const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
     // Fechas de inicio y fin
-    worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
-    worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+    worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicioSeleccionado}`, s: fechaStyle };
+    worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFinSeleccionado}`, s: fechaStyle };
 
     // Estilo para los encabezados
     const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
@@ -2077,6 +2088,49 @@ export default {
     // Descargar el archivo
     XLSX.writeFile(workbook, 'reporte_kardex_fisico.xlsx');
 },
+reportePDF() {
+            const pdf = new jsPDF();
+            
+            const titulo = 'Kardex Inventario Fisico';
+            const fechaInicio = `Fecha Inicio: ${this.fechaInicioSeleccionado}`;
+            const fechaFin = `Fecha Fin: ${this.fechaFinSeleccionado}`;
+            const articulo = `Articulo: ${this.articuloseleccionada.nombre}`;
+            const codigo = `Codigo: ${this.articuloseleccionada.codigo}`;
+            const descripcion = `Descripcion: ${this.articuloseleccionada.descripcion}`;
+
+            pdf.setFont('helvetica');
+            pdf.setFontSize(16); // Tamaño de letra más grande para el título
+            pdf.text(titulo, 15, 10);
+
+            pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
+            pdf.text(fechaInicio, 15, 20);
+            pdf.text(fechaFin, 100, 20);
+            pdf.text(articulo, 150, 20);
+            pdf.text(codigo, 15, 30);
+            pdf.text(descripcion, 100, 30);
+
+            const tableYPosition = 40;
+
+            const columns = ['C.C', 'Num Comprobante', 'Fecha', 'Detalle', 'Entrada', 'Salida', 'Saldo', 'Costo unitario', 'Ingreso', 'Egreso', 'Saldo'];
+
+            const rows = this.sortedResultados.map(item => [item.tipo,
+                    item.num_comprobante,
+                    item.fecha_hora,
+                    item.tipo_comprobante,
+                    item.tipo === 'Ingreso' ? item.cantidad : '',
+                    item.tipo === 'Venta' ? item.cantidad : '',
+                    item.resultado_operacionFisico,
+                    item.tipo === 'Ingreso' ? item.precio_ingreso : item.precio_venta,
+                    item.tipo === 'Ingreso' ? item.subtotal : '',
+                    item.tipo === 'Venta' ? item.subtotal : '',
+                    item.resultado_operacionValorado,
+                ]);
+
+            pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
+
+            pdf.save('reporte_kardex_fisico_valorado.pdf');
+        },
+
 
         selectMedida() {
             let me = this;
