@@ -11,6 +11,7 @@ use App\Articulo;
 use App\Inventario;
 use App\DetalleVenta;
 use App\User;
+use App\Ingreso;
 use App\CreditoVenta;
 use App\CuotasCredito;
 use App\Empresa;
@@ -69,6 +70,7 @@ class VentaController extends Controller
                     'ventas.fecha_hora',
                     'ventas.impuesto',
                     'ventas.total',
+                    'ventas.idtipo_venta',
                     'ventas.estado',
                     'personas.nombre',
                     'users.usuario'
@@ -85,6 +87,7 @@ class VentaController extends Controller
                     'ventas.fecha_hora',
                     'ventas.impuesto',
                     'ventas.total',
+                    'ventas.idtipo_venta',
                     'ventas.estado',
                     'personas.nombre',
                     'users.usuario'
@@ -315,6 +318,7 @@ class VentaController extends Controller
         return $pdf->setPaper('a4', 'landscape')->download('venta-' . $numventa[0]->num_comprobante . '.pdf');
 
     }
+
     public function store(Request $request)
     {
         if (!$request->ajax())
@@ -323,167 +327,339 @@ class VentaController extends Controller
         try {
             DB::beginTransaction();
 
-            $descu = '';
-            $valorMaximoDescuentoEmpresa = Empresa::first();
-            $valorMaximo = $valorMaximoDescuentoEmpresa->valorMaximoDescuento;
-            $detalles = $request->data; //Array de detalles
-            $idAlmacen = $request->idAlmacen;
-
-            foreach ($detalles as $ep => $det) {
-                $descu = $det['descuento'];
+            if (!$this->validarCajaAbierta()) {
+                return ['id' => -1, 'caja_validado' => 'Debe tener una caja abierta'];
             }
+            $venta = $this->crearVenta($request);
 
-            if ($descu > $valorMaximoDescuentoEmpresa->valorMaximoDescuento) {
-                return [
-                    'id' => -1,
-                    'valorMaximo' => $valorMaximo
-                ];
-            } else {
+            $this->actualizarCaja($request->total);
 
-                $ultimaCaja = Caja::latest()->first();
+            $this->registrarDetallesVenta($venta, $request->data, $request->idAlmacen);
 
-                if ($ultimaCaja) {
-                    if ($ultimaCaja->estado == '1') {
-                        $venta = new Venta();
-                        $venta->idcliente = $request->idcliente;
-                        $venta->idusuario = \Auth::user()->id;
-                        $venta->idtipo_pago = $request->idtipo_pago;
-                        //  tipo ventas cambiado por tipo ventas
-                        $venta->idtipo_venta = $request->idtipo_venta;
-                        //
-                        $venta->tipo_comprobante = $request->tipo_comprobante;
-                        $venta->serie_comprobante = $request->serie_comprobante;
-                        $venta->num_comprobante = $request->num_comprobante;
-                        $venta->fecha_hora = now()->setTimezone('America/La_Paz');
-                        $venta->impuesto = $request->impuesto;
-                        $venta->total = $request->total;
-                        $venta->estado = 'Registrado';
-                        $venta->idcaja = $ultimaCaja->id;
-                        //---------registro credito_Ventas---
-                        Log::info('DATOS REGISTRO ARTICULO VENTA:', [
-                            'idcliente' => $request->idcliente,
-                            'idusuario' => $request->id,
-                            'idtipo_pago' => $request->idtipo_pago,
-                            //
-                            'idtipo_venta' => $request->idtipo_venta,
-                            //
-                            'tipo_comprobante' => $request->tipo_comprobante,
-                            'serie_comprobante' => $request->serie_comprobante,
-                            'num_comprobante' => $request->num_comprobante,
-                            'fecha_hora' => $request->fecha_hora,
-                            'impuesto' => $request->impuesto,
-                            'total' => $request->total,
-                            //'estado' => $request->precio_venta,
-                            'idcaja' => $request->id,
-                        ]);
-                        $venta->save();
-                        //-----hasta aqui---- cambiando tipo pagos por tipo de venta
+            $this->notificarAdministradores();
 
-                        if ($request->idtipo_venta == 2) {
-                            //----REGIStRADO DE CREDITOS_VENTAAS--
-                            $creditoventa = new CreditoVenta();
-                            $creditoventa->idventa = $venta->id;
-                            $creditoventa->idpersona = $request->idpersona;
-                            $creditoventa->numero_cuotas = $request->numero_cuotas;
-                            $creditoventa->tiempo_dias_cuota = $request->tiempo_dias_cuota;
-                            $creditoventa->estado = $request->estadocrevent; //--OJO CON ESTO REPIDE EN VARIOS
-                            Log::info('LLEGA_2 CREDITOS_VENTAS:', [
-                                'DATOS' => $creditoventa,
-                            ]);
-                            $creditoventa->save();
-                            //----HASTA AQUI REGIStRADO DE CREDITOS_VENTAS--
+            DB::commit();
 
-                            //------para Ver que daTos llega
-                            $detallescuota = $request->cuotaspago; //Array de detalles
-                            //Recorro todos los elementos
-                            Log::info('LLEGA_3 CUOTAS_CREDITO:', [
-                                'DATOS' => $detallescuota,
-                            ]);
-                            //----REGIStRADO DE CUOTAS_CREDITO--
-                            foreach ($detallescuota as $detalle) {
-                                $cuotascredito = new CuotasCredito();
-                                $cuotascredito->idcredito = $creditoventa->id;
-                                $cuotascredito->fecha_pago = $detalle['fechaPago'];
-                                $cuotascredito->fecha_cancelado = $detalle['fechaCancelado'];
-                                $cuotascredito->precio_cuota = $detalle['precioCuota'];
-                                $cuotascredito->total_cancelado = $detalle['totalCancelado'];
-                                $cuotascredito->saldo = $detalle['saldo'];
-                                $cuotascredito->estado = $detalle['estadocuocre'];
-                                $cuotascredito->save();
-                            }
-                            //---hastaa qui REGIStRADO DE CUOTAS_CREDITO--
-
-                        }
-
-                        $ultimaCaja->ventasContado = ($request->total) + ($ultimaCaja->ventasContado);
-                        $ultimaCaja->save();
-
-                        Log::info('venta', [
-                            'data' => $ultimaCaja,
-                            'idalmacen' => $idAlmacen,
-                        ]);
-
-                        foreach ($detalles as $ep => $det) {
-
-                            $disminuirStock = Inventario::where('idalmacen', $idAlmacen)
-                                ->where('idarticulo', $det['idarticulo'])
-                                ->firstOrFail();
-                            $disminuirStock->saldo_stock -= $det['cantidad'];
-                            $disminuirStock->save();
-
-                            $detalle = new DetalleVenta();
-                            $detalle->idventa = $venta->id;
-                            $detalle->idarticulo = $det['idarticulo'];
-                            $detalle->cantidad = $det['cantidad'];
-                            $detalle->precio = $det['precioseleccionado'];
-                            $detalle->descuento = $det['descuento'];
-                            $detalle->save();
-                        }
-                        $fechaActual = date('Y-m-d');
-                        $numVentas = DB::table('ventas')->whereDate('created_at', $fechaActual)->count();
-                        $numIngresos = DB::table('ingresos')->whereDate('created_at', $fechaActual)->count();
-
-                        $arreglosDatos = [
-                            'ventas' => [
-                                'numero' => $numVentas,
-                                'msj' => 'Ventas'
-                            ],
-                            'ingresos' => [
-                                'numero' => $numIngresos,
-                                'msj' => 'Ingresos'
-                            ]
-                        ];
-                        $allUsers = User::all();
-
-                        foreach ($allUsers as $notificar) {
-                            User::findOrFail($notificar->id)->notify(new NotifyAdmin($arreglosDatos));
-                        }
-                        DB::commit();
-                        return [
-                            'id' => $venta->id
-                        ];
-                    } else {
-                        return [
-                            'id' => -1,
-                            'caja_validado' => 'Debe tener una caja abierta'
-                        ];
-                    }
-                } else {
-                    return [
-                        'id' => -1,
-                        'caja_validado' => 'Debe crear primero una apertura de caja'
-                    ];
-                }
-
-            }
+            return ['id' => $venta->id];
         } catch (Exception $e) {
             DB::rollBack();
-            return [
-                'id' => -1,
-                'error' => 'Error interno del servidor'
-            ];
         }
     }
+
+    private function validarCajaAbierta()
+    {
+        $ultimaCaja = Caja::latest()->first();
+        return $ultimaCaja && $ultimaCaja->estado == '1';
+    }
+
+    private function calcularDescuentoMaximo($detalles)
+    {
+        $descuento = 0;
+        foreach ($detalles as $ep => $det) {
+            $descuento = $det['descuento'];
+        }
+        return $descuento;
+    }
+
+    private function crearVenta($request)
+    {
+        $venta = new Venta();
+        $venta->fill($request->only([
+            'idcliente',
+            'idtipo_pago',
+            'idtipo_venta',
+            'tipo_comprobante',
+            'serie_comprobante',
+            'num_comprobante',
+            'impuesto',
+            'total'
+        ]));
+        $venta->idusuario = \Auth::user()->id;
+        $venta->fecha_hora = now()->setTimezone('America/La_Paz');
+        if ($request->idtipo_venta == 2) {
+            $venta->estado = 'Pendiente';
+
+        } else {
+            $venta->estado = 'Registrado';
+        }
+        $venta->idcaja = Caja::latest()->first()->id;
+        $venta->save();
+
+        if ($request->idtipo_venta == 2) {
+            $creditoventa = $this->crearCreditoVenta($venta, $request);
+            $this->registrarCuotasCredito($creditoventa, $request->cuotaspago);
+        }
+
+        return $venta;
+    }
+
+    private function crearCreditoVenta($venta, $request)
+    {
+        $creditoventa = new CreditoVenta();
+        $creditoventa->idventa = $venta->id;
+        $creditoventa->idcliente = $request->idcliente;
+        $creditoventa->numero_cuotas = $request->numero_cuotasCredito;
+        $creditoventa->tiempo_dias_cuota = $request->tiempo_dias_cuotaCredito;
+        $creditoventa->total = $request->totalCredito;
+        $creditoventa->estado = $request->estadoCredito;
+
+        $primerCuotaNoPagada = null;
+        foreach ($request->cuotaspago as $cuota) {
+            if ($cuota['estado'] !== 'Pagado') {
+                $primerCuotaNoPagada = $cuota;
+                break;
+            }
+        }
+        $creditoventa->proximo_pago = $primerCuotaNoPagada['fecha_pago'];
+
+        $creditoventa->save();
+
+        return $creditoventa;
+    }
+
+    private function registrarCuotasCredito($creditoventa, $cuotas)
+    {
+        $numeroCuota = 1; // Inicializamos el número de cuota en 1
+
+        foreach ($cuotas as $detalle) {
+            $cuota = new CuotasCredito();
+            $cuota->idcredito = $creditoventa->id;
+            if ($detalle['estado'] == "Pagado") {
+                $cuota->idcobrador = \Auth::user()->id;
+                $cuota->fecha_cancelado = $detalle['fecha_cancelado']; // Podrías ajustar esto según tus necesidades
+
+            } else {
+                $cuota->idcobrador = null;
+                $cuota->fecha_cancelado = null; // Podrías ajustar esto según tus necesidades
+
+
+            }
+
+            $cuota->numero_cuota = $numeroCuota++; // Asignamos el número de cuota y luego incrementamos
+            $cuota->fecha_pago = $detalle['fecha_pago'];
+            $cuota->precio_cuota = $detalle['precio_cuota'];
+            $cuota->saldo_restante = $detalle['saldo_restante'];
+            $cuota->estado = $detalle['estado'];
+            $cuota->save();
+        }
+    }
+
+
+    private function actualizarCaja($total)
+    {
+        $ultimaCaja = Caja::latest()->first();
+        $ultimaCaja->ventasContado += $total;
+        $ultimaCaja->save();
+    }
+
+    private function registrarDetallesVenta($venta, $detalles, $idAlmacen)
+    {
+        foreach ($detalles as $ep => $det) {
+            $this->actualizarInventario($idAlmacen, $det);
+            $detalleVenta = new DetalleVenta();
+            $detalleVenta->idventa = $venta->id;
+            $detalleVenta->fill($det);
+            $detalleVenta->save();
+        }
+    }
+
+    private function actualizarInventario($idAlmacen, $detalle)
+    {
+        $inventario = Inventario::where('idalmacen', $idAlmacen)
+            ->where('idarticulo', $detalle['idarticulo'])
+            ->firstOrFail();
+        $inventario->saldo_stock -= $detalle['cantidad'];
+        $inventario->save();
+    }
+
+    private function notificarAdministradores()
+    {
+        $fechaActual = date('Y-m-d');
+        $numVentas = Venta::whereDate('created_at', $fechaActual)->count();
+        $numIngresos = Ingreso::whereDate('created_at', $fechaActual)->count();
+
+        $arreglosDatos = [
+            'ventas' => ['numero' => $numVentas, 'msj' => 'Ventas'],
+            'ingresos' => ['numero' => $numIngresos, 'msj' => 'Ingresos']
+        ];
+
+        $allUsers = User::all();
+
+        foreach ($allUsers as $notificar) {
+            $user = User::findOrFail($notificar->id);
+            $user->notify(new NotifyAdmin($arreglosDatos));
+        }
+    }
+
+    // public function store(Request $request)
+    // {
+    //     if (!$request->ajax())
+    //         return redirect('/');
+
+    //     try {
+    //         DB::beginTransaction();
+
+    //         $descu = '';
+    //         $valorMaximoDescuentoEmpresa = Empresa::first();
+    //         $valorMaximo = $valorMaximoDescuentoEmpresa->valorMaximoDescuento;
+    //         $detalles = $request->data; //Array de detalles
+    //         $idAlmacen = $request->idAlmacen;
+
+    //         foreach ($detalles as $ep => $det) {
+    //             $descu = $det['descuento'];
+    //         }
+
+    //         if ($descu > $valorMaximoDescuentoEmpresa->valorMaximoDescuento) {
+    //             return [
+    //                 'id' => -1,
+    //                 'valorMaximo' => $valorMaximo
+    //             ];
+    //         } else {
+
+    //             $ultimaCaja = Caja::latest()->first();
+
+    //             if ($ultimaCaja) {
+    //                 if ($ultimaCaja->estado == '1') {
+    //                     $venta = new Venta();
+    //                     $venta->idcliente = $request->idcliente;
+    //                     $venta->idusuario = \Auth::user()->id;
+    //                     $venta->idtipo_pago = $request->idtipo_pago;
+    //                     //  tipo ventas cambiado por tipo ventas
+    //                     $venta->idtipo_venta = $request->idtipo_venta;
+    //                     //
+    //                     $venta->tipo_comprobante = $request->tipo_comprobante;
+    //                     $venta->serie_comprobante = $request->serie_comprobante;
+    //                     $venta->num_comprobante = $request->num_comprobante;
+    //                     $venta->fecha_hora = now()->setTimezone('America/La_Paz');
+    //                     $venta->impuesto = $request->impuesto;
+    //                     $venta->total = $request->total;
+    //                     $venta->estado = 'Registrado';
+    //                     $venta->idcaja = $ultimaCaja->id;
+    //                     //---------registro credito_Ventas---
+    //                     Log::info('DATOS REGISTRO ARTICULO VENTA:', [
+    //                         'idcliente' => $request->idcliente,
+    //                         'idusuario' => $request->id,
+    //                         'idtipo_pago' => $request->idtipo_pago,
+    //                         //
+    //                         'idtipo_venta' => $request->idtipo_venta,
+    //                         //
+    //                         'tipo_comprobante' => $request->tipo_comprobante,
+    //                         'serie_comprobante' => $request->serie_comprobante,
+    //                         'num_comprobante' => $request->num_comprobante,
+    //                         'fecha_hora' => $request->fecha_hora,
+    //                         'impuesto' => $request->impuesto,
+    //                         'total' => $request->total,
+    //                         //'estado' => $request->precio_venta,
+    //                         'idcaja' => $request->id,
+    //                     ]);
+    //                     $venta->save();
+    //                     //-----hasta aqui---- cambiando tipo pagos por tipo de venta
+
+    //                     if ($request->idtipo_venta == 2) {
+    //                         //----REGIStRADO DE CREDITOS_VENTAAS--
+    //                         $creditoventa = new CreditoVenta();
+    //                         $creditoventa->idventa = $venta->id;
+    //                         $creditoventa->idpersona = $request->idpersona;
+    //                         $creditoventa->numero_cuotas = $request->numero_cuotas;
+    //                         $creditoventa->tiempo_dias_cuota = $request->tiempo_dias_cuota;
+    //                         $creditoventa->estado = $request->estadocrevent; //--OJO CON ESTO REPIDE EN VARIOS
+    //                         Log::info('LLEGA_2 CREDITOS_VENTAS:', [
+    //                             'DATOS' => $creditoventa,
+    //                         ]);
+    //                         $creditoventa->save();
+    //                         //----HASTA AQUI REGIStRADO DE CREDITOS_VENTAS--
+
+    //                         //------para Ver que daTos llega
+    //                         $detallescuota = $request->cuotaspago; //Array de detalles
+    //                         //Recorro todos los elementos
+    //                         Log::info('LLEGA_3 CUOTAS_CREDITO:', [
+    //                             'DATOS' => $detallescuota,
+    //                         ]);
+    //                         //----REGIStRADO DE CUOTAS_CREDITO--
+    //                         foreach ($detallescuota as $detalle) {
+    //                             $cuotascredito = new CuotasCredito();
+    //                             $cuotascredito->idcredito = $creditoventa->id;
+    //                             $cuotascredito->fecha_pago = $detalle['fechaPago'];
+    //                             $cuotascredito->fecha_cancelado = $detalle['fechaCancelado'];
+    //                             $cuotascredito->precio_cuota = $detalle['precioCuota'];
+    //                             $cuotascredito->total_cancelado = $detalle['totalCancelado'];
+    //                             $cuotascredito->saldo = $detalle['saldo'];
+    //                             $cuotascredito->estado = $detalle['estadocuocre'];
+    //                             $cuotascredito->save();
+    //                         }
+    //                         //---hastaa qui REGIStRADO DE CUOTAS_CREDITO--
+
+    //                     }
+
+    //                     $ultimaCaja->ventasContado = ($request->total) + ($ultimaCaja->ventasContado);
+    //                     $ultimaCaja->save();
+
+    //                     Log::info('venta', [
+    //                         'data' => $ultimaCaja,
+    //                         'idalmacen' => $idAlmacen,
+    //                     ]);
+
+    //                     foreach ($detalles as $ep => $det) {
+
+    //                         $disminuirStock = Inventario::where('idalmacen', $idAlmacen)
+    //                             ->where('idarticulo', $det['idarticulo'])
+    //                             ->firstOrFail();
+    //                         $disminuirStock->saldo_stock -= $det['cantidad'];
+    //                         $disminuirStock->save();
+
+    //                         $detalle = new DetalleVenta();
+    //                         $detalle->idventa = $venta->id;
+    //                         $detalle->idarticulo = $det['idarticulo'];
+    //                         $detalle->cantidad = $det['cantidad'];
+    //                         $detalle->precio = $det['precioseleccionado'];
+    //                         $detalle->descuento = $det['descuento'];
+    //                         $detalle->save();
+    //                     }
+    //                     $fechaActual = date('Y-m-d');
+    //                     $numVentas = DB::table('ventas')->whereDate('created_at', $fechaActual)->count();
+    //                     $numIngresos = DB::table('ingresos')->whereDate('created_at', $fechaActual)->count();
+
+    //                     $arreglosDatos = [
+    //                         'ventas' => [
+    //                             'numero' => $numVentas,
+    //                             'msj' => 'Ventas'
+    //                         ],
+    //                         'ingresos' => [
+    //                             'numero' => $numIngresos,
+    //                             'msj' => 'Ingresos'
+    //                         ]
+    //                     ];
+    //                     $allUsers = User::all();
+
+    //                     foreach ($allUsers as $notificar) {
+    //                         User::findOrFail($notificar->id)->notify(new NotifyAdmin($arreglosDatos));
+    //                     }
+    //                     DB::commit();
+    //                     return [
+    //                         'id' => $venta->id
+    //                     ];
+    //                 } else {
+    //                     return [
+    //                         'id' => -1,
+    //                         'caja_validado' => 'Debe tener una caja abierta'
+    //                     ];
+    //                 }
+    //             } else {
+    //                 return [
+    //                     'id' => -1,
+    //                     'caja_validado' => 'Debe crear primero una apertura de caja'
+    //                 ];
+    //             }
+
+    //         }
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //         return [
+    //             'id' => -1,
+    //             'error' => 'Error interno del servidor'
+    //         ];
+    //     }
+    // }
 
     public function desactivar(Request $request)
     {
@@ -746,7 +922,7 @@ class VentaController extends Controller
         $descuentoAdicional = $valores['descuentoAdicional'];
         $productos = file_get_contents(public_path("docs/facturaxml.xml"));
 
-            
+
         $data = $this->insertarFactura($request, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
 
         if ($data) {
@@ -757,22 +933,23 @@ class VentaController extends Controller
             //var_dump($resFactura);
             if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "VALIDADA") {
                 $mensaje = $resFactura->RespuestaServicioFacturacion->codigoDescripcion;
-            }else if($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA"){
+            } else if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA") {
                 $mensajes = $resFactura->RespuestaServicioFacturacion->mensajesList;
                 //dd($mensajes);
                 if (is_array($mensajes)) {
-                    $descripciones = array_map(function($mensaje) {
+                    $descripciones = array_map(function ($mensaje) {
                         return $mensaje->descripcion;
                     }, $mensajes);
                     $mensaje = $descripciones;
                 }
             }
             echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
-            
-        } 
+
+        }
     }
 
-    public function emitirFacturaInstitucional(Request $request){    
+    public function emitirFacturaInstitucional(Request $request)
+    {
 
         $user = Auth::user();
         //$puntoVenta = $user->idpuntoventa;
@@ -783,10 +960,10 @@ class VentaController extends Controller
         $datos = $request->input('factura');
         $id_cliente = $request->input('id_cliente');
         $idventainstitucional = $request->input('idventainstitucional');
-            
+
         $valores = $datos['factura'][0]['cabecera'];
         $nitEmisor = str_pad($valores['nitEmisor'], 13, "0", STR_PAD_LEFT);
-            
+
         $fechaEmision = $valores['fechaEmision'];
         $fecha_formato = str_replace("T", "", $fechaEmision);
         $fecha_formato = str_replace("-", "", $fecha_formato);
@@ -806,14 +983,14 @@ class VentaController extends Controller
         $x10 = false;
         $mod11 = CustomHelpers::calculaDigitoMod11($cadena, $numDig, $limMult, $x10);
         $cadena2 = $cadena . $mod11;
-        
+
         $pString = $cadena2;
         $bas16 = CustomHelpers::base16($pString);
-        
+
         $cuf = strtoupper($bas16) . $codigoControl;
-            
+
         $datos['factura'][0]['cabecera']['cuf'] = $cuf;
-            
+
         $temporal = $datos['factura'];
         //dd($temporal);
         $xml_temporal = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><facturaComputarizadaCompraVenta xsi:noNamespaceSchemaLocation=\"facturaComputarizadaCompraVenta.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"></facturaComputarizadaCompraVenta>");
@@ -826,7 +1003,7 @@ class VentaController extends Controller
         fclose($fp);
         $archivo = $gzdata;
         $hashArchivo = hash("sha256", file_get_contents(public_path("docs/facturaxml.xml")));
-            
+
         $numeroFactura = $valores['numeroFactura'];
         $codigoMetodoPago = $valores['codigoMetodoPago'];
         $montoTotal = $valores['montoTotal'];
@@ -834,7 +1011,7 @@ class VentaController extends Controller
         $descuentoAdicional = $valores['descuentoAdicional'];
         $productos = file_get_contents(public_path("docs/facturaxml.xml"));
 
-            
+
         $data = $this->insertarFacturaInstitucional($request, $id_cliente, $idventainstitucional, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
 
         if ($data) {
@@ -843,13 +1020,13 @@ class VentaController extends Controller
             $siat = new SiatController();
             $resFactura = $siat->recepcionFactura($archivo, $fechaEmision, $hashArchivo, $puntoVenta, $codSucursal);
             //var_dump($resFactura);
-            if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "VALIDADA"){
+            if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "VALIDADA") {
                 $mensaje = $resFactura->RespuestaServicioFacturacion->codigoDescripcion;
-            }else if($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA"){
+            } else if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA") {
                 $mensajes = $resFactura->RespuestaServicioFacturacion->mensajesList;
                 //dd($mensajes);
                 if (is_array($mensajes)) {
-                    $descripciones = array_map(function($mensaje) {
+                    $descripciones = array_map(function ($mensaje) {
                         return $mensaje->descripcion;
                     }, $mensajes);
                     $mensaje = $descripciones;
@@ -862,11 +1039,11 @@ class VentaController extends Controller
 
     public function paqueteFactura(Request $request)
     {
-            $user = Auth::user();
-            //$puntoVenta = $user->idpuntoventa;
-            $puntoVenta = 0;
-            $sucursal = $user->sucursal;
-            $codSucursal = $sucursal->codigoSucursal;
+        $user = Auth::user();
+        //$puntoVenta = $user->idpuntoventa;
+        $puntoVenta = 0;
+        $sucursal = $user->sucursal;
+        $codSucursal = $sucursal->codigoSucursal;
 
         $datos = $request->input('factura');
         $id_cliente = $request->input('id_cliente');
@@ -1188,14 +1365,15 @@ class VentaController extends Controller
         return $success;
     }
 
-    public function insertarFacturaInstitucional(Request $request, $id_cliente, $idventainstitucional, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos){
+    public function insertarFacturaInstitucional(Request $request, $id_cliente, $idventainstitucional, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
+    {
         if (!$request->ajax()) {
             return response()->json(['error' => 'Acceso no autorizado'], 401);
         }
 
         $facturaInstitucional = new FacturaInstitucional();
         $facturaInstitucional->idcliente = $id_cliente;
-        $facturaInstitucional->idventainstitucional  = $idventainstitucional;
+        $facturaInstitucional->idventainstitucional = $idventainstitucional;
         $facturaInstitucional->numeroFactura = $numeroFactura;
         $facturaInstitucional->cuf = $cuf;
         $facturaInstitucional->fechaEmision = $fechaEmision;
@@ -1205,31 +1383,32 @@ class VentaController extends Controller
         $facturaInstitucional->descuentoAdicional = $descuentoAdicional;
         $facturaInstitucional->productos = $productos;
         $facturaInstitucional->estado = 1;
-        
+
         $success = $facturaInstitucional->save();
-    
+
         return $success;
     }
 
-    public function formato_xml($temporal, $xml_temporal){
-        $ns_xsi="http://www.w3.org/2001/XMLSchema-instance";
-            foreach($temporal as $key => $value){
-                if(is_array($value)){
-                    if(!is_numeric($key)){
-                        $subnodo = $xml_temporal->addChild("$key");
-                        $this->formato_xml($value, $subnodo);
-                    }else{
-                        $this->formato_xml($value, $xml_temporal);
-                    }
-                }else{
-                    if($value == null && $value <> '0'){
-                        $hijo = $xml_temporal->addChild("$key", "$value");
-                        $hijo->addAttribute('xsi:nil', 'true', $ns_xsi);
-                    }else{
-                        $xml_temporal->addChild("$key", "$value");
-                    }
+    public function formato_xml($temporal, $xml_temporal)
+    {
+        $ns_xsi = "http://www.w3.org/2001/XMLSchema-instance";
+        foreach ($temporal as $key => $value) {
+            if (is_array($value)) {
+                if (!is_numeric($key)) {
+                    $subnodo = $xml_temporal->addChild("$key");
+                    $this->formato_xml($value, $subnodo);
+                } else {
+                    $this->formato_xml($value, $xml_temporal);
+                }
+            } else {
+                if ($value == null && $value <> '0') {
+                    $hijo = $xml_temporal->addChild("$key", "$value");
+                    $hijo->addAttribute('xsi:nil', 'true', $ns_xsi);
+                } else {
+                    $xml_temporal->addChild("$key", "$value");
                 }
             }
+        }
     }
 
     public function anulacionFactura($cuf, $motivoSeleccionado)
@@ -1824,7 +2003,7 @@ class VentaController extends Controller
     {
         $fechaInicio = $request->input('fecha_inicio');
         $fechaFin = $request->input('fecha_fin');
-    
+
         $topProductos = DetalleVenta::join('articulos', 'detalle_ventas.idarticulo', '=', 'articulos.id')
             ->select(
                 'detalle_ventas.idarticulo',
@@ -1838,7 +2017,7 @@ class VentaController extends Controller
             ->orderByDesc('cantidadTotal')
             ->limit(10)
             ->get();
-    
+
         return response()->json(['topProductos' => $topProductos]);
     }
 }

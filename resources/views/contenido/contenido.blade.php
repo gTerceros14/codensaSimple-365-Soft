@@ -176,6 +176,10 @@
 <template v-if="menu==52">
     <reportekardexfisico></reportekardexfisico>
 </template>
+
+<template v-if="menu==53">
+    <ventacredito></ventacredito>
+</template>
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
     <dashboard></dashboard>

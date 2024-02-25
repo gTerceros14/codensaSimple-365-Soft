@@ -45,29 +45,37 @@
                                 <thead>
                                     <tr>
                                         <th>Opciones</th>
-                                        <th>Usuario</th>
+                                        <th>Vendedor</th>
                                         <th>Cliente</th>
-                                        <th>Tipo Comprobante</th>
-                                        <th>Número Comprobante</th>
-                                        <th>Fecha Hora</th>
+                                        <th>Tipo de Documento</th>
+                                        <th>Número de Documento</th>
+                                        <th>Fecha y Hora</th>
+                                        <th>Tipo de Venta</th>
                                         <th>Total</th>
                                         <th>Estado</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="venta in arrayVenta" :key="venta.id">
-                                        <td>
+                                        <td class="d-flex align-items-center">
                                             <button type="button" @click="verVenta(venta.id)"
-                                                class="btn btn-success btn-sm">
+                                                class="btn btn-success btn-sm mr-1">
                                                 <i class="icon-eye"></i>
-                                            </button> &nbsp;
-                                            <button type="button" @click="pdfVenta(venta.id)" class="btn btn-info btn-sm">
+                                            </button>
+                                            <button type="button" @click="pdfVenta(venta.id)"
+                                                class="btn btn-info btn-sm mr-1">
                                                 <i class="icon-doc"></i>
-                                            </button> &nbsp;
+                                            </button>
                                             <template v-if="venta.estado == 'Registrado'">
-                                                <button type="button" class="btn btn-danger btn-sm"
+                                                <button type="button" class="btn btn-danger btn-sm mr-1"
                                                     @click="desactivarVenta(venta.id)">
                                                     <i class="icon-trash"></i>
+                                                </button>
+                                            </template>
+                                            <template v-if="venta.idtipo_venta == 2 && venta.estado == 'Pendiente'">
+                                                <button type="button" class="btn btn-primary btn-sm mr-1"
+                                                    @click="abrirModalCuotas(venta.id)">
+                                                    <i class="icon-plus"></i>
                                                 </button>
                                             </template>
                                         </td>
@@ -76,6 +84,9 @@
                                         <td v-text="venta.tipo_comprobante"></td>
                                         <td v-text="venta.num_comprobante"></td>
                                         <td v-text="venta.fecha_hora"></td>
+                                        <td>
+                                            {{ venta.idtipo_venta == 1 ? "Contado" : "Credito" }}
+                                        </td>
                                         <td>
                                             {{ ((venta.total) * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
                                             }}
@@ -157,6 +168,13 @@
                                 </label>
 
                                 <input type="text" id="email" class="form-control" v-model="email" ref="emailRef" readonly>
+                            </div>
+                            <div v-if="clienteDeudas > 0" class="alert alert-danger text-center " role="alert"
+                                style="width: 100%;">
+                                Este cliente tiene <b>{{ clienteDeudas }}</b> pagos pendientes de crédito.
+                                <button type="button" class="close" @click="clienteDeudas = 0">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                             </div>
 
                             <div class="col-md-3">
@@ -248,10 +266,10 @@
                                             <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
                                             <b v-else>{{ (calcularPrecioConDescuento(resultadoMultiplicacion,
                                                 arrayPromocion.porcentaje) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                monedaVenta[1] }}</b>
+        monedaVenta[1] }}</b>
                                             <s style="font-size:15px" class="lead">{{
                                                 (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                monedaVenta[1] }}</s>
+        monedaVenta[1] }}</s>
                                         </h3>
 
                                         <h3 v-else style="display:flex;align-items:center;margin:0px;">
@@ -415,8 +433,9 @@
 
                                             </td>
                                             <td>
-                                                <input type="number" v-model="detalle.cantidad" min="1" @input="actualizarDetalle(index)" 
-                                                style="border: none; outline: none; width: 50px;" />
+                                                <input type="number" v-model="detalle.cantidad" min="1"
+                                                    @input="actualizarDetalle(index)"
+                                                    style="border: none; outline: none; width: 50px;" />
                                             </td>
 
                                             <td> {{ (detalle.cantidad / detalle.unidad_envase).toFixed(2) }} </td>
@@ -433,7 +452,7 @@
 
                                             <td>
                                                 <input type="number" v-model="detalle.descuento" max="99"
-                                                style="border: none; outline: none; width: 50px;" />
+                                                    style="border: none; outline: none; width: 50px;" />
                                             </td>
                                             <!--<span style="color:red;"
                                                     v-show="detalle.descuento > (detalle.precioseleccionado * detalle.cantidad)">Descuento
@@ -457,7 +476,8 @@
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="9" align="right"><strong>Descuento Adicional: </strong></td>
-                                            <input id="descuentoAdicional" v-model="descuentoAdicional" type="number" class="form-control" @change="validarDescuentoAdicional">
+                                            <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
+                                                class="form-control" @change="validarDescuentoAdicional">
                                         </tr>
 
                                         <tr style="background-color: #CEECF5;">
@@ -795,79 +815,82 @@
                         </button>
                     </div>
                     <div v-if="!tipoPago" class="row col-md-12">
-                        <p><strong>Tipo de pago:</strong></p>             
+                        <p><strong>Tipo de pago:</strong></p>
                         <div class="d-flex flex-column align-items-center">
-                                <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('EFECTIVO')">EFECTIVO</button>
-                                <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('TRANSFERENCIA BANCARIA')">TRANSFERENCIA BANCARIA</button>
-                                <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('QR')">QR</button>
-                        </div>       
-                       
-                  </div>
-                  <div  v-else>
-                   <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Recibido
-                                        {{ monedaVenta[1] }}(*)</label>
-                                    <div class="input-group">
-                                        <input type="number" v-model="recibido">
+                            <button type="button" class="btn btn-primary mb-2"
+                                @click="seleccionarTipoPago('EFECTIVO')">EFECTIVO</button>
+                            <button type="button" class="btn btn-primary mb-2"
+                                @click="seleccionarTipoPago('TRANSFERENCIA BANCARIA')">TRANSFERENCIA BANCARIA</button>
+                            <button type="button" class="btn btn-primary mb-2"
+                                @click="seleccionarTipoPago('QR')">QR</button>
+                        </div>
+
+                    </div>
+                    <div v-else>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="text-input">Recibido
+                                            {{ monedaVenta[1] }}(*)</label>
+                                        <div class="input-group">
+                                            <input type="number" v-model="recibido">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="text-input">Calcular</label>
+                                        <div class="input-group">
+                                            <button type="button" class="btn btn-primary"
+                                                @click="calcularCambio()">Calcular</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Calcular</label>
-                                    <div class="input-group">
-                                        <button type="button" class="btn btn-primary"
-                                            @click="calcularCambio()">Calcular</button>
-                                    </div>
-                                </div>
-                            </div>
 
 
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">ToTal(*)</label>
-                                    <div class="input-group">
-                                        <input type="number"
-                                            :value="((calcularTotal) * parseFloat(monedaVenta[0])).toFixed(2)"
-                                            class="font-weight-bold">
-                                        <!-- <input type="number"  v-model="totalprue" class="negrita-input"> -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="text-input">ToTal(*)</label>
+                                        <div class="input-group">
+                                            <input type="number"
+                                                :value="((calcularTotal) * parseFloat(monedaVenta[0])).toFixed(2)"
+                                                class="font-weight-bold">
+                                            <!-- <input type="number"  v-model="totalprue" class="negrita-input"> -->
+                                        </div>
                                     </div>
-                                </div>
-                                <!-- {{((articulo.precio_venta) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }} -->
+                                    <!-- {{((articulo.precio_venta) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }} -->
 
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Efec(*)</label>
-                                    <div class="input-group">
-                                        <input type="number" disabled
-                                            :value="(efectivo * parseFloat(monedaVenta[0])).toFixed(2)">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="text-input">Efec(*)</label>
+                                        <div class="input-group">
+                                            <input type="number" disabled
+                                                :value="(efectivo * parseFloat(monedaVenta[0])).toFixed(2)">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Cambio(*)</label>
-                                    <div class="input-group">
-                                        <input type="number" disabled
-                                            :value="(cambio * parseFloat(monedaVenta[0])).toFixed(2)">
-                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="text-input">Cambio(*)</label>
+                                        <div class="input-group">
+                                            <input type="number" disabled
+                                                :value="(cambio * parseFloat(monedaVenta[0])).toFixed(2)">
+                                        </div>
 
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Faltante(*)</label>
-                                    <div class="input-group">
-                                        <input type="number" disabled
-                                            :value="(faltante * parseFloat(monedaVenta[0])).toFixed(2)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="text-input">Faltante(*)</label>
+                                        <div class="input-group">
+                                            <input type="number" disabled
+                                                :value="(faltante * parseFloat(monedaVenta[0])).toFixed(2)">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="cerrarModal2()">Volver</button>
+                            <button type="button" v-if="tipoAccion2 == 1" class="btn btn-primary"
+                                @click="registrar()">Cobrar</button>
+                            <!-- <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarSucursal()">Actualizar</button> -->
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="cerrarModal2()">Volver</button>
-                        <button type="button" v-if="tipoAccion2 == 1" class="btn btn-primary"
-                            @click="registrar()">Cobrar</button>
-                        <!-- <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarSucursal()">Actualizar</button> -->
-                    </div>
-                  </div>
                 </div>
             </div>
         </div>
@@ -885,54 +908,65 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Numero Cuotas</label>
-                                    <div class="input-group">
-                                        <input type="number" v-model="numero_cuotas">
+                            <div class="col-md-4">
+                                <label for="" class="font-weight-bold">Cantidad de cuotas
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" id="nombreCliente" class="form-control" v-model="numero_cuotas">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="" class="font-weight-bold">Frecuencia de Pagos
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" v-model="tiempo_diaz">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">Dias</span>
                                     </div>
+                                </div>
+
+                            </div>
+
+
+
+
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Total</label>
+                                    <label>
+
+                                        {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                            monedaVenta[1] }}
+
+                                    </label>
+                                    <button @click="generarCuotas" type="button" class="btn btn-success">GENERAR
+                                        CUOTA</button>
                                 </div>
                             </div>
 
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Tiempo Días</label>
-                                    <div class="input-group">
-                                        <input type="number" v-model="tiempo_diaz">
-                                    </div>
+                            <div class="col-md-5">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" v-model="primera_cuota">
+                                    <label class="form-check-label" for="defaultCheck1">
+                                        Primera cuota pagada
+                                    </label>
                                 </div>
                             </div>
 
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Generar Cuota</label>
-                                    <button @click="generarCuotas">GENERAR_CUOTA</button>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="text-input">Primera Cuota</label>
-                                    <div class="input-group">
-                                        <div class="input-group-append">
-                                            <div class="input-group-text">
-                                                <input type="checkbox" v-model="primera_cuota" id="primera_cuota">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
                             <div class="col-md-3" v-if="primera_cuota">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="select-input">Tipo de Pago</label>
-                                        <select id="select-input" v-model="tipo_pago" @change="seleccionarTipoPago(tipo_pago)">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="select-input">Tipo de Pago</label>
+                                    <select class="form-control" id="select-input" v-model="tipo_pago"
+                                        @change="seleccionarTipoPago(tipo_pago)">
                                         <option v-for="(value, key) in tiposPago" :value="value">{{ key }}</option>
-                                        </select>
+                                    </select>
 
-                                
-                                    </div>
-                           </div>
+
+                                </div>
+                            </div>
                         </div>
                         <!--################################-listado de cuotas-#######################-->
                         <div class="form-group row border">
@@ -940,6 +974,7 @@
                                 <table class="table table-bordered table-striped table-sm">
                                     <thead>
                                         <tr>
+                                            <th>#</th>
                                             <th>Fecha Pago</th>
                                             <th>Precio_Cuota</th>
                                             <th>Total Cancelado</th>
@@ -950,9 +985,12 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(cuota, index) in cuotas" :key="index">
-                                            <td>{{ cuota.fechaPago }}</td>
+                                            <td>{{ index + 1 }}</td>
+
+                                            <td>{{ new Date(cuota.fecha_pago).toLocaleDateString('es-ES') }}</td>
+
                                             <td>
-                                                {{ (cuota.precioCuota * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                                {{ (cuota.precio_cuota * parseFloat(monedaVenta[0])).toFixed(2) }} {{
                                                     monedaVenta[1] }}
 
                                             </td>
@@ -962,12 +1000,14 @@
 
                                             </td>
                                             <td>
-                                                {{ (cuota.saldo * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                                {{ (cuota.saldo_restante * parseFloat(monedaVenta[0])).toFixed(2) }} {{
                                                     monedaVenta[1] }}
 
                                             </td>
-                                            <td>{{ cuota.fechaCancelado }}</td>
-                                            <td>{{ cuota.estadocuocre }}</td>
+                                            <td>{{ cuota.fecha_cancelado ? new Date(cuota.fecha_cancelado
+                                            ).toLocaleDateString('es-ES') : "Sin fecha" }}</td>
+
+                                            <td>{{ cuota.estado }}</td>
                                         </tr>
                                     </tbody>
                                     <!-- <tbody v-else>
@@ -1061,6 +1101,11 @@
                 </div>
             </div>
         </div>
+
+        <div>
+            <AbonarCuota v-if="cuotaSeleccionada" :cuota="cuotaSeleccionada" :modal="modalCuotas" :moneda="monedaVenta"
+                :ventaCredito="arraySeleccionado" :arrayCuotas="arrayCuotas" @cerrar-modal="cerrarModalCuotas" />
+        </div>
     </main>
 </template>
 
@@ -1069,7 +1114,13 @@ import vSelect from 'vue-select';
 export default {
     data() {
         return {
+            clienteDeudas: 0,
+            arrayCuotas: [],
+            arraySeleccionado: [],
+            cuotaSeleccionada: null,
+            modalCuotas: 0,
 
+            tipo_pago: '',
             criterioKit: 'nombre',
             buscarKit: '',
 
@@ -1140,7 +1191,7 @@ export default {
             precio: 0,
             unidad_envase: 0,
             cantidad: 1,
-            paquni:'',
+            paquni: '',
             precioBloqueado: false,
             descuento: 0,
             sTotal: 0,
@@ -1185,19 +1236,19 @@ export default {
             faltante: 0,
             //-------DEStE AQUI 13-OCTUBRE--
             idtipo_pago: '',
-            idtipo_venta:'',
+            idtipo_venta: '',
             tiempo_diaz: '',
             numero_cuotas: '',
             cuotas: [],//---para almacenar las fechas
             estadocrevent: 'activo',
             primera_cuota: '',
             habilitarPrimeraCuota: false,
-            tipoPago:'',
+            tipoPago: '',
             tiposPago: {
-                        EFECTIVO: 1,
-                       "TRANSFERENCIA BANCARIA": 2,
-                        QR: 3
-                        },
+                EFECTIVO: 1,
+                "TRANSFERENCIA BANCARIA": 2,
+                QR: 3
+            },
 
         }
     },
@@ -1218,7 +1269,7 @@ export default {
                 return this.precioseleccionado * this.unidadPaquete * this.cantidad;
             }
         },
-      
+
 
         isActived: function () {
             return this.pagination.current_page;
@@ -1270,6 +1321,25 @@ export default {
 
     },
     methods: {
+        cerrarModalCuotas() {
+            this.modalCuotas = 0;
+            this.listarVenta(1, this.buscar, this.criterio);
+
+        },
+        abrirModalCuotas(idventa) {
+            this.modalCuotas = 1;
+            axios.get(`/credito/cuotas/venta/${idventa}`)
+                .then(response => {
+                    this.arrayCuotas = response.data.cuotasCredito;
+                    this.arraySeleccionado = response.data.creditoVenta;
+                    const cuotasPendientes = this.arrayCuotas.filter(cuota => cuota.estado === 'Pendiente');
+                    this.cuotaSeleccionada = cuotasPendientes.find(cuota => cuota.estado === 'Pendiente');
+                })
+                .catch(error => {
+                    console.error('Error al obtener crédito y cuotas:', error);
+                });
+
+        },
         GetValidateKit(idPromocion) {
             return axios.get('/kits/id', {
                 params: {
@@ -1278,8 +1348,6 @@ export default {
             })
                 .then((response) => {
                     const datos = response.data;
-                    console.log(datos);
-
                     this.arrayArticulosKit = datos.articulosPorPromocion.map(item => ({
                         ...item.articulo,
                         cantidad: item.cantidad
@@ -1292,13 +1360,10 @@ export default {
                 });
         },
         seleccionarTipoPago(tipo) {
-                        // Esta función asigna el tipo de pago y actualiza el título del modal
-                        this.tipoPago = tipo;
-                      
-                        this.tituloModal2 = `TIPO DE PAGO : ${tipo}`; // Usamos '`' para interpolar el nombre del cliente
-                        this.idtipo_pago = this.tiposPago[tipo];
-                        console.log('idtipo_pago:', this.idtipo_pago);
-            },
+            this.tipoPago = tipo;
+            this.tituloModal2 = `TIPO DE PAGO : ${tipo}`;
+            this.idtipo_pago = this.tiposPago[tipo];
+        },
 
         agregarKit(kit) {
             if (new Date(kit.fecha_final) < new Date()) {
@@ -1309,7 +1374,6 @@ export default {
                 });
                 return;
             }
-            console.log(kit);
             //   this.GetValidateKit(kit['id'])
             this.GetValidateKit(kit['id'])
                 .then(() => {
@@ -1328,7 +1392,6 @@ export default {
                         });
                         console.log("Estos son los articulos: ", this.arrayArticulosKit);
                         this.arrayArticulosKit.forEach(articulo => {
-                            // Agregar los detalles del artículo al arrayDetalle
                             this.arrayDetalle.push({
                                 idkit: kit['id'],
                                 idarticulo: articulo.id,
@@ -1339,7 +1402,6 @@ export default {
                                 cantidad_paquetes: articulo.unidad_envase * articulo.cantidad,
                                 precio: articulo.nuevo_precio,
                                 descuento: (((articulo.precio_costo_unid * articulo.cantidad) - (articulo.nuevo_precio)) / (articulo.precio_costo_unid * articulo.cantidad)) * 100,
-                                // descuento: (((articulo.precio_costo_unid*articulo.cantidad)-articulo.nuevo_precio)/articulo.precio_costo_unid)*100,
                                 stock: articulo.stock,
                                 precioseleccionado: articulo.precio_costo_unid
                             });
@@ -1360,7 +1422,6 @@ export default {
                                 numeroImei: null
                             });
                             this.cerrarModal()
-                            console.log("Esto se facturara ", this.arrayProductos)
                         });
                         // this.arrayDetalle.push({
                         //                 idarticulo: this.arraySeleccionado.id,
@@ -1418,8 +1479,6 @@ export default {
             })
                 .then((response) => {
                     const datos = response.data.articulosPorPromocion;
-                    console.log(datos);
-
                     this.arrayArticulosKit = datos.map(item => ({
                         ...item.articulo,
                         cantidad: item.cantidad
@@ -1468,16 +1527,14 @@ export default {
             });
         },
         scrollToSection() {
-            // Utiliza jQuery para animar el desplazamiento hacia la sección objetivo
             $('html, body').animate({
                 scrollTop: $('#seccionObjetivo').offset().top
-            }, 50); // El valor 1000 es la duración de la animación en milisegundos
+            }, 50);
         },
         scrollToTop() {
-            // Utiliza jQuery para animar el desplazamiento hacia arriba
             $('html, body').animate({
                 scrollTop: 0
-            }, 50); // El valor 1000 es la duración de la animación en milisegundos
+            }, 50);
         },
         calcularPrecioConDescuento(precioOriginal, porcentajeDescuento) {
             const descuento = precioOriginal * (porcentajeDescuento / 100);
@@ -1495,30 +1552,27 @@ export default {
             this.arrayDetalle[index].total = (this.arrayDetalle[index].precioseleccionado * this.arrayDetalle[index].cantidad).toFixed(2);
         },
         actualizarDetalleDescuento(index) {
-           this.calcularTotal(index);
+            this.calcularTotal(index);
         },
         validarDescuentoAdicional() {
-            
             if (this.descuentoAdicional >= this.totalParcial) {
                 this.descuentoAdicional = 0;
                 alert("El descuento adicional no puede ser mayor o igual al total.");
             }
-        }, 
+        },
         validarDescuentoGiftCard() {
-            
+
             if (this.descuentoGiftCard >= this.calcularTotal) {
                 this.descuentoGiftCard = 0;
                 alert("El descuento Gift Card no puede ser mayor o igual al total.");
             }
-        }, 
+        },
         buscarPromocion(idArticulo) {
             // Supongamos que el ID del artículo es 1, ajusta según tus necesidades
 
             axios.get(`/promocion/id?idArticulo=${idArticulo}`)
                 .then(response => {
-                    // Maneja la respuesta aquí
                     this.arrayPromocion = response.data.promocion
-                    console.log(response.data);
                 })
                 .catch(error => {
                     // Maneja los errores aquí
@@ -1527,8 +1581,6 @@ export default {
         },
 
         atajoButton: function (event) {
-            //console.log(event.keyCode);
-            //console.log(event.ctrlKey);
             if (event.shiftKey && event.keyCode === 81) {
                 event.preventDefault();
                 this.$refs.impuestoRef.focus();
@@ -1629,6 +1681,7 @@ export default {
             var url = '/venta?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
+                console.log(respuesta)
                 me.arrayVenta = respuesta.ventas.data;
                 me.pagination = respuesta.pagination;
             })
@@ -1645,6 +1698,7 @@ export default {
                 let respuesta = response.data;
                 q: search
                 me.arrayCliente = respuesta.clientes;
+                console.log(me.arrayCliente);
                 loading(false)
             })
                 .catch(function (error) {
@@ -1661,7 +1715,7 @@ export default {
             this.documento = val1.num_documento;
             this.tipo_documento = val1.tipo_documento;
             this.complemento_id = val1.complemento_id;
-
+            this.clienteDeudas = val1.cantidad_creditos;
         },
 
         buscarArticulo() {
@@ -2001,14 +2055,7 @@ export default {
             }
 
             let me = this;
-
-            for (let i = 0; i < me.cuotas.length; i++) {
-                // console.log('INvENtARIO',me.cuotas[i].idinventario);
-                // console.log('ARtICULOID',me.cuotas[i].idarticulo);
-                // console.log(me.cuotas[i].cantidad_traspaso);                 
-                console.log('LLEGA ARRAYDATA!', me.cuotas[i]);
-            }
-
+            console.log(this.idtipo_pago)
             axios.post('/venta/registrar', {
                 'idcliente': this.idcliente,
                 'tipo_comprobante': this.tipo_comprobante,
@@ -2017,23 +2064,21 @@ export default {
                 'impuesto': this.impuesto,
                 'total': this.calcularTotal,
                 'idAlmacen': this.idAlmacen,
-                'idtipo_pago': this.idtipo_pago,
+                'idtipo_pago': this.idtipo_pago ? this.idtipo_pago : 1,
                 'idtipo_venta': this.idtipo_venta,
-                
-                //----creditos Ventas----
+                // Datos para el crédito de venta
                 'idpersona': this.idcliente,
-                'numero_cuotas': this.numero_cuotas,
-                'tiempo_dias_cuota': this.tiempo_diaz,
-                'estadocrevent': this.estadocrevent,
-                //-----hasta aqui-------
-                //----Cuotas Credito----
+                'numero_cuotasCredito': this.numero_cuotas, // Cambio de nombre
+                'tiempo_dias_cuotaCredito': this.tiempo_diaz, // Cambio de nombre
+                'totalCredito': this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal, // Asegúrate de tener esta variable
+                'estadoCredito': "Pendiente", // Asegúrate de tener esta variable
+                // Cuotas del crédito
                 'cuotaspago': this.cuotas,
-                //-----hasta aqui-------
                 'data': this.arrayDetalle
-
             }).then(function (response) {
-                //console.log(response.data.id);
+                console.log("Esto devolvio", response)
                 if (response.data.id > 0) {
+                    // Restablecer valores después de una venta exitosa
                     me.listado = 1;
                     me.listarVenta(1, '', 'num_comprob');
                     me.cerrarModal2();
@@ -2059,9 +2104,9 @@ export default {
                     me.codigo = '';
                     me.descuento = 0;
                     me.arrayDetalle = [];
-                    me.recibido = 0;
                     //window.open('/factura/imprimir/' + response.data.id);
                 } else {
+                    console.log(response)
                     if (response.data.valorMaximo) {
                         //alert('El valor de descuento no puede exceder el '+ response.data.valorMaximo);
                         swal(
@@ -2071,6 +2116,7 @@ export default {
                         )
                         return;
                     } else {
+
                         //alert(response.data.caja_validado); 
                         swal(
                             'Aviso',
@@ -2081,7 +2127,6 @@ export default {
                     }
                     //console.log(response.data.valorMaximo)
                 }
-
             }).catch(function (error) {
                 console.log(error);
             });
@@ -2212,7 +2257,7 @@ export default {
                         me.cerrarModal2();
                         me.cerrarModal3();
                         me.listarVenta(1, '', 'id');
-                    } else{
+                    } else {
                         me.arrayProductos = [];
                         swal(
                             'FACTURA RECHAZADA',
@@ -2375,7 +2420,7 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.arrayPrecios = respuesta.precio.data;
-                console.log('PRECIOS',me.arrayPrecios);
+                console.log('PRECIOS', me.arrayPrecios);
                 //me.precioCount = me.arrayBuscador.length;
             }).catch(function (error) {
                 console.log(error);
@@ -2391,7 +2436,8 @@ export default {
             console.log('USUARIO LLEGA:', this.cliente);
             this.tituloModal2 = 'VENTA  AL CONTADO ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion2 = 1;
-        //    this.idtipo_pago = 1;
+            this.scrollToTop()
+            //    this.idtipo_pago = 1;
             this.idtipo_venta = 1;
             console.log('idtipo_venta LLEGA:', this.idtipo_venta);
             console.log('idtipo_pago LLEGA:', this.idtipo_pago);
@@ -2400,11 +2446,12 @@ export default {
         registrarAbrilModal2() {
             this.modal3 = 1;
             this.cliente = this.nombreCliente;
+            this.scrollToTop();
             console.log('USUARIO LLEGA:', this.cliente);
             this.tituloModal3 = 'CREDITOS ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
             this.tipoAccion3 = 1;
             this.idtipo_pago = this.tipo_pago;
-           // this.idtipo_pago = 1;
+            // this.idtipo_pago = 1;
             this.idtipo_venta = 2;
             console.log('idtipo_venta LLEGA:', this.idtipo_venta);
             console.log('idtipo_pago LLEGA:', this.idtipo_pago);
@@ -2412,8 +2459,8 @@ export default {
         cerrarModal2() {
             this.modal2 = 0;
             this.tituloModal2 = '';
-            this.idtipo_pago='';
-            this.tipoPago='';
+            this.idtipo_pago = '';
+            this.tipoPago = '';
         },
         cerrarModal3() {
             this.modal3 = 0;
@@ -2522,16 +2569,15 @@ export default {
                 const año = fechaPago.getFullYear();
 
                 const cuota = {
-                    fechaPago: `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}`,
-                    precioCuota: i === this.numero_cuotas - 1 ? parseFloat(montoDecimal).toFixed(2) : montoEntero,
+                    fecha_pago: `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}`,
+                    precio_cuota: i === this.numero_cuotas - 1 ? parseFloat(montoDecimal).toFixed(2) : montoEntero,
                     totalCancelado: i === 0 ? primerPrecioCuota : 0,
-                    saldo: saldos_total,//saldo
-                    fechaCancelado: i === 0 && this.primera_cuota ? `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}` : null,
-                    estadocuocre: i === 0 ? (this.primera_cuota ? 'Pagado' : estadoCuota) : 'Pendiente',
+                    saldo_restante: saldos_total,//saldo
+                    fecha_cancelado: i === 0 && this.primera_cuota ? `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}` : null,
+                    estado: i === 0 ? (this.primera_cuota ? 'Pagado' : estadoCuota) : 'Pendiente',
                 };
 
                 this.cuotas.push(cuota);
-                console.log('LLEGA_ARRAY_CUOTA', this.cuotas);
             }
         },
     },
@@ -2600,6 +2646,5 @@ export default {
 
     /* .negrita-input {
         font-weight: bold;
-    } */
-</style>
+    } */</style>
   
