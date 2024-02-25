@@ -54,27 +54,27 @@
                                         <th>Total</th>
                                         <th>Estado</th>
                                     </tr>
-
                                 </thead>
                                 <tbody>
                                     <tr v-for="venta in arrayVenta" :key="venta.id">
-                                        <td>
+                                        <td class="d-flex align-items-center">
                                             <button type="button" @click="verVenta(venta.id)"
-                                                class="btn btn-success btn-sm">
+                                                class="btn btn-success btn-sm mr-1">
                                                 <i class="icon-eye"></i>
-                                            </button> &nbsp;
-                                            <button type="button" @click="pdfVenta(venta.id)" class="btn btn-info btn-sm">
+                                            </button>
+                                            <button type="button" @click="pdfVenta(venta.id)"
+                                                class="btn btn-info btn-sm mr-1">
                                                 <i class="icon-doc"></i>
-                                            </button> &nbsp;
+                                            </button>
                                             <template v-if="venta.estado == 'Registrado'">
-                                                <button type="button" class="btn btn-danger btn-sm"
+                                                <button type="button" class="btn btn-danger btn-sm mr-1"
                                                     @click="desactivarVenta(venta.id)">
                                                     <i class="icon-trash"></i>
                                                 </button>
                                             </template>
                                             <template v-if="venta.idtipo_venta == 2 && venta.estado == 'Pendiente'">
-                                                <button type="button" style="background-color:blue;color:white"
-                                                    class="btn btn-info btn-sm" @click="abrirModalCuotas(venta.id)">
+                                                <button type="button" class="btn btn-primary btn-sm mr-1"
+                                                    @click="abrirModalCuotas(venta.id)">
                                                     <i class="icon-plus"></i>
                                                 </button>
                                             </template>
@@ -1534,7 +1534,7 @@ export default {
         scrollToTop() {
             $('html, body').animate({
                 scrollTop: 0
-            }, 50); 
+            }, 50);
         },
         calcularPrecioConDescuento(precioOriginal, porcentajeDescuento) {
             const descuento = precioOriginal * (porcentajeDescuento / 100);
@@ -2646,6 +2646,5 @@ export default {
 
     /* .negrita-input {
         font-weight: bold;
-    } */
-</style>
+    } */</style>
   
