@@ -1,13 +1,13 @@
 <?php
- 
+
 namespace App;
- 
+
 use Illuminate\Database\Eloquent\Model;
- 
+
 class Venta extends Model
 {
-    protected $fillable =[
-        'idcliente', 
+    protected $fillable = [
+        'idcliente',
         'idusuario',
         'tipo_comprobante',
         'num_comprobante',
@@ -15,10 +15,13 @@ class Venta extends Model
         'impuesto',
         'total',
         'estado',
-        'idcaja'
+        'idcaja',
+        'idtipo_venta',
+        'idtipo_pago'
     ];
 
-    public function caja(){
+    public function caja()
+    {
         return $this->belongsTo('App\Caja', 'id');
     }
 }
