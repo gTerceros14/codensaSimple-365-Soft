@@ -26,10 +26,13 @@ Vue.component(
   require("./components/dashboard/TopVendedores.vue")
 );
 Vue.component("TopClientes", require("./components/dashboard/TopClientes.vue"));
+Vue.component("ventacredito", require("./components/VentaCredito.vue"));
 Vue.component(
   "TopArticulos",
   require("./components/dashboard/TopArticulos.vue")
 );
+
+Vue.component("AbonarCuota", require("./components/creditos/AbonarCuota.vue"));
 
 Vue.component("icon-button", require("./components/buttons/IconButton.vue"));
 
@@ -157,9 +160,18 @@ Vue.component(
   require("./components/ReporteVentasDiarias.vue")
 );
 
-Vue.component("reportekardexfisicovalorado",require("./components/ReporteKardexFisicoValorado.vue"));
-Vue.component("reportekardexfisico",require("./components/ReporteKardexFisico.vue"));
-Vue.component("resumenclientes",require("./components/ReporteResumenClientes.vue"));
+Vue.component(
+  "reportekardexfisicovalorado",
+  require("./components/ReporteKardexFisicoValorado.vue")
+);
+Vue.component(
+  "reportekardexfisico",
+  require("./components/ReporteKardexFisico.vue")
+);
+Vue.component(
+  "resumenclientes",
+  require("./components/ReporteResumenClientes.vue")
+);
 
 Vue.component(
   "ventasinstitucionales",
