@@ -315,10 +315,12 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select class="form-control col-md-3">
+                                    <select class="form-control col-md-3" v-model="criterioA">
                                         <option v-if="tituloModal2 !== 'Grupos'" value="nombre">Nombre</option>
                                         <option v-else-if="tituloModal2 == 'Grupos'" value="nombre_grupo">Grupo</option>
                                         <!-- <option v-if="tituloModal2=='Grupos'" value="nombre_grupo">Nombre_grupo</option> -->
+                                        <option  v-if ="tituloModal2 == 'Articulo'" value="precio_uno"> Precio</option>
+                                        <option  v-if ="tituloModal2 == 'Articulo'" value="codigo"> codigo</option>
                                     </select>
                                     <input v-if="tituloModal2 == 'Marcas'" type="text" v-model="buscarA"
                                         @keyup="listarMarca(1, buscarA, criterioA)" class="form-control"
@@ -337,6 +339,10 @@
                                         placeholder="Texto a buscar">
                                     <input v-if="tituloModal2 == 'Sucursal'" type="text" v-model="buscarA"
                                         @keyup="listarSucursal(1, buscarA, criterioA)" class="form-control"
+                                        placeholder="Texto a buscar">
+                                    
+                                    <input v-if="tituloModal2 == 'Articulo'" type="text" v-model="buscarA"
+                                        @keyup="listarArticulo(1,buscarA,criterioA)" class="form-control"
                                         placeholder="Texto a buscar">
                                     <!--button type="submit" @click="listarArticulo(buscarA, criterioA)"
                                         class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button-->
@@ -2835,7 +2841,14 @@ reportePDF() {
                 else if (inputType === 'codigoProductoSin') {
                     return 'Codigo de Linea';
                 }
+            } else if (this.tituloModal2 == 'Articulo'){
+                if (inputType === 'nombre'){
+                    return 'Nombre articulo';
+                } else if (inputType === 'precio'){
+                    return 'Precio Articulo'
+                }
             }
+
         },
         //############hasta aqui-#########
         //################-Abrl moda de industrial,marca,Linea########
