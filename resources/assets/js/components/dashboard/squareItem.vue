@@ -34,7 +34,7 @@
       },
       moneda: {
         type: String,
-        required: true
+        required: false
       },
       fondoDegradado: {
         type: String,

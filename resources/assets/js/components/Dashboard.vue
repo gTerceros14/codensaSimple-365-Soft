@@ -19,7 +19,8 @@
                     <div class="col-auto">
                         <label for="fechaInicio">Fecha de Inicio:</label>
 
-                        <input type="date" class="form-control" id="fechaInicio"  @change="fetchData()" v-model="fechaInicio">
+                        <input type="date" class="form-control" id="fechaInicio" @change="fetchData()"
+                            v-model="fechaInicio">
                     </div>
 
                     <div class="col-auto">
@@ -35,11 +36,13 @@
             </div>
 
             <div class="row d-flex justify-content-between">
-                <square-item :icono="'fa fa-usd'" :titulo="'Ventas'" :moneda="'BOB'" :cantidad="sumaVentas"
+                <square-item :icono="'fa fa-usd'" :titulo="'Ventas'" :moneda="monedaPrincipal[1]"
+                    :cantidad="(sumaVentas).toFixed(2)"
                     :fondoDegradado="'linear-gradient(35deg, #028bd2, #6dd3dd)'" />
-                <square-item :icono="'fa fa-shopping-cart'" :titulo="'Gastos'" :moneda="'BOB'" :cantidad="sumaCompras"
+                <square-item :icono="'fa fa-shopping-cart'" :titulo="'Gastos'" :moneda="monedaPrincipal[1]"
+                    :cantidad="(sumaCompras).toFixed(2)"
                     :fondoDegradado="'linear-gradient(35deg, #f67318, #f9ca38)'" />
-                <square-item :icono="'fa fa-angle-double-up'" :titulo="'Ganancias'" :moneda="'BOB'"
+                <square-item :icono="'fa fa-angle-double-up'" :titulo="'Ganancias'" :moneda="monedaPrincipal[1]"
                     :cantidad="sumaVentas - sumaCompras" :fondoDegradado="'linear-gradient(35deg, #3b9c3f, #41d445)'" />
 
             </div>
@@ -87,10 +90,10 @@
                         <TopArticulos :fechaInicio="fechaInicio" :fechaFin="fechaFin" />
                     </div>
                     <div class="col-md-4">
-                        <TopClientes :fechaInicio="fechaInicio" :fechaFin="fechaFin" />
+                        <TopClientes :fechaInicio="fechaInicio" :fechaFin="fechaFin" :moneda="monedaPrincipal"/>
                     </div>
                     <div class="col-md-4">
-                        <TopVendedores :fechaInicio="fechaInicio" :fechaFin="fechaFin" />
+                        <TopVendedores :fechaInicio="fechaInicio" :fechaFin="fechaFin" :moneda="monedaPrincipal"/>
                     </div>
 
 
@@ -128,6 +131,7 @@ export default {
         const formattedEndDate = this.formatDate(lastDayOfMonth);
 
         return {
+            monedaPrincipal: [],
             tipoPeriodo: "Mes",
             sumaVentas: 0,
 
@@ -151,6 +155,15 @@ export default {
     },
 
     methods: {
+        async datosConfiguracion() {
+            try {
+                const response = await axios.get('/configuracion');
+                const respuesta = response.data;
+                this.monedaPrincipal = [respuesta.configuracionTrabajo.valor_moneda_principal, respuesta.configuracionTrabajo.simbolo_moneda_principal];
+            } catch (error) {
+                console.log(error);
+            }
+        },
         formatDate(date) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -170,23 +183,30 @@ export default {
         },
         fetchData() {
 
-    axios.get('/dashboard', {
-        params: {
-            fecha_inicio: this.fechaInicio,
-            fecha_fin: this.fechaFin
-        }
-    })
-    .then(response => {
-        const respuesta = response.data;
-        this.ingresos = respuesta.ingresos;
-        this.ventas = respuesta.ventas;
-        this.loadIngresos();
-        this.loadVentas();
-    })
-    .catch(error => {
-        console.log(error);
-    });
-},
+            axios.get('/dashboard', {
+                params: {
+                    fecha_inicio: this.fechaInicio,
+                    fecha_fin: this.fechaFin
+                }
+            })
+                .then(response => {
+                    const respuesta = response.data;
+                    this.ingresos = respuesta.ingresos.map(item => {
+                        item.total *= parseFloat(this.monedaPrincipal[0]);
+                        return item;
+                    });
+                    console.log(this.ingresos);
+                    this.ventas = respuesta.ventas.map(item => {
+                        item.total *= parseFloat(this.monedaPrincipal[0]);
+                        return item;
+                    });
+                    this.loadIngresos();
+                    this.loadVentas();
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        },
 
         loadChart(tipo, data, chartElement, color) {
             const arrayMes = [];
@@ -231,7 +251,6 @@ export default {
         },
         loadIngresos() {
 
-
             this.charIngreso = this.loadChart('compras',
                 this.ingresos,
                 document.getElementById('ingresos').getContext('2d'),
@@ -250,6 +269,7 @@ export default {
         }
     },
     mounted() {
+        this.datosConfiguracion();
         this.fetchData();
     }
 }

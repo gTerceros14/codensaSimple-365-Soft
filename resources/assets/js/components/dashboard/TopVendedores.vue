@@ -39,7 +39,7 @@
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ vendedor.nombreUsuario }}</td>
                     <td>{{ vendedor.cantidadVentas }}</td>
-                    <td>{{ vendedor.totalVentas }}</td>
+                    <td>{{ (vendedor.totalVentas*moneda[0]).toFixed(2) }} {{ moneda[1] }}</td>
                 </tr>
             </tbody>
         </table>
@@ -63,7 +63,11 @@ export default {
         fechaFin: {
             type: String,
             required: true
-        }
+        },
+        moneda: {
+            type: Array,
+            required: true
+        },
     },
     data() {
         return {

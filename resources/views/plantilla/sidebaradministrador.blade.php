@@ -39,9 +39,13 @@
                     <li @click="menu=5" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas</a>
                     </li>
-                    <li @click="menu=40" class="nav-item">
+                    <!-- <li @click="menu=40" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Registro
                             Ventas</a>
+                    </li> -->
+                    <li @click="menu=53" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas a
+                            credito</a>
                     </li>
                     <li @click="menu=48" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas
@@ -165,14 +169,17 @@
                             Usuarios</a>
                     </li>
                     <li @click="menu=50" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen de clientes</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen de
+                            clientes</a>
                     </li>
                     <li @click="menu=51" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex Fisico Valorado</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex
+                            Fisico Valorado</a>
                     </li>
-                    
+
                     <li @click="menu=52" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex Fisico</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex
+                            Fisico</a>
                     </li>
                 </ul>
             </li>

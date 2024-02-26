@@ -169,6 +169,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/credito/registrar', 'CreditoVentaController@store');
         Route::put('/credito/actualizar', 'CreditoVentaController@update');
         Route::get('/credito/eliminar', 'CreditoVentaController@destroy');
+        Route::post('/credito/cuotas', 'CreditoVentaController@obtenerCuotasCredito');
+        Route::post('/credito/cuotas/registrar', 'CreditoVentaController@registrarPagoCuota');
+        Route::get('/credito/cuotas/venta/{idventa}', 'CreditoVentaController@obtenerCreditoYCuotas');
         // cuota_credito
         Route::get('/cuota', 'CuotasCreditoController@index');
         Route::post('/cuota/registrar', 'CuotasCreditoController@store');
@@ -389,12 +392,12 @@ Route::group(['middleware' => ['auth']], function () {
         //REPORTES
         Route::get('/ventas-diarias', 'VentaController@reporteVentasDiarias');
         Route::get('/reporte-almacen', 'InventarioController@reporteAlmacenes');
-        Route::get('/reporte-kardex-fisico-valorado','ReporteKardexFisicoInventarioController@generarReporte');
+        Route::get('/reporte-kardex-fisico-valorado', 'ReporteKardexFisicoInventarioController@generarReporte');
         Route::get('/reporte-kardex-fisico', 'ReporteKardexFisicoInventarioController@generarReporteFisico');
         Route::get('/top-vendedores', 'VentaController@topVendedores');
         Route::get('/top-clientes', 'VentaController@topClientes');
         Route::get('/top-articulos', 'VentaController@topProductos');
-        
+
 
 
 
@@ -404,6 +407,14 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/variables/registrarArticuloVariable2', 'VentasInstitucionalesController@registrarArticuloVariable2');
         Route::get('/variables/listarArticulosVariable', 'VentasInstitucionalesController@obtenerArticulosPorVariableTemporal');
         Route::delete('/variables/excluirArticulo', 'VentasInstitucionalesController@excluirArticulo');
+        Route::post('/variables/registrar-venta-institucional', 'VentasInstitucionalesController@registrarVentaInstitucional');
+        Route::post('/variables/ventas_institucionales', 'VentasInstitucionalesController@registrarModificacionVentasInstitucionales');
+        Route::get('/variables/facturaInstitucional', 'VentasInstitucionalesController@listarFacturas');
+        Route::post('/variables/emitirFacturaInstitucional', 'VentaController@emitirFacturaInstitucional');
+        Route::post('/variables/insertarFacturaInstitucional', 'VentaController@insertarFacturaInstitucional');
+        Route::get('/variables/imprimirCarta/{id}/{idventainstitucional}', 'VentasInstitucionalesController@imprimirFactura');
+
+
 
 
 

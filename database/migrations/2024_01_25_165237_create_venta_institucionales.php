@@ -13,7 +13,7 @@ class CreateVentaInstitucionales extends Migration
      */
     public function up()
     {
-        Schema::create('venta_institucionales', function (Blueprint $table) {
+        Schema::create('ventas_institucionales', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('idcliente')->unsigned();
             $table->foreign('idcliente')->references('id')->on('personas');
@@ -29,8 +29,6 @@ class CreateVentaInstitucionales extends Migration
             $table->decimal('impuesto', 4, 2);
             $table->decimal('total', 11, 2);
             $table->string('estado', 20);
-            $table->integer('idcaja')->unsigned();
-            $table->foreign('idcaja')->references('id')->on('cajas');
             $table->timestamps();
         });
     }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\CreditoVenta;
+
 use Illuminate\Http\Request;
 use App\Persona;
 use App\Exports\ClientExport;
@@ -20,14 +22,14 @@ class ClienteController extends Controller
 
     //     $buscar = $request->buscar;
     //     $criterio = $request->criterio;
-        
+
     //     if ($buscar==''){
     //         $personas = Persona::orderBy('id', 'desc')->paginate(3);
     //     }
     //     else{
     //         $personas = Persona::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(3);
     //     }
-        
+
 
     //     return [
     //         'pagination' => [
@@ -103,7 +105,7 @@ class ClienteController extends Controller
         $usuarioid = $request->usuarioid;
 
         // Consulta para obtener personas que no son usuarios
-        $usuarios = Persona::whereNotIn('id', function($query) {
+        $usuarios = Persona::whereNotIn('id', function ($query) {
             $query->select('id')->from('users');
         });
 
@@ -134,21 +136,37 @@ class ClienteController extends Controller
         ];
     }
 
-    public function selectCliente(Request $request){
-        if (!$request->ajax()) return redirect('/');
- 
+    public function selectCliente(Request $request)
+    {
+        if (!$request->ajax())
+            return redirect('/');
+
         $filtro = $request->filtro;
-        $clientes = Persona::where('nombre', 'like', '%'. $filtro . '%')
-        ->orWhere('num_documento', 'like', '%'. $filtro . '%')
-        ->select('id','nombre','num_documento','email','telefono')
-        ->orderBy('nombre', 'asc')->get();
- 
-        return ['clientes' => $clientes];
+        $clientes = Persona::where('nombre', 'like', '%' . $filtro . '%')
+            ->orWhere('num_documento', 'like', '%' . $filtro . '%')
+            ->select('id', 'nombre', 'num_documento', 'email', 'telefono')
+            ->orderBy('nombre', 'asc')
+            ->take(5)
+            ->get();
+
+        $clientesConCreditos = $clientes->map(function ($cliente) {
+            $cantidadCreditos = CreditoVenta::where('idcliente', $cliente->id)
+                ->where('estado', '!=', 'Completado')
+                ->count();
+            $cliente->cantidad_creditos = $cantidadCreditos;
+            return $cliente;
+        });
+
+        return ['clientes' => $clientesConCreditos];
     }
+
+
+
 
     public function store(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');
+        if (!$request->ajax())
+            return redirect('/');
         $persona = new Persona();
         $persona->nombre = $request->nombre;
         $persona->usuario = Auth::user()->iduse;
@@ -166,7 +184,8 @@ class ClienteController extends Controller
 
     public function update(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');
+        if (!$request->ajax())
+            return redirect('/');
         $persona = Persona::findOrFail($request->id);
         $persona->nombre = $request->nombre;
         $persona->usuario = $request->usuariodos_id;
@@ -187,42 +206,44 @@ class ClienteController extends Controller
     }
 
     //---seleccionar usuario vendedor--
-    public function selectUsuarioVendedor(Request $request){
-        if (!$request->ajax()) return redirect('/');
- 
+    public function selectUsuarioVendedor(Request $request)
+    {
+        if (!$request->ajax())
+            return redirect('/');
+
         $filtro = $request->filtro;
         $clientes = User::join('personas', 'users.id', '=', 'personas.id')
-        ->select(
-            'personas.id as ID',
-            'personas.nombre',
-            'users.idrol',
-            'users.iduse as ID_use'
-        )  ->where('users.idrol', '=', 2)
-            ->orWhere('personas.nombre', 'like', '%'. $filtro . '%')
+            ->select(
+                'personas.id as ID',
+                'personas.nombre',
+                'users.idrol',
+                'users.iduse as ID_use'
+            )->where('users.idrol', '=', 2)
+            ->orWhere('personas.nombre', 'like', '%' . $filtro . '%')
             ->orderBy('personas.nombre', 'asc')
             //->toSql();
             ->get();
- 
+
         return ['clientes' => $clientes];
     }
-     //---listado por id lo que se pidio de Personana--
+    //---listado por id lo que se pidio de Personana--
     public function indexUsuario(Request $request)
     {
-         if (!$request->ajax())
-             return redirect('/');
- 
-         $idusuario = $request->idusuario;
-         $usuario =User::join('personas', 'users.id', '=', 'personas.id')
-         //->join('roles', 'users.idrol', '=', 'roles.id')
-         ->select(
-             'personas.id as ID', 
-             'personas.nombre',
-             'personas.usuario',
-             //'users.iduse as ID_use'
+        if (!$request->ajax())
+            return redirect('/');
+
+        $idusuario = $request->idusuario;
+        $usuario = User::join('personas', 'users.id', '=', 'personas.id')
+            //->join('roles', 'users.idrol', '=', 'roles.id')
+            ->select(
+                'personas.id as ID',
+                'personas.nombre',
+                'personas.usuario',
+                //'users.iduse as ID_use'
             )
             //->where('personas.usuario', '=', $idusuario)->get();
             ->where('users.iduse', '=', $idusuario)->get();
-         return ['usuario' => $usuario];
+        return ['usuario' => $usuario];
     }
     //---listado por id lo que se pidio de Personana--
     public function indexUsuarioFiltro(Request $request)
@@ -232,16 +253,16 @@ class ClienteController extends Controller
 
         //$idusuario = $request->idusuario;
         $filtro = $request->filtro;
-        $usuariodos =User::join('personas', 'users.id', '=', 'personas.id')
-        //->join('roles', 'users.idrol', '=', 'roles.id')
-        ->select(
-            'personas.nombre',
-            'personas.usuario',
-            'users.iduse'
+        $usuariodos = User::join('personas', 'users.id', '=', 'personas.id')
+            //->join('roles', 'users.idrol', '=', 'roles.id')
+            ->select(
+                'personas.nombre',
+                'personas.usuario',
+                'users.iduse'
             )
             //->where('personas.usuario', '=', $idusuario)->get();
             ->where('users.idrol', '=', 2)
-            ->orWhere('personas.nombre', 'like', '%'. $filtro . '%')
+            ->orWhere('personas.nombre', 'like', '%' . $filtro . '%')
             ->orderBy('personas.nombre', 'asc')
             //->toSql();
             ->get();
@@ -256,10 +277,10 @@ class ClienteController extends Controller
     }
     // public function selectUsuarioVendedor(Request $request){
     //     if (!$request->ajax()) return redirect('/');
- 
+
     //     $buscar = $request->buscar;
     //     $criterio = $request->criterio;
-        
+
     //     if ($buscar==''){
     //         $personas = User::join('personas', 'users.id', '=', 'personas.id')
     //             ->join('roles', 'users.idrol', '=', 'roles.id')
@@ -276,7 +297,7 @@ class ClienteController extends Controller
     //             'personas.id', 'personas.nombre',
     //             'roles.id as ID',
     //             )  ->where('roles.id', '=', '2')->paginate(3);        }
-        
+
 
     //     return [
     //         'pagination' => [
@@ -303,8 +324,8 @@ class ClienteController extends Controller
         $fechaFin = $request->fechaFin;
 
         $ventas = Venta::leftJoin('personas', 'ventas.idcliente', '=', 'personas.id')
-                        ->select('ventas.*', 'personas.nombre as nombre_cliente')
-                        ->where('idusuario', $vendedorId);
+            ->select('ventas.*', 'personas.nombre as nombre_cliente')
+            ->where('idusuario', $vendedorId);
 
         if ($fechaInicio && $fechaFin) {
             $ventas->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
@@ -322,33 +343,33 @@ class ClienteController extends Controller
         $ventas = $ventas->paginate(10);
 
         $clientes = $ventas->groupBy('idcliente')->map(function ($ventasCliente) {
-        $cliente = $ventasCliente->first();
-        $cuotasPendientes = DB::table('cuotas_credito')
-            ->join('credito_ventas', 'cuotas_credito.idcredito', '=', 'credito_ventas.id')
-            ->where('credito_ventas.idpersona', $cliente->idcliente)
-            ->where('cuotas_credito.estado', 'Pendiente')
-            ->get();
+            $cliente = $ventasCliente->first();
+            $cuotasPendientes = DB::table('cuotas_credito')
+                ->join('credito_ventas', 'cuotas_credito.idcredito', '=', 'credito_ventas.id')
+                ->where('credito_ventas.idpersona', $cliente->idcliente)
+                ->where('cuotas_credito.estado', 'Pendiente')
+                ->get();
 
-        $precioCuota = $cuotasPendientes->sum('precio_cuota');
-        $totalCancelado = $cuotasPendientes->sum('total_cancelado');
-        $saldo = $precioCuota - $totalCancelado;
+            $precioCuota = $cuotasPendientes->sum('precio_cuota');
+            $totalCancelado = $cuotasPendientes->sum('total_cancelado');
+            $saldo = $precioCuota - $totalCancelado;
 
-        if ($saldo === 0) {
-            $totalCancelado = $cliente->total;
-        }
+            if ($saldo === 0) {
+                $totalCancelado = $cliente->total;
+            }
 
-        return [
-            'fecha_venta' => $cliente->fecha_hora,
-            'nombre_cliente' => $cliente->nombre_cliente,
-            'id_cliente' => $cliente->idcliente,
-            'id_vendedor' => $cliente->idusuario,
-            'tipo_comprobante' => $cliente->tipo_comprobante,
-            'total' => $cliente->total,
-            'impuesto' => $cliente->impuesto,
-            'precio_cuota' => $precioCuota,
-            'total_cancelado' => $totalCancelado,
-            'saldo' => $saldo,
-        ];
+            return [
+                'fecha_venta' => $cliente->fecha_hora,
+                'nombre_cliente' => $cliente->nombre_cliente,
+                'id_cliente' => $cliente->idcliente,
+                'id_vendedor' => $cliente->idusuario,
+                'tipo_comprobante' => $cliente->tipo_comprobante,
+                'total' => $cliente->total,
+                'impuesto' => $cliente->impuesto,
+                'precio_cuota' => $precioCuota,
+                'total_cancelado' => $totalCancelado,
+                'saldo' => $saldo,
+            ];
         });
 
         //$clientes = $ventas->paginate(10);

@@ -2142,6 +2142,7 @@ export default {
                 var respuesta = response.data;
                 me.arrayArticulo = respuesta.articulos.data;
                 me.pagination = respuesta.pagination;
+                console.log(me.arrayArticulo);
             })
                 .catch(function (error) {
                     console.log(error);
@@ -2405,6 +2406,7 @@ export default {
             });
 
         },
+
         //---actuslizar articulo
         actualizarArticulo(data) {
 
