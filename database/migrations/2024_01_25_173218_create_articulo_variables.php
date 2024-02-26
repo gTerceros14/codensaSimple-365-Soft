@@ -15,7 +15,7 @@ class CreateArticuloVariables extends Migration
     {
         Schema::create('articulo_variables', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('idvariable');
+            $table->integer('idvariable')->unsigned();
             $table->foreign('idvariable')->references('id')->on('variable_temporals')->onDelete('cascade');
             $table->integer('idarticulo')->unsigned();
             $table->foreign('idarticulo')->references('id')->on('articulos');

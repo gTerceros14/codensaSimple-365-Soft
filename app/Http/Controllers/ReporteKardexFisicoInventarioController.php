@@ -126,14 +126,6 @@ class ReporteKardexFisicoInventarioController extends Controller
     // Calcular el saldo
     $saldo = 0;
     $saldoFisico = 0;
-    /*foreach ($resultados as &$resultado) {
-        if ($resultado->tipo === 'Ingreso') {
-            $saldo += $resultado->cantidad;
-        } else {
-            $saldo -= $resultado->cantidad;
-        }
-        $resultado->resultado_operacion = $saldo;
-    }*/
 
     foreach ($resultados as &$resultado) {
         if ($resultado->tipo === 'Ingreso') {
