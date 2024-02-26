@@ -202,7 +202,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
-                            <button type="button"  class="btn btn-success" @click="listaReporte()" >Visualizar Reporte</button>
+                            <button type="button"  class="btn btn-success" @click="listaReporte(); cerrarModal()" >Visualizar Reporte</button>
                         </div>
                     </form>
 
@@ -319,8 +319,8 @@
                                         <option v-if="tituloModal2 !== 'Grupos'" value="nombre">Nombre</option>
                                         <option v-else-if="tituloModal2 == 'Grupos'" value="nombre_grupo">Grupo</option>
                                         <!-- <option v-if="tituloModal2=='Grupos'" value="nombre_grupo">Nombre_grupo</option> -->
-                                        <option  v-if ="tituloModal2 == 'Articulo'" value="precio_uno"> Precio</option>
-                                        <option  v-if ="tituloModal2 == 'Articulo'" value="codigo"> codigo</option>
+                                        <option  v-if ="tituloModal2 == 'Articulo'" value="precio_uno"> Precio</option> 
+                                        <option  v-if ="tituloModal2 == 'Articulo'" value="codigo"> Codigo</option>
                                     </select>
                                     <input v-if="tituloModal2 == 'Marcas'" type="text" v-model="buscarA"
                                         @keyup="listarMarca(1, buscarA, criterioA)" class="form-control"
@@ -340,12 +340,9 @@
                                     <input v-if="tituloModal2 == 'Sucursal'" type="text" v-model="buscarA"
                                         @keyup="listarSucursal(1, buscarA, criterioA)" class="form-control"
                                         placeholder="Texto a buscar">
-                                    
                                     <input v-if="tituloModal2 == 'Articulo'" type="text" v-model="buscarA"
                                         @keyup="listarArticulo(1,buscarA,criterioA)" class="form-control"
                                         placeholder="Texto a buscar">
-                                    <!--button type="submit" @click="listarArticulo(buscarA, criterioA)"
-                                        class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button-->
                                 </div>
                             </div>
                         </div>
