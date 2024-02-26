@@ -1932,26 +1932,31 @@ export default {
                     console.log('ERRORES', error);
                 });
         },
-        listaReporte(){
-            let me = this;
+        listaReporte() {
+    let me = this;
+    var url = '/reporte-kardex-fisico-valorado?';
 
-            console.log('FECHA INICIO ',me.fechaInicio)
-            console.log('FECHA FIN ',me.fechaFin)
-            var url = '/reporte-kardex-fisico-valorado?sucursal='+this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id +'&grupo=' + this.gruposeleccionada.id + '&fechainicio='+me.fechaInicio + '&fechafin=' + me.fechaFin
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                me.total_saldofisico = respuesta.total_saldo;
-                me.arrayReporte = respuesta.resultados;
-                console.log("array reporte",me.arrayReporte)
-                console.log ("total saldo fisico ",me.total_saldofisico)
-                me.fechaInicioSeleccionado = me.fechaInicio;
-                me.fechaFinSeleccionado = me.fechaFin;
-                //me.formateaKardex();
-            })
-                .catch(function (error) {
-                    console.log('ERRORES', error);
-                });
-        },
+    // Agregar los parámetros obligatorios
+    url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id +  '&grupo=' + this.gruposeleccionada.id;
+
+    // Agregar las fechas de inicio y fin
+    url += '&fechainicio=' + me.fechaInicio + '&fechafin=' + me.fechaFin;
+
+    axios.get(url)
+        .then(function (response) {
+            var respuesta = response.data;
+            me.total_saldofisico = respuesta.total_saldo;
+            me.arrayReporte = respuesta.resultados;
+            me.fechaInicioSeleccionado = me.fechaInicio;
+            me.fechaFinSeleccionado = me.fechaFin;
+            console.log("array reporte",me.arrayReporte);
+        })
+        .catch(function (error) {
+            console.log('ERRORES', error);
+        });
+},
+
+
         formateaKardex(){
             let saldo = 0;
             let me = this;
@@ -2568,6 +2573,8 @@ reportePDF() {
             this.gruposeleccionadaVacio = false;
             this.medidaseleccionadaVacio = false;
             this.sucursalseleccionadaVacio = false;
+            this.articuloseleccionadaVacio = false;
+
             //
             this.codigo = '';
             this.nombre_producto = '';
@@ -2586,6 +2593,8 @@ reportePDF() {
             this.gruposeleccionada.nombre_grupo = '';
             this.medidaseleccionada.descripcion_medida = '';
             this.lineaseleccionada.nombre = '';
+            this.articuloseleccionada.nombre = '';
+            this.sucursalseleccionada.nombre = '';
             this.errorArticulo = 0;
 
             this.idmedida = 0;
