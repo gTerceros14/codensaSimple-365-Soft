@@ -41,14 +41,17 @@
                             <tbody>
                                 <tr v-for="articulo in sortedResultados" :key="articulo.id">
                                     <td v-text="articulo.tipo"></td>
-                                    <td v-text="articulo.num_comprobante"></td>
-                                    <td v-text="articulo.fecha_hora"></td>
-                                    <td v-text="articulo.tipo_comprobante"></td>
-                                    <td v-if="articulo.tipo === 'Ingreso'" v-text="articulo.cantidad"></td>
-                                    <td v-else>0</td>
-                                    <td v-if="articulo.tipo === 'Venta'" v-text="articulo.cantidad"></td>
-                                    <td v-else>0</td>
-                                    <td v-text="articulo.resultado_operacion"></td>
+                                    <td v-text="articulo.Factura"></td>
+                                    <td v-text="articulo.Nombre_sucursal"></td>
+                                    <td v-text="articulo.fecha_hora"></td>  
+                                    <td v-text="articulo.Tipo_Cambio"></td>
+                                    <td v-text="articulo.Tipo_venta"></td>
+                                    <td v-text="articulo.nombre_rol"></td>
+                                    <td v-text="articulo.usuario"></td>
+                                    <td v-text="articulo.nombre"></td>
+                                    <td v-text="articulo.importe_BS"></td>
+                                    <td v-text="articulo.importe_usd"></td>
+
                                 </tr>
                             </tbody>
                         </table>
@@ -1358,10 +1361,10 @@ export default {
 
         listaReporte() {
             let me = this;
-            var url = '/reporte-kardex-fisico?';
+            var url = '/resumen-ventas-documento?';
 
             // Agregar los parámetros obligatorios
-            url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.clienteseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id +  '&grupo=' + this.gruposeleccionada.id;
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.articuloseleccionada.id + '&estadoVenta=' + this.clienteseleccionada.id + '&idcliente=' + this.lineaseleccionada.id;
 
             // Agregar las fechas de inicio y fin
             url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
@@ -1369,8 +1372,8 @@ export default {
             axios.get(url)
                 .then(function (response) {
                     var respuesta = response.data;
-                    me.total_saldofisico = respuesta.total_saldo;
-                    me.arrayReporte = respuesta.resultados;
+                    me.total_saldofisico = respuesta.total_BS;
+                    me.arrayReporte = respuesta.ventas;
                     console.log("array reporte",me.arrayReporte);
                 })
                 .catch(function (error) {

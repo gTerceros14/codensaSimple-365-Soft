@@ -10,22 +10,18 @@ use Illuminate\Support\Facades\DB;
 class ReportesVentas extends Controller
 {
     public function ResumenVentasPorDocumento(Request $request){
-        $estado_venta = $request->estado;
-        $cliente = $request->idcliente;
-        $ejecutivoCuentas = $request->ejecutivoCuentas;
-        $idusuario = $request->idusuario;
-        $fecha_inicio = $request->fecha_inicio;
-        $fecha_fin = $request->fecha_fin;
+        $fechaInicio = $request->fechaInicio;
+        $fechaFin = $request->fechaFin;
 
         $ventas = Venta::join('personas','ventas.idcliente','=','personas.id')
         ->join('users','ventas.idusuario','=','users.id')
         ->join('tipo_ventas','ventas.idtipo_venta','=','tipo_ventas.id')
         ->join('roles','users.idrol','=','roles.id')
         ->join('sucursales','users.idsucursal','=','sucursales.id')
-        ->join('monedas', 'monedas.id', '=', DB::raw('2'))
+        ->join('monedas', 'monedas.id', '=', DB::raw('1'))
         ->select('ventas.num_comprobante as Factura',
                 'sucursales.nombre as Nombre_sucursal',
-                'ventas.fecha_hora as Fecha',
+                'ventas.fecha_hora',
                 'monedas.tipo_cambio as Tipo_Cambio',
                 'tipo_ventas.nombre_tipo_ventas as Tipo_venta',
                 'roles.nombre AS nombre_rol',
@@ -33,7 +29,31 @@ class ReportesVentas extends Controller
                 'personas.nombre',
                 'ventas.total AS importe_BS',
                 DB::raw('ROUND(ventas.total / monedas.tipo_cambio,2) AS importe_usd'))
-        ->get();
+        ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
+
+        //if ($request->has('estadoVenta') && $request->estadoVenta !== 'undefined') {
+          //  $estado_venta = $request->estadoVenta;
+            //$ventas->where('articulos.id' , $idarticulo);
+        //}
+
+        if ($request->has('sucursal') && $request->sucursal !== 'undefined') {
+            $sucursal = $request->sucursal;
+            $ventas->where('sucursales.id', $sucursal);
+        }
+
+        if ($request->has('ejecutivoCuentas') && $request->ejecutivoCuentas !== 'undefined') {
+            $ejecutivoCuentas = $request->ejecutivoCuentas;
+            $ventas->where('users.id' , $ejecutivoCuentas);
+        }
+
+        if ($request->has('idusuario') && $request->idcliente !== 'undefined') {
+            $cliente = $request->idcliente;
+            $ventas->where('personas.id' , $cliente);
+        }
+
+
+        $ventas = $ventas->get();
+
         $total_importeBs =0;
         $total_importeUSD = 0;
         foreach ($ventas as &$venta){
@@ -41,8 +61,8 @@ class ReportesVentas extends Controller
             $total_importeUSD += $venta->importe_usd;
         }
         return['ventas' => $ventas,
-                'total BS'=>$total_importeBs,
-                'total USD'=>$total_importeUSD];
+                'total_BS'=>$total_importeBs,
+                'total_USD'=>$total_importeUSD];
 
     } 
 }
