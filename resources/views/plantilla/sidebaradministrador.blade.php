@@ -181,6 +181,9 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex
                             Fisico</a>
                     </li>
+                    <li @click="menu=55" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas x Documento</a>
+                    </li>
                 </ul>
             </li>
             <li class="nav-item nav-dropdown">

@@ -172,6 +172,10 @@ Vue.component(
   "resumenclientes",
   require("./components/ReporteResumenClientes.vue")
 );
+Vue.component(
+  "resumenventaxdocumento",
+  require("./components/ReporteResumenVentasXDocumento.vue")
+);
 
 Vue.component(
   "ventasinstitucionales",

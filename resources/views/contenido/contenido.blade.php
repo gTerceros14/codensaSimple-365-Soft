@@ -180,6 +180,10 @@
 <template v-if="menu==53">
     <ventacredito></ventacredito>
 </template>
+
+<template v-if="menu==55">
+    <resumenventaxdocumento></resumenventaxdocumento>
+</template>
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
     <dashboard></dashboard>
