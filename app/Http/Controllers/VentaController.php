@@ -448,7 +448,7 @@ class VentaController extends Controller
     private function actualizarCaja($total)
     {
         $ultimaCaja = Caja::latest()->first();
-        $ultimaCaja->ventasContado += $total;
+        $ultimaCaja->ventas += $total;
         $ultimaCaja->save();
     }
 
