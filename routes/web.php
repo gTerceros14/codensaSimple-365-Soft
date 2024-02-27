@@ -15,7 +15,6 @@ Route::group(['middleware' => ['guest']], function () {
     Route::get('/', 'Auth\LoginController@showLoginForm');
     Route::post('/', 'Auth\LoginController@login')->name('login');
 });
-
 Route::group(['middleware' => ['auth']], function () {
 
     Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
@@ -397,6 +396,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/top-vendedores', 'VentaController@topVendedores');
         Route::get('/top-clientes', 'VentaController@topClientes');
         Route::get('/top-articulos', 'VentaController@topProductos');
+        Route::get('/resumen-ventas-documento','ReportesVentas@ResumenVentasPorDocumento');
 
 
 
