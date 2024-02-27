@@ -860,61 +860,8 @@ export default {
                     console.error('Error al obtener configuración de trabajo:', error);
                 });
         },
-        agregarMarca(nombre) {
-            console.log("Se registrara la marca " + nombre)
-            axios.post('/marca/registrar', {
-                'nombre': nombre,
 
-            }).then(function (response) {
-                this.registrosSuccess.push("Se registro la marca " + nombre);
 
-                console.log(response);
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-
-        agregarGrupo(nombre) {
-            console.log("Se registrara la marca " + nombre)
-
-            axios.post('/grupos/registrar', {
-                'nombre_grupo': nombre
-            }).then(function (response) {
-                this.registrosSuccess.push("Se registro el grupo " + nombre);
-
-                console.log(response)
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        agregarLinea(nombre) {
-            console.log("Se registrara la linea " + nombre)
-
-            axios.post('/categoria/registrar', {
-                'nombre': nombre,
-                'descripcion': "",
-                'codigoProductoSin': 0
-
-            }).then(function (response) {
-                this.registrosSuccess.push("Se registro la linea " + nombre);
-
-                console.log(response)
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        agregarIndustria(nombre) {
-            console.log("Se registrara la marca " + nombre)
-
-            axios.post('/industria/registrar', {
-                'nombre': nombre
-            }).then(function (response) {
-                this.registrosSuccess.push("Se registro la industria " + nombre);
-                console.log(response)
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
         confirmarRegistro() {
             this.erroresNoExiste.forEach((elemento) => {
                 const palabras = elemento.split(' ');
@@ -1429,55 +1376,8 @@ export default {
                     console.log(error);
                 });
         },
-        registrarProveedor() {
-            // if (this.validarPersona()){
-            //     return;
-            // }
 
-            let me = this;
-
-            axios.post('/proveedor/registrar', {
-                'nombre': this.nombre,
-                'tipo_documento': this.tipo_documento,
-                'num_documento': this.num_documento,
-                'direccion': this.direccion,
-                'telefono': this.telefono,
-                'email': this.email,
-                'contacto': this.contacto,
-                'telefono_contacto': this.telefono_contacto,
-
-            }).then(function (response) {
-                me.cerrarModal3();
-                me.listarproveedor(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        actualizarProveedor() {
-            // if (this.validarPersona()){
-            //         return;
-            // }
-
-            let me = this;
-
-            axios.put('/proveedor/actualizar', {
-                'id': this.proveedor_id,
-                'nombre': this.nombre,
-                'tipo_documento': this.tipo_documento,
-                'num_documento': this.num_documento,
-                'direccion': this.direccion,
-                'telefono': this.telefono,
-                'email': this.email,
-                'contacto': this.contacto,
-                'telefono_contacto': this.telefono_contacto,
-            }).then(function (response) {
-                me.cerrarModal3();
-                me.listarproveedor(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //--------------------hasta aqui proveedor--------
+       
         //--grupo listado ,registro y actualizar
         listargrupo(page, buscar, criterio) {
             let me = this;
@@ -1498,26 +1398,26 @@ export default {
 
 
         listaReporte() {
-    let me = this;
-    var url = '/reporte-kardex-fisico?';
+            let me = this;
+            var url = '/reporte-kardex-fisico?';
 
-    // Agregar los parámetros obligatorios
-    url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id +  '&grupo=' + this.gruposeleccionada.id;
+            // Agregar los parámetros obligatorios
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id +  '&grupo=' + this.gruposeleccionada.id;
 
-    // Agregar las fechas de inicio y fin
-    url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
+            // Agregar las fechas de inicio y fin
+            url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
 
-    axios.get(url)
-        .then(function (response) {
-            var respuesta = response.data;
-            me.total_saldofisico = respuesta.total_saldo;
-            me.arrayReporte = respuesta.resultados;
-            console.log("array reporte",me.arrayReporte);
-        })
-        .catch(function (error) {
-            console.log('ERRORES', error);
-        });
-},
+            axios.get(url)
+                .then(function (response) {
+                    var respuesta = response.data;
+                    me.total_saldofisico = respuesta.total_saldo;
+                    me.arrayReporte = respuesta.resultados;
+                    console.log("array reporte",me.arrayReporte);
+                })
+                .catch(function (error) {
+                    console.log('ERRORES', error);
+                });
+        },
 
         exportarPDF() {
             const pdf = new jsPDF();
@@ -1752,118 +1652,8 @@ export default {
         convertDolar(precio) {
             return (precio / parseFloat(this.monedaPrincipal))
         },
-        registrarArticulo(data) {
-            let me = this;
-
-            axios.post('/articulo/registrar', data).then(function (response) {
-                console.log("Registro")
-                me.cerrarModal();
-                me.listarArticulo(1, '', 'nombre');
-                me.toastSuccess("Articulo registrado correctamente")
-
-            }).catch(function (error) {
-                console.log(error);
-                me.toastError("Hubo un error al registrar el articulo")
-            });
-
-        },
-        //---actuslizar articulo
-        actualizarArticulo(data) {
-
-            let me = this;
 
 
-
-            axios.post('/articulo/actualizar', data).then(function (response) {
-                //alert("Datos actualizados con éxito");
-                //console.log("datos actuales",formData);
-                me.cerrarModal();
-                me.listarArticulo(1, '', 'nombre');
-                me.toastSuccess("Articulo actualizado correctamente")
-                console.log(response)
-            }).catch(function (error) {
-                console.log(error);
-                me.toastError("No se puedo actualizar el articulo")
-            });
-        },
-        desactivarArticulo(id) {
-            swal({
-                title: 'Esta seguro de desactivar este artículo?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar!',
-                cancelButtonText: 'Cancelar',
-                confirmButtonClass: 'btn btn-success',
-                cancelButtonClass: 'btn btn-danger',
-                buttonsStyling: false,
-                reverseButtons: true
-            }).then((result) => {
-                if (result.value) {
-                    let me = this;
-
-                    axios.put('/articulo/desactivar', {
-                        'id': id
-                    }).then(function (response) {
-                        me.listarArticulo(1, '', 'nombre');
-                        swal(
-                            'Desactivado!',
-                            'El registro ha sido desactivado con éxito.',
-                            'success'
-                        )
-                    }).catch(function (error) {
-                        console.log(error);
-                    });
-
-
-                } else if (
-                    // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
-                ) {
-
-                }
-            })
-        },
-        activarArticulo(id) {
-            swal({
-                title: 'Esta seguro de activar este artículo?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar!',
-                cancelButtonText: 'Cancelar',
-                confirmButtonClass: 'btn btn-success',
-                cancelButtonClass: 'btn btn-danger',
-                buttonsStyling: false,
-                reverseButtons: true
-            }).then((result) => {
-                if (result.value) {
-                    let me = this;
-
-                    axios.put('/articulo/activar', {
-                        'id': id
-                    }).then(function (response) {
-                        me.listarArticulo(1, '', 'nombre');
-                        swal(
-                            'Activado!',
-                            'El registro ha sido activado con éxito.',
-                            'success'
-                        )
-                    }).catch(function (error) {
-                        console.log(error);
-                    });
-
-
-                } else if (
-                    // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
-                ) {
-
-                }
-            })
-        },
         advertenciaInactiva(nombre) {
             swal({
                 title: 'Opción Inactiva',
@@ -1883,166 +1673,7 @@ export default {
 
             });
         },
-        //#################registro industria############
-        registrarIndustria() {
-            if (this.validarIndustria()) {
-                return;
-            }
-            let me = this;
 
-            axios.post('/industria/registrar', {
-                'nombre': this.nombre,
-                'estado': this.estado
-            }).then(function (response) {
-                me.cerrarModal3();
-                //me.modal3=0;
-                console.log(response)
-                me.listarIndustria(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //#################hasta aqui####################
-        //#################Actualizar Industria####################
-        actualizarIndustria() {
-            if (this.validarIndustria()) {
-                return;
-            }
-
-            let me = this;
-
-            axios.put('/industria/actualizar', {
-                'nombre': this.nombre,
-                'estado': this.estado,
-                'id': this.industria_id
-            }).then(function (response) {
-                me.cerrarModal3();
-                me.listarIndustria(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //#################hasta aqui####################
-        //#################registro industria############
-        registrarMarca() {
-            if (this.validarIndustria()) {
-                return;
-            }
-            let me = this;
-
-            axios.post('/marca/registrar', {
-                'nombre': this.nombre,
-                'condicion': this.condicion
-            }).then(function (response) {
-                me.cerrarModal3();
-                //me.modal3=0;
-                console.log(response)
-                me.listarMarca(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //#################hasta aqui####################
-        //#################-Actualizar Industria-####################
-        actualizarMarca() {
-            if (this.validarIndustria()) {
-                return;
-            }
-            let me = this;
-
-            axios.put('/marca/actualizar', {
-                'nombre': this.nombre,
-                'condicion': this.condicion,
-                'id': this.marca_id
-            }).then(function (response) {
-                me.cerrarModal3();
-                me.listarMarca(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //#################hasta aqui####################
-        //##############registrar linea##########
-        registrarLinea() {
-            if (this.validarIndustria()) {
-                return;
-            }
-            let me = this;
-
-            axios.post('/categoria/registrar', {
-                'nombre': this.nombreLinea,
-                'condicion': this.condicion,
-                'descripcion': this.descripcion,
-                'codigoProductoSin': this.codigoProductoSin
-            }).then(function (response) {
-                me.cerrarModal3();
-                //me.modal3=0;
-                console.log(response)
-                me.listarLinea(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //#################hasta aqui####################
-        actualizarLinea() {
-            if (this.validarIndustria()) {
-                return;
-            }
-            let me = this;
-
-            axios.put('/categoria/actualizar', {
-                'nombre': this.nombreLinea,
-                'condicion': this.condicion,
-                'descripcion': this.descripcion,
-                'codigoProductoSin': this.codigoProductoSin,
-                'id': this.linea_id
-            }).then(function (response) {
-                me.cerrarModal3();
-                me.listarLinea(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-
-        //#################registro medida############
-        registrarMedida() {
-            if (this.validarMedida()) {
-                return;
-            }
-            let me = this;
-
-            axios.post('/medida/registrar', {
-                'descripcion_medida': this.descripcion_medida,
-                'descripcion_corta': this.descripcion_corta,
-                'estado': this.estado
-            }).then(function (response) {
-                me.cerrarModal7();
-                console.log(response)
-                me.listarMedida(1, '', 'descripcion_medida');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //#################hasta aqui####################
-        actualizarMedida() {
-            if (this.validarMedida()) {
-                return;
-            }
-
-            let me = this;
-
-            axios.put('/medida/actualizar', {
-                'descripcion_medida': this.descripcion_medida,
-                'descripcion_corta': this.descripcion_corta,
-                'estado': this.estado,
-                'id': this.medida_id
-            }).then(function (response) {
-                me.cerrarModal7();
-                me.listarMedida(1, '', 'descripcion_medida');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
         //#################hasta aqui####################
         validarArticulo() {
             this.errorArticulo = 0;
