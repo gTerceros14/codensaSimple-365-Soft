@@ -241,7 +241,7 @@ class UserController extends Controller
 
         $usuarios = User::join('personas', 'users.id', '=', 'personas.id')
             ->where('users.idrol', '=', $filtro )
-            ->select('personas.nombre as nombre','personas.id')
+            ->select('personas.nombre as nombre','personas.id','users.condicion')
             ->orderBy('personas.nombre', 'asc')
             ->get();
 
