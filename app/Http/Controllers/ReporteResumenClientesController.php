@@ -25,10 +25,10 @@ class ReporteResumenClientesController extends Controller
         $clientes = Venta::join('personas', 'ventas.idcliente','=','personas.id')
             ->join('cajas', 'ventas.idcaja','=','cajas.id')
             ->join('sucursales', 'cajas.idsucursal','=','sucursales.id')
-            ->join('users', 'ventas.idusuario','=','users.iduse');
+            ->join('users', 'ventas.idusuario','=','users.id');
 
         $usuarios = User::join('personas', 'users.id', '=', 'personas.id')
-            ->where('users.iduse', '=', $vendedorId )
+            ->where('users.id', '=', $vendedorId )
             ->select('personas.nombre as nombre')
             ->orderBy('personas.nombre', 'asc')
             ->get();
