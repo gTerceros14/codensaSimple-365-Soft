@@ -139,7 +139,6 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/cliente/actualizar', 'ClienteController@update');
         Route::get('/cliente/selectCliente', 'ClienteController@selectCliente');
         Route::get('/cliente/listarReporteClienteExcel', 'ClienteController@listarReporteClienteExcel');
-        Route::get('/cliente/clientesPorVendedor', 'ClienteController@clientesPorVendedor');
 
         Route::get('/cliente/selectUusarioVend', 'ClienteController@selectUsuarioVendedor');
         Route::get('/cliente/usuario', 'ClienteController@indexUsuario');
@@ -397,6 +396,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/top-vendedores', 'VentaController@topVendedores');
         Route::get('/top-clientes', 'VentaController@topClientes');
         Route::get('/top-articulos', 'VentaController@topProductos');
+        Route::get('/reporte-resumen-clientes', 'ReporteResumenClientesController@clientesPorVendedor');
 
 
 
