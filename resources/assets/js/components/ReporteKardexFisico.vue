@@ -185,7 +185,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
-                            <button type="submit" @click="listaReporte" class="btn btn-primary">Visualizar Reporte</button>
+                            <button type="submit" @click="listaReporte(); cerrarModal()" class="btn btn-primary">Visualizar Reporte</button>
                         </div>
                     </form>
 
@@ -970,16 +970,6 @@ export default {
             this.selectedHeadersFromFile = [...this.csvHeaders];
         },
 
-        cerrarModalImportar() {
-            this.modalImportar = 0;
-            this.pageImportar = 0;
-            this.errorsImport = [];
-            this.erroresNoExiste = [];
-            this.successImport = false;
-            this.listarArticulo(1, '', 'nombre');
-
-            this.removeFile();
-        },
 
         handleFileChange(event) {
             this.selectedFile = event.target.files[0];
@@ -1505,20 +1495,29 @@ export default {
                     console.log('ERRORES', error);
                 });
         },
-        listaReporte(){
-            let me = this;
-            var url = '/reporte-kardex-fisico?sucursal='+this.sucursalseleccionada.id+'&articulo='+this.articuloseleccionada.id+'&fechaInicio='+this.fechaInicio+'&fechaFin='+this.fechaFin
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                me.total_saldofisico = respuesta.total_saldo;
-                me.arrayReporte = respuesta.resultados;
-                console.log("array reporte",me.arrayReporte)
-                //me.formateaKardex();
-            })
-                .catch(function (error) {
-                    console.log('ERRORES', error);
-                });
-        },
+
+
+        listaReporte() {
+    let me = this;
+    var url = '/reporte-kardex-fisico?';
+
+    // Agregar los parámetros obligatorios
+    url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id +  '&grupo=' + this.gruposeleccionada.id;
+
+    // Agregar las fechas de inicio y fin
+    url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
+
+    axios.get(url)
+        .then(function (response) {
+            var respuesta = response.data;
+            me.total_saldofisico = respuesta.total_saldo;
+            me.arrayReporte = respuesta.resultados;
+            console.log("array reporte",me.arrayReporte);
+        })
+        .catch(function (error) {
+            console.log('ERRORES', error);
+        });
+},
 
         exportarPDF() {
             const pdf = new jsPDF();
@@ -2096,6 +2095,7 @@ export default {
             this.gruposeleccionadaVacio = false;
             this.medidaseleccionadaVacio = false;
             this.sucursalseleccionadaVacio = false;
+            this.articuloseleccionadaVacio = false;
             //
             this.codigo = '';
             this.nombre_producto = '';
@@ -2114,6 +2114,8 @@ export default {
             this.gruposeleccionada.nombre_grupo = '';
             this.medidaseleccionada.descripcion_medida = '';
             this.lineaseleccionada.nombre = '';
+            this.articuloseleccionada.nombre = '';
+            this.sucursalseleccionada.nombre = '';
             this.errorArticulo = 0;
 
             this.idmedida = 0;
@@ -2123,7 +2125,8 @@ export default {
             this.precio_dos = 0;
             this.precio_tres = 0;
             this.precio_cuatro = 0;
-
+            this.fechaInicio = '';
+            this.fechaFin ='';
             // unidad_envaseVacio: false,
             // nombre_genericoVacio: false,
             // precio_costo_unidVacio: false,
