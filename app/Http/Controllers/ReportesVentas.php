@@ -31,10 +31,10 @@ class ReportesVentas extends Controller
                 DB::raw('ROUND(ventas.total / monedas.tipo_cambio,2) AS importe_usd'))
         ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
 
-        //if ($request->has('estadoVenta') && $request->estadoVenta !== 'undefined') {
-          //  $estado_venta = $request->estadoVenta;
-            //$ventas->where('articulos.id' , $idarticulo);
-        //}
+        if ($request->has('estadoVenta') && $request->estadoVenta !== 'undefined') {
+            $estado_venta = $request->estadoVenta;
+            $ventas->where('ventas.estado' , '=', $estado_venta);
+        }
 
         if ($request->has('sucursal') && $request->sucursal !== 'undefined') {
             $sucursal = $request->sucursal;

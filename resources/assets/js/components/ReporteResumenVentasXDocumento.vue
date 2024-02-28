@@ -9,7 +9,7 @@
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Reporte Kardex Inventario Fisico
+                    <i class="fa fa-align-justify"></i> Resumen de Ventas por Documento
                     <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()"
                     class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros</button>
@@ -128,7 +128,7 @@
                                 <div class="col-md-6">
                                     <label for="" class="font-weight-bold">Estado Venta <span class="text-danger">*</span></label>
                                     <div class="input-group">  
-                                        <select class="form-control col-md-12" v-model="criterio">
+                                        <select class="form-control col-md-12" v-model="criterioEstado">
                                         <option value="Pendiente">Pendiente</option>
                                         <option value="Registrado">Registrado</option>
                                     </select>
@@ -288,15 +288,6 @@
                                         placeholder="Texto a buscar">
                                     <input v-if="tituloModal2 == 'Cliente'" type="text" v-model="buscarA"
                                         @keyup="listarPersona(1, buscarA, criterioA)" class="form-control"
-                                        placeholder="Texto a buscar">
-                                    <input v-if="tituloModal2 == 'Lineas'" type="text" v-model="buscarA"
-                                        @keyup="listarLinea(1, buscarA, criterioA)" class="form-control"
-                                        placeholder="Texto a buscar">
-                                    <input v-if="tituloModal2 == 'Proveedors'" type="text" v-model="buscarA"
-                                        @keyup="listarproveedor(1, buscarA, criterioA)" class="form-control"
-                                        placeholder="Texto a buscar">
-                                    <input v-if="tituloModal2 == 'Grupos'" type="text" v-model="buscarA"
-                                        @keyup="listargrupo(1, buscarA, criterioA)" class="form-control"
                                         placeholder="Texto a buscar">
                                     <input v-if="tituloModal2 == 'Sucursal'" type="text" v-model="buscarA"
                                         @keyup="listarSucursal(1, buscarA, criterioA)" class="form-control"
@@ -567,6 +558,7 @@ export default {
 
 
             criterioA: 'nombre',
+            criterioEstado: '',
             buscarA: '',
             tituloModal2: '',
             clienteseleccionada: [],
@@ -1322,22 +1314,7 @@ export default {
                     console.log(error);
                 });
         },
-        //------listado proveedor, Registro Proveedor y editar-----------
-        listarproveedor(page, buscar, criterio) {
-            let me = this;
-            console.log("ListanoProveedor");
-            var url = '/proveedor?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                console.log(respuesta);
-                me.arrayBuscador = respuesta.personas.data;
-                me.pagination = respuesta.pagination;
-                console.log("Listad0");
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        },
+
 
        
         //--grupo listado ,registro y actualizar
@@ -1364,7 +1341,7 @@ export default {
             var url = '/resumen-ventas-documento?';
 
             // Agregar los parámetros obligatorios
-            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.articuloseleccionada.id + '&estadoVenta=' + this.clienteseleccionada.id + '&idcliente=' + this.lineaseleccionada.id;
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.articuloseleccionada.id + '&estadoVenta=' + this.criterioEstado + '&idcliente=' + this.lineaseleccionada.id;
 
             // Agregar las fechas de inicio y fin
             url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
