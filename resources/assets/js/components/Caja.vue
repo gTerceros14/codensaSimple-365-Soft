@@ -23,15 +23,12 @@
                             <th>Fecha Apertura</th>
                             <th>Fecha Cierre</th>
                             <th>Saldo Inicial</th>
-                           
-                            <th>Ventas Contado</th>
-                            <th>Ventas Crédito</th>
-                            <th>Compras Contado</th>
-                            <th>Compras Crédito</th>
+                            <th>Ventas</th>
+                            <th>Pagos en Efectivo Ventas</th>
+                            <th>Compras </th>
+                            <th>Pagos en Efectivo Compras</th>
                             <th>Saldo Faltante</th>
                             <th>Saldo Sobrante</th>
-                            <th>Total Ingresos Ventas</th>
-                            <th>Total Egresos Compras</th>
                             <th>Depósitos Extras</th>
                             <th>Salidas Extras</th>
                             <th>Saldo Caja</th>
@@ -47,14 +44,12 @@
                             <td v-text="caja.fechaCierre"></td>
                             <td v-text="caja.saldoInicial"></td>
                           
-                            <td v-text="caja.ventasContado"></td>
-                            <td v-text="caja.ventasCredito"></td>
-                            <td v-text="caja.comprasContado"></td>
-                            <td v-text="caja.comprasCredito"></td>
+                            <td v-text="caja.ventas"></td>
+                            <td v-text="caja.pagosEfectivoVentas"></td>
+                            <td v-text="caja.compras"></td>
+                            <td v-text="caja.pagosEfecivocompras"></td>
                             <td v-text="caja.saldoFaltante"></td>
                             <td v-text="caja.saldoSobrante"></td>
-                            <td>{{ parseFloat(caja.ventasContado) + parseFloat(caja.ventasCredito) }}</td>
-                            <td>{{ parseFloat(caja.comprasContado)+ parseFloat(caja.comprasCredito)  }}</td>
                             <td v-text="caja.depositos"></td>
                             <td v-text="caja.salidas"></td>
                             <td v-text="caja.saldoCaja"></td>
