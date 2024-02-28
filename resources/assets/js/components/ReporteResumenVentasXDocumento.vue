@@ -139,7 +139,7 @@
                                     <label for="" class="font-weight-bold">Ejecutivo de Venta <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <input class="form-control" type="text" placeholder="Seleccione una linea" disabled
-                                            v-model="lineaseleccionada.nombre"
+                                            v-model="ejecutivoseleccionado.nombre"
                                             :class="{ 'is-invalid': errores.idcategoria }" @input="validarCampo('codigo')">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button"
@@ -562,6 +562,7 @@ export default {
             buscarA: '',
             tituloModal2: '',
             clienteseleccionada: [],
+            ejecutivoseleccionado: [],
             industriaseleccionada: [],
             lineaseleccionada: [],
             proveedorseleccionada: [],
@@ -600,6 +601,7 @@ export default {
             fotografiaVacio: false,
             lineaseleccionadaVacio: false,
             clienteseleccionadaVacio: false,
+            ejecutivoseleccionadoVacio: false,
             industriaseleccionadaVacio: false,
             proveedorseleccionadaVacio: false,
             gruposeleccionadaVacio: false,
@@ -1124,13 +1126,8 @@ export default {
                 }
             } else if (this.tituloModal2 == "Cliente") {
                 this.clienteseleccionadaVacio = false;
-                if (selected.estado == 1) {
-                    this.clienteseleccionada = selected;
-                    this.validarCampo("idindustria");
-
-                } else if (selected.estado == 0) {
-                    this.advertenciaInactiva('Cliente');
-                }
+                this.clienteseleccionada = selected;
+                
             } else if (this.tituloModal2 == "Lineas") {
                 if (selected.condicion == 1) {
                     this.lineaseleccionada = selected;
@@ -1164,6 +1161,10 @@ export default {
 
                 } else if (selected.condicion == 0) {
                     this.advertenciaInactiva('Articulo');
+                }
+            }else if (this.tituloModal2 == "Ejecutivo") {
+                if (selected.condicion == 1) {
+                    this.ejecutivoseleccionado = selected;
                 }
             }
             
@@ -1244,13 +1245,14 @@ export default {
                 this.listarPersona(1, '', 'nombre');
                 this.modal2 = true;
                 this.tituloModal2 = titulo;
-                this.industriaseleccionadaVacio = false;
+                this.clienteseleccionada = false;
+
 
             } else if (titulo == "Ejecutivo") {
                 this.listarEjecutivo(1, '', 'nombre');
                 this.modal2 = true;
                 this.tituloModal2 = titulo;
-                this.lineaseleccionadaVacio = false;
+                this.ejecutivoseleccionado = false;
 
             }else if (titulo == "Sucursal") {
                 this.listarSucursal(1, '', 'nombre');
@@ -1660,6 +1662,7 @@ export default {
             this.fotografiaVacio = false;
             this.lineaseleccionadaVacio = false;
             this.clienteseleccionada = false;
+            this.ejecutivoseleccionado = false;
             this.industriaseleccionadaVacio = false;
             this.proveedorseleccionadaVacio = false;
             this.gruposeleccionadaVacio = false;
@@ -1678,7 +1681,6 @@ export default {
             this.fotografia = ''; //Pasando el valor limpio de la referencia
             this.fotoMuestra = null;
             this.lineaseleccionada.nombre = '';
-            this.clienteseleccionada.nombre = '';
             this.industriaseleccionada.nombre = '';
             this.proveedorseleccionada.nombre = '';
             this.gruposeleccionada.nombre_grupo = '';
