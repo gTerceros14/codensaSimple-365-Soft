@@ -31,11 +31,13 @@ class ReportesVentas extends Controller
                 DB::raw('ROUND(ventas.total / monedas.tipo_cambio,2) AS importe_usd'))
         ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
 
-        if ($request->has('estadoVenta') && $request->estadoVenta !== 'undefined') {
+        if ($request->has('estadoVenta')) {
             $estado_venta = $request->estadoVenta;
-            $ventas->where('ventas.estado' , '=', $estado_venta);
+            if ($estado_venta !== 'Todos') {
+                $ventas->where('ventas.estado', '=', $estado_venta);
+            }
         }
-
+        
         if ($request->has('sucursal') && $request->sucursal !== 'undefined') {
             $sucursal = $request->sucursal;
             $ventas->where('sucursales.id', $sucursal);
@@ -43,12 +45,12 @@ class ReportesVentas extends Controller
 
         if ($request->has('ejecutivoCuentas') && $request->ejecutivoCuentas !== 'undefined') {
             $ejecutivoCuentas = $request->ejecutivoCuentas;
-            $ventas->where('users.id' , $ejecutivoCuentas);
+            $ventas->where('ventas.idusuario' , $ejecutivoCuentas);
         }
 
-        if ($request->has('idusuario') && $request->idcliente !== 'undefined') {
+        if ($request->has('idcliente') && $request->idcliente !== 'undefined') {
             $cliente = $request->idcliente;
-            $ventas->where('personas.id' , $cliente);
+            $ventas->where('ventas.idcliente' , $cliente);
         }
 
 

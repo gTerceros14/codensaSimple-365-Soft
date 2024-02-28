@@ -129,6 +129,8 @@
                                     <label for="" class="font-weight-bold">Estado Venta <span class="text-danger">*</span></label>
                                     <div class="input-group">  
                                         <select class="form-control col-md-12" v-model="criterioEstado">
+                                        <option value="Todos">Todos</option>
+
                                         <option value="Pendiente">Pendiente</option>
                                         <option value="Registrado">Registrado</option>
                                     </select>
@@ -1343,7 +1345,7 @@ export default {
             var url = '/resumen-ventas-documento?';
 
             // Agregar los parámetros obligatorios
-            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.articuloseleccionada.id + '&estadoVenta=' + this.criterioEstado + '&idcliente=' + this.lineaseleccionada.id;
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.ejecutivoseleccionado.id + '&estadoVenta=' + this.criterioEstado + '&idcliente=' + this.clienteseleccionada.id;
 
             // Agregar las fechas de inicio y fin
             url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
@@ -1667,7 +1669,7 @@ export default {
             this.proveedorseleccionadaVacio = false;
             this.gruposeleccionadaVacio = false;
             this.medidaseleccionadaVacio = false;
-            this.sucursalseleccionadaVacio = false;
+            this.sucursalseleccionada = false;
             this.articuloseleccionadaVacio = false;
             //
             this.codigo = '';
