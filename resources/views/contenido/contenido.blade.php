@@ -184,6 +184,14 @@
 <template v-if="menu==55">
     <resumenventaxdocumento></resumenventaxdocumento>
 </template>
+
+<template v-if="menu==57">
+    <resumenventaxproducto></resumenventaxproducto>
+</template>
+
+<template v-if="menu==58">
+    <resumenfisicomovimientos></resumenfisicomovimientos>
+</template>
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
     <dashboard></dashboard>

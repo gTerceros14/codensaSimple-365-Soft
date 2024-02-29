@@ -150,26 +150,32 @@ public function generarReporteFisico(Request $request)
         }
     
     
-    $ingresos = $ingresos->get();
-    $ventas = $ventas->get();
-
-    $resultados = $ingresos->concat($ventas)->sortBy('fecha_hora');
-
-    $saldo = 0;
-
-    foreach ($resultados as &$resultado) {
-        if ($resultado->tipo === 'Ingreso') {
-            $saldo += $resultado->cantidad;
-        } else {
-            $saldo -= $resultado->cantidad;
+      // Realizar las consultas
+        $ingresos = $ingresos->get();
+        $ventas = $ventas->get();
+    
+        // Combinar los resultados de ingresos y ventas
+        $resultados = $ingresos->concat($ventas)->sortBy('fecha_hora');
+    
+        // Calcular el saldo
+        $saldo = 0;
+        $saldoFisico = 0;
+    
+        foreach ($resultados as &$resultado) {
+            if ($resultado->tipo === 'Ingreso') {
+                $resultado->subtotal = $resultado->cantidad * $resultado->precio_ingreso;
+                $saldo += $resultado->subtotal;
+                $saldoFisico += $resultado->cantidad;
+            } else {
+                $resultado->subtotal = $resultado->cantidad * $resultado->precio_venta;
+                $saldo -= $resultado->subtotal;
+                $saldoFisico -= $resultado->cantidad;
+            }
+            $resultado->resultado_operacionValorado = $saldo;
+            $resultado->resultado_operacionFisico = $saldoFisico;
         }
-        $resultado->resultado_operacion = $saldo;
-    }
-    $total_saldo = $resultado->resultado_operacion;
-
-
-    return ['resultados' => $resultados,
-    'total_saldo' => $total_saldo
-    ];}
+        $total_saldo = $saldoFisico; // Total físico como saldo total
+    
+        return ['resultados' => $resultados, 'total_saldo' => $total_saldo];}
 
 }

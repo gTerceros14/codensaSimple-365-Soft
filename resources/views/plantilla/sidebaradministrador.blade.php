@@ -172,17 +172,26 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen de
                             clientes</a>
                     </li>
+
                     <li @click="menu=51" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex
                             Fisico Valorado</a>
                     </li>
 
                     <li @click="menu=52" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex
-                            Fisico</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex Fisico</a>
                     </li>
+
+                    <li @click="menu=58" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Fisico de Movimientos</a>
+                    </li>
+
                     <li @click="menu=55" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas x Documento</a>
+                    </li>
+
+                    <li @click="menu=57" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas x Producto</a>
                     </li>
                 </ul>
             </li>

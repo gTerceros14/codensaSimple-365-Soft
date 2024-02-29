@@ -43,7 +43,7 @@
                                     <td v-else>0</td>
                                     <td v-if="articulo.tipo === 'Venta'" v-text="articulo.cantidad"></td>
                                     <td v-else>0</td>
-                                    <td v-text="articulo.resultado_operacion"></td>
+                                    <td v-text="articulo.resultado_operacionFisico"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1449,7 +1449,7 @@ export default {
                     item.tipo_comprobante,
                     item.tipo === 'Ingreso' ? item.cantidad : '',
                     item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacion,]);
+                    item.resultado_operacionFisico,]);
 
             pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
 
@@ -1498,7 +1498,7 @@ export default {
                     item.tipo_comprobante,
                     item.tipo === 'Ingreso' ? item.cantidad : '',
                     item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacion,
+                    item.resultado_operacionFisico,
                 ];
 
                 // Añadir la fila al kardex
@@ -2242,6 +2242,8 @@ export default {
         this.obtenerConfiguracionTrabajo();
         this.listarArticulo(1, this.buscar, this.criterio);
         this.listarPrecio();//aumenTe 6julio
+        this.listaReporte();
+
     }
 }
 </script>

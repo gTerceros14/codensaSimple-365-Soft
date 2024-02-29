@@ -178,6 +178,17 @@ Vue.component(
 );
 
 Vue.component(
+  "resumenventaxproducto",
+  require("./components/ReporteResumenVentasXProducto.vue")
+);
+
+Vue.component(
+  "resumenfisicomovimientos",
+  require("./components/ReporteResumenFisicoMovimientos.vue")
+);
+
+
+Vue.component(
   "ventasinstitucionales",
   require("./components/VentasInstitucionales.vue")
 );
