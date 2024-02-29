@@ -113,7 +113,8 @@ class IngresoController extends Controller
                     $ingreso->idcaja = $ultimaCaja->id;
                     $ingreso->save();
                     
-                    $ultimaCaja->comprasContado = ($request->total)+($ultimaCaja->comprasContado);
+                    $ultimaCaja->compras = ($request->total)+($ultimaCaja->compras);
+                    $ultimaCaja->pagosEfecivocompras = ($request->total)+($ultimaCaja->pagosEfecivocompras);
                     $ultimaCaja->save();
 
                     $detalles = $request->data;//Array de detalles
