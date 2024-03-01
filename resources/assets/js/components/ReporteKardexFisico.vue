@@ -1744,8 +1744,7 @@ export default {
             this.proveedorseleccionada.nombre = '';
             this.gruposeleccionada.nombre_grupo = '';
             this.medidaseleccionada.descripcion_medida = '';
-            this.lineaseleccionada.nombre = '';
-            this.articuloseleccionada.nombre = '';
+            //this.articuloseleccionada.nombre = '';
             this.sucursalseleccionada.nombre = '';
             this.errorArticulo = 0;
 
@@ -1756,8 +1755,7 @@ export default {
             this.precio_dos = 0;
             this.precio_tres = 0;
             this.precio_cuatro = 0;
-            this.fechaInicio = '';
-            this.fechaFin ='';
+            
             // unidad_envaseVacio: false,
             // nombre_genericoVacio: false,
             // precio_costo_unidVacio: false,
@@ -1776,6 +1774,14 @@ export default {
             // medidaseleccionadaVacio: false,
         },
         abrirModal(modelo, accion, data = []) {
+            this.sucursalseleccionada = false;
+            this.articuloseleccionada = false;
+            this.gruposeleccionada = false;
+            this.lineaseleccionada = false;
+            this.marcaseleccionada = false;
+            this.industriaseleccionada = false;
+            this.fechaInicio = '';
+            this.fechaFin ='';
             switch (modelo) {
                 case "articulo":
                     {
