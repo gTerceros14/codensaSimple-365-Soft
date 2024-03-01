@@ -37,15 +37,18 @@
                             </thead>
                             <tbody>
                                 <tr v-for="articulo in sortedResultados" :key="articulo.id">
-                                    <td v-text="articulo.tipo"></td>
-                                    <td v-text="articulo.num_comprobante"></td>
+                                    <td v-text="articulo.codigo"></td>
                                     <td v-text="articulo.fecha_hora"></td>
-                                    <td v-text="articulo.tipo_comprobante"></td>
-                                    <td v-if="articulo.tipo === 'Ingreso'" v-text="articulo.cantidad"></td>
-                                    <td v-else>0</td>
-                                    <td v-if="articulo.tipo === 'Venta'" v-text="articulo.cantidad"></td>
-                                    <td v-else>0</td>
-                                    <td v-text="articulo.resultado_operacion"></td>
+                                    <td v-text="articulo.nombre_marca"></td>
+                                    <td v-text="articulo.nombre_categoria"></td>
+                                    <td v-text="articulo.nombre_industria"></td>
+                                    <td v-text="articulo.medida"></td>
+                                    <td v-text="articulo.descripcion"></td>
+                                    <td v-text="articulo.cantidad"></td>
+                                    <td v-text="articulo.precio"></td>
+
+
+
                                 </tr>
                             </tbody>
                         </table>
@@ -1436,7 +1439,7 @@ export default {
 
         listaReporte() {
             let me = this;
-            var url = '/reporte-kardex-fisico?';
+            var url = '/reporte-ventas-producto?';
 
             // Agregar los parámetros obligatorios
             url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id + '&idcliente=' + this.clienteseleccionada.id;
@@ -2279,7 +2282,8 @@ export default {
         this.recuperarIdRol();
         this.datosConfiguracion();
         this.obtenerConfiguracionTrabajo();
-        this.listarArticulo(1, this.buscar, this.criterio);
+        //this.listarArticulo(1, this.buscar, this.criterio);
+        this.listaReporte();
         this.listarPrecio();//aumenTe 6julio
     }
 }
