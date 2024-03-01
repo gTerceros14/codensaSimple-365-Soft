@@ -332,7 +332,7 @@ class VentaController extends Controller
             }
             $venta = $this->crearVenta($request);
 
-            $this->actualizarCaja($request->total,$request->pagosEfectivoVentas);
+            $this->actualizarCaja($request->total,$request->idtipo_pago);
 
             $this->registrarDetallesVenta($venta, $request->data, $request->idAlmacen);
 
@@ -382,6 +382,7 @@ class VentaController extends Controller
         } else {
             $venta->estado = 'Registrado';
         }
+        
         $venta->idcaja = Caja::latest()->first()->id;
         $venta->save();
 
@@ -445,11 +446,11 @@ class VentaController extends Controller
     }
 
 
-    private function actualizarCaja($total,$pagosEfectivoVentas)
+    private function actualizarCaja($total,$idtipo_pago)
     {
         $ultimaCaja = Caja::latest()->first();
         $ultimaCaja->ventas += $total;
-        if ($ultimaCaja->pagosEfectivoVentas==1){
+        if ($idtipo_pago == 1){
             $ultimaCaja->pagosEfectivoVentas+= $total;
         }
         $ultimaCaja->save();
