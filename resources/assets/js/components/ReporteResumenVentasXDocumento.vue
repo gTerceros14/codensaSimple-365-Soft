@@ -1407,7 +1407,7 @@ export default {
             // Merge de celdas para el título
             worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
             // Título del reporte
-            worksheet['A1'] = { t: 's', v: 'REPORTE KARDEX INVENTARIO FISICO VALORADO', s: { 
+            worksheet['A1'] = { t: 's', v: 'RESUMEN DE VENTAS POR DOCUMENTOS', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
                 alignment: { horizontal: 'center', vertical: 'center' },
                 fill: { fgColor: { rgb: '3669a8' } } } };
@@ -1417,15 +1417,15 @@ export default {
             // Fechas de inicio y fin
             worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
             worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
-            worksheet['D2'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
-            worksheet['A3'] = { t: 's', v: `Codigo: ${this.articuloseleccionada.codigo}`, s: fechaStyle };
-            worksheet['B3'] = { t: 's', v: `Descripcion: ${this.articuloseleccionada.descripcion}`, s: fechaStyle };
+            //worksheet['D2'] = { t: 's', v: `Sucursal: ${this.sucursalseleccionadaseleccionada.nombre}`, s: fechaStyle };
+            //worksheet['A3'] = { t: 's', v: `Ventas: ${this.criterioEstado}`, s: fechaStyle };
+            //worksheet['B3'] = { t: 's', v: `Cliente: ${this.clienteseleccionadaseleccionada.nombre}`, s: fechaStyle };
 
 
             // Estilo para los encabezados
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
             // Cabeceras de las columnas
-            const headers = ['C.C', 'Num comprobante', 'Fecha', 'Detalle','Entrada','Salida','Saldo','Costo unitario','Ingreso','Egreso','Saldo'];
+            const headers = ['Factura', 'Sucursal', 'Fecha', 'Tipo de cambio','Tipo de venta','Ejecutivo de Venta','Nombre Ejecutivo de Venta','Cliente','Importe Bs','Importe US'];
 
             // Añadir las cabeceras a la hoja de cálculo
             headers.forEach((header, index) => {
@@ -1435,13 +1435,15 @@ export default {
             // Añadir los datos al kardex
             Object.values(this.sortedResultados).forEach((item, rowIndex) => {
                 const rowData = [
-                    item.tipo,
-                    item.num_comprobante,
+                    item.Factura,
+                    item.Nombre_sucursal,
                     item.fecha_hora,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacion,
+                    item.Tipo_Cambio,
+                    item.nombre_rol,
+                    item.usuario,
+                    item.nombre,
+                    item.importe_BS,
+                    item.importe_usd,
                 ];
 
                 // Añadir la fila al kardex
@@ -1450,8 +1452,8 @@ export default {
 
             // Añadir el total ganado al final del reporte
             
-            const totalRow = [`Total Ganado: Bs. ${this.total_saldo}`];
-            worksheet['!merges'].push({ s: { r: startRow + Object.values(this.sortedResultados).length, c: 0 }, e: { r: startRow + Object.values(this.sortedResultados).length, c: 3 } });
+           // const totalRow = [`Total Ganado: Bs. ${this.total_saldo}`];
+            //worksheet['!merges'].push({ s: { r: startRow + Object.values(this.sortedResultados).length, c: 0 }, e: { r: startRow + Object.values(this.sortedResultados).length, c: 3 } });
 
             // Establecer el ancho de las columnas
             const columnWidths = [
