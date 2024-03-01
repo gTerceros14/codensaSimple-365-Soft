@@ -24,7 +24,6 @@
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th>NOTA VENTA</th>
                                     <th>NUM FACTURA</th>
                                     <th>SUCURSAL</th>
                                     <th>FECHA</th>
@@ -40,7 +39,6 @@
                             </thead>
                             <tbody>
                                 <tr v-for="articulo in sortedResultados" :key="articulo.id">
-                                    <td v-text="articulo.tipo"></td>
                                     <td v-text="articulo.Factura"></td>
                                     <td v-text="articulo.Nombre_sucursal"></td>
                                     <td v-text="articulo.fecha_hora"></td>  
@@ -130,7 +128,6 @@
                                     <div class="input-group">  
                                         <select class="form-control col-md-12" v-model="criterioEstado">
                                         <option value="Todos">Todos</option>
-
                                         <option value="Pendiente">Pendiente</option>
                                         <option value="Registrado">Registrado</option>
                                     </select>
@@ -560,7 +557,7 @@ export default {
 
 
             criterioA: 'nombre',
-            criterioEstado: '',
+            criterioEstado: 'Todos',
             buscarA: '',
             tituloModal2: '',
             clienteseleccionada: [],
@@ -1363,40 +1360,45 @@ export default {
         },
 
         exportarPDF() {
-            const pdf = new jsPDF();
+            const pdf = new jsPDF('landscape');
             
-            const titulo = 'Kardex Inventario Fisico';
+            const titulo = 'RESUMEN DE VENTA POR DOCUMENTO';
             const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
             const fechaFin = `Fecha Fin: ${this.fechaFin}`;
-            const articulo = `Articulo: ${this.articuloseleccionada.nombre}`;
-            const codigo = `Codigo: ${this.articuloseleccionada.codigo}`;
-            const descripcion = `Descripcion: ${this.articuloseleccionada.descripcion}`;
+            const sucursal = `Sucursal: ${this.sucursalseleccionada.nombre}`;
+            const venta = `Venta: ${this.criterioEstado}`;
+            const cliente = `Cliente: ${this.clienteseleccionada.nombre}`;
 
             pdf.setFont('helvetica');
             pdf.setFontSize(16); // Tamaño de letra más grande para el título
-            pdf.text(titulo, 15, 10);
+            pdf.text(titulo, 100, 10);
 
             pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
             pdf.text(fechaInicio, 15, 20);
-            pdf.text(fechaFin, 100, 20);
-            pdf.text(articulo, 150, 20);
-            pdf.text(codigo, 15, 30);
-            pdf.text(descripcion, 100, 30);
+            pdf.text(fechaFin, 125, 20);
+            pdf.text(sucursal, 240, 20);
+            pdf.text(venta, 15, 30);
+            pdf.text(cliente, 125, 30);
 
             const tableYPosition = 40;
 
-            const columns = ['C.C.', 'Num Comprobante', 'Fecha', 'Detalle', 'Entrada', 'Salida', 'Saldo'];
-            const rows = this.arrayReporte.map(item => [item.tipo,
-                    item.num_comprobante,
+            const columns = ['Factura', 'Sucursal', 'Fecha', 'Tipo de cambio','Tipo de venta','Ejecutivo de Venta','Nombre Ejecutivo de Venta','Cliente','Importe Bs','Importe US'];
+            const rows = this.arrayReporte.map(item => [
+                    item.Factura,
+                    item.Nombre_sucursal,
                     item.fecha_hora,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacion,]);
+                    item.Tipo_Cambio,
+                    item.Tipo_venta,
+                    item.nombre_rol,
+                    item.usuario,
+                    item.nombre,
+                    item.importe_BS,
+                    item.importe_usd,
+                ]);
 
             pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
 
-            pdf.save('reporte_inventarios.pdf');
+            pdf.save('reporte_resumen_ventas_por_documento.pdf');
         },
 
         exportarExcel() {
@@ -1405,27 +1407,27 @@ export default {
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
             // Título del reporte
-            worksheet['A1'] = { t: 's', v: 'REPORTE KARDEX INVENTARIO FISICO VALORADO', s: { 
+            worksheet['A1'] = { t: 's', v: 'RESUMEN DE VENTAS POR DOCUMENTOS', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
                 alignment: { horizontal: 'center', vertical: 'center' },
                 fill: { fgColor: { rgb: '3669a8' } } } };
 
             // Estilo para la fecha
-            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
+            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
             // Fechas de inicio y fin
             worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
-            worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
-            worksheet['D2'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
-            worksheet['A3'] = { t: 's', v: `Codigo: ${this.articuloseleccionada.codigo}`, s: fechaStyle };
-            worksheet['B3'] = { t: 's', v: `Descripcion: ${this.articuloseleccionada.descripcion}`, s: fechaStyle };
+            worksheet['C2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+            worksheet['F2'] = { t: 's', v: `Sucursal: ${this.sucursalseleccionada.nombre}`, s: fechaStyle };
+            worksheet['A3'] = { t: 's', v: `Ventas: ${this.criterioEstado}`, s: fechaStyle };
+            worksheet['C3'] = { t: 's', v: `Cliente: ${this.clienteseleccionada.nombre}`, s: fechaStyle };
 
 
             // Estilo para los encabezados
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
             // Cabeceras de las columnas
-            const headers = ['C.C', 'Num comprobante', 'Fecha', 'Detalle','Entrada','Salida','Saldo','Costo unitario','Ingreso','Egreso','Saldo'];
+            const headers = ['Factura', 'Sucursal', 'Fecha', 'Tipo de cambio','Tipo de venta','Ejecutivo de Venta','Nombre Ejecutivo de Venta','Cliente','Importe Bs','Importe US'];
 
             // Añadir las cabeceras a la hoja de cálculo
             headers.forEach((header, index) => {
@@ -1435,13 +1437,16 @@ export default {
             // Añadir los datos al kardex
             Object.values(this.sortedResultados).forEach((item, rowIndex) => {
                 const rowData = [
-                    item.tipo,
-                    item.num_comprobante,
+                    item.Factura,
+                    item.Nombre_sucursal,
                     item.fecha_hora,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacion,
+                    item.Tipo_Cambio,
+                    item.Tipo_venta,
+                    item.nombre_rol,
+                    item.usuario,
+                    item.nombre,
+                    item.importe_BS,
+                    item.importe_usd,
                 ];
 
                 // Añadir la fila al kardex
@@ -1450,23 +1455,30 @@ export default {
 
             // Añadir el total ganado al final del reporte
             
-            const totalRow = [`Total Ganado: Bs. ${this.total_saldo}`];
-            worksheet['!merges'].push({ s: { r: startRow + Object.values(this.sortedResultados).length, c: 0 }, e: { r: startRow + Object.values(this.sortedResultados).length, c: 3 } });
+           // const totalRow = [`Total Ganado: Bs. ${this.total_saldo}`];
+            //worksheet['!merges'].push({ s: { r: startRow + Object.values(this.sortedResultados).length, c: 0 }, e: { r: startRow + Object.values(this.sortedResultados).length, c: 3 } });
 
             // Establecer el ancho de las columnas
             const columnWidths = [
-                { wch: 27.8 },
+                { wch: 21.56 },
                 { wch: 16.0 },   
-                { wch: 18.6 },
-                { wch: 15.2 }
+                { wch: 22.22 },
+                { wch: 15.14 },
+                { wch: 14.78 },
+                { wch: 17.11 },
+                { wch: 25.0 },
+                { wch: 26.67 },
+                { wch: 13.11 },
+                { wch: 12.78 },
+
             ];
             worksheet['!cols'] = columnWidths;
 
             // Añadir la hoja de cálculo al libro
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte Ventas');
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Resumen Ventas por Documento');
 
             // Descargar el archivo
-            XLSX.writeFile(workbook, 'reporte_kardex_fisico_valorado.xlsx');
+            XLSX.writeFile(workbook, 'reporte_resumen_ventas_por_documento.xlsx');
         },
 
         formateaKardex(){
@@ -1663,13 +1675,10 @@ export default {
             this.descripcionVacio = false;
             this.fotografiaVacio = false;
             this.lineaseleccionadaVacio = false;
-            this.clienteseleccionada = false;
-            this.ejecutivoseleccionado = false;
             this.industriaseleccionadaVacio = false;
             this.proveedorseleccionadaVacio = false;
             this.gruposeleccionadaVacio = false;
             this.medidaseleccionadaVacio = false;
-            this.sucursalseleccionada = false;
             this.articuloseleccionadaVacio = false;
             //
             this.codigo = '';
@@ -1689,7 +1698,8 @@ export default {
             this.medidaseleccionada.descripcion_medida = '';
             this.lineaseleccionada.nombre = '';
             this.articuloseleccionada.nombre = '';
-            this.sucursalseleccionada.nombre = '';
+            //this.sucursalseleccionada.nombre = '';
+
             this.errorArticulo = 0;
 
             this.idmedida = 0;
@@ -1699,8 +1709,7 @@ export default {
             this.precio_dos = 0;
             this.precio_tres = 0;
             this.precio_cuatro = 0;
-            this.fechaInicio = '';
-            this.fechaFin ='';
+            
             // unidad_envaseVacio: false,
             // nombre_genericoVacio: false,
             // precio_costo_unidVacio: false,
@@ -1719,6 +1728,11 @@ export default {
             // medidaseleccionadaVacio: false,
         },
         abrirModal(modelo, accion, data = []) {
+            this.ejecutivoseleccionado = false;
+            this.clienteseleccionada = false;
+            this.sucursalseleccionada = false;
+            this.fechaInicio = '';
+            this.fechaFin ='';
             switch (modelo) {
                 case "articulo":
                     {

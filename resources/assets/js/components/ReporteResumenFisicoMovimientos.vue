@@ -1437,40 +1437,48 @@ export default {
         },
 
         exportarPDF() {
-            const pdf = new jsPDF();
+            const pdf = new jsPDF('landscape');
             
-            const titulo = 'Kardex Inventario Fisico';
+            const titulo = 'RESUMEN FISICO DE MOVIMIENTOS';
             const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
             const fechaFin = `Fecha Fin: ${this.fechaFin}`;
             const articulo = `Articulo: ${this.articuloseleccionada.nombre}`;
-            const codigo = `Codigo: ${this.articuloseleccionada.codigo}`;
-            const descripcion = `Descripcion: ${this.articuloseleccionada.descripcion}`;
+            const sucursal = `Sucursal: ${this.sucursalseleccionada.nombre}`;
+            const linea = `Linea: ${this.lineaseleccionada.nombre}`;
+            const marca = `Marca: ${this.marcaseleccionada.nombre}`;
+
 
             pdf.setFont('helvetica');
             pdf.setFontSize(16); // Tamaño de letra más grande para el título
-            pdf.text(titulo, 15, 10);
+            pdf.text(titulo, 100, 10);
 
             pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
             pdf.text(fechaInicio, 15, 20);
-            pdf.text(fechaFin, 100, 20);
-            pdf.text(articulo, 150, 20);
-            pdf.text(codigo, 15, 30);
-            pdf.text(descripcion, 100, 30);
+            pdf.text(fechaFin, 125, 20);
+            pdf.text(sucursal, 240, 20);
+            pdf.text(articulo, 15, 30);
+            pdf.text(linea, 125, 30);
+            pdf.text(marca, 240, 30);
 
             const tableYPosition = 40;
 
-            const columns = ['C.C.', 'Num Comprobante', 'Fecha', 'Detalle', 'Entrada', 'Salida', 'Saldo'];
-            const rows = this.arrayReporte.map(item => [item.tipo,
-                    item.num_comprobante,
+            const columns = ['Codigo Item', 'Fecha', 'Descripcion', 'Detalle','Marca','Linea','Saldo Anterior','Entrada','Salida','Saldo Actual'];
+            const rows = this.arrayReporte.map(item => [
+                    item.codigo,
                     item.fecha_hora,
+                    item.descripcion,
+                    item.tipo_comprobante,
+                    item.nombre_marca,
+                    item.nombre_categoria,
                     item.tipo_comprobante,
                     item.tipo === 'Ingreso' ? item.cantidad : '',
                     item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacion,]);
+                    item.resultado_operacionFisico,
+                ]);
 
             pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
 
-            pdf.save('reporte_inventarios.pdf');
+            pdf.save('resumen_movimientos_fisicos.pdf');
         },
 
         exportarExcel() {
@@ -1479,27 +1487,28 @@ export default {
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
             // Título del reporte
-            worksheet['A1'] = { t: 's', v: 'REPORTE KARDEX INVENTARIO FISICO VALORADO', s: { 
+            worksheet['A1'] = { t: 's', v: 'RESUMEN FISICO DE MOVIMIENTOS', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
                 alignment: { horizontal: 'center', vertical: 'center' },
                 fill: { fgColor: { rgb: '3669a8' } } } };
 
             // Estilo para la fecha
-            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
+            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
             // Fechas de inicio y fin
             worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
-            worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
-            worksheet['D2'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
-            worksheet['A3'] = { t: 's', v: `Codigo: ${this.articuloseleccionada.codigo}`, s: fechaStyle };
-            worksheet['B3'] = { t: 's', v: `Descripcion: ${this.articuloseleccionada.descripcion}`, s: fechaStyle };
+            worksheet['C2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+            worksheet['F2'] = { t: 's', v: `Sucursal: ${this.sucursalseleccionada.nombre}`, s: fechaStyle };
+            worksheet['A3'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
+            worksheet['C3'] = { t: 's', v: `Marca: ${this.marcaseleccionada.nombre}`, s: fechaStyle };
+            worksheet['F3'] = { t: 's', v: `Linea: ${this.lineaseleccionada.nombre}`, s: fechaStyle };
 
 
             // Estilo para los encabezados
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
             // Cabeceras de las columnas
-            const headers = ['C.C', 'Num comprobante', 'Fecha', 'Detalle','Entrada','Salida','Saldo','Costo unitario','Ingreso','Egreso','Saldo'];
+            const headers = ['Codigo Item', 'Fecha', 'Descripcion', 'Detalle','Marca','Linea','Saldo Anterior','Entrada','Salida','Saldo Actual'];
 
             // Añadir las cabeceras a la hoja de cálculo
             headers.forEach((header, index) => {
@@ -1509,13 +1518,16 @@ export default {
             // Añadir los datos al kardex
             Object.values(this.sortedResultados).forEach((item, rowIndex) => {
                 const rowData = [
-                    item.tipo,
-                    item.num_comprobante,
+                    item.codigo,
                     item.fecha_hora,
+                    item.descripcion,
+                    item.tipo_comprobante,
+                    item.nombre_marca,
+                    item.nombre_categoria,
                     item.tipo_comprobante,
                     item.tipo === 'Ingreso' ? item.cantidad : '',
                     item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacion,
+                    item.resultado_operacionFisico,
                 ];
 
                 // Añadir la fila al kardex
@@ -1529,18 +1541,24 @@ export default {
 
             // Establecer el ancho de las columnas
             const columnWidths = [
-                { wch: 27.8 },
-                { wch: 16.0 },   
-                { wch: 18.6 },
-                { wch: 15.2 }
+                { wch: 37.22 },
+                { wch: 21.33 },   
+                { wch: 36.67 },
+                { wch: 28.33 },
+                { wch: 8.56 },
+                { wch: 23.89 },
+                { wch: 13.68 },
+                { wch: 9.11 },
+                { wch: 9.0 },
+                { wch: 10.78 },
             ];
             worksheet['!cols'] = columnWidths;
 
             // Añadir la hoja de cálculo al libro
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte Ventas');
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Resumen Movimientos Fisicos');
 
             // Descargar el archivo
-            XLSX.writeFile(workbook, 'reporte_kardex_fisico_valorado.xlsx');
+            XLSX.writeFile(workbook, 'resumen_movimientos_fisicos.xlsx');
         },
 
         formateaKardex(){
@@ -1744,7 +1762,7 @@ export default {
             this.medidaseleccionadaVacio = false;
             this.sucursalseleccionadaVacio = false;
             this.articuloseleccionadaVacio = false;
-            this.clienteseleccionada = false;
+            
 
             //
             this.codigo = '';
@@ -1757,15 +1775,15 @@ export default {
             this.descripcion = '';
             this.fotografia = ''; //Pasando el valor limpio de la referencia
             this.fotoMuestra = null;
-            this.lineaseleccionada.nombre = '';
-            this.marcaseleccionada.nombre = '';
+            //this.lineaseleccionada.nombre = '';
+            //this.marcaseleccionada.nombre = '';
             this.industriaseleccionada.nombre = '';
             this.proveedorseleccionada.nombre = '';
             this.gruposeleccionada.nombre_grupo = '';
             this.medidaseleccionada.descripcion_medida = '';
-            this.lineaseleccionada.nombre = '';
-            this.articuloseleccionada.nombre = '';
-            this.sucursalseleccionada.nombre = '';
+            //this.lineaseleccionada.nombre = '';
+            //this.articuloseleccionada.nombre = '';
+            //this.sucursalseleccionada.nombre = '';
             this.errorArticulo = 0;
 
             this.idmedida = 0;
@@ -1775,8 +1793,7 @@ export default {
             this.precio_dos = 0;
             this.precio_tres = 0;
             this.precio_cuatro = 0;
-            this.fechaInicio = '';
-            this.fechaFin ='';
+            
             // unidad_envaseVacio: false,
             // nombre_genericoVacio: false,
             // precio_costo_unidVacio: false,
@@ -1795,6 +1812,12 @@ export default {
             // medidaseleccionadaVacio: false,
         },
         abrirModal(modelo, accion, data = []) {
+            this.sucursalseleccionada = false;
+            this.articuloseleccionada = false;
+            this.lineaseleccionada = false;
+            this.marcaseleccionada = false;
+            this.fechaInicio = '';
+            this.fechaFin ='';
             switch (modelo) {
                 case "articulo":
                     {

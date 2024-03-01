@@ -1460,41 +1460,52 @@ export default {
         },
 
         exportarPDF() {
-            const pdf = new jsPDF();
-            
-            const titulo = 'Kardex Inventario Fisico';
-            const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
-            const fechaFin = `Fecha Fin: ${this.fechaFin}`;
-            const articulo = `Articulo: ${this.articuloseleccionada.nombre}`;
-            const codigo = `Codigo: ${this.articuloseleccionada.codigo}`;
-            const descripcion = `Descripcion: ${this.articuloseleccionada.descripcion}`;
+  const pdf = new jsPDF('landscape'); // Cambiar a orientación horizontal
 
-            pdf.setFont('helvetica');
-            pdf.setFontSize(16); // Tamaño de letra más grande para el título
-            pdf.text(titulo, 15, 10);
+  const titulo = 'Kardex Inventario Fisico';
+  const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
+  const fechaFin = `Fecha Fin: ${this.fechaFin}`;
+  const sucursal = `Sucursal: ${this.sucursalseleccionada.nombre}`;
+  const cliente = `Cliente: ${this.clienteseleccionada.nombre}`;
+  const articulo = `Articulo: ${this.articuloseleccionada.nombre}`;
+  const marca = `Marca: ${this.articuloseleccionada.idmarca}`;
+  const linea = `Linea: ${this.articuloseleccionada.idcategoria}`;
+  const industria = `Industria: ${this.articuloseleccionada.idindustria}`;
 
-            pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
-            pdf.text(fechaInicio, 15, 20);
-            pdf.text(fechaFin, 100, 20);
-            pdf.text(articulo, 150, 20);
-            pdf.text(codigo, 15, 30);
-            pdf.text(descripcion, 100, 30);
+  pdf.setFont('helvetica');
+  pdf.setFontSize(16); // Tamaño de letra más grande para el título
+  pdf.text(titulo, 120, 10);
 
-            const tableYPosition = 40;
+  pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
+  pdf.text(fechaInicio, 15, 20);
+  pdf.text(fechaFin, 125, 20);
+  pdf.text(sucursal, 240, 20);
+  pdf.text(articulo, 15, 30);
+  pdf.text(marca, 125, 30);
+  pdf.text(cliente, 240, 30);
+  pdf.text(linea, 15, 40);
+  pdf.text(industria, 125, 40);
 
-            const columns = ['C.C.', 'Num Comprobante', 'Fecha', 'Detalle', 'Entrada', 'Salida', 'Saldo'];
-            const rows = this.arrayReporte.map(item => [item.tipo,
-                    item.num_comprobante,
-                    item.fecha_hora,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacion,]);
+  const tableYPosition = 50; // Aumentar la posición Y para dejar espacio para los encabezados de las columnas
 
-            pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
+  const columns = ['Codigo Item', 'Fecha', 'Marca', 'Linea', 'Industria', 'Unidad', 'Descripcion', 'Cantidad Fisica', 'Contado'];
+  const rows = this.arrayReporte.map(item => [
+    item.codigo,
+    item.fecha_hora,
+    item.nombre_marca,
+    item.nombre_categoria,
+    item.nombre_industria,
+    item.medida,
+    item.descripcion,
+    item.cantidad,
+    item.precio,
+  ]);
 
-            pdf.save('reporte_inventarios.pdf');
-        },
+  pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
+
+  pdf.save('resumen_venta_por_producto.pdf');
+},
+
 
         exportarExcel() {
             const workbook = XLSX.utils.book_new();
@@ -1502,27 +1513,32 @@ export default {
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }];
             // Título del reporte
-            worksheet['A1'] = { t: 's', v: 'REPORTE KARDEX INVENTARIO FISICO VALORADO', s: { 
+            worksheet['A1'] = { t: 's', v: 'RESUMEN DE VENTA POR PRODUCTO', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
                 alignment: { horizontal: 'center', vertical: 'center' },
                 fill: { fgColor: { rgb: '3669a8' } } } };
 
             // Estilo para la fecha
-            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
+            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
             // Fechas de inicio y fin
             worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
-            worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
-            worksheet['D2'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
-            worksheet['A3'] = { t: 's', v: `Codigo: ${this.articuloseleccionada.codigo}`, s: fechaStyle };
-            worksheet['B3'] = { t: 's', v: `Descripcion: ${this.articuloseleccionada.descripcion}`, s: fechaStyle };
+            worksheet['C2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+            worksheet['E2'] = { t: 's', v: `Sucursal: ${this.sucursalseleccionada.nombre}`, s: fechaStyle };
+            worksheet['G2'] = { t: 's', v: `Cliente: ${this.clienteseleccionada.nombre}`, s: fechaStyle };
+
+            worksheet['A3'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
+            worksheet['C3'] = { t: 's', v: `Marca: ${this.articuloseleccionada.idmarca}`, s: fechaStyle };
+            worksheet['E3'] = { t: 's', v: `Linea: ${this.articuloseleccionada.idcategoria}`, s: fechaStyle };
+            worksheet['G3'] = { t: 's', v: `Industria: ${this.articuloseleccionada.idindustria}`, s: fechaStyle };
+
 
 
             // Estilo para los encabezados
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
             // Cabeceras de las columnas
-            const headers = ['C.C', 'Num comprobante', 'Fecha', 'Detalle','Entrada','Salida','Saldo','Costo unitario','Ingreso','Egreso','Saldo'];
+            const headers = ['Codigo Item', 'Fecha', 'Marca', 'Linea','Industria','Unidad','Descripcion','Cantidad Fisica','Contado'];
 
             // Añadir las cabeceras a la hoja de cálculo
             headers.forEach((header, index) => {
@@ -1532,13 +1548,16 @@ export default {
             // Añadir los datos al kardex
             Object.values(this.sortedResultados).forEach((item, rowIndex) => {
                 const rowData = [
-                    item.tipo,
-                    item.num_comprobante,
+                    item.codigo,
                     item.fecha_hora,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacion,
+                    item.nombre_marca,
+                    item.nombre_categoria,
+                    item.nombre_industria,
+                    item.medida,
+                    item.descripcion,
+                    item.cantidad,
+                    item.precio,
+                 
                 ];
 
                 // Añadir la fila al kardex
@@ -1552,18 +1571,23 @@ export default {
 
             // Establecer el ancho de las columnas
             const columnWidths = [
-                { wch: 27.8 },
-                { wch: 16.0 },   
-                { wch: 18.6 },
-                { wch: 15.2 }
+                { wch: 24.33 },
+                { wch: 20.89 },   
+                { wch: 22.0 },
+                { wch: 26.0 },
+                { wch: 16.22 },
+                { wch: 17.22 },
+                { wch: 35.67 },
+                { wch: 12.78 },
+                { wch: 9.0 },
             ];
             worksheet['!cols'] = columnWidths;
 
             // Añadir la hoja de cálculo al libro
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte Ventas');
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Resumen Venta x Producto');
 
             // Descargar el archivo
-            XLSX.writeFile(workbook, 'reporte_kardex_fisico_valorado.xlsx');
+            XLSX.writeFile(workbook, 'resumen_venta_por_producto.xlsx');
         },
 
         formateaKardex(){
@@ -1767,7 +1791,6 @@ export default {
             this.medidaseleccionadaVacio = false;
             this.sucursalseleccionadaVacio = false;
             this.articuloseleccionadaVacio = false;
-            this.clienteseleccionada = false;
 
             //
             this.codigo = '';
@@ -1780,15 +1803,15 @@ export default {
             this.descripcion = '';
             this.fotografia = ''; //Pasando el valor limpio de la referencia
             this.fotoMuestra = null;
-            this.lineaseleccionada.nombre = '';
-            this.marcaseleccionada.nombre = '';
-            this.industriaseleccionada.nombre = '';
+            //this.lineaseleccionada.nombre = '';
+            //this.marcaseleccionada.nombre = '';
+            //this.industriaseleccionada.nombre = '';
             this.proveedorseleccionada.nombre = '';
             this.gruposeleccionada.nombre_grupo = '';
             this.medidaseleccionada.descripcion_medida = '';
             this.lineaseleccionada.nombre = '';
-            this.articuloseleccionada.nombre = '';
-            this.sucursalseleccionada.nombre = '';
+            //this.articuloseleccionada.nombre = '';
+            //this.sucursalseleccionada.nombre = '';
             this.errorArticulo = 0;
 
             this.idmedida = 0;
@@ -1798,8 +1821,7 @@ export default {
             this.precio_dos = 0;
             this.precio_tres = 0;
             this.precio_cuatro = 0;
-            this.fechaInicio = '';
-            this.fechaFin ='';
+           
             // unidad_envaseVacio: false,
             // nombre_genericoVacio: false,
             // precio_costo_unidVacio: false,
@@ -1818,6 +1840,15 @@ export default {
             // medidaseleccionadaVacio: false,
         },
         abrirModal(modelo, accion, data = []) {
+            this.clienteseleccionada = false;
+            this.lineaseleccionada = false;
+            this.marcaseleccionada = false;
+            this.industriaseleccionada = false;
+            this.sucursalseleccionada = false;
+            this.articuloseleccionada = false;
+            this.fechaInicio = '';
+            this.fechaFin ='';
+
             switch (modelo) {
                 case "articulo":
                     {

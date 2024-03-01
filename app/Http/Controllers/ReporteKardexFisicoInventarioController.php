@@ -163,15 +163,10 @@ public function generarReporteFisico(Request $request)
     
         foreach ($resultados as &$resultado) {
             if ($resultado->tipo === 'Ingreso') {
-                $resultado->subtotal = $resultado->cantidad * $resultado->precio_ingreso;
-                $saldo += $resultado->subtotal;
                 $saldoFisico += $resultado->cantidad;
             } else {
-                $resultado->subtotal = $resultado->cantidad * $resultado->precio_venta;
-                $saldo -= $resultado->subtotal;
                 $saldoFisico -= $resultado->cantidad;
             }
-            $resultado->resultado_operacionValorado = $saldo;
             $resultado->resultado_operacionFisico = $saldoFisico;
         }
         $total_saldo = $saldoFisico; // Total físico como saldo total
