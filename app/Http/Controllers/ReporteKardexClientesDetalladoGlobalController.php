@@ -27,7 +27,7 @@ class ReporteKardexClientesDetalladoGlobalController extends Controller
             ->join('sucursales', 'sucursales.id','=','users.idsucursal')
             ->join('inventarios', 'inventarios.idarticulo','=','articulos.id');
 
-        /*if ($fechaInicio && $fechaFin) {
+        if ($fechaInicio && $fechaFin) {
             $detalles->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
         }
 
@@ -45,7 +45,7 @@ class ReporteKardexClientesDetalladoGlobalController extends Controller
 
         if ($tipo_comprobante != 'todos') {
             $detalles->where('ventas.tipo_comprobante','=',$tipo_comprobante);
-        }*/
+        }
 
         /*$detalles = $detalles
             ->select(
