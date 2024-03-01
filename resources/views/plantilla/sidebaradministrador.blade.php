@@ -190,6 +190,10 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas x Documento</a>
                     </li>
 
+                    <li @click="menu=56" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Clientes Detallado Global</a>
+                    </li>
+
                     <li @click="menu=57" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas x Producto</a>
                     </li>
