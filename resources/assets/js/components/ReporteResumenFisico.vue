@@ -9,7 +9,7 @@
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Resumen Fisico de Movimientos
+                    <i class="fa fa-align-justify"></i> Resumen Fisico
                     <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()"
                     class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros</button>
@@ -117,6 +117,7 @@
                                         </div>
                                     </div>
                                     <p class="text-danger" v-if="errores.idmarca">{{ errores.idmarca }}</p>
+                                  
                                 </div>
 
                                 <div class="col-md-6">
@@ -1415,7 +1416,7 @@ export default {
             var url = '/reporte-resumen-fisico-movimientos?';
 
             // Agregar los parámetros obligatorios
-            url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id  ;
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id;
 
             // Agregar las fechas de inicio y fin
             url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
@@ -1458,18 +1459,17 @@ export default {
 
             const tableYPosition = 40;
 
-            const columns = ['Codigo Item', 'Fecha', 'Descripcion', 'Detalle','Marca','Linea','Saldo Anterior','Entrada','Salida','Saldo Actual'];
+            const columns = ['Codigo Item', 'Descripcion', 'Detalle','Marca','Linea','Saldo Anterior','Entrada','Salida','Saldo Actual'];
             const rows = this.arrayReporte.map(item => [
                     item.codigo,
-                    item.fecha_hora,
                     item.descripcion,
-                    item.tipo_comprobante,
+                    item.nombre_producto,
                     item.nombre_marca,
                     item.nombre_categoria,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacionFisico,
+                    item.saldo_anterior,
+                    item.ingresos,
+                    item.ventas,
+                    item.saldo_actual,
                 ]);
 
             pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
@@ -1483,7 +1483,7 @@ export default {
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }];
             // Título del reporte
             worksheet['A1'] = { t: 's', v: 'RESUMEN FISICO DE MOVIMIENTOS', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
@@ -1504,7 +1504,7 @@ export default {
             // Estilo para los encabezados
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
             // Cabeceras de las columnas
-            const headers = ['Codigo Item', 'Fecha', 'Descripcion', 'Detalle','Marca','Linea','Saldo Anterior','Entrada','Salida','Saldo Actual'];
+            const headers = ['Codigo Item', 'Descripcion', 'Detalle','Marca','Linea','Saldo Anterior','Entrada','Salida','Saldo Actual'];
 
             // Añadir las cabeceras a la hoja de cálculo
             headers.forEach((header, index) => {
@@ -1515,15 +1515,14 @@ export default {
             Object.values(this.sortedResultados).forEach((item, rowIndex) => {
                 const rowData = [
                     item.codigo,
-                    item.fecha_hora,
                     item.descripcion,
-                    item.tipo_comprobante,
+                    item.nombre_producto,
                     item.nombre_marca,
                     item.nombre_categoria,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacionFisico,
+                    item.saldo_anterior,
+                    item.ingresos,
+                    item.ventas,
+                    item.saldo_actual,
                 ];
 
                 // Añadir la fila al kardex
@@ -1538,7 +1537,6 @@ export default {
             // Establecer el ancho de las columnas
             const columnWidths = [
                 { wch: 37.22 },
-                { wch: 21.33 },   
                 { wch: 36.67 },
                 { wch: 28.33 },
                 { wch: 8.56 },
