@@ -188,7 +188,7 @@ Vue.component(
 
 Vue.component(
   "resumenfisico",
-  require("./components/ReporteResumenFisicoMovimientos.vue")
+  require("./components/ReporteResumenFisico.vue")
 );
 
 Vue.component(
