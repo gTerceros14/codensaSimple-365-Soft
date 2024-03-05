@@ -19,11 +19,13 @@
                     <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
 
                 </div>
+                <template v-if="listado == 1">
                 <div class="card-body">
                     <div style="overflow-x: auto;">
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
+                                    <th>Opciones</th>
                                     <th>NUM FACTURA</th>
                                     <th>SUCURSAL</th>
                                     <th>FECHA</th>
@@ -39,6 +41,11 @@
                             </thead>
                             <tbody>
                                 <tr v-for="articulo in sortedResultados" :key="articulo.id">
+                                    <td class="d-flex align-items-center">
+                                            <button type="button" @click="verVenta(articulo.id)"
+                                                class="btn btn-success btn-sm mr-1">
+                                                <i class="icon-eye"></i>
+                                            </button></td>
                                     <td v-text="articulo.Factura"></td>
                                     <td v-text="articulo.Nombre_sucursal"></td>
                                     <td v-text="articulo.fecha_hora"></td>  
@@ -74,15 +81,121 @@
                             </li>
                         </ul>
                     </nav>
-
                 </div>
+            </template>
+
+            <template v-else-if="listado == 2">
+                    <div class="card-body">
+                        <div class="form-group row border">
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <label for="">Cliente</label>
+                                    <p v-text="cliente"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="">Impuesto</label>
+                                <p v-text="impuesto"></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Tipo Comprobante</label>
+                                    <p v-text="tipo_comprobante"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Serie Comprobante</label>
+                                    <p v-text="serie_comprobante"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Número Comprobante</label>
+                                    <p v-text="num_comprobante"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row border">
+                            <div class="table-responsive col-md-12">
+                                <table class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Artículo</th>
+                                            <th>Precio</th>
+                                            <th>Cantidad</th>
+                                            <th>Descuento</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="arrayDetalle.length">
+                                        <tr v-for="detalle in arrayDetalle" :key="detalle.id">
+                                            <td v-text="detalle.articulo">
+                                            </td>
+
+                                            <td>
+                                                {{ ((detalle.precio / detalle.cantidad) * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                                                    monedaPrincipal[1] }}
+
+                                            </td>
+                                            <td v-text="detalle.cantidad">
+                                            </td>
+                                            <td v-text="detalle.descuento">
+                                            </td>
+                                            <td>
+                                                {{ (((detalle.precio/detalle.cantidad) * detalle.cantidad - detalle.descuento)
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Parcial:</strong>
+                                            </td>
+                                            <td>
+                                                {{ ((totalParcial = (total - totalImpuesto))
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+                                            </td>
+
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
+                                            <td>
+                                                {{ ((totalImpuesto = (total * impuesto))
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Neto:</strong></td>
+                                            <td>
+                                                {{ ((total) * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-else>
+                                        <tr>
+                                            <td colspan="5">
+                                                No hay articulos agregados
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
-            <!-- Fin ejemplo de tabla Listado -->
         </div>
         <!-- MODAL LISTADO DE MARCAS -->
 
         <!-- contenido del modal -->
-
+        
         <!--Inicio del modal agregar/actualizar-->
         <div class="modal" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
@@ -171,8 +284,6 @@
                 </div>
                 <!-- /.modal-content -->
             </div>
-
-
             <!-- /.modal-dialog -->
         </div>
 
@@ -509,6 +620,10 @@ export default {
                 idproveedor: null,
                 idmedida: null
             },
+            listado: 1,
+            cliente: '',
+            totalImpuesto: 0.0,
+            
             errores: {},
 
             monedaPrincipal: [],
@@ -709,6 +824,9 @@ export default {
             //fechas
             fechaInicio:'',
             fechaFin:'',
+
+            arrayDetalle: [],
+
         }
     },
     components: {
@@ -739,6 +857,24 @@ export default {
         imagen() {
             console.log(this.fotoMuestra);
             return this.fotoMuestra;
+        },
+        calcularTotal: function () {
+            var resultado = 0.0;
+            for (var i = 0; i < this.arrayDetalle.length; i++) {
+                resultado += ((this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad) - (this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad * this.arrayDetalle[i].descuento / 100))
+
+            }
+            resultado -= this.descuentoAdicional;
+            resultado -= this.descuentoGiftCard;
+            return resultado;
+        },
+
+        calcularSubTotal: function () {
+            var resultado = 0.0;
+            for (var i = 0; i < this.arrayDetalle.length; i++) {
+                resultado = resultado + ((this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad) - (this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad * this.arrayDetalle[i].descuento / 100))
+            }
+            return resultado;
         },
     },
     watch: {
@@ -1657,6 +1793,61 @@ export default {
 
             return this.errorArticulo;
         },
+        ocultarDetalle() {
+            this.listado = 1;
+            this.codigo = null;
+            this.arrayArticulo.length = 0;
+            this.precioseleccionado = null;
+            this.medida = null;
+            this.nombreCliente = null;
+            this.documento = null;
+            this.email = null;
+            this.idAlmacen = null;
+            this.arrayProductos = [];
+            this.arrayDetalle = [];
+            this.precioBloqueado = false;
+
+        },
+
+        verVenta(id) {
+            let me = this;
+            me.listado = 2;
+
+            //Obtener datos del ingreso
+            var arrayVentaT = [];
+            var url = '/venta/obtenerCabecera?id=' + id;
+
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                arrayVentaT = respuesta.venta;
+                console.log("VIENDO ", respuesta)
+
+                me.cliente = arrayVentaT[0]['nombre'];
+                me.tipo_comprobante = arrayVentaT[0]['tipo_comprobante'];
+                me.serie_comprobante = arrayVentaT[0]['serie_comprobante'];
+                me.num_comprobante = arrayVentaT[0]['num_comprobante'];
+                me.impuesto = arrayVentaT[0]['impuesto'];
+                me.total = arrayVentaT[0]['total'];
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+            //obtener datos de los detalles
+            var url = '/venta/obtenerDetalles?id=' + id;
+
+            axios.get(url).then(function (response) {
+                //console.log(response);
+                var respuesta = response.data;
+                me.arrayDetalle = respuesta.detalles;
+                console.log(array)
+
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
         cerrarModal() {
             this.modal = 0;
             this.tituloModal = '';

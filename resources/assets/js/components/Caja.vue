@@ -23,11 +23,11 @@
                             <th>Fecha Apertura</th>
                             <th>Fecha Cierre</th>
                             <th>Saldo Inicial</th>
-                            <th>Ventas</th>
+                            <th>Ventas al Contado</th>
+                            <th>Ventas a Credito </th>
                             <th>Pagos en Efectivo Ventas</th>
-                            <th>Compras </th>
-                            <th>Pagos en Efectivo Compras</th>
-                            <th>Saldo Faltante</th>
+                            <th>Pagos de Cuotas</th>
+                            <th>Pagos de Cuotas Efectivo</th>
                             <th>Saldo Sobrante</th>
                             <th>Depósitos Extras</th>
                             <th>Salidas Extras</th>
@@ -47,7 +47,7 @@
                             <td v-text="caja.ventas"></td>
                             <td v-text="caja.pagosEfectivoVentas"></td>
                             <td v-text="caja.compras"></td>
-                            <td v-text="caja.pagosEfecivocompras"></td>
+                            <td v-text="caja.cuotasventasCredito"></td>
                             <td v-text="caja.saldoFaltante"></td>
                             <td v-text="caja.saldoSobrante"></td>
                             <td v-text="caja.depositos"></td>

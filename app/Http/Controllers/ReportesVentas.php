@@ -20,6 +20,7 @@ class ReportesVentas extends Controller
         ->join('sucursales','users.idsucursal','=','sucursales.id')
         ->join('monedas', 'monedas.id', '=', DB::raw('1'))
         ->select('ventas.num_comprobante as Factura',
+                'ventas.id',
                 'sucursales.nombre as Nombre_sucursal',
                 'ventas.fecha_hora',
                 'monedas.tipo_cambio as Tipo_Cambio',
