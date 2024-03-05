@@ -194,8 +194,13 @@
 </template>
 
 <template v-if="menu==58">
+    <resumenfisico></resumenfisico>
+</template>
+
+<template v-if="menu==60">
     <resumenfisicomovimientos></resumenfisicomovimientos>
 </template>
+
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
     <dashboard></dashboard>

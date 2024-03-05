@@ -183,7 +183,11 @@
                     </li>
 
                     <li @click="menu=58" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Fisico de Movimientos</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Fisico</a>
+                    </li>
+
+                    <li @click="menu=60" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Fisico de Movimientos</a>
                     </li>
 
                     <li @click="menu=55" class="nav-item">
