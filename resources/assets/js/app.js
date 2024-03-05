@@ -187,10 +187,9 @@ Vue.component(
 );
 
 Vue.component(
-  "resumenfisicomovimientos",
+  "resumenfisico",
   require("./components/ReporteResumenFisicoMovimientos.vue")
 );
-
 
 Vue.component(
   "ventasinstitucionales",
