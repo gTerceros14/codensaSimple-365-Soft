@@ -185,6 +185,10 @@
     <resumenventaxdocumento></resumenventaxdocumento>
 </template>
 
+<template v-if="menu==56">
+    <kardexclientesdetalladoglobal></kardexclientesdetalladoglobal>
+</template>
+
 <template v-if="menu==57">
     <resumenventaxproducto></resumenventaxproducto>
 </template>

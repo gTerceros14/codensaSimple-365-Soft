@@ -64,7 +64,7 @@
                                     <tr>
                                         <th>Codigo</th>
                                         <th>Nombre cliente</th>
-                                        <th>Ejecutivo vendedor</th>
+                                        <th>Num Documento</th>
                                         <th>Ventas</th>
                                         <th>Cobros</th>
                                         <th>Total cuotas</th>
@@ -75,9 +75,9 @@
                                     <tr  v-for="cliente in clientes" :key="cliente.id_cliente">
                                         <td>{{ cliente.cliente_id }}</td>
                                         <td>{{ cliente.cliente_nombre }}</td>
-                                        <td>{{ vendedorSeleccionado[0].nombre }}</td>
+                                        <td>{{ cliente.num_documento }}</td>
                                         <td>{{ cliente.total_ventas }}</td>
-                                        <td>{{ cliente.total_deuda === 0 ? cliente.total_ventas : (cliente.total_ventas - cliente.total_deuda) }}</td>
+                                        <td>{{ cliente.cobros }}</td>
                                         <td>{{ cliente.numero_cuotas }}</td>
                                         <td>{{ cliente.total_deuda }}</td>
                                     </tr>
@@ -97,24 +97,6 @@
                         <div class="text-right">
                             <strong>Saldo Total: </strong>Bs. {{ calcularTotal('total_deuda') }}
                         </div>
-
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item" v-if="pagination.current_page > 1">
-                                    <a class="page-link" href="#"
-                                        @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
-                                </li>
-                                <li class="page-item" v-for="page in pagesNumber" :key="page"
-                                    :class="[page == isActived ? 'active' : '']">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                        v-text="page"></a>
-                                </li>
-                                <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                    <a class="page-link" href="#"
-                                        @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
-                                </li>
-                            </ul>
-                        </nav> 
 
                         <hr>
                         <div class="d-flex justify-content-between mt-3">
@@ -147,12 +129,11 @@ data() {
         offset: 3,
         currentPage: 1,
         
-        SucursalSeleccionado : 0,
         arraySucursales : [],
         arrayEjecutivos : [],
 
         clientes: [],
-        vendedorSeleccionado: [],
+        filtrosSeleccionados: [],
         vendedorId: null,
         sucursalId: null,
         fechaInicio: '2024-01-01',
@@ -242,16 +223,10 @@ methods: {
         axios.get(url).then(function (response) {
             var respuesta = response.data;
             me.clientes = respuesta.clientes;
+            me.filtrosSeleccionados = respuesta.filtros;
 
-            if (respuesta.vendedor.length != 0) {
-                me.vendedorSeleccionado = respuesta.vendedor;
-            } else {
-                me.vendedorSeleccionado.unshift({
-                    'nombre': 'TODOS'
-                });
-            }
             console.log('CLIENTES: ', me.clientes);
-            console.log('VENDEDORES: ', me.vendedorSeleccionado);
+            console.log('FILTROS: ', me.filtrosSeleccionados);
         })
         .catch(function (error) {
             console.log(error);
@@ -273,7 +248,7 @@ methods: {
         const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
         worksheet['A2'] = { t: 's', v: `Fecha: ${new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' })}`, s: fechaStyle };
 
-        const headers = ['Fecha Venta', 'Nombre Cliente', 'Tipo Comprobante', 'Total', 'Impuesto', 'Precio Cuota', 'Total Cancelado', 'Saldo'];
+        const headers = ['Codigo Cliente', 'Nombre Cliente', 'Num Documento', 'Total Ventas', 'Cobros', 'Num Cuotas', 'Total Deuda'];
         const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
 
         headers.forEach((header, index) => {
@@ -281,8 +256,8 @@ methods: {
         });
 
         for (let i = 0; i < this.clientes.length; i++) {
-            const { fecha_venta, nombre_cliente, tipo_comprobante, total, impuesto, precio_cuota, total_cancelado, saldo } = this.clientes[i];
-            const rowData = [fecha_venta, nombre_cliente, tipo_comprobante, total, impuesto, precio_cuota, total_cancelado, saldo];
+            const { cliente_id, cliente_nombre, num_documento, total_ventas, cobros, numero_cuotas, total_deuda } = this.clientes[i];
+            const rowData = [cliente_id, cliente_nombre, num_documento, total_ventas, cobros, numero_cuotas, total_deuda ];
             XLSX.utils.sheet_add_aoa(worksheet, [rowData], { origin: `A${startRow + i}` });
         }
 
@@ -322,8 +297,8 @@ methods: {
 
         const tableYPosition = 30;
 
-        const columns = ['Codigo', 'Nombre cliente', 'Saldo anterior', 'Ventas', 'Cobros', 'Diferencia', 'Saldo actual'];
-        const rows = this.clientes.map(datos => [datos.id_cliente, datos.nombre_cliente, datos.precio_cuota, datos.total, datos.total_cancelado, (datos.total - datos.total_cancelado), datos.saldo]);
+        const columns = ['Codigo Cliente', 'Nombre cliente', 'Num Documento', 'Total Ventas', 'Cobros', 'Num Cuotas', 'Total Deuda'];
+        const rows = this.clientes.map(datos => [datos.cliente_id, datos.cliente_nombre, datos.num_documento, datos.total_ventas, datos.cobros, datos.numero_cuotas, datos.total_deuda]);
         pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
 
         pdf.setFont('helvetica');
