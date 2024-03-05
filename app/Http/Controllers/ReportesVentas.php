@@ -125,93 +125,101 @@ class ReportesVentas extends Controller
     public function resumenFisicoMovimientos(Request $request){
         $fechaInicio = $request->fechaInicio;
         $fechaFin = $request->fechaFin;
-        /*$ventas = Venta::join('detalle_ventas','ventas.id','detalle_ventas.idventa')
-        ->join('personas','personas.id','=','ventas.idcliente')
-        ->join('articulos','detalle_ventas.idarticulo','=','articulos.id')
-        ->join('categorias','articulos.idcategoria','=','categorias.id')
-        ->join('marcas','articulos.idmarca','=','marcas.id')
-        ->join('industrias','articulos.idindustria','=','industrias.id')
-        ->join('medidas','articulos.idmedida','=','medidas.id')
-        ->join('users','ventas.idusuario','=','users.id')
-        ->join('sucursales','users.idsucursal','=','sucursales.id')
-        ->select('ventas.fecha_hora',
-                'personas.nombre',
-            'detalle_ventas.*',
+
+        $fechaInicio = $fechaInicio . ' 00:00:00';
+        $fechaFin = $fechaFin . ' 23:59:59';
+        $productos = DB::table('articulos')
+        ->select(
+            'articulos.id',
+            'articulos.nombre',
             'articulos.codigo',
             'articulos.descripcion',
             'categorias.nombre as nombre_categoria',
             'marcas.nombre as nombre_marca',
             'industrias.nombre as nombre_industria',
-            'medidas.descripcion_medida as medida')
-        ->get();*/
-        $ingresos = DB::table('ingresos')
-        ->join('detalle_ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
-        ->join('articulos','detalle_ingresos.idarticulo','=', 'articulos.id')
-        ->join('almacens','almacens.encargado','=','ingresos.idusuario')
-        ->join('sucursales','sucursales.id','=','almacens.sucursal')
-        ->join('marcas','articulos.idmarca','=','marcas.id')
-        ->join('categorias','articulos.idcategoria','=','categorias.id')
-        ->select(DB::raw("'Ingreso' AS tipo"), 'articulos.codigo', 'detalle_ingresos.cantidad', 'articulos.descripcion', 'ingresos.fecha_hora','categorias.nombre as nombre_categoria','marcas.nombre as nombre_marca','detalle_ingresos.precio AS precio_ingreso')
-        ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
+            'medidas.descripcion_medida as medida'
+        )
+        ->join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
+        ->join('marcas', 'articulos.idmarca', '=', 'marcas.id')
+        ->join('industrias', 'articulos.idindustria', '=', 'industrias.id')
+        ->join('medidas', 'articulos.idmedida', '=', 'medidas.id')
+        ->join('inventarios','inventarios.idarticulo','=','articulos.id')
+        ->join('almacens','inventarios.idalmacen','=','almacens.id')
+        ->join('sucursales','almacens.sucursal','=','sucursales.id')
+        ->groupBy('articulos.id', 'articulos.nombre', 'articulos.codigo', 'articulos.descripcion', 'categorias.nombre', 'marcas.nombre', 'industrias.nombre', 'medidas.descripcion_medida');
+
         
-
-        $ventas = DB::table('ventas')
-        ->join('detalle_ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
-        ->join('articulos','detalle_ventas.idarticulo','=', 'articulos.id')
-        ->join('almacens','almacens.encargado','=','ventas.idusuario')
-        ->join('sucursales','sucursales.id','=','almacens.sucursal')
-        ->join('marcas','articulos.idmarca','=','marcas.id')
-        ->join('categorias','articulos.idcategoria','=','categorias.id')
-        ->select(DB::raw("'Venta' AS tipo"), 'articulos.codigo',  'detalle_ventas.cantidad', 'articulos.descripcion', 'ventas.fecha_hora','categorias.nombre as nombre_categoria','marcas.nombre as nombre_marca','detalle_ventas.precio  AS precio_venta')
-        ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
-
         if ($request->has('articulo') && $request->articulo !== 'undefined') {
             $idarticulo = $request->articulo;
-            $ingresos->where('articulos.id' , $idarticulo);
-            $ventas->where('articulos.id' , $idarticulo);
+            $productos->where('articulos.id' , $idarticulo);
         }
         if ($request->has('sucursal') && $request->sucursal !== 'undefined') {
             $sucursal = $request->sucursal;
-            $ingresos->where('sucursales.id', $sucursal);
-            $ventas->where('sucursales.id', $sucursal);
+            $productos->where('sucursales.id', $sucursal);
         }
         // Agregar filtros opcionales si se proporcionan otros parámetros
         if ($request->has('marca') && $request->marca !== 'undefined') {
             $idmarca = $request->marca;
-            $ingresos->where('articulos.idmarca' , $idmarca);
-            $ventas->where('articulos.idmarca' , $idmarca);
+            $productos->where('articulos.idmarca' , $idmarca);
         }
         if ($request->has('linea') && $request->linea !== 'undefined') {
             $idlinea = $request->linea;
-            $ingresos->where('articulos.idcategoria' , $idlinea);
-            $ventas->where('articulos.idcategoria' , $idlinea);
+            $productos->where('articulos.idcategoria' , $idlinea);
         }
-
-        $ingresos = $ingresos->get();
-        $ventas = $ventas->get();
+    $productos=$productos->get();
     
-        // Combinar los resultados de ingresos y ventas
-        $resultados = $ingresos->concat($ventas)->sortBy('fecha_hora');
+    $resultados = [];
     
-        // Calcular el saldo
-        $saldo = 0;
-        $saldoFisico = 0;
+    foreach ($productos as $producto) {
+        
+        $saldoAnterior = DB::table('detalle_ingresos')
+            ->join('ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
+            ->where('detalle_ingresos.idarticulo', $producto->id)
+            ->where('ingresos.fecha_hora', '<', $fechaInicio)
+            ->sum('detalle_ingresos.cantidad');
+        
+        $egresosAnteriores = DB::table('ventas')
+            ->join('detalle_ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
+            ->where('detalle_ventas.idarticulo', $producto->id)
+            ->where('ventas.fecha_hora', '<', $fechaInicio)
+            ->sum('detalle_ventas.cantidad');
+        $saldoAnterior -= $egresosAnteriores;
     
-        foreach ($resultados as &$resultado) {
-            if ($resultado->tipo === 'Ingreso') {
-                $resultado->subtotal = $resultado->cantidad * $resultado->precio_ingreso;
-                $saldo += $resultado->subtotal;
-                $saldoFisico += $resultado->cantidad;
-            } else {
-                $resultado->subtotal = $resultado->cantidad * $resultado->precio_venta;
-                $saldo -= $resultado->subtotal;
-                $saldoFisico -= $resultado->cantidad;
-            }
-            $resultado->resultado_operacionValorado = $saldo;
-            $resultado->resultado_operacionFisico = $saldoFisico;
-        }
-        $total_saldo = $saldoFisico; // Total físico como saldo total
-
-        return ['resultados' => $resultados, 'total_saldo' => $total_saldo];
+        $ingresos = DB::table('detalle_ingresos')
+            ->join('ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
+            ->where('detalle_ingresos.idarticulo', $producto->id)
+            ->where('ingresos.fecha_hora', '>=', $fechaInicio)
+            ->where('ingresos.fecha_hora', '<=', $fechaFin)
+            ->sum('detalle_ingresos.cantidad');
+    
+        $ventas = DB::table('ventas')
+            ->join('detalle_ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
+            ->where('detalle_ventas.idarticulo', $producto->id)
+            ->where('ventas.fecha_hora', '>=', $fechaInicio)
+            ->where('ventas.fecha_hora', '<=', $fechaFin)
+            ->sum('detalle_ventas.cantidad');
+        
+        $saldoActual = $saldoAnterior + $ingresos - $ventas;
+    
+        $resultado = [
+            
+            'nombre_producto' => $producto->nombre,
+            'codigo' => $producto->codigo,
+            'descripcion' => $producto->descripcion,
+            'nombre_categoria' => $producto->nombre_categoria,
+            'nombre_marca' => $producto->nombre_marca,
+            'nombre_industria' => $producto->nombre_industria,
+            'medida' => $producto->medida,
+            'saldo_anterior' => $saldoAnterior,
+            'ingresos' => $ingresos,
+            'ventas' => $ventas,
+            'saldo_actual' => $saldoActual
+        ];
+    
+        $resultados[] = $resultado;
+    }
+    
+        return ['resultados' => $resultados];
+    
     }
 }

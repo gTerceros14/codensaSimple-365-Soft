@@ -24,8 +24,7 @@
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th>CODICO ITEM</th>
-                                    <th>FECHA</th>
+                                    <th>CODIGO ITEM</th>
                                     <th>DESCRIPCION</th>
                                     <th>DETALLE</th>
                                     <th>MARCA</th>
@@ -39,17 +38,14 @@
                             <tbody>
                                 <tr v-for="articulo in sortedResultados" :key="articulo.id">
                                     <td v-text="articulo.codigo"></td>
-                                    <td v-text="articulo.fecha_hora"></td>
                                     <td v-text="articulo.descripcion"></td>
-                                    <td>0</td>
+                                    <td v-text="articulo.nombre_producto"></td>
                                     <td v-text="articulo.nombre_marca"></td>
                                     <td v-text="articulo.nombre_categoria"></td>
-                                    <td>0</td>
-                                    <td v-if="articulo.tipo === 'Ingreso'" v-text="articulo.cantidad"></td>
-                                    <td v-else>0</td>
-                                    <td v-if="articulo.tipo === 'Venta'" v-text="articulo.cantidad"></td>
-                                    <td v-else>0</td>
-                                    <td v-text="articulo.resultado_operacionFisico"></td>
+                                    <td v-text="articulo.saldo_anterior"></td>
+                                    <td v-text="articulo.ingresos"></td>
+                                    <td v-text="articulo.ventas"></td>
+                                    <td v-text="articulo.saldo_actual"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -2282,7 +2278,6 @@ export default {
         this.recuperarIdRol();
         this.datosConfiguracion();
         this.obtenerConfiguracionTrabajo();
-        this.listaReporte();
         this.listarArticulo(1, this.buscar, this.criterio);
         this.listarPrecio();//aumenTe 6julio
     }
