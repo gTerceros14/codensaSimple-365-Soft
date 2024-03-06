@@ -198,7 +198,7 @@
 </template>
 
 <template v-if="menu==60">
-    <resumenfisicomovimientos></resumenfisicomovimientos>
+    <reportefisicomovimientos></reportefisicomovimientos>
 </template>
 
 @elseif (Auth::user()->idrol == 2)

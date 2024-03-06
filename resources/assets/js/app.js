@@ -192,6 +192,12 @@ Vue.component(
 );
 
 Vue.component(
+  "reportefisicomovimientos",
+  require("./components/ReporteDetalladoFisicoMovimientos.vue")
+);
+
+
+Vue.component(
   "ventasinstitucionales",
   require("./components/VentasInstitucionales.vue")
 );
