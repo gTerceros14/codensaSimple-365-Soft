@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DetalleVenta;
 use App\Moneda;
 use App\Venta;
 use Illuminate\Http\Request;
@@ -223,4 +224,67 @@ class ReportesVentas extends Controller
         return ['resultados' => $resultados];
     
     }
+    public function ResumenVentasPorDocumentoDetallado(Request $request){
+        $fechaInicio = $request->fechaInicio;
+        $fechaFin = $request->fechaFin;
+        $fechaInicio = $fechaInicio . ' 00:00:00';
+        $fechaFin = $fechaFin . ' 23:59:59';
+        $ventas = DetalleVenta::select(
+            'ventas.num_comprobante as Factura',
+            'ventas.id',
+            'ventas.fecha_hora',
+            'personas.id as id_cliente',
+            'personas.nombre as nombre_cliente',
+            'users.usuario',
+            'tipo_ventas.nombre_tipo_ventas as Tipo_venta',
+            'roles.nombre as nombre_rol',
+            'sucursales.nombre as Nombre_sucursal',
+            'articulos.nombre',
+            'detalle_ventas.cantidad',
+            'detalle_ventas.precio'
+        )
+        ->join('ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
+        ->join('personas', 'ventas.idcliente', '=', 'personas.id')
+        ->join('users', 'ventas.idusuario', '=', 'users.id')
+        ->join('tipo_ventas', 'ventas.idtipo_venta', '=', 'tipo_ventas.id')
+        ->join('roles', 'users.idrol', '=', 'roles.id')
+        ->join('sucursales', 'users.idsucursal', '=', 'sucursales.id')
+        ->join('articulos', 'detalle_ventas.idarticulo', '=', 'articulos.id')
+        ->orderBy('personas.nombre')
+        ->orderBy('ventas.fecha_hora')
+        ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin])
+        ->get();
+    
+    $totalVentasPorCliente = [];
+    
+    foreach ($ventas as $venta) {
+        $idCliente = $venta->id_cliente;
+        $cantidadVenta = $venta->cantidad;
+        $precioVenta = $venta->precio;
+    
+        if (!isset($totalVentasPorCliente[$idCliente])) {
+            $totalVentasPorCliente[$idCliente] = [
+                'total_cantidad' => 0,
+                'total_precio' => 0,
+                'index' => null,];
+        }
+    
+        $totalVentasPorCliente[$idCliente]['total_cantidad'] += $cantidadVenta;
+        $totalVentasPorCliente[$idCliente]['total_precio'] += $precioVenta;
+        $totalVentasPorCliente[$idCliente]['index'] = $venta->id; 
+    }
+    foreach ($ventas as $venta) {
+        $idCliente = $venta->id_cliente;
+
+        if (isset($totalVentasPorCliente[$idCliente]) && $venta->id == $totalVentasPorCliente[$idCliente]['index']) {
+            $venta->total_cantidad_cliente = $totalVentasPorCliente[$idCliente]['total_cantidad'];
+            $venta->total_precio_cliente = $totalVentasPorCliente[$idCliente]['total_precio'];
+        }
+    }
+
+    return [
+        'ventas' => $ventas,
+    ];
+    }
+
 }

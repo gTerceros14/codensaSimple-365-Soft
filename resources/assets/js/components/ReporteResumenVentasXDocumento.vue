@@ -277,7 +277,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
-                            <button type="submit" @click="listaReporte(); cerrarModal()" class="btn btn-primary">Visualizar Reporte</button>
+                            <button type="submit" @click="listaReporte();listaReporteDetallado(); cerrarModal()" class="btn btn-primary">Visualizar Reporte</button>
                         </div>
                     </form>
 
@@ -826,6 +826,7 @@ export default {
             fechaFin:'',
 
             arrayDetalle: [],
+            arrayReporteDetallado:[]
 
         }
     },
@@ -1494,7 +1495,26 @@ export default {
                     console.log('ERRORES', error);
                 });
         },
+        listaReporteDetallado() {
+            let me = this;
+            var url = '/resumen-ventas-documento-detallado?';
 
+            // Agregar los parámetros obligatorios
+            //url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.ejecutivoseleccionado.id + '&estadoVenta=' + this.criterioEstado + '&idcliente=' + this.clienteseleccionada.id;
+
+            // Agregar las fechas de inicio y fin
+            url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
+
+            axios.get(url)
+                .then(function (response) {
+                    var respuesta = response.data;
+                    me.arrayReporteDetallado = respuesta.ventas;
+                    console.log("array reporte detallado",me.arrayReporteDetallado);
+                })
+                .catch(function (error) {
+                    console.log('ERRORES', error);
+                });
+        },
         exportarPDF() {
             const pdf = new jsPDF('landscape');
             
@@ -1571,7 +1591,7 @@ export default {
             });
 
             // Añadir los datos al kardex
-            Object.values(this.sortedResultados).forEach((item, rowIndex) => {
+            Object.values(this.arrayReporte).forEach((item, rowIndex) => {
                 const rowData = [
                     item.Factura,
                     item.Nombre_sucursal,
@@ -1616,7 +1636,17 @@ export default {
             // Descargar el archivo
             XLSX.writeFile(workbook, 'reporte_resumen_ventas_por_documento.xlsx');
         },
-
+        exportarExcelDetallado(){
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.aoa_to_sheet([]);
+            const startRow = 5;
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
+             // Título del reporte
+             worksheet['A1'] = { t: 's', v: 'RESUMEN DE VENTAS POR DOCUMENTOS DETALLADO', s: { 
+                font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
+                alignment: { horizontal: 'center', vertical: 'center' },
+                fill: { fgColor: { rgb: '3669a8' } } } };
+        },
         formateaKardex(){
             let saldo = 0;
             let me = this;
@@ -2343,6 +2373,7 @@ export default {
                 console.log("MostrarCostos: " + me.mostrarCostos);
                 console.log("ProveedorEstado: " + me.mostrarProveedores);
                 console.log("MostrarSaldosStock: " + me.mostrarSaldosStock);
+                console.log("Moneda principal; ",me.monedaPrincipal);
 
             })
                 .catch(function (error) {
