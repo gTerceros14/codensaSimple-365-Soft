@@ -9,15 +9,9 @@
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Resumen de Ventas por Documento
-                    <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()"
-                    class="btn btn-primary">
+                    <i class="fa fa-align-justify"></i> Reporte Ventas por Documento
+                    <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()" class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros</button>
-                    <button type="button" @click="exportarExcel" class="btn btn-success">
-                        <i class="icon-doc"></i>&nbsp;Exportar a Excel
-                    </button>
-                    <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
-
                 </div>
                 <template v-if="listado == 1">
                 <div class="card-body">
@@ -40,7 +34,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="articulo in sortedResultados" :key="articulo.id">
+                                <tr v-for="articulo in arrayReporte" :key="articulo.id">
                                     <td class="d-flex align-items-center">
                                             <button type="button" @click="verVenta(articulo.id)"
                                                 class="btn btn-success btn-sm mr-1">
@@ -56,14 +50,13 @@
                                     <td v-text="articulo.nombre"></td>
                                     <td v-text="articulo.importe_BS"></td>
                                     <td v-text="articulo.importe_usd"></td>
-
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="text-right">
-                            <strong>Total Saldo Fisico: </strong> {{ total_saldofisico }} Unidades
-                        </div>
+                    <!--<div class="text-right">
+                        <strong>Total Saldo: </strong> {{ total_saldofisico }} Unidades
+                    </div>-->
                     <nav>
                         <ul class="pagination">
                             <li class="page-item" v-if="pagination.current_page > 1">
@@ -81,6 +74,22 @@
                             </li>
                         </ul>
                     </nav>
+                        <div class="d-flex justify-content-between">
+                        <div>
+                            <p>Exportar Resumen</p>
+                            <div class="d-inline-block">
+                                <button type="button" @click="exportarExcel" class="btn btn-success"> <i class="icon-doc"></i>&nbsp;Excel</button>
+                                <button type="button" @click="exportarPDF" class="btn btn-danger"> <i class="icon-doc"></i>&nbsp;PDF</button>
+                            </div>
+                        </div>
+                        <div>
+                            <p>Exportar Detallado</p>
+                            <div class="d-inline-block">
+                                <button type="button" @click="exportarExcel" class="btn btn-success"> <i class="icon-doc"></i>&nbsp;Excel</button>
+                                <button type="button" @click="exportarPDF" class="btn btn-danger"> <i class="icon-doc"></i>&nbsp;PDF</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </template>
 

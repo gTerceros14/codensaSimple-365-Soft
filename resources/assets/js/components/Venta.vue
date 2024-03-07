@@ -1199,6 +1199,7 @@ export default {
             valorMaximoDescuento: '',
             mostrarDireccion: true,
             mostrarCUFD: true,
+            primer_precio_cuota: 0,
 
             //almacenes
             arrayAlmacenes: [],
@@ -2055,7 +2056,8 @@ export default {
             }
 
             let me = this;
-            console.log(this.idtipo_pago)
+            console.log("hola");
+            console.log(this.primer_precio_cuota);
             axios.post('/venta/registrar', {
                 'idcliente': this.idcliente,
                 'tipo_comprobante': this.tipo_comprobante,
@@ -2066,12 +2068,14 @@ export default {
                 'idAlmacen': this.idAlmacen,
                 'idtipo_pago': this.idtipo_pago ? this.idtipo_pago : 1,
                 'idtipo_venta': this.idtipo_venta,
+                'primer_precio_cuota': this.primer_precio_cuota,
                 // Datos para el crédito de venta
                 'idpersona': this.idcliente,
                 'numero_cuotasCredito': this.numero_cuotas, // Cambio de nombre
                 'tiempo_dias_cuotaCredito': this.tiempo_diaz, // Cambio de nombre
                 'totalCredito': this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal, // Asegúrate de tener esta variable
                 'estadoCredito': "Pendiente", // Asegúrate de tener esta variable
+                
                 // Cuotas del crédito
                 'cuotaspago': this.cuotas,
                 'data': this.arrayDetalle
@@ -2104,6 +2108,8 @@ export default {
                     me.codigo = '';
                     me.descuento = 0;
                     me.arrayDetalle = [];
+                    me.primer_precio_cuota = 0;
+                    
                     //window.open('/factura/imprimir/' + response.data.id);
                 } else {
                     console.log(response)
@@ -2544,19 +2550,19 @@ export default {
             const montoEntero = Math.floor(this.calcularTotal / this.numero_cuotas);
             const montoDecimal = (this.calcularTotal - montoEntero * (this.numero_cuotas - 1)).toFixed(2);
 
-            let primerPrecioCuota;
+            
             let fechaInicioPago;
             let saldos_total;
             let estadoCuota;
             if (this.primera_cuota) {
-                primerPrecioCuota = montoEntero;
-                console.log('primerPrecioCuota', primerPrecioCuota);
+                 this.primer_precio_cuota = montoEntero;
+                console.log('primer_precio_cuota', this.primer_precio_cuota);
                 fechaInicioPago = fechaHoy;
-                saldos_total = (this.calcularTotal - primerPrecioCuota).toFixed(2);
+                saldos_total = (this.calcularTotal - this.primer_precio_cuota).toFixed(2);
                 console.log('saldos_total', saldos_total);
                 estadoCuota = 'Pagado';
             } else {
-                primerPrecioCuota = 0;
+                this.primer_precio_cuota = 0;
                 fechaInicioPago = new Date(fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000); // Sumar 7 días
                 saldos_total = this.calcularTotal;
                 estadoCuota = 'Pendiente';
@@ -2571,7 +2577,7 @@ export default {
                 const cuota = {
                     fecha_pago: `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}`,
                     precio_cuota: i === this.numero_cuotas - 1 ? parseFloat(montoDecimal).toFixed(2) : montoEntero,
-                    totalCancelado: i === 0 ? primerPrecioCuota : 0,
+                    totalCancelado: i === 0 ? this.primer_precio_cuota : 0,
                     saldo_restante: saldos_total,//saldo
                     fecha_cancelado: i === 0 && this.primera_cuota ? `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}` : null,
                     estado: i === 0 ? (this.primera_cuota ? 'Pagado' : estadoCuota) : 'Pendiente',

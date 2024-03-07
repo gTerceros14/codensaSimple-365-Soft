@@ -332,7 +332,8 @@ class VentaController extends Controller
             }
             $venta = $this->crearVenta($request);
 
-            $this->actualizarCaja($request->total,$request->idtipo_pago);
+           $this->actualizarCaja($request);
+            
 
             $this->registrarDetallesVenta($venta, $request->data, $request->idAlmacen);
 
@@ -446,15 +447,39 @@ class VentaController extends Controller
     }
 
 
-    private function actualizarCaja($total,$idtipo_pago)
-    {
-        $ultimaCaja = Caja::latest()->first();
-        $ultimaCaja->ventas += $total;
-        if ($idtipo_pago == 1){
-            $ultimaCaja->pagosEfectivoVentas+= $total;
-        }
-        $ultimaCaja->save();
-    }
+    private function actualizarCaja($request)
+{
+
+    $ultimaCaja = Caja::latest()->first();
+
+    if ($request->idtipo_pago == 1) {
+        // Actualizar caja en ventas y ventas efectivo
+        // Código para ventas en efectivo
+
+        if ($request->idtipo_venta == 2) {
+            // Sumar a ventas crédito
+            // Código para ventas a crédito
+            $ultimaCaja->ventas += $request->primer_precio_cuota;
+           $ultimaCaja->pagosEfectivoVentas += $request->primer_precio_cuota;
+        } else {
+            // Sumar a ventas contado
+            // Código para ventas a contado
+            $ultimaCaja->ventas += $request->total;
+            $ultimaCaja->pagosEfectivoVentas += $request->total;
+       }
+    } elseif ($request->idtipo_venta == 1) {
+        // Actualizar caja en ventas y ventas cotado no efectivo
+        // Código para ventas cotado no efectivo
+      
+      $ultimaCaja->ventas += $request->total;
+   } else {
+       $ultimaCaja->ventas += $request->primer_precio_cuota;
+   }
+   
+
+    $ultimaCaja->save();
+}
+
 
     private function registrarDetallesVenta($venta, $detalles, $idAlmacen)
     {
