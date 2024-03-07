@@ -154,55 +154,62 @@
                 </ul>
             </li>
             <li class="nav-item nav-dropdown">
-                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-line-chart"></i> Reportes</a>
+                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-line-chart"></i> Reportes Inventario</a>
                 <ul class="nav-dropdown-items">
+
                     <li @click="menu=45" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte
-                            Ventas Diarias</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Diarias</a>
                     </li>
                     <li @click="menu=49" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte
-                            Inventarios</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventarios</a>
                     </li>
-                    <li @click="menu=10" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte
-                            Usuarios</a>
-                    </li>
-                    <li @click="menu=50" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen de
-                            clientes</a>
-                    </li>
-
                     <li @click="menu=51" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex
-                            Fisico Valorado</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Fisico Valorado</a>
                     </li>
-
                     <li @click="menu=52" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Kardex Fisico</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Fisico</a>
                     </li>
-
                     <li @click="menu=58" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Fisico</a>
                     </li>
-
                     <li @click="menu=60" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Fisico de Movimientos</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Detallado Fisico de Movimientos</a>
                     </li>
+
+                </ul>
+            </li>
+
+            <li class="nav-item nav-dropdown">
+                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-line-chart"></i> Reportes Ventas</a>
+                <ul class="nav-dropdown-items">
 
                     <li @click="menu=55" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas x Documento</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas x Documento</a>
+                    </li>
+                    <li @click="menu=57" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas x Producto</a>
                     </li>
 
+                </ul>
+            </li>
+
+            <li class="nav-item nav-dropdown">
+                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-line-chart"></i> Reportes Cientes</a>
+                <ul class="nav-dropdown-items">
+
+                    <li @click="menu=10" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Usuarios</a>
+                    </li>
+                    <li @click="menu=50" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen de clientes</a>
+                    </li>
                     <li @click="menu=56" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Clientes Detallado Global</a>
                     </li>
-
-                    <li @click="menu=57" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas x Producto</a>
-                    </li>
+                    
                 </ul>
             </li>
+               
             <li class="nav-item nav-dropdown">
                 <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-info"></i>SIAT</a>
                 <ul class="nav-dropdown-items">

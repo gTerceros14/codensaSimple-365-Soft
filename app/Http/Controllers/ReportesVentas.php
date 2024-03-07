@@ -30,7 +30,8 @@ class ReportesVentas extends Controller
                 'personas.nombre',
                 'ventas.total AS importe_BS',
                 DB::raw('ROUND(ventas.total / monedas.tipo_cambio,2) AS importe_usd'))
-        ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
+        ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin])
+        ->orderBy('ventas.fecha_hora', 'asc');
 
         if ($request->has('estadoVenta')) {
             $estado_venta = $request->estadoVenta;
