@@ -85,7 +85,7 @@
                         <div>
                             <p>Exportar Detallado</p>
                             <div class="d-inline-block">
-                                <button type="button" @click="exportarExcel" class="btn btn-success"> <i class="icon-doc"></i>&nbsp;Excel</button>
+                                <button type="button" @click="exportarExcelDetallado" class="btn btn-success"> <i class="icon-doc"></i>&nbsp;Excel</button>
                                 <button type="button" @click="exportarPDF" class="btn btn-danger"> <i class="icon-doc"></i>&nbsp;PDF</button>
                             </div>
                         </div>
@@ -286,7 +286,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
-                            <button type="submit" @click="listaReporte(); cerrarModal()" class="btn btn-primary">Visualizar Reporte</button>
+                            <button type="submit" @click="listaReporte();listaReporteDetallado(); cerrarModal()" class="btn btn-primary">Visualizar Reporte</button>
                         </div>
                     </form>
 
@@ -835,6 +835,7 @@ export default {
             fechaFin:'',
 
             arrayDetalle: [],
+            arrayReporteDetallado:[]
 
         }
     },
@@ -1487,7 +1488,7 @@ export default {
             var url = '/resumen-ventas-documento?';
 
             // Agregar los parámetros obligatorios
-            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.ejecutivoseleccionado.id + '&estadoVenta=' + this.criterioEstado + '&idcliente=' + this.clienteseleccionada.id;
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.ejecutivoseleccionado.id + '&estadoVenta=' + this.criterioEstado + '&idcliente=' + this.clienteseleccionada.id +'&moneda='+this.monedaPrincipal[0];
 
             // Agregar las fechas de inicio y fin
             url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
@@ -1503,7 +1504,26 @@ export default {
                     console.log('ERRORES', error);
                 });
         },
+        listaReporteDetallado() {
+            let me = this;
+            var url = '/resumen-ventas-documento-detallado?';
 
+            // Agregar los parámetros obligatorios
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.ejecutivoseleccionado.id + '&estadoVenta=' + this.criterioEstado + '&idcliente=' + this.clienteseleccionada.id+'&moneda='+this.monedaPrincipal[0];
+
+            // Agregar las fechas de inicio y fin
+            url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
+
+            axios.get(url)
+                .then(function (response) {
+                    var respuesta = response.data;
+                    me.arrayReporteDetallado = respuesta.ventas;
+                    console.log("array reporte detallado",me.arrayReporteDetallado);
+                })
+                .catch(function (error) {
+                    console.log('ERRORES', error);
+                });
+        },
         exportarPDF() {
             const pdf = new jsPDF('landscape');
             
@@ -1625,7 +1645,55 @@ export default {
             // Descargar el archivo
             XLSX.writeFile(workbook, 'reporte_resumen_ventas_por_documento.xlsx');
         },
+        exportarExcelDetallado(){
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.aoa_to_sheet([]);
+            const startRow = 5;
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
+             // Título del reporte
+            worksheet['A1'] = { t: 's', v: 'RESUMEN DE VENTAS POR DOCUMENTOS DETALLADO', s: { 
+                font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
+                alignment: { horizontal: 'center', vertical: 'center' },
+                fill: { fgColor: { rgb: '3669a8' } } } };
 
+            // Estilo para la fecha
+            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
+            // Fechas de inicio y fin
+            worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
+            worksheet['C2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+            worksheet['F2'] = { t: 's', v: `Sucursal: ${this.sucursalseleccionada.nombre}`, s: fechaStyle };
+            worksheet['A3'] = { t: 's', v: `Ventas: ${this.criterioEstado}`, s: fechaStyle };
+            worksheet['C3'] = { t: 's', v: `Cliente: ${this.clienteseleccionada.nombre}`, s: fechaStyle };
+            // Estilo para los encabezados
+            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
+            // Cabeceras de las columnas
+            const headers = ['Codigo item', 'Marca', 'Linea', 'Industria','Descripcion','Unidad','Cantidad','P/U','Importe Bs','Importe US'];
+            // Añadir las cabeceras a la hoja de cálculo
+            headers.forEach((header, index) => {
+                worksheet[XLSX.utils.encode_cell({ r: 3, c: index })] = { t: 's', v: header, s: headerStyle };
+            });
+
+            Object.values(this.arrayReporteDetallado).forEach((item, rowIndex) => {
+                const rowData = [
+                    item.codigo_item,
+                    item.nombre_marca,
+                    item.nombre_categoria,
+                    item.nombre_industria,
+                    item.nombre_articulo,
+                    item.medida,
+                    item.cantidad,
+                    item.precio_unitario,
+                    item.precio,
+                    item.importe_usd,
+                ];
+            XLSX.utils.sheet_add_aoa(worksheet, [rowData], { origin: `A${startRow + rowIndex}` });
+            });
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Resumen Documento Detallado');
+
+            // Descargar el archivo
+            XLSX.writeFile(workbook, 'reporte_resumen_ventas_por_documento_detallado.xlsx');
+        },
         formateaKardex(){
             let saldo = 0;
             let me = this;
@@ -2352,6 +2420,8 @@ export default {
                 console.log("MostrarCostos: " + me.mostrarCostos);
                 console.log("ProveedorEstado: " + me.mostrarProveedores);
                 console.log("MostrarSaldosStock: " + me.mostrarSaldosStock);
+                console.log("Moneda principal; ",me.monedaPrincipal);
+                console.log("Moneda; ",me.monedaPrincipal[0]);
 
             })
                 .catch(function (error) {

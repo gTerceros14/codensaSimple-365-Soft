@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DetalleVenta;
 use App\Moneda;
 use App\Venta;
 use Illuminate\Http\Request;
@@ -12,24 +13,25 @@ class ReportesVentas extends Controller
     public function ResumenVentasPorDocumento(Request $request){
         $fechaInicio = $request->fechaInicio;
         $fechaFin = $request->fechaFin;
-
+        $fechaInicio = $fechaInicio . ' 00:00:00';
+        $fechaFin = $fechaFin . ' 23:59:59';
+        $moneda = $request->moneda;
         $ventas = Venta::join('personas','ventas.idcliente','=','personas.id')
         ->join('users','ventas.idusuario','=','users.id')
         ->join('tipo_ventas','ventas.idtipo_venta','=','tipo_ventas.id')
         ->join('roles','users.idrol','=','roles.id')
         ->join('sucursales','users.idsucursal','=','sucursales.id')
-        ->join('monedas', 'monedas.id', '=', DB::raw('1'))
         ->select('ventas.num_comprobante as Factura',
                 'ventas.id',
                 'sucursales.nombre as Nombre_sucursal',
                 'ventas.fecha_hora',
-                'monedas.tipo_cambio as Tipo_Cambio',
+                DB::raw("'$moneda' as Tipo_Cambio"),
                 'tipo_ventas.nombre_tipo_ventas as Tipo_venta',
                 'roles.nombre AS nombre_rol',
                 'users.usuario',
                 'personas.nombre',
                 'ventas.total AS importe_BS',
-                DB::raw('ROUND(ventas.total / monedas.tipo_cambio,2) AS importe_usd'))
+                DB::raw("ROUND((ventas.total / $moneda), 2) AS importe_usd"))
         ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin])
         ->orderBy('ventas.fecha_hora', 'asc');
 
@@ -72,7 +74,8 @@ class ReportesVentas extends Controller
     public function ventasPorProducto(Request $request){
         $fechaInicio = $request->fechaInicio;
         $fechaFin = $request->fechaFin;
-
+        $fechaInicio = $fechaInicio . ' 00:00:00';
+        $fechaFin = $fechaFin . ' 23:59:59';
         $ventas = Venta::join('detalle_ventas','ventas.id','detalle_ventas.idventa')
         ->join('personas','personas.id','=','ventas.idcliente')
         ->join('articulos','detalle_ventas.idarticulo','=','articulos.id')
@@ -224,4 +227,104 @@ class ReportesVentas extends Controller
         return ['resultados' => $resultados];
     
     }
+    public function ResumenVentasPorDocumentoDetallado(Request $request){
+        $fechaInicio = $request->fechaInicio;
+        $fechaFin = $request->fechaFin;
+        $fechaInicio = $fechaInicio . ' 00:00:00';
+        $fechaFin = $fechaFin . ' 23:59:59';
+        $moneda = $request->moneda;
+        $ventas = DetalleVenta::select(
+            'articulos.codigo as codigo_item',
+            'articulos.nombre as nombre_articulo',
+            'ventas.num_comprobante as Factura',
+            'ventas.id',
+            'ventas.fecha_hora',
+            'personas.id as id_cliente',
+            'personas.nombre as nombre_cliente',
+            'users.usuario',
+            'tipo_ventas.nombre_tipo_ventas as Tipo_venta',
+            'roles.nombre as nombre_rol',
+            'sucursales.nombre as Nombre_sucursal',
+            'articulos.nombre',
+            'detalle_ventas.cantidad',
+            'detalle_ventas.precio',
+            'categorias.nombre as nombre_categoria',
+            'marcas.nombre as nombre_marca',
+            'industrias.nombre as nombre_industria',
+            'medidas.descripcion_medida as medida',
+            
+            DB::raw("ROUND((detalle_ventas.precio / detalle_ventas.cantidad), 2) AS precio_unitario"),
+            DB::raw("'$moneda' as Tipo_Cambio"),
+            DB::raw("ROUND((detalle_ventas.precio / $moneda), 2) AS importe_usd")
+             )
+            ->join('ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
+            ->join('personas', 'ventas.idcliente', '=', 'personas.id')
+            ->join('users', 'ventas.idusuario', '=', 'users.id')
+            ->join('tipo_ventas', 'ventas.idtipo_venta', '=', 'tipo_ventas.id')
+            ->join('roles', 'users.idrol', '=', 'roles.id')
+            ->join('sucursales', 'users.idsucursal', '=', 'sucursales.id')
+            ->join('articulos', 'detalle_ventas.idarticulo', '=', 'articulos.id')
+
+            ->join('categorias','articulos.idcategoria','=','categorias.id')
+            ->join('marcas','articulos.idmarca','=','marcas.id')
+            ->join('industrias','articulos.idindustria','=','industrias.id')
+            ->join('medidas','articulos.idmedida','=','medidas.id')
+            ->orderBy('personas.nombre')
+            ->orderBy('ventas.fecha_hora')
+            ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
+        if ($request->has('estadoVenta')) {
+            $estado_venta = $request->estadoVenta;
+            if ($estado_venta !== 'Todos') {
+                $ventas->where('ventas.estado', '=', $estado_venta);
+            }
+        }
+        
+        if ($request->has('sucursal') && $request->sucursal !== 'undefined') {
+            $sucursal = $request->sucursal;
+            $ventas->where('sucursales.id', $sucursal);
+        }
+
+        if ($request->has('ejecutivoCuentas') && $request->ejecutivoCuentas !== 'undefined') {
+            $ejecutivoCuentas = $request->ejecutivoCuentas;
+            $ventas->where('ventas.idusuario' , $ejecutivoCuentas);
+        }
+
+        if ($request->has('idcliente') && $request->idcliente !== 'undefined') {
+            $cliente = $request->idcliente;
+            $ventas->where('ventas.idcliente' , $cliente);
+        }
+        $ventas = $ventas->get();
+    
+    $totalVentasPorCliente = [];
+    
+    foreach ($ventas as $venta) {
+        $idCliente = $venta->id_cliente;
+        $cantidadVenta = $venta->cantidad;
+        $precioVenta = $venta->precio;
+    
+        if (!isset($totalVentasPorCliente[$idCliente])) {
+            $totalVentasPorCliente[$idCliente] = [
+                'total_cantidad' => 0,
+                'total_precio' => 0,
+                'index' => null,];
+        }
+    
+        $totalVentasPorCliente[$idCliente]['total_cantidad'] += $cantidadVenta;
+        $totalVentasPorCliente[$idCliente]['total_precio'] += $precioVenta;
+        $totalVentasPorCliente[$idCliente]['index'] = $venta->id; 
+    }
+    foreach ($ventas as $venta) {
+        $idCliente = $venta->id_cliente;
+
+        if (isset($totalVentasPorCliente[$idCliente]) && $venta->id == $totalVentasPorCliente[$idCliente]['index']) {
+            $venta->total_cantidad_cliente = $totalVentasPorCliente[$idCliente]['total_cantidad'];
+            $venta->total_precio_cliente = $totalVentasPorCliente[$idCliente]['total_precio'];
+        }
+    }
+
+    return [
+        'ventas' => $ventas,
+    ];
+    }
+
 }
