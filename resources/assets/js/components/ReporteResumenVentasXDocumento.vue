@@ -13,9 +13,10 @@
                     <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()" class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros</button>
                 </div>
+                
                 <template v-if="listado == 1">
-                <div class="card-body">
-                    <div style="overflow-x: auto;">
+                <div class="card-body"  style="max-height: 600px; overflow-y: auto;" >
+                    <div class = "table-resposive" > 
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
@@ -56,7 +57,7 @@
                     </div>
                     <!--<div class="text-right">
                         <strong>Total Saldo: </strong> {{ total_saldofisico }} Unidades
-                    </div>-->
+                    </div>
                     <nav>
                         <ul class="pagination">
                             <li class="page-item" v-if="pagination.current_page > 1">
@@ -73,8 +74,9 @@
                                     @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
                             </li>
                         </ul>
-                    </nav>
-                        <div class="d-flex justify-content-between">
+                    </nav>-->
+                </div>
+                <div class="d-flex justify-content-between">
                         <div>
                             <p>Exportar Resumen</p>
                             <div class="d-inline-block">
@@ -85,12 +87,11 @@
                         <div>
                             <p>Exportar Detallado</p>
                             <div class="d-inline-block">
-                                <button type="button" @click="exportarExcel" class="btn btn-success"> <i class="icon-doc"></i>&nbsp;Excel</button>
-                                <button type="button" @click="exportarPDF" class="btn btn-danger"> <i class="icon-doc"></i>&nbsp;PDF</button>
+                                <button type="button" @click="" class="btn btn-success"> <i class="icon-doc"></i>&nbsp;Excel</button>
+                                <button type="button" @click="" class="btn btn-danger"> <i class="icon-doc"></i>&nbsp;PDF</button>
                             </div>
                         </div>
                     </div>
-                </div>
             </template>
 
             <template v-else-if="listado == 2">

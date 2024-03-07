@@ -19,8 +19,8 @@
                     <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
 
                 </div>
-                <div class="card-body">
-                    <div style="overflow-x: auto;">
+                <div class="card-body"  style="max-height: 600px; overflow-y: auto;" >
+                    <div class = "table-resposive" > 
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
@@ -53,7 +53,7 @@
                     <div class="text-right">
                             <strong>Total Saldo Fisico: </strong> {{ total_saldofisico }} Unidades
                         </div>
-                    <nav>
+                    <!--<nav>
                         <ul class="pagination">
                             <li class="page-item" v-if="pagination.current_page > 1">
                                 <a class="page-link" href="#"
@@ -69,7 +69,7 @@
                                     @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
                             </li>
                         </ul>
-                    </nav>
+                    </nav>-->
 
                 </div>
             </div>

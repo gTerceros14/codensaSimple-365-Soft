@@ -157,9 +157,6 @@
                 <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-line-chart"></i> Reportes Inventario</a>
                 <ul class="nav-dropdown-items">
 
-                    <li @click="menu=45" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Diarias</a>
-                    </li>
                     <li @click="menu=49" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventarios</a>
                     </li>
@@ -183,6 +180,9 @@
                 <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-line-chart"></i> Reportes Ventas</a>
                 <ul class="nav-dropdown-items">
 
+                    <li @click="menu=45" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Diarias</a>
+                    </li>
                     <li @click="menu=55" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas x Documento</a>
                     </li>
