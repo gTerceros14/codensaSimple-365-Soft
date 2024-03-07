@@ -23,7 +23,7 @@ class Caja extends Model
         'compras', 
         'comprasContado',
         'saldoFaltante', 
-        'saldoSobrante', 
+        'PagoCuotaEfectivo', 
         'saldoCaja', 
         'estado',
         'cuotasventasCredito'

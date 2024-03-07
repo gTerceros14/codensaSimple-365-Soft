@@ -461,11 +461,15 @@ class VentaController extends Controller
             // Código para ventas a crédito
             $ultimaCaja->ventas += $request->primer_precio_cuota;
            $ultimaCaja->pagosEfectivoVentas += $request->primer_precio_cuota;
+           $ultimaCaja->ventasCredito += $request->primer_precio_cuota;
+           $ultimaCaja->saldoCaja += $request->primer_precio_cuota;
         } else {
             // Sumar a ventas contado
             // Código para ventas a contado
+            $ultimaCaja->ventasContado += $request->total;
             $ultimaCaja->ventas += $request->total;
             $ultimaCaja->pagosEfectivoVentas += $request->total;
+            $ultimaCaja->saldoCaja += $request->total;
        }
     } elseif ($request->idtipo_venta == 1) {
         // Actualizar caja en ventas y ventas cotado no efectivo

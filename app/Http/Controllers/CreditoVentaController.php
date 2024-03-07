@@ -6,9 +6,11 @@ use App\Venta;
 use Illuminate\Support\Facades\Log;
 use App\CreditoVenta;
 use App\CuotasCredito;
+use App\Caja;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+
 
 class CreditoVentaController extends Controller
 {
@@ -175,6 +177,11 @@ class CreditoVentaController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            if (!$this->validarCajaAbierta()) {
+                return ['id' => -1, 'caja_validado' => 'Debe tener una caja abierta'];
+            }
+
             $request->validate([
                 'id_credito' => 'required|integer|exists:credito_ventas,id',
                 'numero_cuota' => 'required|integer',
@@ -204,6 +211,7 @@ class CreditoVentaController extends Controller
             $cuota->estado = 'Pagado';
             $cuota->saldo_restante = $valorCuotaAnterior - $montoPago;
             $cuota->save();
+            $this->actualizarCaja($request);
             DB::commit();
 
             return $cuota;
@@ -212,6 +220,28 @@ class CreditoVentaController extends Controller
             throw ValidationException::withMessages(['error' => 'Error al procesar la solicitud. Inténtalo de nuevo más tarde.']);
         }
     }
+    private function validarCajaAbierta()
+    {
+        $ultimaCaja = Caja::latest()->first();
+        return $ultimaCaja && $ultimaCaja->estado == '1';
+    }
+
+    private function actualizarCaja($request)
+{
+
+    $ultimaCaja = Caja::latest()->first();
+
+    if ($request->tipo_pago == 1) {
+        // Actualizar caja en cuota y cuota efectivo
+      $ultimaCaja->PagoCuotaEfectivo += $request->monto_pago;
+      $ultimaCaja->saldoCaja += $request->monto_pago;
+
+    }
+    $ultimaCaja->cuotasventasCredito += $request->monto_pago;
+    
+    $ultimaCaja->save();
+}
+
     public function obtenerCreditoYCuotas(Request $request)
     {
         $creditoVenta = CreditoVenta::where('idventa', $request->idventa)->first();
