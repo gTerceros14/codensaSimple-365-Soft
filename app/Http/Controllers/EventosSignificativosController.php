@@ -17,12 +17,12 @@ class EventosSignificativosController extends Controller
         if($buscar==''){
             $eventos_significativos = EventosSignificativos::join('motivo_eventos', 'eventos_significativos.idmotivoevento', '=', 'motivo_eventos.id')
             ->select('eventos_significativos.*', 'motivo_eventos.codigo as codigo', 'motivo_eventos.descripcion as descripcionEvento')
-            ->orderBy('eventos_significativos.id', 'desc')->paginate(3);
+            ->orderBy('eventos_significativos.id', 'desc')->paginate(6);
         }
         else{
             $eventos_significativos = EventosSignificativos::join('motivo_eventos', 'eventos_significativos.idmotivoevento', '=', 'motivo_eventos.id')
             ->select('eventos_significativos.*', 'motivo_eventos.codigo', 'motivo_eventos.descripcion')
-            ->orderBy('eventos_significativos.id', 'desc')->paginate(3);
+            ->orderBy('eventos_significativos.id', 'desc')->paginate(6);
         }
 
         return [

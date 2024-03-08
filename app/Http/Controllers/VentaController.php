@@ -75,7 +75,7 @@ class VentaController extends Controller
                     'personas.nombre',
                     'users.usuario'
                 )
-                ->orderBy('ventas.id', 'desc')->paginate(3);
+                ->orderBy('ventas.id', 'desc')->paginate(6);
         } else {
             $ventas = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
                 ->join('users', 'ventas.idusuario', '=', 'users.id')
@@ -93,7 +93,7 @@ class VentaController extends Controller
                     'users.usuario'
                 )
                 ->where('ventas.' . $criterio, 'like', '%' . $buscar . '%')
-                ->orderBy('ventas.id', 'desc')->paginate(3);
+                ->orderBy('ventas.id', 'desc')->paginate(6);
         }
 
         return [
@@ -162,7 +162,7 @@ class VentaController extends Controller
                 $ventas->whereBetween('ventas.fecha_hora', [$fechaInicio, $fechaFin]);
             }
 
-            $ventas = $ventas->orderBy('ventas.id', 'desc')->paginate(3);
+            $ventas = $ventas->orderBy('ventas.id', 'desc')->paginate(6);
         } else {
             $ventas = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
                 ->join('users', 'ventas.idusuario', '=', 'users.id')
@@ -201,7 +201,7 @@ class VentaController extends Controller
                 $ventas->whereBetween('ventas.fecha_hora', [$fechaInicio, $fechaFin]);
             }
 
-            $ventas = $ventas->orderBy('ventas.id', 'desc')->paginate(3);
+            $ventas = $ventas->orderBy('ventas.id', 'desc')->paginate(6);
         }
         return [
             'pagination' => [
@@ -1550,7 +1550,7 @@ class VentaController extends Controller
         $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
             ->select('facturas.*', 'personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
             ->where('facturas.id', '=', $id)
-            ->orderBy('facturas.id', 'desc')->paginate(3);
+            ->orderBy('facturas.id', 'desc')->paginate(6);
 
         Log::info('Resultado', [
             //'facturas' => $facturas,
@@ -1743,7 +1743,7 @@ class VentaController extends Controller
         $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
             ->select('facturas.*', 'personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
             ->where('facturas.id', '=', $id)
-            ->orderBy('facturas.id', 'desc')->paginate(3);
+            ->orderBy('facturas.id', 'desc')->paginate(6);
 
         Log::info('Resultado', [
             //'facturas' => $facturas,

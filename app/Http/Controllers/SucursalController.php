@@ -25,12 +25,12 @@ class SucursalController extends Controller
         if ($buscar == '') {
             $sucursales = Sucursales::join('empresas', 'sucursales.idempresa', '=', 'empresas.id')
                 ->select('sucursales.id', 'sucursales.idempresa', 'empresas.nombre as nombre_empresa', 'sucursales.nombre', 'sucursales.direccion', 'sucursales.correo', 'sucursales.telefono', 'sucursales.departamento', 'sucursales.codigoSucursal', 'sucursales.condicion')
-                ->orderBy('sucursales.id', 'desc')->paginate(3);
+                ->orderBy('sucursales.id', 'desc')->paginate(6);
         } else {
             $sucursales = Sucursales::join('empresas', 'sucursales.idempresa', '=', 'empresas.id')
                 ->select('sucursales.id', 'sucursales.idempresa', 'empresas.nombre as nombre_empresa', 'sucursales.nombre', 'sucursales.direccion', 'sucursales.correo', 'sucursales.telefono', 'sucursales.departamento', 'sucursales.codigoSucursal', 'sucursales.condicion')
                 ->where('sucursales.' . $criterio, 'like', '%' . $buscar . '%')
-                ->orderBy('sucursales.id', 'desc')->paginate(3);
+                ->orderBy('sucursales.id', 'desc')->paginate(6);
         }
 
         return [
