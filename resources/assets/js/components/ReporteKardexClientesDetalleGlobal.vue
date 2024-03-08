@@ -316,7 +316,7 @@ methods: {
         ];
         worksheet['!cols'] = columnWidths;
 
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'kardex clientes global');
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'kardex clientes detallado');
 
         XLSX.writeFile(workbook, 'kardex_clientes_detallado_global.xlsx');
     },

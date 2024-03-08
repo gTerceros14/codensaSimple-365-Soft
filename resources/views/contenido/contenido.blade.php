@@ -196,6 +196,9 @@
 <template v-if="menu==58">
     <resumenfisicomovimientos></resumenfisicomovimientos>
 </template>
+<template v-if="menu==59">
+    <kardexclientesresumenglobal></kardexclientesresumenglobal>
+</template>
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
     <dashboard></dashboard>

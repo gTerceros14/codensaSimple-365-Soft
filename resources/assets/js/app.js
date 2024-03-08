@@ -177,6 +177,10 @@ Vue.component(
   require("./components/ReporteKardexClientesDetalleGlobal.vue")
 );
 Vue.component(
+  "kardexclientesresumenglobal",
+  require("./components/ReporteKardexClientesResumenGlobal.vue")
+);
+Vue.component(
   "resumenventaxdocumento",
   require("./components/ReporteResumenVentasXDocumento.vue")
 );
