@@ -775,6 +775,7 @@ methods : {
         this.totalMonedas = moneda5*5 + moneda2*2 + moneda1*1 + moneda050*0.50 + moneda020*0.20 + moneda010*0.10;
     },
     cerrarCaja(id){
+        const total = this.totalEfectivo;
        swal({
         title: 'Esta seguro de cerrar la caja?',
         type: 'warning',
@@ -792,7 +793,8 @@ methods : {
             let me = this;
 
             axios.put('/caja/cerrar',{
-                'id': id
+                'id': id,
+                'saldoFaltante':total
             }).then(function (response) {
                 me.listarCaja(1,'','id');
                 swal(

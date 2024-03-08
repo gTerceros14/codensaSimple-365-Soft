@@ -2,8 +2,8 @@
     <main class="main">
         <ol class="breadcrumb bg-light rounded px-3 shadow-sm">
             <li class="breadcrumb-item"><a class="text-primary text-decoration-none" href="/">Escritorio</a></li>
-            <li class="breadcrumb-item active text-primary" aria-current="page">Compras</li>
-            <li class="breadcrumb-item active text-primary" aria-current="page">{{showRegistrarVenta?"Ingresos":"Pedidos a proveedores"}}</li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">Ventas</li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">{{showRegistrarVenta?"Ventas":"Preventa "}}</li>
         </ol>
         <!-- <div class="m-2 p-2"></div> -->
         <div class="container-fluid">
