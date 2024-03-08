@@ -13,7 +13,6 @@
                     <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()" class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros</button>
                 </div>
-                
                 <template v-if="listado == 1">
                 <div class="card-body"  style="max-height: 600px; overflow-y: auto;" >
                     <div class = "table-resposive" > 
@@ -88,11 +87,10 @@
                             <p>Exportar Detallado</p>
                             <div class="d-inline-block">
                                 <button type="button" @click="exportarExcelDetallado" class="btn btn-success"> <i class="icon-doc"></i>&nbsp;Excel</button>
-                                <button type="button" @click="exportarPDF" class="btn btn-danger"> <i class="icon-doc"></i>&nbsp;PDF</button>
+                                <button type="button" @click="exportarPdfDetallado" class="btn btn-danger"> <i class="icon-doc"></i>&nbsp;PDF</button>
                             </div>
                         </div>
                     </div>
-                </div>
             </template>
 
             <template v-else-if="listado == 2">
@@ -1568,6 +1566,145 @@ export default {
             pdf.save('reporte_resumen_ventas_por_documento.pdf');
         },
 
+        exportarPdfDetallado() {
+    const pdf = new jsPDF({
+        orientation: 'l',
+        unit: 'mm',
+        format: 'letter',
+    });
+
+    let startRow = 20;
+    const lineHeight = 2; // Altura de línea reducida
+    const fontSize = 7; // Tamaño de fuente
+    const spaceBetweenGroups = 10; // Espacio adicional entre grupos de ventas
+    const maxRowsPerPage = 50; // Máximo número de filas por página
+
+    const groupedData = this.groupById();
+
+    groupedData.forEach((venta, index) => {
+        // Verificar si hay espacio suficiente en la página actual para los datos de este grupo
+        const spaceNeeded = (venta.length * lineHeight) + 30; // Espacio necesario para los datos del grupo
+        const spaceLeftOnPage = pdf.internal.pageSize.height - startRow; // Espacio restante en la página actual
+
+        if (spaceNeeded > spaceLeftOnPage) {
+            pdf.addPage(); // Agregar una nueva página si no hay suficiente espacio
+            startRow = 10; // Reiniciar la posición de inicio en la nueva página
+
+            // Título del reporte y datos de filtro (aparecerán en todas las páginas)
+            pdf.setFontSize(16);
+            pdf.setTextColor(0, 0, 0);
+            
+            pdf.text('DETALLE DE VENTAS POR DOCUMENTOS', 148, startRow, { align: 'center' });
+
+            // Fechas e información general (aparecerán en todas las páginas)
+            pdf.setFontSize(12);
+            pdf.text(`Fecha inicio: ${this.fechaInicio}`, 10, startRow + 10);
+            pdf.text(`Fecha fin: ${this.fechaFin}`, 70, startRow + 10);
+            pdf.text(`Sucursal: ${this.sucursalseleccionada.nombre}`, 140, startRow + 10);
+            pdf.text(`Ventas: ${this.criterioEstado}`, 10, startRow + 15);
+            pdf.text(`Cliente: ${this.clienteseleccionada.nombre}`, 70, startRow + 15);
+
+            startRow += 30; // Espacio adicional después del título y datos de filtro
+        }
+
+        const headersGenerales = [
+            'Factura', 'Sucursal', 'Fecha', 'Tipo_Cambio', 'Tipo de venta',
+            'Ejecutivo de Venta', 'Nombre Ejecutivo de Venta', 'Cliente', 'Importe Bs', 'Importe Bs'
+        ];
+
+        //pdf.setFillColor(240, 240, 240);
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont('helvetica', 'bold'); // Estilo de texto normal
+        pdf.setFontSize(fontSize); // Tamaño de fuente
+
+        headersGenerales.forEach((header, colIndex) => {
+            pdf.rect(10 + colIndex * 30, startRow, 30, lineHeight + 2, 'S');
+            pdf.text(header, 12 + colIndex * 30, startRow + lineHeight + 2);
+        });
+
+        startRow += lineHeight + 2; // Espacio reducido entre encabezados y datos generales
+
+        pdf.setFont('helvetica', 'normal'); // Estilo de texto normal
+
+        // Datos generales
+        const datosGenerales = headersGenerales.map(header => (venta[0][header] !== undefined ? venta[0][header] : ''));
+        pdf.setTextColor(0, 0, 0); // Color de texto negro
+
+        datosGenerales.forEach((data, colIndex) => {
+            pdf.text(String(data), 12 + colIndex * 30, startRow + lineHeight + 2);
+        });
+
+        startRow += lineHeight + 5; // Espacio adicional antes de los detalles
+
+        // Encabezados de detalles
+        const headersDetalle = ['Codigo item', 'Marca', 'Linea', 'Industria', 'Descripcion', 'Unidad', 'Cantidad', 'P/U', 'Importe Bs', 'Importe US'];
+
+        //pdf.setFillColor(240, 240, 240);
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont('helvetica', 'normal'); // Estilo de texto normal
+        pdf.setFontSize(fontSize); // Tamaño de fuente
+
+        headersDetalle.forEach((header, colIndex) => {
+            pdf.rect(10 + colIndex * 30, startRow, 30, lineHeight + 2, 'S');
+            pdf.text(header, 12 + colIndex * 30, startRow + lineHeight + 2);
+        });
+
+        startRow += lineHeight + 2; // Espacio reducido entre encabezados y datos de detalle
+
+        // Datos de detalle
+        venta.forEach((item, rowIndex) => {
+            if (startRow + lineHeight + 2 > pdf.internal.pageSize.height) {
+                // Si no hay suficiente espacio en la página actual, agregar una nueva página
+                pdf.addPage();
+                startRow = 10; // Reiniciar la posición de inicio en la nueva página
+
+                // Título del reporte y datos de filtro (aparecerán en todas las páginas)
+                pdf.setFontSize(16);
+                pdf.setTextColor(0, 0, 0);
+                //pdf.setFillColor(240, 240, 240);
+                pdf.text('DETALLE DE VENTAS POR DOCUMENTOS', 148, startRow, { align: 'center' });
+
+                // Fechas e información general (aparecerán en todas las páginas)
+                pdf.setFontSize(12);
+                pdf.text(`Fecha inicio: ${this.fechaInicio}`, 10, startRow + 10);
+                pdf.text(`Fecha fin: ${this.fechaFin}`, 70, startRow + 10);
+                pdf.text(`Sucursal: ${this.sucursalseleccionada.nombre}`, 140, startRow + 10);
+                pdf.text(`Ventas: ${this.criterioEstado}`, 10, startRow + 15);
+                pdf.text(`Cliente: ${this.clienteseleccionada.nombre}`, 70, startRow + 15);
+
+                startRow += 30; // Espacio adicional después del título y datos de filtro
+            }
+
+            const rowDataDetalle = [
+                item.codigo_item,
+                item.nombre_marca,
+                item.nombre_categoria,
+                item.nombre_industria,
+                item.nombre_articulo,
+                item.medida,
+                item.cantidad,
+                item.precio_unitario,
+                item.precio,
+                item.importe_usd
+            ];
+
+            pdf.setTextColor(0, 0, 0); // Color de texto negro
+
+            rowDataDetalle.forEach((data, colIndex) => {
+                pdf.text(String(data), 12 + colIndex * 30, startRow + lineHeight + 2);
+            });
+
+            startRow += lineHeight + 2;
+        });
+
+        startRow += 15; // Espacio adicional después de los detalles
+    });
+
+    pdf.save('reporte_resumen_ventas_por_documento_detallado.pdf');
+},
+
+
+
         exportarExcel() {
             const workbook = XLSX.utils.book_new();
             const worksheet = XLSX.utils.aoa_to_sheet([]);
@@ -1647,55 +1784,140 @@ export default {
             // Descargar el archivo
             XLSX.writeFile(workbook, 'reporte_resumen_ventas_por_documento.xlsx');
         },
-        exportarExcelDetallado(){
+        
+        exportarExcelDetallado() {
             const workbook = XLSX.utils.book_new();
             const worksheet = XLSX.utils.aoa_to_sheet([]);
-            const startRow = 5;
+            let startRow = 3;
+
             worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
-             // Título del reporte
-            worksheet['A1'] = { t: 's', v: 'RESUMEN DE VENTAS POR DOCUMENTOS DETALLADO', s: { 
-                font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
-                alignment: { horizontal: 'center', vertical: 'center' },
-                fill: { fgColor: { rgb: '3669a8' } } } };
+            // Título del reporte
+            worksheet['A1'] = {
+                    t: 's',
+                    v: 'DETALLE DE VENTAS POR DOCUMENTOS',
+                    s: {
+                        font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
+                        alignment: { horizontal: 'center', vertical: 'center' },
+                        fill: { fgColor: { rgb: '3669a8' } }
+                    }
+                };
 
-            // Estilo para la fecha
-            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
-            // Fechas de inicio y fin
-            worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
-            worksheet['C2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
-            worksheet['F2'] = { t: 's', v: `Sucursal: ${this.sucursalseleccionada.nombre}`, s: fechaStyle };
-            worksheet['A3'] = { t: 's', v: `Ventas: ${this.criterioEstado}`, s: fechaStyle };
-            worksheet['C3'] = { t: 's', v: `Cliente: ${this.clienteseleccionada.nombre}`, s: fechaStyle };
-            // Estilo para los encabezados
-            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
-            // Cabeceras de las columnas
-            const headers = ['Codigo item', 'Marca', 'Linea', 'Industria','Descripcion','Unidad','Cantidad','P/U','Importe Bs','Importe US'];
-            // Añadir las cabeceras a la hoja de cálculo
-            headers.forEach((header, index) => {
-                worksheet[XLSX.utils.encode_cell({ r: 3, c: index })] = { t: 's', v: header, s: headerStyle };
-            });
+                // Estilo para la fecha
+                const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
 
-            Object.values(this.arrayReporteDetallado).forEach((item, rowIndex) => {
-                const rowData = [
-                    item.codigo_item,
-                    item.nombre_marca,
-                    item.nombre_categoria,
-                    item.nombre_industria,
-                    item.nombre_articulo,
-                    item.medida,
-                    item.cantidad,
-                    item.precio_unitario,
-                    item.precio,
-                    item.importe_usd,
+                // Fechas de inicio y fin
+                worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
+                worksheet['C2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+                worksheet['F2'] = { t: 's', v: `Sucursal: ${this.sucursalseleccionada.nombre}`, s: fechaStyle };
+                worksheet['A3'] = { t: 's', v: `Ventas: ${this.criterioEstado}`, s: fechaStyle };
+                worksheet['C3'] = { t: 's', v: `Cliente: ${this.clienteseleccionada.nombre}`, s: fechaStyle };
+
+            // Agrupar datos por 'id'
+            const groupedData = this.groupById();
+
+            groupedData.forEach((venta, index) => {
+                
+                // Encabezados generales
+                const headersGenerales = [
+                    'Factura', 'Sucursal', 'Fecha', 'Tipo_Cambio', 'Tipo de venta',
+                    'Ejecutivo de Venta', 'Nombre Ejecutivo de Venta', 'Cliente', 'Importe Bs', 'Importe Bs'
                 ];
-            XLSX.utils.sheet_add_aoa(worksheet, [rowData], { origin: `A${startRow + rowIndex}` });
+
+                // Estilo para los encabezados generales
+                const headerGeneralStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
+
+                // Obtener datos generales del primer elemento del grupo
+                const datosGenerales = headersGenerales.map((header) => (venta[0][header] !== undefined ? venta[0][header] : ''));
+
+                // Añadir los encabezados generales a la hoja de cálculo
+                headersGenerales.forEach((header, colIndex) => {
+                    worksheet[XLSX.utils.encode_cell({ r: startRow, c: colIndex })] = {
+                        t: 's',
+                        v: header,
+                        s: headerGeneralStyle
+                    };
+                    worksheet[XLSX.utils.encode_cell({ r: startRow + 1, c: colIndex })] = {
+                        t: 's',
+                        v: datosGenerales[colIndex],
+                        s: {}
+                    };
+                    
+                });
+
+                // Separador entre los encabezados generales y del detalle
+                worksheet[XLSX.utils.encode_cell({ r: startRow + 2, c: 0 })] = { t: 's', v: '', s: {} };
+
+                // Encabezados del detalle
+                const headersDetalle = ['Codigo item', 'Marca', 'Linea', 'Industria', 'Descripcion', 'Unidad', 'Cantidad', 'P/U', 'Importe Bs', 'Importe US'];
+
+                // Estilo para los encabezados del detalle
+                const headerDetalleStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '2F75B5' } } };
+
+                // Añadir las cabeceras del detalle a la hoja de cálculo
+                headersDetalle.forEach((header, colIndex) => {
+                    worksheet[XLSX.utils.encode_cell({ r: startRow + 3, c: colIndex })] = {
+                        t: 's',
+                        v: header,
+                        s: headerDetalleStyle
+                    };
+                });
+
+                // Datos del detalle de la venta
+                venta.forEach((item, rowIndex) => {
+                    const rowDataDetalle = [
+                        item.codigo_item,
+                        item.nombre_marca,
+                        item.nombre_categoria,
+                        item.nombre_industria,
+                        item.nombre_articulo,
+                        item.medida,
+                        item.cantidad,
+                        item.precio_unitario,
+                        item.precio,
+                        item.importe_usd
+                    ];
+                    XLSX.utils.sheet_add_aoa(worksheet, [rowDataDetalle], { origin: `A${startRow +5 + rowIndex}` });
+                });
+
+                startRow += 8 + venta.length;
+
             });
+
+            // Establecer el ancho de las columnas
+            const columnWidths = [
+                { wch: 21.56 },
+                { wch: 16.0 },   
+                { wch: 22.22 },
+                { wch: 15.14 },
+                { wch: 28.44 },
+                { wch: 17.11 },
+                { wch: 25.0 },
+                { wch: 26.67 },
+                { wch: 13.11 },
+                { wch: 12.78 },
+            ];
+            worksheet['!cols'] = columnWidths;
 
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Resumen Documento Detallado');
 
             // Descargar el archivo
             XLSX.writeFile(workbook, 'reporte_resumen_ventas_por_documento_detallado.xlsx');
         },
+
+        groupById() {
+            // Función para agrupar datos por 'id'
+            const groupedData = {};
+            this.arrayReporteDetallado.forEach((item) => {
+                const key = item.id;
+                if (!groupedData[key]) {
+                    groupedData[key] = [];
+                }
+                groupedData[key].push(item);
+            });
+            return Object.values(groupedData);
+        },
+
+
         formateaKardex(){
             let saldo = 0;
             let me = this;

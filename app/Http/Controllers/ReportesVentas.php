@@ -238,13 +238,14 @@ class ReportesVentas extends Controller
             'articulos.nombre as nombre_articulo',
             'ventas.num_comprobante as Factura',
             'ventas.id',
-            'ventas.fecha_hora',
+            'ventas.total as Importe Bs',
+            'ventas.fecha_hora as Fecha',
             'personas.id as id_cliente',
-            'personas.nombre as nombre_cliente',
-            'users.usuario',
-            'tipo_ventas.nombre_tipo_ventas as Tipo_venta',
-            'roles.nombre as nombre_rol',
-            'sucursales.nombre as Nombre_sucursal',
+            'personas.nombre as Cliente',
+            'users.usuario as Nombre Ejecutivo de Venta',
+            'tipo_ventas.nombre_tipo_ventas as Tipo de venta',
+            'roles.nombre as Ejecutivo de Venta',
+            'sucursales.nombre as Sucursal',
             'articulos.nombre',
             'detalle_ventas.cantidad',
             'detalle_ventas.precio',
@@ -254,7 +255,7 @@ class ReportesVentas extends Controller
             'medidas.descripcion_medida as medida',
             
             DB::raw("ROUND((detalle_ventas.precio / detalle_ventas.cantidad), 2) AS precio_unitario"),
-            DB::raw("'$moneda' as Tipo_Cambio"),
+            DB::raw("'$moneda' as Tipo_cambio"),
             DB::raw("ROUND((detalle_ventas.precio / $moneda), 2) AS importe_usd")
              )
             ->join('ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
