@@ -21,9 +21,9 @@
                         <i class="icon-doc"></i>&nbsp;Reporte PDF
                     </button>
                 </div>
+
                 <div class="card-body"  style="max-height: 400px; overflow-y: auto;" >
-                    
-                        <div class = "table-resposive" > 
+                    <div class = "table-resposive" > 
                         <table class="table table-bordered table-striped table-sm" >
                             <thead>
                                 <tr>

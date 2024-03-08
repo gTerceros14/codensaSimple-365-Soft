@@ -23,12 +23,13 @@
                             <th>Fecha Apertura</th>
                             <th>Fecha Cierre</th>
                             <th>Saldo Inicial</th>
+                            <th>Ventas Totales</th>
                             <th>Ventas al Contado</th>
                             <th>Ventas a Credito </th>
                             <th>Pagos en Efectivo Ventas</th>
                             <th>Pagos de Cuotas</th>
                             <th>Pagos de Cuotas Efectivo</th>
-                            <th>Saldo Sobrante</th>
+                            <th>Saldo de faltante </th>
                             <th>Depósitos Extras</th>
                             <th>Salidas Extras</th>
                             <th>Saldo Caja</th>
@@ -45,11 +46,13 @@
                             <td v-text="caja.saldoInicial"></td>
                           
                             <td v-text="caja.ventas"></td>
+                            <td v-text="caja.ventasContado"></td>
+                            <td v-text="caja.ventasCredito"></td>
                             <td v-text="caja.pagosEfectivoVentas"></td>
-                            <td v-text="caja.compras"></td>
                             <td v-text="caja.cuotasventasCredito"></td>
+                            <td v-text="caja.PagoCuotaEfectivo"></td>
                             <td v-text="caja.saldoFaltante"></td>
-                            <td v-text="caja.saldoSobrante"></td>
+                           
                             <td v-text="caja.depositos"></td>
                             <td v-text="caja.salidas"></td>
                             <td v-text="caja.saldoCaja"></td>
@@ -542,7 +545,7 @@ data (){
         comprasContado : '',
         comprasCredito : '',
         saldoFaltante : '',
-        saldoSobrante : '',
+        PagoCuotaEfectivo : '',
         saldoCaja : '',
         arqueo_id: 0,
         billete200 : 0,
@@ -772,6 +775,7 @@ methods : {
         this.totalMonedas = moneda5*5 + moneda2*2 + moneda1*1 + moneda050*0.50 + moneda020*0.20 + moneda010*0.10;
     },
     cerrarCaja(id){
+        const total = this.totalEfectivo;
        swal({
         title: 'Esta seguro de cerrar la caja?',
         type: 'warning',
@@ -789,7 +793,8 @@ methods : {
             let me = this;
 
             axios.put('/caja/cerrar',{
-                'id': id
+                'id': id,
+                'saldoFaltante':total
             }).then(function (response) {
                 me.listarCaja(1,'','id');
                 swal(

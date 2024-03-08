@@ -9,21 +9,18 @@
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Resumen de Ventas por Documento
-                    <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()"
-                    class="btn btn-primary">
+                    <i class="fa fa-align-justify"></i> Reporte Ventas por Documento
+                    <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()" class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros</button>
-                    <button type="button" @click="exportarExcel" class="btn btn-success">
-                        <i class="icon-doc"></i>&nbsp;Exportar a Excel
-                    </button>
-                    <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
-
                 </div>
-                <div class="card-body">
-                    <div style="overflow-x: auto;">
+                
+                <template v-if="listado == 1">
+                <div class="card-body"  style="max-height: 600px; overflow-y: auto;" >
+                    <div class = "table-resposive" > 
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
+                                    <th>Opciones</th>
                                     <th>NUM FACTURA</th>
                                     <th>SUCURSAL</th>
                                     <th>FECHA</th>
@@ -38,7 +35,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="articulo in sortedResultados" :key="articulo.id">
+                                <tr v-for="articulo in arrayReporte" :key="articulo.id">
+                                    <td class="d-flex align-items-center">
+                                            <button type="button" @click="verVenta(articulo.id)"
+                                                class="btn btn-success btn-sm mr-1">
+                                                <i class="icon-eye"></i>
+                                            </button></td>
                                     <td v-text="articulo.Factura"></td>
                                     <td v-text="articulo.Nombre_sucursal"></td>
                                     <td v-text="articulo.fecha_hora"></td>  
@@ -49,14 +51,13 @@
                                     <td v-text="articulo.nombre"></td>
                                     <td v-text="articulo.importe_BS"></td>
                                     <td v-text="articulo.importe_usd"></td>
-
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="text-right">
-                            <strong>Total Saldo Fisico: </strong> {{ total_saldofisico }} Unidades
-                        </div>
+                    <!--<div class="text-right">
+                        <strong>Total Saldo: </strong> {{ total_saldofisico }} Unidades
+                    </div>
                     <nav>
                         <ul class="pagination">
                             <li class="page-item" v-if="pagination.current_page > 1">
@@ -73,16 +74,139 @@
                                     @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
                             </li>
                         </ul>
-                    </nav>
-
+                    </nav>-->
                 </div>
+                <div class="d-flex justify-content-between">
+                        <div>
+                            <p>Exportar Resumen</p>
+                            <div class="d-inline-block">
+                                <button type="button" @click="exportarExcel" class="btn btn-success"> <i class="icon-doc"></i>&nbsp;Excel</button>
+                                <button type="button" @click="exportarPDF" class="btn btn-danger"> <i class="icon-doc"></i>&nbsp;PDF</button>
+                            </div>
+                        </div>
+                        <div>
+                            <p>Exportar Detallado</p>
+                            <div class="d-inline-block">
+                                <button type="button" @click="exportarExcelDetallado" class="btn btn-success"> <i class="icon-doc"></i>&nbsp;Excel</button>
+                                <button type="button" @click="exportarPDF" class="btn btn-danger"> <i class="icon-doc"></i>&nbsp;PDF</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <template v-else-if="listado == 2">
+                    <div class="card-body">
+                        <div class="form-group row border">
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <label for="">Cliente</label>
+                                    <p v-text="cliente"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="">Impuesto</label>
+                                <p v-text="impuesto"></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Tipo Comprobante</label>
+                                    <p v-text="tipo_comprobante"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Serie Comprobante</label>
+                                    <p v-text="serie_comprobante"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Número Comprobante</label>
+                                    <p v-text="num_comprobante"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row border">
+                            <div class="table-responsive col-md-12">
+                                <table class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Artículo</th>
+                                            <th>Precio</th>
+                                            <th>Cantidad</th>
+                                            <th>Descuento</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="arrayDetalle.length">
+                                        <tr v-for="detalle in arrayDetalle" :key="detalle.id">
+                                            <td v-text="detalle.articulo">
+                                            </td>
+
+                                            <td>
+                                                {{ ((detalle.precio / detalle.cantidad) * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                                                    monedaPrincipal[1] }}
+
+                                            </td>
+                                            <td v-text="detalle.cantidad">
+                                            </td>
+                                            <td v-text="detalle.descuento">
+                                            </td>
+                                            <td>
+                                                {{ (((detalle.precio/detalle.cantidad) * detalle.cantidad - detalle.descuento)
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Parcial:</strong>
+                                            </td>
+                                            <td>
+                                                {{ ((totalParcial = (total - totalImpuesto))
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+                                            </td>
+
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
+                                            <td>
+                                                {{ ((totalImpuesto = (total * impuesto))
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Neto:</strong></td>
+                                            <td>
+                                                {{ ((total) * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-else>
+                                        <tr>
+                                            <td colspan="5">
+                                                No hay articulos agregados
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
-            <!-- Fin ejemplo de tabla Listado -->
         </div>
         <!-- MODAL LISTADO DE MARCAS -->
 
         <!-- contenido del modal -->
-
+        
         <!--Inicio del modal agregar/actualizar-->
         <div class="modal" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
@@ -164,15 +288,13 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
-                            <button type="submit" @click="listaReporte(); cerrarModal()" class="btn btn-primary">Visualizar Reporte</button>
+                            <button type="submit" @click="listaReporte();listaReporteDetallado(); cerrarModal()" class="btn btn-primary">Visualizar Reporte</button>
                         </div>
                     </form>
 
                 </div>
                 <!-- /.modal-content -->
             </div>
-
-
             <!-- /.modal-dialog -->
         </div>
 
@@ -509,6 +631,10 @@ export default {
                 idproveedor: null,
                 idmedida: null
             },
+            listado: 1,
+            cliente: '',
+            totalImpuesto: 0.0,
+            
             errores: {},
 
             monedaPrincipal: [],
@@ -709,6 +835,10 @@ export default {
             //fechas
             fechaInicio:'',
             fechaFin:'',
+
+            arrayDetalle: [],
+            arrayReporteDetallado:[]
+
         }
     },
     components: {
@@ -739,6 +869,24 @@ export default {
         imagen() {
             console.log(this.fotoMuestra);
             return this.fotoMuestra;
+        },
+        calcularTotal: function () {
+            var resultado = 0.0;
+            for (var i = 0; i < this.arrayDetalle.length; i++) {
+                resultado += ((this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad) - (this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad * this.arrayDetalle[i].descuento / 100))
+
+            }
+            resultado -= this.descuentoAdicional;
+            resultado -= this.descuentoGiftCard;
+            return resultado;
+        },
+
+        calcularSubTotal: function () {
+            var resultado = 0.0;
+            for (var i = 0; i < this.arrayDetalle.length; i++) {
+                resultado = resultado + ((this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad) - (this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad * this.arrayDetalle[i].descuento / 100))
+            }
+            return resultado;
         },
     },
     watch: {
@@ -1342,7 +1490,7 @@ export default {
             var url = '/resumen-ventas-documento?';
 
             // Agregar los parámetros obligatorios
-            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.ejecutivoseleccionado.id + '&estadoVenta=' + this.criterioEstado + '&idcliente=' + this.clienteseleccionada.id;
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.ejecutivoseleccionado.id + '&estadoVenta=' + this.criterioEstado + '&idcliente=' + this.clienteseleccionada.id +'&moneda='+this.monedaPrincipal[0];
 
             // Agregar las fechas de inicio y fin
             url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
@@ -1358,7 +1506,26 @@ export default {
                     console.log('ERRORES', error);
                 });
         },
+        listaReporteDetallado() {
+            let me = this;
+            var url = '/resumen-ventas-documento-detallado?';
 
+            // Agregar los parámetros obligatorios
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.ejecutivoseleccionado.id + '&estadoVenta=' + this.criterioEstado + '&idcliente=' + this.clienteseleccionada.id+'&moneda='+this.monedaPrincipal[0];
+
+            // Agregar las fechas de inicio y fin
+            url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
+
+            axios.get(url)
+                .then(function (response) {
+                    var respuesta = response.data;
+                    me.arrayReporteDetallado = respuesta.ventas;
+                    console.log("array reporte detallado",me.arrayReporteDetallado);
+                })
+                .catch(function (error) {
+                    console.log('ERRORES', error);
+                });
+        },
         exportarPDF() {
             const pdf = new jsPDF('landscape');
             
@@ -1435,7 +1602,7 @@ export default {
             });
 
             // Añadir los datos al kardex
-            Object.values(this.sortedResultados).forEach((item, rowIndex) => {
+            Object.values(this.arrayReporte).forEach((item, rowIndex) => {
                 const rowData = [
                     item.Factura,
                     item.Nombre_sucursal,
@@ -1480,7 +1647,55 @@ export default {
             // Descargar el archivo
             XLSX.writeFile(workbook, 'reporte_resumen_ventas_por_documento.xlsx');
         },
+        exportarExcelDetallado(){
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.aoa_to_sheet([]);
+            const startRow = 5;
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
+             // Título del reporte
+            worksheet['A1'] = { t: 's', v: 'RESUMEN DE VENTAS POR DOCUMENTOS DETALLADO', s: { 
+                font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
+                alignment: { horizontal: 'center', vertical: 'center' },
+                fill: { fgColor: { rgb: '3669a8' } } } };
 
+            // Estilo para la fecha
+            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
+            // Fechas de inicio y fin
+            worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
+            worksheet['C2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+            worksheet['F2'] = { t: 's', v: `Sucursal: ${this.sucursalseleccionada.nombre}`, s: fechaStyle };
+            worksheet['A3'] = { t: 's', v: `Ventas: ${this.criterioEstado}`, s: fechaStyle };
+            worksheet['C3'] = { t: 's', v: `Cliente: ${this.clienteseleccionada.nombre}`, s: fechaStyle };
+            // Estilo para los encabezados
+            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
+            // Cabeceras de las columnas
+            const headers = ['Codigo item', 'Marca', 'Linea', 'Industria','Descripcion','Unidad','Cantidad','P/U','Importe Bs','Importe US'];
+            // Añadir las cabeceras a la hoja de cálculo
+            headers.forEach((header, index) => {
+                worksheet[XLSX.utils.encode_cell({ r: 3, c: index })] = { t: 's', v: header, s: headerStyle };
+            });
+
+            Object.values(this.arrayReporteDetallado).forEach((item, rowIndex) => {
+                const rowData = [
+                    item.codigo_item,
+                    item.nombre_marca,
+                    item.nombre_categoria,
+                    item.nombre_industria,
+                    item.nombre_articulo,
+                    item.medida,
+                    item.cantidad,
+                    item.precio_unitario,
+                    item.precio,
+                    item.importe_usd,
+                ];
+            XLSX.utils.sheet_add_aoa(worksheet, [rowData], { origin: `A${startRow + rowIndex}` });
+            });
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Resumen Documento Detallado');
+
+            // Descargar el archivo
+            XLSX.writeFile(workbook, 'reporte_resumen_ventas_por_documento_detallado.xlsx');
+        },
         formateaKardex(){
             let saldo = 0;
             let me = this;
@@ -1657,6 +1872,61 @@ export default {
 
             return this.errorArticulo;
         },
+        ocultarDetalle() {
+            this.listado = 1;
+            this.codigo = null;
+            this.arrayArticulo.length = 0;
+            this.precioseleccionado = null;
+            this.medida = null;
+            this.nombreCliente = null;
+            this.documento = null;
+            this.email = null;
+            this.idAlmacen = null;
+            this.arrayProductos = [];
+            this.arrayDetalle = [];
+            this.precioBloqueado = false;
+
+        },
+
+        verVenta(id) {
+            let me = this;
+            me.listado = 2;
+
+            //Obtener datos del ingreso
+            var arrayVentaT = [];
+            var url = '/venta/obtenerCabecera?id=' + id;
+
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                arrayVentaT = respuesta.venta;
+                console.log("VIENDO ", respuesta)
+
+                me.cliente = arrayVentaT[0]['nombre'];
+                me.tipo_comprobante = arrayVentaT[0]['tipo_comprobante'];
+                me.serie_comprobante = arrayVentaT[0]['serie_comprobante'];
+                me.num_comprobante = arrayVentaT[0]['num_comprobante'];
+                me.impuesto = arrayVentaT[0]['impuesto'];
+                me.total = arrayVentaT[0]['total'];
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+            //obtener datos de los detalles
+            var url = '/venta/obtenerDetalles?id=' + id;
+
+            axios.get(url).then(function (response) {
+                //console.log(response);
+                var respuesta = response.data;
+                me.arrayDetalle = respuesta.detalles;
+                console.log(array)
+
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
         cerrarModal() {
             this.modal = 0;
             this.tituloModal = '';
@@ -2152,6 +2422,8 @@ export default {
                 console.log("MostrarCostos: " + me.mostrarCostos);
                 console.log("ProveedorEstado: " + me.mostrarProveedores);
                 console.log("MostrarSaldosStock: " + me.mostrarSaldosStock);
+                console.log("Moneda principal; ",me.monedaPrincipal);
+                console.log("Moneda; ",me.monedaPrincipal[0]);
 
             })
                 .catch(function (error) {

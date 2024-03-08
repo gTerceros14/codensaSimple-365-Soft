@@ -194,11 +194,16 @@
 </template>
 
 <template v-if="menu==58">
-    <resumenfisicomovimientos></resumenfisicomovimientos>
+    <resumenfisico></resumenfisico>
 </template>
 <template v-if="menu==59">
     <kardexclientesresumenglobal></kardexclientesresumenglobal>
 </template>
+
+<template v-if="menu==60">
+    <reportefisicomovimientos></reportefisicomovimientos>
+</template>
+
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
     <dashboard></dashboard>

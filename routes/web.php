@@ -401,7 +401,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/kardex-clientes-resumen-global', 'ReporteKardexClientesResumenGlobalController@ventasPorCliente');
         Route::get('/reporte-ventas-producto', 'ReportesVentas@ventasPorProducto');
         Route::get('/reporte-resumen-fisico-movimientos', 'ReportesVentas@resumenFisicoMovimientos');
-
+        Route::get('/resumen-ventas-documento-detallado','ReportesVentas@ResumenVentasPorDocumentoDetallado');
 
 
 

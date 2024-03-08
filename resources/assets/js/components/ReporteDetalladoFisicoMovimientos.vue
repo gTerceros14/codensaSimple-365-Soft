@@ -9,7 +9,7 @@
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Resumen Fisico de Movimientos
+                    <i class="fa fa-align-justify"></i> Reporte Fisico de Movimientos
                     <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()"
                     class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros</button>
@@ -19,37 +19,33 @@
                     <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
 
                 </div>
-                <div class="card-body">
-                    <div style="overflow-x: auto;">
+                <div class="card-body"  style="max-height: 600px; overflow-y: auto;" >
+                    <div class = "table-resposive" > 
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th>CODICO ITEM</th>
-                                    <th>FECHA</th>
+                                    <th>CODIGO ITEM</th>
                                     <th>DESCRIPCION</th>
-                                    <th>DETALLE</th>
-                                    <th>MARCA</th>
-                                    <th>LINEA</th>
-                                    <th>SALDO ANTERIOR</th>
-                                    <th>ENTRADA</th>
-                                    <th>SALIDA</th>
+                                    <th>SALDO INICIAL</th>
+                                    <th>COMPRAS</th>
+                                    <th>TRANSF</th>
+                                    <th>RECEP</th>
+                                    <th>VENTAS</th>
+                                    <th>AJUSTES</th>
                                     <th>SALDO ACTUAL</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="articulo in sortedResultados" :key="articulo.id">
                                     <td v-text="articulo.codigo"></td>
-                                    <td v-text="articulo.fecha_hora"></td>
-                                    <td v-text="articulo.descripcion"></td>
-                                    <td>0</td>
-                                    <td v-text="articulo.nombre_marca"></td>
-                                    <td v-text="articulo.nombre_categoria"></td>
-                                    <td>0</td>
-                                    <td v-if="articulo.tipo === 'Ingreso'" v-text="articulo.cantidad"></td>
-                                    <td v-else>0</td>
-                                    <td v-if="articulo.tipo === 'Venta'" v-text="articulo.cantidad"></td>
-                                    <td v-else>0</td>
-                                    <td v-text="articulo.resultado_operacionFisico"></td>
+                                    <td v-text="articulo.nombre_producto"></td>
+                                    <td v-text="articulo.saldo_anterior"></td>
+                                    <td v-text="articulo.ingresos"></td>
+                                    <td v-text="0"></td>
+                                    <td v-text="0"></td>
+                                    <td v-text="articulo.ventas"></td>
+                                    <td v-text="0"></td>
+                                    <td v-text="articulo.saldo_actual"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -57,7 +53,7 @@
                     <div class="text-right">
                             <strong>Total Saldo Fisico: </strong> {{ total_saldofisico }} Unidades
                         </div>
-                    <nav>
+                    <!--<nav>
                         <ul class="pagination">
                             <li class="page-item" v-if="pagination.current_page > 1">
                                 <a class="page-link" href="#"
@@ -73,7 +69,7 @@
                                     @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
                             </li>
                         </ul>
-                    </nav>
+                    </nav>-->
 
                 </div>
             </div>
@@ -121,6 +117,20 @@
                                         </div>
                                     </div>
                                     <p class="text-danger" v-if="errores.idmarca">{{ errores.idmarca }}</p>
+
+                                      
+                                    <label for="" class="font-weight-bold">Industria <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" placeholder="Seleccione una industria"
+                                            disabled v-model="industriaseleccionada.nombre"
+                                            :class="{ 'is-invalid': errores.idindustria }" @input="validarCampo('codigo')">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button"
+                                                @click="abrirModal2('Industrias')">...</button>
+                                        </div>
+                                    </div>
+                                    <p class="text-danger" v-if="errores.idindustria">{{ errores.idindustria }}</p>
                                 </div>
 
                                 <div class="col-md-6">
@@ -1419,7 +1429,7 @@ export default {
             var url = '/reporte-resumen-fisico-movimientos?';
 
             // Agregar los parámetros obligatorios
-            url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id  ;
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id ;
 
             // Agregar las fechas de inicio y fin
             url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
@@ -1816,6 +1826,7 @@ export default {
             this.articuloseleccionada = false;
             this.lineaseleccionada = false;
             this.marcaseleccionada = false;
+            this.industriaseleccionada = false;
             this.fechaInicio = '';
             this.fechaFin ='';
             switch (modelo) {
@@ -2282,7 +2293,6 @@ export default {
         this.recuperarIdRol();
         this.datosConfiguracion();
         this.obtenerConfiguracionTrabajo();
-        this.listaReporte();
         this.listarArticulo(1, this.buscar, this.criterio);
         this.listarPrecio();//aumenTe 6julio
     }

@@ -58,18 +58,18 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <div class="col-md-6">
-                                    <label for="" class="font-weight-bold">Forma de pago</label>
-                                    <select class="form-select" aria-label="Default select example">
-                                        <option disabled>Selecciona la forma de pago</option>
-                                        <option selected value="1">Efectivo</option>
-                                        <option value="2">Cheque</option>
-
-                                        <option value="2">QR</option>
-                                        <option value="3">Deposito</option>
-                                    </select>
-                                </div>
+                              <div class="col-md-6">
+                                 <label for="" class="font-weight-bold">Forma de pago</label>
+                                <select class="form-select" aria-label="Default select example" v-model="tipo_pago">
+                                  <option disabled>Selecciona la forma de pago</option>
+                                  <option value="1">Efectivo</option>
+                                  <option value="2">Cheque</option>
+                                  <option value="2">QR</option>
+                                  <option value="3">Deposito</option>
+                                </select>
+                              </div>
                            
+
 
                             </div>
                         </div>
@@ -116,6 +116,7 @@
         },
         errores: {},
         ultimaCuota:0,
+        tipo_pago:0,
       };
     },
     methods: {
@@ -140,7 +141,8 @@
         id_credito: idCredito,
         numero_cuota: numeroCuota,
         monto_pago: montoPago,
-        cuota_anterior:this.ultimaCuota
+        cuota_anterior:this.ultimaCuota,
+        tipo_pago: this.tipo_pago,
       };
       axios.post('/credito/cuotas/registrar', data)
         .then(response => {

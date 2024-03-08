@@ -9,7 +9,7 @@
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Reporte Kardex Inventario Fisico
+                    <i class="fa fa-align-justify"></i> Resumen Fisico
                     <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()"
                     class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros</button>
@@ -24,31 +24,35 @@
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th>C.C</th>
-                                    <th>NUM COMPROBANTE</th>
-                                    <th>FECHA</th>
+                                    <th>CODIGO ITEM</th>
+                                    <th>DESCRIPCION</th>
                                     <th>DETALLE</th>
+                                    <th>MARCA</th>
+                                    <th>LINEA</th>
+                                    <th>SALDO ANTERIOR</th>
                                     <th>ENTRADA</th>
                                     <th>SALIDA</th>
-                                    <th>SALDO</th>
+                                    <th>SALDO ACTUAL</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="articulo in sortedResultados" :key="articulo.id">
-                                    <td v-text="articulo.tipo"></td>
-                                    <td v-text="articulo.num_comprobante"></td>
-                                    <td v-text="articulo.fecha_hora"></td>
-                                    <td v-text="articulo.tipo_comprobante"></td>
-                                    <td v-if="articulo.tipo === 'Ingreso'" v-text="articulo.cantidad"></td>
-                                    <td v-else>0</td>
-                                    <td v-if="articulo.tipo === 'Venta'" v-text="articulo.cantidad"></td>
-                                    <td v-else>0</td>
-                                    <td v-text="articulo.resultado_operacionFisico"></td>
+                                    <td v-text="articulo.codigo"></td>
+                                    <td v-text="articulo.descripcion"></td>
+                                    <td v-text="articulo.nombre_producto"></td>
+                                    <td v-text="articulo.nombre_marca"></td>
+                                    <td v-text="articulo.nombre_categoria"></td>
+                                    <td v-text="articulo.saldo_anterior"></td>
+                                    <td v-text="articulo.ingresos"></td>
+                                    <td v-text="articulo.ventas"></td>
+                                    <td v-text="articulo.saldo_actual"></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    
+                    <div class="text-right">
+                            <strong>Total Saldo Fisico: </strong> {{ total_saldofisico }} Unidades
+                        </div>
                     <!--<nav>
                         <ul class="pagination">
                             <li class="page-item" v-if="pagination.current_page > 1">
@@ -68,9 +72,6 @@
                     </nav>-->
 
                 </div>
-                <div class="text-right">
-                            <strong>Total Saldo Fisico: </strong> {{ total_saldofisico }} Unidades
-                    </div>
             </div>
             <!-- Fin ejemplo de tabla Listado -->
         </div>
@@ -116,20 +117,9 @@
                                         </div>
                                     </div>
                                     <p class="text-danger" v-if="errores.idmarca">{{ errores.idmarca }}</p>
-
-                                    <label for="" class="font-weight-bold">Industria <span
-                                            class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input class="form-control" type="text" placeholder="Seleccione una industria"
-                                            disabled v-model="industriaseleccionada.nombre"
-                                            :class="{ 'is-invalid': errores.idindustria }" @input="validarCampo('codigo')">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button"
-                                                @click="abrirModal2('Industrias')">...</button>
-                                        </div>
-                                    </div>
-                                    <p class="text-danger" v-if="errores.idindustria">{{ errores.idindustria }}</p>
+                                  
                                 </div>
+
                                 <div class="col-md-6">
                                     <label for="" class="font-weight-bold">Articulo <span class="text-danger">*</span></label>
                                     <div class="input-group">  
@@ -156,18 +146,6 @@
                                     </div>
                                     <p class="text-danger" v-if="errores.idcategoria">{{ errores.idcategoria }}</p>
                                     
-                                    
-                                    <label for="" class="font-weight-bold">Grupo <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input class="form-control" type="text" placeholder="Seleccione un grupo" disabled
-                                            v-model="gruposeleccionada.nombre_grupo"
-                                            :class="{ 'is-invalid': errores.idgrupo }" @input="validarCampo('codigo')">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button"
-                                                @click="abrirModal2('Grupos')">...</button>
-                                        </div>
-                                    </div>
-                                    <p class="text-danger" v-if="errores.idgrupo">{{ errores.idgrupo }}</p>
                                 
                                 </div> 
                                 <div class="col-md-6">
@@ -325,6 +303,9 @@
                                         placeholder="Texto a buscar">
                                     <input v-if="tituloModal2 == 'Articulo'" type="text" v-model="buscarA"
                                         @keyup="listarArticulo(1, buscarA, criterioA)" class="form-control"
+                                        placeholder="Texto a buscar">
+                                    <input v-if="tituloModal2 == 'Cliente'" type="text" v-model="buscarA"
+                                        @keyup="listarPersona(1, buscarA, criterioA)" class="form-control"
                                         placeholder="Texto a buscar">
                                 </div>
                             </div>
@@ -592,6 +573,7 @@ export default {
             criterioA: 'nombre',
             buscarA: '',
             tituloModal2: '',
+            clienteseleccionada: [],
             marcaseleccionada: [],
             industriaseleccionada: [],
             lineaseleccionada: [],
@@ -637,6 +619,8 @@ export default {
             medidaseleccionadaVacio: false,
             sucursalseleccionadaVacio: false,
             articuloseleccionadaVacio: false,
+            clienteseleccionadaVacio: false,
+
 
             //aumente esto
             unidad_envase: 0,
@@ -807,6 +791,8 @@ export default {
             this.datosFormulario.idgrupo = this.gruposeleccionada.id
             this.datosFormulario.idSucursal = this.sucursalseleccionada.id
             this.datosFormulario.idArticulo = this.articuloseleccionada.id
+            this.datosFormulario.idCliente = this.clienteseleccionada.id
+
 
             this.datosFormulario.precio_costo_unid = this.convertDolar(this.datosFormulario.precio_costo_unid);
             this.datosFormulario.precio_costo_paq = this.convertDolar(this.datosFormulario.precio_costo_paq);
@@ -1153,6 +1139,7 @@ export default {
                 } else if (selected.condicion == 0) {
                     this.advertenciaInactiva('Marcas');
                 }
+
             } else if (this.tituloModal2 == "Industrias") {
                 this.industriaseleccionadaVacio = false;
                 if (selected.estado == 1) {
@@ -1196,6 +1183,10 @@ export default {
                 } else if (selected.condicion == 0) {
                     this.advertenciaInactiva('Articulo');
                 }
+                
+            } else if (this.tituloModal2 == "Cliente") {
+                this.clienteseleccionadaVacio = false;
+                this.clienteseleccionada = selected;
             }
             
             // if (this.marcaseleccionada.condicion == 1 ){
@@ -1306,6 +1297,12 @@ export default {
                 this.tituloModal2 = titulo;
                 this.articuloseleccionadaVacio = false;
             }
+            else if (titulo == "Cliente") {
+                this.listarPersona(1, '', 'nombre');
+                this.modal2 = true;
+                this.tituloModal2 = titulo;
+                this.clienteseleccionada = false;
+            }
 
         },
 
@@ -1317,6 +1314,7 @@ export default {
                 this.medidaseleccionadaVacio = false;
             }
         },
+
         listarSucursal(page, buscar, criterio) {
             let me = this;
             var url = '/sucursal?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
@@ -1324,11 +1322,26 @@ export default {
             var respuesta = response.data;
             me.arrayBuscador = respuesta.sucursales.data;
             me.pagination = respuesta.pagination;
-      })
-        .catch(function (error) {
-          console.log(error);
-        });
+                })
+            .catch(function (error) {
+            console.log(error);
+            });
         },
+
+        listarPersona(page,buscar,criterio){
+                let me=this;
+                var url= '/cliente?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayBuscador = respuesta.usuarios.data;
+                    me.pagination= respuesta.pagination;
+                    console.log("hola",me.arrayBuscador);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+
         listarArticulo(page, buscar, criterio) {
             let me = this;
             var url = '/articulo?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
@@ -1400,10 +1413,10 @@ export default {
 
         listaReporte() {
             let me = this;
-            var url = '/reporte-kardex-fisico?';
+            var url = '/reporte-resumen-fisico-movimientos?';
 
             // Agregar los parámetros obligatorios
-            url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id +  '&grupo=' + this.gruposeleccionada.id;
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id;
 
             // Agregar las fechas de inicio y fin
             url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
@@ -1421,40 +1434,47 @@ export default {
         },
 
         exportarPDF() {
-            const pdf = new jsPDF();
+            const pdf = new jsPDF('landscape');
             
-            const titulo = 'Kardex Inventario Fisico';
+            const titulo = 'RESUMEN FISICO DE MOVIMIENTOS';
             const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
             const fechaFin = `Fecha Fin: ${this.fechaFin}`;
             const articulo = `Articulo: ${this.articuloseleccionada.nombre}`;
-            const codigo = `Codigo: ${this.articuloseleccionada.codigo}`;
-            const descripcion = `Descripcion: ${this.articuloseleccionada.descripcion}`;
+            const sucursal = `Sucursal: ${this.sucursalseleccionada.nombre}`;
+            const linea = `Linea: ${this.lineaseleccionada.nombre}`;
+            const marca = `Marca: ${this.marcaseleccionada.nombre}`;
+
 
             pdf.setFont('helvetica');
             pdf.setFontSize(16); // Tamaño de letra más grande para el título
-            pdf.text(titulo, 15, 10);
+            pdf.text(titulo, 100, 10);
 
             pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
             pdf.text(fechaInicio, 15, 20);
-            pdf.text(fechaFin, 100, 20);
-            pdf.text(articulo, 150, 20);
-            pdf.text(codigo, 15, 30);
-            pdf.text(descripcion, 100, 30);
+            pdf.text(fechaFin, 125, 20);
+            pdf.text(sucursal, 240, 20);
+            pdf.text(articulo, 15, 30);
+            pdf.text(linea, 125, 30);
+            pdf.text(marca, 240, 30);
 
             const tableYPosition = 40;
 
-            const columns = ['C.C.', 'Num Comprobante', 'Fecha', 'Detalle', 'Entrada', 'Salida', 'Saldo'];
-            const rows = this.arrayReporte.map(item => [item.tipo,
-                    item.num_comprobante,
-                    item.fecha_hora,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacionFisico,]);
+            const columns = ['Codigo Item', 'Descripcion', 'Detalle','Marca','Linea','Saldo Anterior','Entrada','Salida','Saldo Actual'];
+            const rows = this.arrayReporte.map(item => [
+                    item.codigo,
+                    item.descripcion,
+                    item.nombre_producto,
+                    item.nombre_marca,
+                    item.nombre_categoria,
+                    item.saldo_anterior,
+                    item.ingresos,
+                    item.ventas,
+                    item.saldo_actual,
+                ]);
 
             pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
 
-            pdf.save('reporte_inventarios.pdf');
+            pdf.save('resumen_movimientos_fisicos.pdf');
         },
 
         exportarExcel() {
@@ -1463,27 +1483,28 @@ export default {
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }];
             // Título del reporte
-            worksheet['A1'] = { t: 's', v: 'REPORTE KARDEX INVENTARIO FISICO VALORADO', s: { 
+            worksheet['A1'] = { t: 's', v: 'RESUMEN FISICO DE MOVIMIENTOS', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
                 alignment: { horizontal: 'center', vertical: 'center' },
                 fill: { fgColor: { rgb: '3669a8' } } } };
 
             // Estilo para la fecha
-            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
+            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
             // Fechas de inicio y fin
             worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
-            worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
-            worksheet['D2'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
-            worksheet['A3'] = { t: 's', v: `Codigo: ${this.articuloseleccionada.codigo}`, s: fechaStyle };
-            worksheet['B3'] = { t: 's', v: `Descripcion: ${this.articuloseleccionada.descripcion}`, s: fechaStyle };
+            worksheet['C2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+            worksheet['F2'] = { t: 's', v: `Sucursal: ${this.sucursalseleccionada.nombre}`, s: fechaStyle };
+            worksheet['A3'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
+            worksheet['C3'] = { t: 's', v: `Marca: ${this.marcaseleccionada.nombre}`, s: fechaStyle };
+            worksheet['F3'] = { t: 's', v: `Linea: ${this.lineaseleccionada.nombre}`, s: fechaStyle };
 
 
             // Estilo para los encabezados
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
             // Cabeceras de las columnas
-            const headers = ['C.C', 'Num comprobante', 'Fecha', 'Detalle','Entrada','Salida','Saldo','Costo unitario','Ingreso','Egreso','Saldo'];
+            const headers = ['Codigo Item', 'Descripcion', 'Detalle','Marca','Linea','Saldo Anterior','Entrada','Salida','Saldo Actual'];
 
             // Añadir las cabeceras a la hoja de cálculo
             headers.forEach((header, index) => {
@@ -1493,13 +1514,15 @@ export default {
             // Añadir los datos al kardex
             Object.values(this.sortedResultados).forEach((item, rowIndex) => {
                 const rowData = [
-                    item.tipo,
-                    item.num_comprobante,
-                    item.fecha_hora,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacionFisico,
+                    item.codigo,
+                    item.descripcion,
+                    item.nombre_producto,
+                    item.nombre_marca,
+                    item.nombre_categoria,
+                    item.saldo_anterior,
+                    item.ingresos,
+                    item.ventas,
+                    item.saldo_actual,
                 ];
 
                 // Añadir la fila al kardex
@@ -1513,18 +1536,23 @@ export default {
 
             // Establecer el ancho de las columnas
             const columnWidths = [
-                { wch: 27.8 },
-                { wch: 16.0 },   
-                { wch: 18.6 },
-                { wch: 15.2 }
+                { wch: 37.22 },
+                { wch: 36.67 },
+                { wch: 28.33 },
+                { wch: 8.56 },
+                { wch: 23.89 },
+                { wch: 13.68 },
+                { wch: 9.11 },
+                { wch: 9.0 },
+                { wch: 10.78 },
             ];
             worksheet['!cols'] = columnWidths;
 
             // Añadir la hoja de cálculo al libro
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte Ventas');
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Resumen Movimientos Fisicos');
 
             // Descargar el archivo
-            XLSX.writeFile(workbook, 'reporte_kardex_fisico_valorado.xlsx');
+            XLSX.writeFile(workbook, 'resumen_movimientos_fisicos.xlsx');
         },
 
         formateaKardex(){
@@ -1728,6 +1756,8 @@ export default {
             this.medidaseleccionadaVacio = false;
             this.sucursalseleccionadaVacio = false;
             this.articuloseleccionadaVacio = false;
+            
+
             //
             this.codigo = '';
             this.nombre_producto = '';
@@ -1739,14 +1769,15 @@ export default {
             this.descripcion = '';
             this.fotografia = ''; //Pasando el valor limpio de la referencia
             this.fotoMuestra = null;
-            this.lineaseleccionada.nombre = '';
-            this.marcaseleccionada.nombre = '';
+            //this.lineaseleccionada.nombre = '';
+            //this.marcaseleccionada.nombre = '';
             this.industriaseleccionada.nombre = '';
             this.proveedorseleccionada.nombre = '';
             this.gruposeleccionada.nombre_grupo = '';
             this.medidaseleccionada.descripcion_medida = '';
+            //this.lineaseleccionada.nombre = '';
             //this.articuloseleccionada.nombre = '';
-            this.sucursalseleccionada.nombre = '';
+            //this.sucursalseleccionada.nombre = '';
             this.errorArticulo = 0;
 
             this.idmedida = 0;
@@ -1777,10 +1808,8 @@ export default {
         abrirModal(modelo, accion, data = []) {
             this.sucursalseleccionada = false;
             this.articuloseleccionada = false;
-            this.gruposeleccionada = false;
             this.lineaseleccionada = false;
             this.marcaseleccionada = false;
-            this.industriaseleccionada = false;
             this.fechaInicio = '';
             this.fechaFin ='';
             switch (modelo) {
@@ -2249,8 +2278,6 @@ export default {
         this.obtenerConfiguracionTrabajo();
         this.listarArticulo(1, this.buscar, this.criterio);
         this.listarPrecio();//aumenTe 6julio
-        this.listaReporte();
-
     }
 }
 </script>
