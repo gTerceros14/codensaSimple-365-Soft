@@ -196,6 +196,9 @@
 <template v-if="menu==58">
     <resumenfisico></resumenfisico>
 </template>
+<template v-if="menu==59">
+    <kardexclientesresumenglobal></kardexclientesresumenglobal>
+</template>
 
 <template v-if="menu==60">
     <reportefisicomovimientos></reportefisicomovimientos>

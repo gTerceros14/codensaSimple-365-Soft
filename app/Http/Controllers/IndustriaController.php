@@ -20,9 +20,9 @@ class IndustriaController extends Controller
         $criterio = $request->criterio;
 
         if ($buscar == '') {
-            $industrias = Industria::orderBy('id', 'desc')->paginate(3);
+            $industrias = Industria::orderBy('id', 'desc')->paginate(6);
         } else {
-            $industrias = Industria::where($criterio, 'like', '%' . $buscar . '%')->orderBy('id', 'desc')->paginate(3);
+            $industrias = Industria::where($criterio, 'like', '%' . $buscar . '%')->orderBy('id', 'desc')->paginate(6);
         }
 
 

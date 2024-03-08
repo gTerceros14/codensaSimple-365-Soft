@@ -20,14 +20,14 @@ class PuntoVentaController extends Controller
             $punto_ventas = PuntoVenta::join('tipo_punto_ventas', 'punto_ventas.idtipopuntoventa', '=', 'tipo_punto_ventas.id')
             ->join('sucursales', 'punto_ventas.idsucursal', '=', 'sucursales.id')
             ->select('punto_ventas.*', 'tipo_punto_ventas.codigo as codigotipo', 'tipo_punto_ventas.descripcion as descripcionTipo', 'sucursales.nombre as nombreSucursal')
-            ->orderBy('punto_ventas.id', 'desc')->paginate(3);
+            ->orderBy('punto_ventas.id', 'desc')->paginate(6);
         }
         else{
             $punto_ventas = PuntoVenta::join('tipo_punto_ventas', 'punto_ventas.idtipopuntoventa', '=', 'tipo_punto_ventas.id')
             ->join('sucursales', 'punto_ventas.idsucursal', '=', 'sucursales.id')
             ->select('punto_ventas.*', 'tipo_punto_ventas.codigo as codigotipo', 'tipo_punto_ventas.descripcion as descripcionTipo', 'sucursales.nombre as nombreSucursal')
             ->where('punto_ventas.' . $criterio, 'like', '%' . $buscar . '%')
-            ->orderBy('punto_ventas.id', 'desc')->paginate(3);
+            ->orderBy('punto_ventas.id', 'desc')->paginate(6);
         }
 
         return [

@@ -82,7 +82,7 @@ class CotizacionVentaController extends Controller
                     'users.usuario'
                 )
                 ->where('cotizacion_venta.' . $criterio, 'like', '%' . $buscar . '%')
-                ->orderBy('cotizacion_venta.id', 'desc')->paginate(3);
+                ->orderBy('cotizacion_venta.id', 'desc')->paginate(6);
         }
 
         return [

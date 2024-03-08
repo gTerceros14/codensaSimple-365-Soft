@@ -560,7 +560,7 @@ class ArticuloController extends Controller
                 $query->where('articulos.' . $criterio, 'like', '%' . $buscar . '%');
             });
         }
-        $articulos = $articulos->orderBy('articulos.id', 'desc')->paginate(4);
+        $articulos = $articulos->orderBy('articulos.id', 'desc')->paginate(6);
         return [
             'pagination' => [
                 'total' => $articulos->total(),

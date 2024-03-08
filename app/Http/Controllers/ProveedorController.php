@@ -34,7 +34,7 @@ class ProveedorController extends Controller
                     'proveedores.contacto',
                     'proveedores.telefono_contacto'
                 )
-                ->orderBy('personas.id', 'desc')->paginate(3);
+                ->orderBy('personas.id', 'desc')->paginate(6);
         } else {
             $personas = Proveedor::join('personas', 'proveedores.id', '=', 'personas.id')
                 ->select(
@@ -49,7 +49,7 @@ class ProveedorController extends Controller
                     'proveedores.telefono_contacto'
                 )
                 ->where('personas.' . $criterio, 'like', '%' . $buscar . '%')
-                ->orderBy('personas.id', 'desc')->paginate(3);
+                ->orderBy('personas.id', 'desc')->paginate(6);
         }
 
 

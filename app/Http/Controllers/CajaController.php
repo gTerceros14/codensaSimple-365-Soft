@@ -135,6 +135,7 @@ class CajaController extends Controller
         $caja = Caja::findOrFail($request->id);
         $caja->fechaCierre = now()->setTimezone('America/La_Paz');
         $caja->estado = '0';
+        $caja->saldoFaltante = ($request->saldoFaltante)-($caja->saldoCaja);
         $caja->save();
     }
 

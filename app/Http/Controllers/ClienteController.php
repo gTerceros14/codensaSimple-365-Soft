@@ -24,10 +24,10 @@ class ClienteController extends Controller
     //     $criterio = $request->criterio;
 
     //     if ($buscar==''){
-    //         $personas = Persona::orderBy('id', 'desc')->paginate(3);
+    //         $personas = Persona::orderBy('id', 'desc')->paginate(6);
     //     }
     //     else{
-    //         $personas = Persona::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(3);
+    //         $personas = Persona::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(6);
     //     }
 
 
@@ -121,7 +121,7 @@ class ClienteController extends Controller
         }
 
         // Ordenar y paginar los resultados
-        $usuarios = $usuarios->orderBy('id', 'desc')->paginate(4);
+        $usuarios = $usuarios->orderBy('id', 'desc')->paginate(6);
 
         return [
             'pagination' => [
@@ -287,8 +287,8 @@ class ClienteController extends Controller
     //             ->select(
     //                 'personas.id as ID', 'personas.nombre',
     //                 'roles.id',
-    //                 )  ->where('roles.id', '=', '2')->paginate(3);
-    //         Persona::orderBy('id', 'desc')->paginate(3);
+    //                 )  ->where('roles.id', '=', '2')->paginate(6);
+    //         Persona::orderBy('id', 'desc')->paginate(6);
     //     }
     //     else{
     //         $personas = User::join('personas', 'users.id', '=', 'personas.id')
@@ -296,7 +296,7 @@ class ClienteController extends Controller
     //         ->select(
     //             'personas.id', 'personas.nombre',
     //             'roles.id as ID',
-    //             )  ->where('roles.id', '=', '2')->paginate(3);        }
+    //             )  ->where('roles.id', '=', '2')->paginate(6);        }
 
 
     //     return [

@@ -24,7 +24,7 @@ class PrecioController extends Controller
     {
         if (!$request->ajax()) return redirect('/');
 
-        //$precio = Precio::orderBy('id', 'desc')->paginate(3);
+        //$precio = Precio::orderBy('id', 'desc')->paginate(6);
         $precio = Precio::orderBy('id', 'asc')->paginate(8);
 
         return [
