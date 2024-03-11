@@ -92,31 +92,28 @@ export const esquemaArticulos = yup.object().shape({
     ),
 
   precio_costo_unid: yup
-  .number()
-  .required("La cantidad del costo por unidad es obligatoria")
-  .typeError("Debe ingresar un número válido")
-  .min(
-    0.01,
-    "El cantidad del costo por unidad no puede ser menor o igual a 0"
-  ),
+    .number()
+    .required("La cantidad del costo por unidad es obligatoria")
+    .typeError("Debe ingresar un número válido")
+    .min(
+      0.01,
+      "El cantidad del costo por unidad no puede ser menor o igual a 0"
+    ),
 
   precio_costo_paq: yup
-  .number()
-  .required("La cantidad del costo por paquete es obligatoria")
-  .typeError("Debe ingresar un número válido")
-  .min(
-    0.01,
-    "El cantidad de costo por paquete no puede ser menor o igual a 0"
-  ),
+    .number()
+    .required("La cantidad del costo por paquete es obligatoria")
+    .typeError("Debe ingresar un número válido")
+    .min(
+      0.01,
+      "El cantidad de costo por paquete no puede ser menor o igual a 0"
+    ),
 
   precio_venta: yup
-  .number()
-  .required("El precio de venta es obligatoria")
-  .typeError("Debe ingresar un número válido")
-  .min(
-    0.01,
-    "El precio de venta no puede ser menor o igual a 0"
-  ),
+    .number()
+    .required("El precio de venta es obligatoria")
+    .typeError("Debe ingresar un número válido")
+    .min(0.01, "El precio de venta no puede ser menor o igual a 0"),
   precio_uno: yup.number().typeError("Debe ingresar un número válido"),
   precio_dos: yup.number().typeError("Debe ingresar un número válido"),
   precio_tres: yup.number().typeError("Debe ingresar un número válido"),
@@ -159,4 +156,19 @@ export const esquemaAlmacen = yup.object().shape({
   observaciones: yup
     .string()
     .max(255, "Las observaciones no pueden tener más de 255 caracteres"),
+});
+
+export const esquemaCliente = yup.object().shape({
+  nombre: yup
+    .string()
+    .required("El nombre del cliente es obligatorio")
+    .max(80, "El nombre del cliente no puede tener más de 80 caracteres"),
+  direccion: yup.string().required("La dirección del cliente es obligatoria"),
+  tipo_documento: yup.string().required("El tipo de documento es obligatorio"),
+  num_documento: yup.string().required("El número de documento es obligatorio"),
+  telefono: yup.string().required("El teléfono es obligatorio"),
+  email: yup
+    .string()
+    .email("El correo electrónico debe tener un formato válido")
+    .required("El correo electrónico es obligatorio"),
 });
