@@ -215,6 +215,17 @@ Vue.component(
   "reporteventas",
   require("./components/ReporteVentasDiarias.vue")
 );
+
+Vue.component(
+  "reporteventasdetallado",
+  require("./components/ReporteVentasDetallado.vue")
+);
+
+Vue.component(
+  "reporteinventariofisicovalorado",
+  require("./components/ReporteInventarioFisicoValorado.vue")
+);
+
 Vue.component(
   "ventasinstitucionales",
   require("./components/VentasInstitucionales.vue")

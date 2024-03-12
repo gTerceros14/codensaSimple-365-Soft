@@ -88,8 +88,9 @@
                                             {{ venta.idtipo_venta == 1 ? "Contado" : "Credito" }}
                                         </td>
                                         <td>
-                                            {{ ((venta.total) * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
-                                            }}
+                                            {{ ((venta.total) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                        monedaVenta[1]
+                    }}
 
                                         </td>
                                         <td v-text="venta.estado"></td>
@@ -149,8 +150,8 @@
                                 ref="tipoDocumentoRef" readonly>
                             <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id"
                                 ref="complementoIdRef" readonly>
-                            <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado"
-                                readonly>
+                            <input type="hidden" id="usuarioAutenticado" class="form-control"
+                                v-model="usuarioAutenticado" readonly>
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Documento
                                     <span class="text-danger">*</span>
@@ -167,7 +168,8 @@
                                     <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                 </label>
 
-                                <input type="text" id="email" class="form-control" v-model="email" ref="emailRef" readonly>
+                                <input type="text" id="email" class="form-control" v-model="email" ref="emailRef"
+                                    readonly>
                             </div>
                             <div v-if="clienteDeudas > 0" class="alert alert-danger text-center " role="alert"
                                 style="width: 100%;">
@@ -204,7 +206,8 @@
                                     <span class="text-danger">*</span>
                                     <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                 </label>
-                                <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" disabled>
+                                <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob"
+                                    disabled>
                             </div>
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Aplicar impuesto:
@@ -254,7 +257,7 @@
                                         <h3 style="margin:0px">{{ arraySeleccionado.nombre }}</h3>
                                         <span class="badge bg-primary">Medida: {{ arraySeleccionado.medida }}</span>
                                         <span class="badge bg-primary">Linea: {{ arraySeleccionado.nombre_categoria
-                                        }}</span>
+                                            }}</span>
                                         <p>
                                             {{ arraySeleccionado.descripcion }}
 
@@ -265,16 +268,18 @@
                                             style="display:flex;align-items:center;margin:0px;">
                                             <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
                                             <b v-else>{{ (calcularPrecioConDescuento(resultadoMultiplicacion,
-                                                arrayPromocion.porcentaje) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-        monedaVenta[1] }}</b>
+                        arrayPromocion.porcentaje) * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                                {{
+                        monedaVenta[1] }}</b>
                                             <s style="font-size:15px" class="lead">{{
-                                                (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-        monedaVenta[1] }}</s>
+                        (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                        monedaVenta[1] }}</s>
                                         </h3>
 
                                         <h3 v-else style="display:flex;align-items:center;margin:0px;">
-                                            <b>{{ (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                monedaVenta[1] }}</b>
+                                            <b>{{ (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                                {{
+                        monedaVenta[1] }}</b>
                                         </h3>
                                         <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id" class="lead">
                                             {{ arrayPromocion.porcentaje }} % de descuento
@@ -282,7 +287,7 @@
                                         <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id"
                                             class="text-danger">
                                             <i class="fa fa-clock-o" aria-hidden="true"></i> Esta oferta termina en {{
-                                                calcularDiasRestantes(arrayPromocion.fecha_final) }} días
+                        calcularDiasRestantes(arrayPromocion.fecha_final) }} días
                                         </p>
                                     </div>
                                 </div>
@@ -294,14 +299,14 @@
 
 
                                     <div :class="{
-                                        'alert': true,
-                                        'alert-success': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) > arraySeleccionado.stock / unidadPaquete,
-                                        'alert-warning': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= arraySeleccionado.stock / unidadPaquete,
-                                        'alert-danger': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= 0
-                                    }" role="alert">
+                        'alert': true,
+                        'alert-success': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) > arraySeleccionado.stock / unidadPaquete,
+                        'alert-warning': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= arraySeleccionado.stock / unidadPaquete,
+                        'alert-danger': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= 0
+                    }" role="alert">
                                         <p style="margin:0px">Stock disponible</p>
                                         <b>{{ arraySeleccionado.saldo_stock / unidadPaquete - cantidad }} {{
-                                            unidadPaquete == 1 ? "Unidades" : "Paquetes" }}</b>
+                        unidadPaquete == 1 ? "Unidades" : "Paquetes" }}</b>
                                     </div>
 
                                 </div>
@@ -336,15 +341,16 @@
                                             <span class="text-danger">*</span>
                                             <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                         </label>
-                                        <select class="form-control" placeholder="Seleccione" v-model="precioseleccionado"
-                                            @change="mostrarSeleccion" :disabled="precioBloqueado">
+                                        <select class="form-control" placeholder="Seleccione"
+                                            v-model="precioseleccionado" @change="mostrarSeleccion"
+                                            :disabled="precioBloqueado">
                                             <option>Selecciona un precio: </option>
                                             <option :value="arraySeleccionado.precio_uno" v-if="arrayPrecios[0]">{{
-                                                arrayPrecios[0].nombre_precio
-                                            }}</option>
+                        arrayPrecios[0].nombre_precio
+                    }}</option>
                                             <option :value="arraySeleccionado.precio_dos" v-if="arrayPrecios[1]">{{
-                                                arrayPrecios[1].nombre_precio
-                                            }}
+                        arrayPrecios[1].nombre_precio
+                    }}
                                             </option>
                                             <option :value="arraySeleccionado.precio_tres" v-if="arrayPrecios[2]">
                                                 {{ arrayPrecios[2].nombre_precio }}</option>
@@ -427,9 +433,10 @@
                                             <td>{{ detalle.unidad_envase }}
                                             </td>
                                             <td>
-                                                {{ (detalle.precioseleccionado * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                                {{ (detalle.precioseleccionado * parseFloat(monedaVenta[0])).toFixed(2)
+                                                }}
                                                 {{
-                                                    monedaVenta[1] }}
+                        monedaVenta[1] }}
 
                                             </td>
                                             <td>
@@ -444,7 +451,7 @@
                                             <td>
 
                                                 {{ ((detalle.precioseleccionado * detalle.cantidad)
-                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
 
 
                                             </td>
@@ -461,8 +468,9 @@
 
                                             <td>
                                                 {{ (((detalle.precioseleccionado * detalle.cantidad) -
-                                                    (detalle.precioseleccionado * detalle.cantidad * detalle.descuento / 100))
-                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                        (detalle.precioseleccionado * detalle.cantidad * detalle.descuento /
+                            100))
+                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
 
                                             </td>
                                         </tr>
@@ -470,7 +478,7 @@
                                             <td colspan="9" align="right"><strong>Sub Total: </strong></td>
                                             <td id="subTotal">
                                                 {{ ((totalParcial = (calcularSubTotal))
-                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
 
                                             </td>
                                         </tr>
@@ -489,7 +497,7 @@
                                             <td colspan="9" align="right"><strong>Total Neto: </strong></td>
                                             <td id="montoTotal">
                                                 {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                    monedaVenta[1] }}
+                        monedaVenta[1] }}
 
                                             </td>
                                         </tr>
@@ -506,16 +514,23 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="form-group row">
-                            <label class="col" for=""><strong>Tipo de Venta </strong></label>
-                            <div class="col-md-12">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
-                                <button type="button" class="btn btn-primary"
-                                    @click="registrarAbrilModal()">Contado</button>
-                                <button type="button" class="btn btn-primary"
-                                    @click="registrarAbrilModal2()">Credito</button>
+                        <div class="d-flex justify-content-between">
+                            <div class="col-md-4">
+                                <label class="col-form-label" for="tipoVenta"><strong>Tipo de Venta</strong></label>
+                                <select class="form-control" v-model="idtipo_venta">
+                                    <option value="1">Contado</option>
+                                    <option value="2">Crédito</option>
+                                </select>
+                            </div>
+                            <div class="d-flex align-items-end">
+                                <button type="button" @click="ocultarDetalle()"
+                                    class="btn btn-secondary btn-block mr-2">Cerrar</button>
+                                <button type="button" class="btn btn-primary btn-block "
+                                    @click="abrirTipoVenta()">Confirmar</button>
                             </div>
                         </div>
+
+
                     </div>
                 </template>
                 <!-- Fin Detalle-->
@@ -571,7 +586,7 @@
 
                                             <td>
                                                 {{ ((detalle.precio) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                    monedaVenta[1] }}
+                        monedaVenta[1] }}
 
                                             </td>
                                             <td v-text="detalle.cantidad">
@@ -580,7 +595,7 @@
                                             </td>
                                             <td>
                                                 {{ ((detalle.precio * detalle.cantidad - detalle.descuento)
-                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
 
                                             </td>
                                         </tr>
@@ -589,7 +604,7 @@
                                             </td>
                                             <td>
                                                 {{ ((totalParcial = (total - totalImpuesto))
-                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
                                             </td>
 
                                         </tr>
@@ -597,14 +612,15 @@
                                             <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
                                             <td>
                                                 {{ ((totalImpuesto = (total * impuesto))
-                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
 
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="4" align="right"><strong>Total Neto:</strong></td>
                                             <td>
-                                                {{ ((total) * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                                                {{ ((total) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                        monedaVenta[1] }}
 
                                             </td>
                                         </tr>
@@ -621,7 +637,8 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-md-12">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                                <button type="button" @click="ocultarDetalle()"
+                                    class="btn btn-secondary">Cerrar</button>
                             </div>
                         </div>
                     </div>
@@ -694,8 +711,8 @@
                                                         <td v-text="articulo.nombre_categoria"></td>
                                                         <td>
                                                             {{ ((articulo.precio_venta) *
-                                                                parseFloat(monedaVenta[0])).toFixed(2) }} {{
-        monedaVenta[1] }}
+                        parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                        monedaVenta[1] }}
 
                                                         </td>
                                                         <td v-text="articulo.saldo_stock"></td>
@@ -765,9 +782,10 @@
                                                         <td v-text="kit.codigo"></td>
                                                         <td v-text="kit.nombre"></td>
                                                         <td>
-                                                            {{ (kit.precio * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                                monedaVenta[1]
-                                                            }}
+                                                            {{ (kit.precio * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                                            {{
+                        monedaVenta[1]
+                    }}
                                                         </td>
                                                         <td>
                                                             {{ new Date(kit.fecha_final).toLocaleDateString('es-ES') }}
@@ -778,7 +796,7 @@
                                                             <i class="fa fa-circle"
                                                                 :style="{ color: getColorForEstado(kit.estado, kit.fecha_final) }"></i>&nbsp;
                                                             {{ new Date(kit.fecha_final) < new Date() ? 'Inactivo' :
-                                                                kit.estado }} </td>
+                        kit.estado }} </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -807,90 +825,230 @@
         <div class="modal " tabindex="-1" :class="{ 'mostrar': modal2 }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" v-text="tituloModal2"></h4>
+                <div class="modal-content" style="max-height: 90vh;min-height: 90vh">
+                    <div class=" modal-header">
+                        <h4 class="modal-title">Detalle de pago</h4>
                         <button type="button" class="close" @click="cerrarModal2()" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <div v-if="!tipoPago" class="row col-md-12">
-                        <p><strong>Tipo de pago:</strong></p>
-                        <div class="d-flex flex-column align-items-center">
-                            <button type="button" class="btn btn-primary mb-2"
-                                @click="seleccionarTipoPago('EFECTIVO')">EFECTIVO</button>
-                            <button type="button" class="btn btn-primary mb-2"
-                                @click="seleccionarTipoPago('TRANSFERENCIA BANCARIA')">TRANSFERENCIA BANCARIA</button>
-                            <button type="button" class="btn btn-primary mb-2"
-                                @click="seleccionarTipoPago('QR')">QR</button>
-                        </div>
+                    <div class="">
+                        <b-tabs content-class="" fill>
+                            <b-tab>
+                                <template #title>
+                                    <span class="d-flex align-items-center">
+                                        <i class="fa fa-money fa-2x icon-color mr-2" aria-hidden="true"></i>
+                                        <label>Efectivo</label>
+                                    </span>
+                                </template>
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <div class="card shadow-sm">
+                                                <div class="card-body">
 
-                    </div>
-                    <div v-else>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Recibido
-                                            {{ monedaVenta[1] }}(*)</label>
-                                        <div class="input-group">
-                                            <input type="number" v-model="recibido">
+                                                    <form>
+                                                        <div class="form-group">
+                                                            <label for="montoEfectivo"><i class="fa fa-money mr-2"></i>
+                                                                Monto
+                                                                Recibido:</label>
+                                                            <div class="input-group mb-3">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        {{
+                        monedaVenta[1] }}
+                                                                    </span>
+                                                                </div>
+                                                                <input type="number" class="form-control"
+                                                                    id="montoEfectivo" v-model="recibido"
+                                                                    placeholder="Ingrese el monto recibido">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="cambioRecibir"><i
+                                                                    class="fa fa-exchange mr-2"></i>
+                                                                Cambio a Entregar:</label>
+                                                            <input type="text" class="form-control" id="cambioRecibir"
+                                                                placeholder="Se calculará automáticamente"
+                                                                :value="recibido - calcularTotal * parseFloat(monedaVenta[0])"
+                                                                readonly>
+                                                        </div>
+
+
+                                                    </form>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Calcular</label>
-                                        <div class="input-group">
-                                            <button type="button" class="btn btn-primary"
-                                                @click="calcularCambio()">Calcular</button>
+                                        <div class="col-md-5">
+                                            <div class="card shadow-sm">
+                                                <div class="card-body">
+                                                    <div class=" mb-3">
+                                                        <h5 class="mb-0"> Detalle
+                                                            de Venta
+                                                        </h5>
+
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span><i class="fa fa-dollar mr-2"></i> Monto Total:</span>
+                                                        <span class="font-weight-bold">
+                                                            {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)
+                                                            }} {{
+                        monedaVenta[1] }}</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span><i class="fa fa-tag mr-2 text-success"></i>
+                                                            Descuento:</span>
+                                                        <span class="font-weight-bold text-success">0.00</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-3">
+                                                        <span><i class="fa fa-percent mr-2 text-danger"></i>
+                                                            Impuestos:</span>
+                                                        <span class="font-weight-bold text-danger">0.00</span>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="codigoDescuento"><i class="fa fa-gift mr-2"></i>
+                                                            Código
+                                                            de Descuento:</label>
+                                                        <div class="input-group mb-3">
+                                                            <input type="text" class="form-control" id="codigoDescuento"
+                                                                placeholder="Ingrese el código de descuento (si aplica)">
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-outline-secondary" type="button"
+                                                                    id="aplicarDescuento"><i
+                                                                        class="fa fa-check"></i></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span><i class="fa fa-money mr-2"></i> Total a Pagar:</span>
+                                                        <span class="font-weight-bold h5">
+
+                                                            {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)
+                                                            }} {{
+                        monedaVenta[1] }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="registrar()"
+                                                class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i>
+                                                Registrar Pago</button>
                                         </div>
                                     </div>
                                 </div>
-
-
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">ToTal(*)</label>
-                                        <div class="input-group">
-                                            <input type="number"
-                                                :value="((calcularTotal) * parseFloat(monedaVenta[0])).toFixed(2)"
-                                                class="font-weight-bold">
-                                            <!-- <input type="number"  v-model="totalprue" class="negrita-input"> -->
+                            </b-tab>
+                            <b-tab>
+                                <template #title>
+                                    <span class="d-flex align-items-center">
+                                        <i class="fa fa-university fa-2x icon-color mr-2" aria-hidden="true"></i>
+                                        <label>Transferencia bancaria</label>
+                                    </span>
+                                </template>
+                                <div>
+                                    <span class="text-secondary">SELECCIONE EL BANCO</span>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input border-dark" type="radio"
+                                                name="inlineRadioOptions" id="inlineRadio1" value="option1">
+                                            <label class="form-check-label" for="inlineRadio1">
+                                                <img src="./../../../../public/img/bancos/logo_banco_union.jpg"
+                                                    width="80px" alt="Imagen 1">
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input border-dark" type="radio"
+                                                name="inlineRadioOptions" id="inlineRadio2" value="option2">
+                                            <label class="form-check-label" for="inlineRadio2">
+                                                <img src="./../../../../public/img/bancos/logo_mercantil_santacruz.jpg"
+                                                    width="80px" alt="Imagen 2">
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input border-dark" type="radio"
+                                                name="inlineRadioOptions" id="inlineRadio3" value="option3">
+                                            <label class="form-check-label" for="inlineRadio3">
+                                                <img src="./../../../../public/img/bancos/logo_bnb.png" width="80px"
+                                                    alt="Imagen 3">
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input border-dark" type="radio"
+                                                name="inlineRadioOptions" id="inlineRadio4" value="option4">
+                                            <label class="form-check-label" for="inlineRadio4">
+                                                <img src="./../../../../public/img/bancos/logo_banco_bisa.png"
+                                                    width="80px" alt="Imagen 4">
+                                            </label>
                                         </div>
                                     </div>
-                                    <!-- {{((articulo.precio_venta) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }} -->
+                                    <div class="mt-4">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="numeroCuenta"><i class="fa fa-credit-card mr-2"></i> Número
+                                                    de
+                                                    Cuenta:</label>
+                                                <div class="input-group mb-3">
 
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Efec(*)</label>
-                                        <div class="input-group">
-                                            <input type="number" disabled
-                                                :value="(efectivo * parseFloat(monedaVenta[0])).toFixed(2)">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Cambio(*)</label>
-                                        <div class="input-group">
-                                            <input type="number" disabled
-                                                :value="(cambio * parseFloat(monedaVenta[0])).toFixed(2)">
-                                        </div>
+                                                    <input type="text" class="form-control" id="numeroCuenta"
+                                                        placeholder="Ingrese el número de cuenta">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="montoTransferencia"><i class="fa fa-money mr-2"></i>
+                                                    Monto de
+                                                    Transferencia:</label>
+                                                <div class="input-group mb-3">
 
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Faltante(*)</label>
-                                        <div class="input-group">
-                                            <input type="number" disabled
-                                                :value="(faltante * parseFloat(monedaVenta[0])).toFixed(2)">
-                                        </div>
+                                                    <input type="number" class="form-control" id="montoTransferencia"
+                                                        placeholder="Ingrese el monto de transferencia">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="fechaTransferencia"><i class="fa fa-calendar mr-2"></i>
+                                                    Fecha de
+                                                    Transferencia:</label>
+                                                <div class="input-group mb-3">
+
+                                                    <input type="date" class="form-control" id="fechaTransferencia"
+                                                        placeholder="Ingrese la fecha de transferencia">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="numeroOperacion"><i class="fa fa-hashtag mr-2"></i> Número
+                                                    de
+                                                    Operación:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="text" class="form-control" id="numeroOperacion"
+                                                        placeholder="Ingrese el número de operación">
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-success btn-block"><i
+                                                    class="fa fa-check mr-2"></i> Confirmar Transferencia</button>
+                                        </form>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal2()">Volver</button>
-                            <button type="button" v-if="tipoAccion2 == 1" class="btn btn-primary"
-                                @click="registrar()">Cobrar</button>
-                            <!-- <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarSucursal()">Actualizar</button> -->
-                        </div>
+                            </b-tab>
+                            <b-tab>
+                                <template #title>
+                                    <span class="d-flex align-items-center">
+                                        <i class="fa fa-qrcode fa-2x icon-color mr-2" aria-hidden="true"></i>
+                                        <label>QR</label>
+                                    </span>
+                                </template>
+                                <div class="text-center">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Ejemplo"
+                                        alt="Código QR" class="img-fluid">
+                                    <p class="mt-3">Escanee el código QR para realizar el pago.</p>
+                                </div>
+                            </b-tab>
+                        </b-tabs>
                     </div>
+                    <!-- <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="cerrarModal2()">Volver</button>
+                        <button type="button" v-if="tipoAccion2 == 1" class="btn btn-primary"
+                            @click="registrar()">Cobrar</button>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -939,7 +1097,7 @@
                                     <label>
 
                                         {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                            monedaVenta[1] }}
+                        monedaVenta[1] }}
 
                                     </label>
                                     <button @click="generarCuotas" type="button" class="btn btn-success">GENERAR
@@ -963,8 +1121,6 @@
                                         @change="seleccionarTipoPago(tipo_pago)">
                                         <option v-for="(value, key) in tiposPago" :value="value">{{ key }}</option>
                                     </select>
-
-
                                 </div>
                             </div>
                         </div>
@@ -991,21 +1147,21 @@
 
                                             <td>
                                                 {{ (cuota.precio_cuota * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                    monedaVenta[1] }}
+                        monedaVenta[1] }}
 
                                             </td>
                                             <td>
                                                 {{ (cuota.totalCancelado * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                    monedaVenta[1] }}
+                        monedaVenta[1] }}
 
                                             </td>
                                             <td>
                                                 {{ (cuota.saldo_restante * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                    monedaVenta[1] }}
+                        monedaVenta[1] }}
 
                                             </td>
                                             <td>{{ cuota.fecha_cancelado ? new Date(cuota.fecha_cancelado
-                                            ).toLocaleDateString('es-ES') : "Sin fecha" }}</td>
+                    ).toLocaleDateString('es-ES') : "Sin fecha" }}</td>
 
                                             <td>{{ cuota.estado }}</td>
                                         </tr>
@@ -1051,7 +1207,7 @@
                         <div class="col-md-5">
                             <label for="" class="font-weight-bold">Precio: </label>
                             {{ (datosFormularioKit.precio * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                monedaVenta[1]
+                            monedaVenta[1]
                             }}
                         </div>
                         <div class="col-md-5">
@@ -1237,14 +1393,14 @@ export default {
             faltante: 0,
             //-------DEStE AQUI 13-OCTUBRE--
             idtipo_pago: '',
-            idtipo_venta: '',
+            idtipo_venta: '1',
             tiempo_diaz: '',
             numero_cuotas: '',
             cuotas: [],//---para almacenar las fechas
             estadocrevent: 'activo',
             primera_cuota: '',
             habilitarPrimeraCuota: false,
-            tipoPago: '',
+            tipoPago: 'EFECTIVO',
             tiposPago: {
                 EFECTIVO: 1,
                 "TRANSFERENCIA BANCARIA": 2,
@@ -1322,6 +1478,23 @@ export default {
 
     },
     methods: {
+        abrirTipoVenta() {
+            if (this.idtipo_venta == 1) {
+                this.modal2 = 1;
+                this.cliente = this.nombreCliente;
+                this.tipoAccion2 = 1;
+                this.scrollToTop()
+            } else {
+                this.modal3 = 1;
+                this.cliente = this.nombreCliente;
+                this.scrollToTop();
+                this.tituloModal3 = 'CREDITOS ' + this.cliente;
+                this.tipoAccion3 = 1;
+                this.idtipo_pago = this.tipo_pago;
+            }
+
+
+        },
         cerrarModalCuotas() {
             this.modalCuotas = 0;
             this.listarVenta(1, this.buscar, this.criterio);
@@ -2075,7 +2248,7 @@ export default {
                 'tiempo_dias_cuotaCredito': this.tiempo_diaz, // Cambio de nombre
                 'totalCredito': this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal, // Asegúrate de tener esta variable
                 'estadoCredito': "Pendiente", // Asegúrate de tener esta variable
-                
+
                 // Cuotas del crédito
                 'cuotaspago': this.cuotas,
                 'data': this.arrayDetalle
@@ -2109,7 +2282,7 @@ export default {
                     me.descuento = 0;
                     me.arrayDetalle = [];
                     me.primer_precio_cuota = 0;
-                    
+
                     //window.open('/factura/imprimir/' + response.data.id);
                 } else {
                     console.log(response)
@@ -2436,32 +2609,7 @@ export default {
             console.log('Precio seleccionado:', this.precioseleccionado);
         },
         //--------------ABRIR MODAL------------------
-        registrarAbrilModal() {
-            this.modal2 = 1;
-            this.cliente = this.nombreCliente;
-            console.log('USUARIO LLEGA:', this.cliente);
-            this.tituloModal2 = 'VENTA  AL CONTADO ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
-            this.tipoAccion2 = 1;
-            this.scrollToTop()
-            //    this.idtipo_pago = 1;
-            this.idtipo_venta = 1;
-            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
-            console.log('idtipo_pago LLEGA:', this.idtipo_pago);
-        },
 
-        registrarAbrilModal2() {
-            this.modal3 = 1;
-            this.cliente = this.nombreCliente;
-            this.scrollToTop();
-            console.log('USUARIO LLEGA:', this.cliente);
-            this.tituloModal3 = 'CREDITOS ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
-            this.tipoAccion3 = 1;
-            this.idtipo_pago = this.tipo_pago;
-            // this.idtipo_pago = 1;
-            this.idtipo_venta = 2;
-            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
-            console.log('idtipo_pago LLEGA:', this.idtipo_pago);
-        },
         cerrarModal2() {
             this.modal2 = 0;
             this.tituloModal2 = '';
@@ -2550,12 +2698,12 @@ export default {
             const montoEntero = Math.floor(this.calcularTotal / this.numero_cuotas);
             const montoDecimal = (this.calcularTotal - montoEntero * (this.numero_cuotas - 1)).toFixed(2);
 
-            
+
             let fechaInicioPago;
             let saldos_total;
             let estadoCuota;
             if (this.primera_cuota) {
-                 this.primer_precio_cuota = montoEntero;
+                this.primer_precio_cuota = montoEntero;
                 console.log('primer_precio_cuota', this.primer_precio_cuota);
                 fechaInicioPago = fechaHoy;
                 saldos_total = (this.calcularTotal - this.primer_precio_cuota).toFixed(2);
@@ -2615,42 +2763,92 @@ export default {
     }
 }
 </script>
-<style>    .modal-content {
-        width: 100% !important;
-        position: absolute !important;
-    }
+<style>
+.custom-btn {
+    width: 100%;
+    text-align: center;
+    padding: 5px;
+    color: #939392;
+    border: 1px solid #939392;
+    background-color: white;
+    margin-left: 5px;
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 5%;
+    /* Agregando sombra */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
 
-    .mostrar {
-        display: list-item !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        background-color: #3c29297a !important;
-    }
 
-    .div-error {
-        display: flex;
-        justify-content: center;
-    }
+.selected {
+    background-color: rgba(5, 75, 122, 0.1);
+    /* Ajusta el último valor para cambiar la opacidad */
+    font-weight: 100;
+    color: #054b7a;
+    border: 1px solid #054b7a;
+    transition: all 0.5s ease;
 
-    .text-error {
-        color: red !important;
+
+}
+
+/* #054b7a; */
+.efectivo {
+    color: #054b7a;
+    transition: all 0.3s ease;
+
+}
+
+.qr {
+    transition: all 0.3s ease;
+
+    color: #054b7a;
+}
+
+.transferencia {
+    transition: all 0.3s ease;
+
+    color: #054b7a;
+}
+
+.modal-content {
+    width: 100% !important;
+    position: absolute !important;
+}
+
+.mostrar {
+    display: list-item !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    background-color: #3c29297a !important;
+}
+
+.div-error {
+    display: flex;
+    justify-content: center;
+}
+
+.text-error {
+    color: red !important;
+    font-weight: bold;
+}
+
+@media (min-width: 600px) {
+    .btnagregar {
+        margin-top: 2rem;
+    }
+}
+
+.card-img {
+    width: auto;
+    height: 200px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+/* .negrita-input {
         font-weight: bold;
-    }
-
-    @media (min-width: 600px) {
-        .btnagregar {
-            margin-top: 2rem;
-        }
-    }
-
-    .card-img {
-        width: auto;
-        height: 200px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-    }
-
-    /* .negrita-input {
-        font-weight: bold;
-    } */</style>
-  
+    } */
+</style>
