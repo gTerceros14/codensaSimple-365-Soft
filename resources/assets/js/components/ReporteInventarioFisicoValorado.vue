@@ -1054,19 +1054,19 @@
         
         listaReporte() {
             let me = this;
-            var url = '/reporte-resumen-fisico-movimientos?';
+            var url = '/reporte-inventario-fisico-valorado/'+me.tipoSeleccionado +'?&fecha_vencimiento=2026-01-01 ';
 
             // Agregar los parámetros obligatorios
-            url += 'almacen=' + this.almacenseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id ;
+            //url += 'almacen=' + this.almacenseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id ;
 
             // Agregar las fechas de inicio y fin
-            url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
+            //url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
 
             axios.get(url)
                 .then(function (response) {
                     var respuesta = response.data;
                     me.total_saldofisico = respuesta.total_saldo;
-                    me.arrayReporte = respuesta.resultados;
+                    me.arrayReporte = respuesta.inventarios_valorado;
                     console.log("array reporte",me.arrayReporte);
                 })
                 .catch(function (error) {
