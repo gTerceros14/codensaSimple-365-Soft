@@ -9,47 +9,55 @@
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Reporte Kardex Inventario Fisico
-                    <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()"
-                    class="btn btn-primary">
+                    <i class="fa fa-align-justify"></i> Reporte de Ventas Detallado
+                    <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()" class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros</button>
-                    <button type="button" @click="exportarExcel" class="btn btn-success">
-                        <i class="icon-doc"></i>&nbsp;Exportar a Excel
-                    </button>
-                    <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
-
                 </div>
+                <template v-if="listado == 1">
                 <div class="card-body"  style="max-height: 600px; overflow-y: auto;" >
                     <div class = "table-resposive" > 
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th>C.C</th>
-                                    <th>NUM COMPROBANTE</th>
+                                    <th>Opciones</th>
+                                    <th>NUM FACTURA</th>
                                     <th>FECHA</th>
-                                    <th>DETALLE</th>
-                                    <th>ENTRADA</th>
-                                    <th>SALIDA</th>
-                                    <th>SALDO</th>
+                                    <th>HORA</th>
+                                    <th>SUCURSAL</th>
+                                    <th>TIPO CAMBIO</th>
+                                    <th>TIPO DE VENTA</th>
+                                    <th>USUARIO</th>
+                                    <th>CLIENTE</th>
+                                    <th>IMPORTE BS</th>
+                                    <th>IMPORTE US</th>
+
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="articulo in sortedResultados" :key="articulo.id">
-                                    <td v-text="articulo.tipo"></td>
-                                    <td v-text="articulo.num_comprobante"></td>
-                                    <td v-text="articulo.fecha_hora"></td>
-                                    <td v-text="articulo.tipo_comprobante"></td>
-                                    <td v-if="articulo.tipo === 'Ingreso'" v-text="articulo.cantidad"></td>
-                                    <td v-else>0</td>
-                                    <td v-if="articulo.tipo === 'Venta'" v-text="articulo.cantidad"></td>
-                                    <td v-else>0</td>
-                                    <td v-text="articulo.resultado_operacionFisico"></td>
+                                <tr v-for="articulo in arrayReporte" :key="articulo.id">
+                                    <td class="d-flex align-items-center">
+                                            <button type="button" @click="verVenta(articulo.id)"
+                                                class="btn btn-success btn-sm mr-1">
+                                                <i class="icon-eye"></i>
+                                            </button></td>
+                                    <td v-text="articulo.Factura"></td>
+                                    <td v-text="articulo.fecha_hora"></td>  
+                                    <td v-text="articulo.fecha_hora"></td>  
+                                    <td v-text="articulo.Nombre_sucursal"></td>
+                                    <td v-text="articulo.Tipo_Cambio"></td>
+                                    <td v-text="articulo.Tipo_venta"></td>
+                                    <td v-text="articulo.usuario"></td>
+                                    <td v-text="articulo.nombre"></td>
+                                    <td v-text="articulo.importe_BS"></td>
+                                    <td v-text="articulo.importe_usd"></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    
-                    <!--<nav>
+                    <!--<div class="text-right">
+                        <strong>Total Saldo: </strong> {{ total_saldofisico }} Unidades
+                    </div>
+                    <nav>
                         <ul class="pagination">
                             <li class="page-item" v-if="pagination.current_page > 1">
                                 <a class="page-link" href="#"
@@ -66,18 +74,130 @@
                             </li>
                         </ul>
                     </nav>-->
-
                 </div>
-                <div class="text-right">
-                            <strong>Total Saldo Fisico: </strong> {{ total_saldofisico }} Unidades
+                <div class="d-flex justify-content-between">
+                        <div>
+                            <p>Exportar Detallado</p>
+                            <div class="d-inline-block">
+                                <button type="button" @click="exportarExcelDetallado" class="btn btn-success"> <i class="icon-doc"></i>&nbsp;Excel</button>
+                                <button type="button" @click="exportarPdfDetallado" class="btn btn-danger"> <i class="icon-doc"></i>&nbsp;PDF</button>
+                            </div>
+                        </div>
                     </div>
+            </template>
+
+            <template v-else-if="listado == 2">
+                    <div class="card-body">
+                        <div class="form-group row border">
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <label for="">Cliente</label>
+                                    <p v-text="cliente"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="">Impuesto</label>
+                                <p v-text="impuesto"></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Tipo Comprobante</label>
+                                    <p v-text="tipo_comprobante"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Serie Comprobante</label>
+                                    <p v-text="serie_comprobante"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Número Comprobante</label>
+                                    <p v-text="num_comprobante"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row border">
+                            <div class="table-responsive col-md-12">
+                                <table class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Artículo</th>
+                                            <th>Precio</th>
+                                            <th>Cantidad</th>
+                                            <th>Descuento</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="arrayDetalle.length">
+                                        <tr v-for="detalle in arrayDetalle" :key="detalle.id">
+                                            <td v-text="detalle.articulo">
+                                            </td>
+
+                                            <td>
+                                                {{ ((detalle.precio / detalle.cantidad) * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                                                    monedaPrincipal[1] }}
+
+                                            </td>
+                                            <td v-text="detalle.cantidad">
+                                            </td>
+                                            <td v-text="detalle.descuento">
+                                            </td>
+                                            <td>
+                                                {{ (((detalle.precio/detalle.cantidad) * detalle.cantidad - detalle.descuento)
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Parcial:</strong>
+                                            </td>
+                                            <td>
+                                                {{ ((totalParcial = (total - totalImpuesto))
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+                                            </td>
+
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
+                                            <td>
+                                                {{ ((totalImpuesto = (total * impuesto))
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Neto:</strong></td>
+                                            <td>
+                                                {{ ((total) * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-else>
+                                        <tr>
+                                            <td colspan="5">
+                                                No hay articulos agregados
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
-            <!-- Fin ejemplo de tabla Listado -->
         </div>
         <!-- MODAL LISTADO DE MARCAS -->
 
         <!-- contenido del modal -->
-
+        
         <!--Inicio del modal agregar/actualizar-->
         <div class="modal" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
@@ -105,70 +225,43 @@
                                     </div>
                                     <p class="text-danger" v-if="errores.idcategoria">{{ errores.idcategoria }}</p>
 
-                                    <label for="" class="font-weight-bold">Marca <span class="text-danger">*</span></label>
+                                    <label for="" class="font-weight-bold">Cliente <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <input class="form-control" type="text" placeholder="Seleccione una marca" disabled
-                                            v-model="marcaseleccionada.nombre" :class="{ 'is-invalid': errores.idmarca }"
+                                        <input class="form-control" type="text" placeholder="Seleccione un Cliente" disabled
+                                            v-model="clienteseleccionada.nombre" :class="{ 'is-invalid': errores.idmarca }"
                                             @input="validarCampo('idmarca')">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button"
-                                                @click="abrirModal2('Marcas')">...</button>
+                                                @click="abrirModal2('Cliente')">...</button>
                                         </div>
                                     </div>
                                     <p class="text-danger" v-if="errores.idmarca">{{ errores.idmarca }}</p>
 
-                                    <label for="" class="font-weight-bold">Industria <span
-                                            class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input class="form-control" type="text" placeholder="Seleccione una industria"
-                                            disabled v-model="industriaseleccionada.nombre"
-                                            :class="{ 'is-invalid': errores.idindustria }" @input="validarCampo('codigo')">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button"
-                                                @click="abrirModal2('Industrias')">...</button>
-                                        </div>
-                                    </div>
-                                    <p class="text-danger" v-if="errores.idindustria">{{ errores.idindustria }}</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="" class="font-weight-bold">Articulo <span class="text-danger">*</span></label>
+                                    <label for="" class="font-weight-bold">Estado Venta <span class="text-danger">*</span></label>
                                     <div class="input-group">  
-                                        <input class="form-control" type="text" placeholder="Seleccione un articulo" disabled
-                                        v-model="articuloseleccionada.nombre"
-                                            :class="{ 'is-invalid': errores.idcategoria }" @input="validarCampo('codigo')">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button"
-                                                @click="abrirModal2('Articulo')">...</button>
-                                        </div>
+                                        <select class="form-control col-md-12" v-model="criterioEstado">
+                                        <option value="Todos">Todos</option>
+                                        <option value="Pendiente">Pendiente</option>
+                                        <option value="Registrado">Registrado</option>
+                                    </select>
                                     </div>
                                     <p class="text-danger" v-if="errores.idcategoria">{{ errores.idcategoria }}</p>
 
                                     
-                                    <label for="" class="font-weight-bold">Linea <span class="text-danger">*</span></label>
+                                    <label for="" class="font-weight-bold">Ejecutivo de Venta <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <input class="form-control" type="text" placeholder="Seleccione una linea" disabled
-                                            v-model="lineaseleccionada.nombre"
+                                            v-model="ejecutivoseleccionado.nombre"
                                             :class="{ 'is-invalid': errores.idcategoria }" @input="validarCampo('codigo')">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button"
-                                                @click="abrirModal2('Lineas')">...</button>
+                                                @click="abrirModal2('Ejecutivo')">...</button>
                                         </div>
                                     </div>
                                     <p class="text-danger" v-if="errores.idcategoria">{{ errores.idcategoria }}</p>
                                     
-                                    
-                                    <label for="" class="font-weight-bold">Grupo <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input class="form-control" type="text" placeholder="Seleccione un grupo" disabled
-                                            v-model="gruposeleccionada.nombre_grupo"
-                                            :class="{ 'is-invalid': errores.idgrupo }" @input="validarCampo('codigo')">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button"
-                                                @click="abrirModal2('Grupos')">...</button>
-                                        </div>
-                                    </div>
-                                    <p class="text-danger" v-if="errores.idgrupo">{{ errores.idgrupo }}</p>
-                                
                                 </div> 
                                 <div class="col-md-6">
                                     <label for="" class="font-weight-bold">Fecha Inicio: <span class="text-danger">*</span> </label>
@@ -186,15 +279,13 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
-                            <button type="submit" @click="listaReporte(); cerrarModal()" class="btn btn-primary">Visualizar Reporte</button>
+                            <button type="submit" @click="listaReporte();listaReporteDetallado(); cerrarModal()" class="btn btn-primary">Visualizar Reporte</button>
                         </div>
                     </form>
 
                 </div>
                 <!-- /.modal-content -->
             </div>
-
-
             <!-- /.modal-dialog -->
         </div>
 
@@ -217,8 +308,7 @@
                                         @click="abrirModal7('medida', 'registrarMed')" class="btn btn-secondary">
                                         <i class="icon-plus"></i>&nbsp;Nuevo
                                     </button>
-                                    <!--button type="submit" @click="listarArticulo(buscarA, criterioA)"
-                                class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button-->
+                                
                                 </div>
                             </div>
                         </div>
@@ -305,27 +395,16 @@
                                         <option v-else-if="tituloModal2 == 'Grupos'" value="nombre_grupo">Grupo</option>
                                         <!-- <option v-if="tituloModal2=='Grupos'" value="nombre_grupo">Nombre_grupo</option> -->
                                     </select>
-                                    <input v-if="tituloModal2 == 'Marcas'" type="text" v-model="buscarA"
-                                        @keyup="listarMarca(1, buscarA, criterioA)" class="form-control"
+                                    <input v-if="tituloModal2 == 'Ejecutivo'" type="text" v-model="buscarA"
+                                        @keyup="listarEjecutivo(1, buscarA, criterioA)" class="form-control"
                                         placeholder="Texto a buscar">
-                                    <input v-if="tituloModal2 == 'Industrias'" type="text" v-model="buscarA"
-                                        @keyup="listarIndustria(1, buscarA, criterioA)" class="form-control"
-                                        placeholder="Texto a buscar">
-                                    <input v-if="tituloModal2 == 'Lineas'" type="text" v-model="buscarA"
-                                        @keyup="listarLinea(1, buscarA, criterioA)" class="form-control"
-                                        placeholder="Texto a buscar">
-                                    <input v-if="tituloModal2 == 'Proveedors'" type="text" v-model="buscarA"
-                                        @keyup="listarproveedor(1, buscarA, criterioA)" class="form-control"
-                                        placeholder="Texto a buscar">
-                                    <input v-if="tituloModal2 == 'Grupos'" type="text" v-model="buscarA"
-                                        @keyup="listargrupo(1, buscarA, criterioA)" class="form-control"
+                                    <input v-if="tituloModal2 == 'Cliente'" type="text" v-model="buscarA"
+                                        @keyup="listarPersona(1, buscarA, criterioA)" class="form-control"
                                         placeholder="Texto a buscar">
                                     <input v-if="tituloModal2 == 'Sucursal'" type="text" v-model="buscarA"
                                         @keyup="listarSucursal(1, buscarA, criterioA)" class="form-control"
                                         placeholder="Texto a buscar">
-                                    <input v-if="tituloModal2 == 'Articulo'" type="text" v-model="buscarA"
-                                        @keyup="listarArticulo(1, buscarA, criterioA)" class="form-control"
-                                        placeholder="Texto a buscar">
+                                    
                                 </div>
                             </div>
                         </div>
@@ -335,17 +414,22 @@
                                     <tr>
                                         <th>Opciones</th>
                                         <th>Id</th>
-
                                         <th>Nombre</th>
-                                        <!-- <th>Estado</th> -->
-                                        <th>
-                                            <div v-if="tituloModal2 == 'Proveedors'">
-                                                Nit
-                                            </div>
+                                        
+                                            <th v-if="tituloModal2 == 'Cliente'">
+                                                Tipo de Documento
+                                            </th>
+                                            <th v-if="tituloModal2 == 'Cliente'">
+                                                Num Documento
+                                            </th>
+                                            <th v-if="tituloModal2 == 'Cliente'">
+                                                Telefono
+                                            </th>
                                             <div v-else>
                                                 Estado
                                             </div>
-                                        </th>
+                                            
+                                        
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -357,19 +441,15 @@
                                             </button>
                                         </td>
                                         <td v-text="arrayelemento.id"></td>
-                                        <!-- <div v-if="tituloModal2=='Grupos'">
-                                            <td  v-text="arrayelemento.nombre_grupo"></td>
-                                        </div> -->
                                         <td v-text="arrayelemento.nombre"></td>
-                                        <td v-if="tituloModal2 == 'Industrias'">
-                                            <div v-if="arrayelemento.estado">
-                                                <span class="badge badge-success">Activo</span>
-                                            </div>
-                                            <div v-else>
-                                                <span class="badge badge-danger">Desactivado</span>
-                                            </div>
-                                        </td>
-                                        <td v-if="tituloModal2 == 'Marcas' || tituloModal2 == 'Lineas' || tituloModal2 == 'Sucursal' || tituloModal2 == 'Articulo'">
+
+    
+                                            <td v-if="tituloModal2 == 'Cliente'" v-text="arrayelemento.tipo_documento"></td>
+                                            <td v-if="tituloModal2 == 'Cliente'" v-text="arrayelemento.num_documento"></td>
+                                            <td v-if="tituloModal2 == 'Cliente'" v-text="arrayelemento.telefono"></td>
+                                    
+
+                                        <td v-if="tituloModal2 == 'Ejecutivo' || tituloModal2 == 'Sucursal'">
                                             <div v-if="arrayelemento.condicion">
                                                 <span class="badge badge-success">Activo</span>
                                             </div>
@@ -443,7 +523,7 @@
                                 </li>
                             </ul>
                         </nav>
-                        <nav v-else-if="tituloModal2 == 'Industrias'">
+                        <nav v-else-if="tituloModal2 == 'Cliente'">
                             <ul class="pagination">
                                 <li class="page-item" v-if="pagination.current_page > 1">
                                     <a class="page-link" href="#"
@@ -542,6 +622,10 @@ export default {
                 idproveedor: null,
                 idmedida: null
             },
+            listado: 1,
+            cliente: '',
+            totalImpuesto: 0.0,
+            
             errores: {},
 
             monedaPrincipal: [],
@@ -590,9 +674,11 @@ export default {
 
 
             criterioA: 'nombre',
+            criterioEstado: 'Todos',
             buscarA: '',
             tituloModal2: '',
-            marcaseleccionada: [],
+            clienteseleccionada: [],
+            ejecutivoseleccionado: [],
             industriaseleccionada: [],
             lineaseleccionada: [],
             proveedorseleccionada: [],
@@ -630,7 +716,8 @@ export default {
             descripcionVacio: false,
             fotografiaVacio: false,
             lineaseleccionadaVacio: false,
-            marcaseleccionadaVacio: false,
+            clienteseleccionadaVacio: false,
+            ejecutivoseleccionadoVacio: false,
             industriaseleccionadaVacio: false,
             proveedorseleccionadaVacio: false,
             gruposeleccionadaVacio: false,
@@ -739,6 +826,10 @@ export default {
             //fechas
             fechaInicio:'',
             fechaFin:'',
+
+            arrayDetalle: [],
+            arrayReporteDetallado:[]
+
         }
     },
     components: {
@@ -770,6 +861,24 @@ export default {
             console.log(this.fotoMuestra);
             return this.fotoMuestra;
         },
+        calcularTotal: function () {
+            var resultado = 0.0;
+            for (var i = 0; i < this.arrayDetalle.length; i++) {
+                resultado += ((this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad) - (this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad * this.arrayDetalle[i].descuento / 100))
+
+            }
+            resultado -= this.descuentoAdicional;
+            resultado -= this.descuentoGiftCard;
+            return resultado;
+        },
+
+        calcularSubTotal: function () {
+            var resultado = 0.0;
+            for (var i = 0; i < this.arrayDetalle.length; i++) {
+                resultado = resultado + ((this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad) - (this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad * this.arrayDetalle[i].descuento / 100))
+            }
+            return resultado;
+        },
     },
     watch: {
         selectedDelimiter: 'updateData',
@@ -800,7 +909,7 @@ export default {
         },
         asignarCampos() {
             this.datosFormulario.idcategoria = this.lineaseleccionada.id
-            this.datosFormulario.idmarca = this.marcaseleccionada.id
+            this.datosFormulario.idCliente = this.clienteseleccionada.id
             this.datosFormulario.idproveedor = this.proveedorseleccionada.id
             this.datosFormulario.idindustria = this.industriaseleccionada.id
             this.datosFormulario.idmedida = this.medidaseleccionada.id
@@ -1145,23 +1254,18 @@ export default {
         //-------------hasta qui calcular -----------
         seleccionar(selected) {
             if (this.tituloModal2 == "Marcas") {
-                this.marcaseleccionadaVacio = false;
+                this.clienteseleccionada = false;
                 if (selected.condicion == 1) {
-                    this.marcaseleccionada = selected;
+                    this.clienteseleccionada = selected;
                     this.validarCampo("idmarca");
 
                 } else if (selected.condicion == 0) {
                     this.advertenciaInactiva('Marcas');
                 }
-            } else if (this.tituloModal2 == "Industrias") {
-                this.industriaseleccionadaVacio = false;
-                if (selected.estado == 1) {
-                    this.industriaseleccionada = selected;
-                    this.validarCampo("idindustria");
-
-                } else if (selected.estado == 0) {
-                    this.advertenciaInactiva('Industrias');
-                }
+            } else if (this.tituloModal2 == "Cliente") {
+                this.clienteseleccionadaVacio = false;
+                this.clienteseleccionada = selected;
+                
             } else if (this.tituloModal2 == "Lineas") {
                 if (selected.condicion == 1) {
                     this.lineaseleccionada = selected;
@@ -1196,6 +1300,10 @@ export default {
                 } else if (selected.condicion == 0) {
                     this.advertenciaInactiva('Articulo');
                 }
+            }else if (this.tituloModal2 == "Ejecutivo") {
+                if (selected.condicion == 1) {
+                    this.ejecutivoseleccionado = selected;
+                }
             }
             
             // if (this.marcaseleccionada.condicion == 1 ){
@@ -1224,18 +1332,20 @@ export default {
         },
 
 
-        listarIndustria(page, buscar, criterio) {
-            let me = this;
-            var url = '/industria?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                me.arrayBuscador = respuesta.industrias.data;
-                me.pagination = respuesta.pagination;
-            })
+        listarPersona(page,buscar,criterio){
+                let me=this;
+                var url= '/cliente?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayBuscador = respuesta.usuarios.data;
+                    me.pagination= respuesta.pagination;
+                    console.log("hola",me.arrayBuscador);
+                })
                 .catch(function (error) {
                     console.log(error);
                 });
-        },
+            },
+
         listarLinea(page, buscar, criterio) {
             let me = this;
             var url = '/categoria?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
@@ -1263,48 +1373,30 @@ export default {
         },
 
         abrirModal2(titulo) {
-            if (titulo == "Marcas") {
-
+            if (titulo == "Estado Venta") {
                 this.listarMarca(1, '', 'nombre');
-
-                this.modal2 = true;
-
-                this.tituloModal2 = titulo;
-                this.marcaseleccionadaVacio = false;
-            } else if (titulo == "Industrias") {
-                this.listarIndustria(1, '', 'nombre');
                 this.modal2 = true;
                 this.tituloModal2 = titulo;
-                this.industriaseleccionadaVacio = false;
+                this.clienteseleccionada = false;
 
-            }
-            else if (titulo == "Lineas") {
-                this.listarLinea(1, '', 'nombreLinea');
+            } else if (titulo == "Cliente") {
+                this.listarPersona(1, '', 'nombre');
                 this.modal2 = true;
                 this.tituloModal2 = titulo;
-                this.lineaseleccionadaVacio = false;
+                this.clienteseleccionada = false;
 
-            } else if (titulo == "Proveedors") {
-                this.listarproveedor(1, '', 'nombre');
+
+            } else if (titulo == "Ejecutivo") {
+                this.listarEjecutivo(1, '', 'nombre');
                 this.modal2 = true;
                 this.tituloModal2 = titulo;
-                this.proveedorseleccionadaVacio = false;
+                this.ejecutivoseleccionado = false;
 
-            } else if (titulo == "Grupos") {
-                this.listargrupo(1, '', 'nombre_grupo');
-                this.modal2 = true;
-                this.tituloModal2 = titulo;
-                this.gruposeleccionadaVacio = false;
             }else if (titulo == "Sucursal") {
                 this.listarSucursal(1, '', 'nombre');
                 this.modal2 = true;
                 this.tituloModal2 = titulo;
                 this.gruposeleccionadaVacio = false;
-            }else if (titulo == "Articulo") {
-                this.listarArticulo(1, '', '');
-                this.modal2 = true;
-                this.tituloModal2 = titulo;
-                this.articuloseleccionadaVacio = false;
             }
 
         },
@@ -1329,17 +1421,18 @@ export default {
           console.log(error);
         });
         },
-        listarArticulo(page, buscar, criterio) {
+
+        listarEjecutivo(page, buscar, criterio) {
             let me = this;
-            var url = '/articulo?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                me.arrayBuscador = respuesta.articulos.data;
-                me.pagination = respuesta.pagination;
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
+        var url = '/user/selectUser/rol?filtro=' + 2;
+        axios.get(url).then(function (response) {
+            var respuesta = response.data;
+            me.arrayBuscador = respuesta.usuarios;
+            console.log('Ejecutivos',me.arrayBuscador);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
         },
 
         listarMarca(page, buscar, criterio) {
@@ -1361,22 +1454,7 @@ export default {
                     console.log(error);
                 });
         },
-        //------listado proveedor, Registro Proveedor y editar-----------
-        listarproveedor(page, buscar, criterio) {
-            let me = this;
-            console.log("ListanoProveedor");
-            var url = '/proveedor?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                console.log(respuesta);
-                me.arrayBuscador = respuesta.personas.data;
-                me.pagination = respuesta.pagination;
-                console.log("Listad0");
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        },
+
 
        
         //--grupo listado ,registro y actualizar
@@ -1400,10 +1478,10 @@ export default {
 
         listaReporte() {
             let me = this;
-            var url = '/reporte-kardex-fisico?';
+            var url = '/resumen-ventas-documento?';
 
             // Agregar los parámetros obligatorios
-            url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id +  '&grupo=' + this.gruposeleccionada.id;
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.ejecutivoseleccionado.id + '&estadoVenta=' + this.criterioEstado + '&idcliente=' + this.clienteseleccionada.id +'&moneda='+this.monedaPrincipal[0];
 
             // Agregar las fechas de inicio y fin
             url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
@@ -1411,51 +1489,226 @@ export default {
             axios.get(url)
                 .then(function (response) {
                     var respuesta = response.data;
-                    me.total_saldofisico = respuesta.total_saldo;
-                    me.arrayReporte = respuesta.resultados;
+                    me.total_saldofisico = respuesta.total_BS;
+                    me.arrayReporte = respuesta.ventas;
                     console.log("array reporte",me.arrayReporte);
                 })
                 .catch(function (error) {
                     console.log('ERRORES', error);
                 });
         },
+        listaReporteDetallado() {
+            let me = this;
+            var url = '/resumen-ventas-documento-detallado?';
 
+            // Agregar los parámetros obligatorios
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&ejecutivoCuentas=' + this.ejecutivoseleccionado.id + '&estadoVenta=' + this.criterioEstado + '&idcliente=' + this.clienteseleccionada.id+'&moneda='+this.monedaPrincipal[0];
+
+            // Agregar las fechas de inicio y fin
+            url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
+
+            axios.get(url)
+                .then(function (response) {
+                    var respuesta = response.data;
+                    me.arrayReporteDetallado = respuesta.ventas;
+                    console.log("array reporte detallado",me.arrayReporteDetallado);
+                })
+                .catch(function (error) {
+                    console.log('ERRORES', error);
+                });
+        },
         exportarPDF() {
-            const pdf = new jsPDF();
+            const pdf = new jsPDF('landscape');
             
-            const titulo = 'Kardex Inventario Fisico';
+            const titulo = 'RESUMEN DE VENTA POR DOCUMENTO';
             const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
             const fechaFin = `Fecha Fin: ${this.fechaFin}`;
-            const articulo = `Articulo: ${this.articuloseleccionada.nombre}`;
-            const codigo = `Codigo: ${this.articuloseleccionada.codigo}`;
-            const descripcion = `Descripcion: ${this.articuloseleccionada.descripcion}`;
+            const sucursal = `Sucursal: ${this.sucursalseleccionada.nombre}`;
+            const venta = `Venta: ${this.criterioEstado}`;
+            const cliente = `Cliente: ${this.clienteseleccionada.nombre}`;
 
             pdf.setFont('helvetica');
             pdf.setFontSize(16); // Tamaño de letra más grande para el título
-            pdf.text(titulo, 15, 10);
+            pdf.text(titulo, 100, 10);
 
             pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
             pdf.text(fechaInicio, 15, 20);
-            pdf.text(fechaFin, 100, 20);
-            pdf.text(articulo, 150, 20);
-            pdf.text(codigo, 15, 30);
-            pdf.text(descripcion, 100, 30);
+            pdf.text(fechaFin, 125, 20);
+            pdf.text(sucursal, 240, 20);
+            pdf.text(venta, 15, 30);
+            pdf.text(cliente, 125, 30);
 
             const tableYPosition = 40;
 
-            const columns = ['C.C.', 'Num Comprobante', 'Fecha', 'Detalle', 'Entrada', 'Salida', 'Saldo'];
-            const rows = this.sortedResultados.map(item => [item.tipo,
-                    item.num_comprobante,
+            const columns = ['Factura', 'Sucursal', 'Fecha', 'Tipo de cambio','Tipo de venta','Ejecutivo de Venta','Nombre Ejecutivo de Venta','Cliente','Importe Bs','Importe US'];
+            const rows = this.arrayReporte.map(item => [
+                    item.Factura,
+                    item.Nombre_sucursal,
                     item.fecha_hora,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacionFisico,]);
+                    item.Tipo_Cambio,
+                    item.Tipo_venta,
+                    item.nombre_rol,
+                    item.usuario,
+                    item.nombre,
+                    item.importe_BS,
+                    item.importe_usd,
+                ]);
 
             pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
 
-            pdf.save('reporte_inventarios.pdf');
+            pdf.save('reporte_resumen_ventas_por_documento.pdf');
         },
+
+        exportarPdfDetallado() {
+    const pdf = new jsPDF({
+        orientation: 'l',
+        unit: 'mm',
+        format: 'letter',
+    });
+
+    let startRow = 40;
+    const lineHeight = 2; // Altura de línea reducida
+    const fontSize = 7; // Tamaño de fuente
+    const spaceBetweenGroups = 10; // Espacio adicional entre grupos de ventas
+    const maxRowsPerPage = 50; // Máximo número de filas por página
+
+    const groupedData = this.groupById();
+    pdf.setFontSize(16);
+    pdf.setTextColor(0, 0, 0);
+        
+    pdf.text('DETALLE DE VENTAS POR DOCUMENTOS', 148, 15 ,{ align: 'center' });
+
+            // Fechas e información general (aparecerán en todas las páginas)
+    pdf.setFontSize(12);
+    pdf.text(`Fecha inicio: ${this.fechaInicio}`, 10, 25);
+    pdf.text(`Fecha fin: ${this.fechaFin}`, 70, 25);
+    pdf.text(`Sucursal: ${this.sucursalseleccionada.nombre}`, 140, 25);
+    pdf.text(`Ventas: ${this.criterioEstado}`, 10, 30);
+    pdf.text(`Cliente: ${this.clienteseleccionada.nombre}`, 70, 30);
+
+    groupedData.forEach((venta, index) => {
+        // Verificar si hay espacio suficiente en la página actual para los datos de este grupo
+        const spaceNeeded = (venta.length * lineHeight) + 30; // Espacio necesario para los datos del grupo
+        const spaceLeftOnPage = pdf.internal.pageSize.height - startRow; // Espacio restante en la página actual
+
+        if (spaceNeeded > spaceLeftOnPage) {
+            pdf.addPage(); // Agregar una nueva página si no hay suficiente espacio
+            startRow = 10; // Reiniciar la posición de inicio en la nueva página
+
+            // Título del reporte y datos de filtro (aparecerán en todas las páginas)
+            pdf.setFontSize(16);
+            pdf.setTextColor(0, 0, 0);
+            
+            pdf.text('DETALLE DE VENTAS POR DOCUMENTOS', 148, 15, { align: 'center' });
+
+            // Fechas e información general (aparecerán en todas las páginas)
+            pdf.setFontSize(12);
+            pdf.text(`Fecha inicio: ${this.fechaInicio}`, 10, startRow + 15);
+            pdf.text(`Fecha fin: ${this.fechaFin}`, 70, startRow + 15);
+            pdf.text(`Sucursal: ${this.sucursalseleccionada.nombre}`, 140, startRow + 15);
+            pdf.text(`Ventas: ${this.criterioEstado}`, 10, startRow + 20);
+            pdf.text(`Cliente: ${this.clienteseleccionada.nombre}`, 70, startRow + 20);
+
+            startRow += 30; // Espacio adicional después del título y datos de filtro
+        }
+
+        const headersGenerales = [
+            'Factura', 'Fecha', 'Fecha', 'Sucursal', 'Tipo_cambio', 'Tipo de venta',
+             'Vendedor', 'Cliente', 'Importe Bs', 'Importe Bs'
+        ];
+
+        //pdf.setFillColor(240, 240, 240);
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont('helvetica', 'bold'); // Estilo de texto normal
+        pdf.setFontSize(fontSize); // Tamaño de fuente
+
+        headersGenerales.forEach((header, colIndex) => {
+            pdf.rect(10 + colIndex * 30, startRow, 30, lineHeight + 2, 'S');
+            pdf.text(header, 12 + colIndex * 30, startRow + lineHeight + 2);
+        });
+
+        startRow += lineHeight + 2; // Espacio reducido entre encabezados y datos generales
+
+        pdf.setFont('helvetica', 'normal'); // Estilo de texto normal
+
+        // Datos generales
+        const datosGenerales = headersGenerales.map(header => (venta[0][header] !== undefined ? venta[0][header] : ''));
+        pdf.setTextColor(0, 0, 0); // Color de texto negro
+
+        datosGenerales.forEach((data, colIndex) => {
+            pdf.text(String(data), 12 + colIndex * 30, startRow + lineHeight + 2);
+        });
+
+        startRow += lineHeight + 5; // Espacio adicional antes de los detalles
+
+        // Encabezados de detalles
+        const headersDetalle = ['Codigo item', 'Marca', 'Linea', 'Industria', 'Descripcion', 'Unidad', 'Cantidad', 'P/U', 'Importe Bs', 'Importe US'];
+
+        //pdf.setFillColor(240, 240, 240);
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont('helvetica', 'normal'); // Estilo de texto normal
+        pdf.setFontSize(fontSize); // Tamaño de fuente
+
+        headersDetalle.forEach((header, colIndex) => {
+            pdf.rect(10 + colIndex * 30, startRow, 30, lineHeight + 2, 'S');
+            pdf.text(header, 12 + colIndex * 30, startRow + lineHeight + 2);
+        });
+
+        startRow += lineHeight + 2; // Espacio reducido entre encabezados y datos de detalle
+
+        // Datos de detalle
+        venta.forEach((item, rowIndex) => {
+            if (startRow + lineHeight + 2 > pdf.internal.pageSize.height) {
+                // Si no hay suficiente espacio en la página actual, agregar una nueva página
+                pdf.addPage();
+                startRow = 10; // Reiniciar la posición de inicio en la nueva página
+
+                // Título del reporte y datos de filtro (aparecerán en todas las páginas)
+                pdf.setFontSize(16);
+                pdf.setTextColor(0, 0, 0);
+                //pdf.setFillColor(240, 240, 240);
+                pdf.text('DETALLE DE VENTAS POR DOCUMENTOS', 148, startRow, { align: 'center' });
+
+                // Fechas e información general (aparecerán en todas las páginas)
+                pdf.setFontSize(12);
+                pdf.text(`Fecha inicio: ${this.fechaInicio}`, 10, startRow + 10);
+                pdf.text(`Fecha fin: ${this.fechaFin}`, 70, startRow + 10);
+                pdf.text(`Sucursal: ${this.sucursalseleccionada.nombre}`, 140, startRow + 10);
+                pdf.text(`Ventas: ${this.criterioEstado}`, 10, startRow + 15);
+                pdf.text(`Cliente: ${this.clienteseleccionada.nombre}`, 70, startRow + 15);
+
+                startRow += 30; // Espacio adicional después del título y datos de filtro
+            }
+
+            const rowDataDetalle = [
+                item.codigo_item,
+                item.nombre_marca,
+                item.nombre_categoria,
+                item.nombre_industria,
+                item.nombre_articulo,
+                item.medida,
+                item.cantidad,
+                item.precio_unitario,
+                item.precio,
+                item.importe_usd
+            ];
+
+            pdf.setTextColor(0, 0, 0); // Color de texto negro
+
+            rowDataDetalle.forEach((data, colIndex) => {
+                pdf.text(String(data), 12 + colIndex * 30, startRow + lineHeight + 2);
+            });
+
+            startRow += lineHeight + 2;
+        });
+
+        startRow += 15; // Espacio adicional después de los detalles
+    });
+
+    pdf.save('reporte_resumen_ventas_por_documento_detallado.pdf');
+},
+
+
 
         exportarExcel() {
             const workbook = XLSX.utils.book_new();
@@ -1463,27 +1716,27 @@ export default {
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
             // Título del reporte
-            worksheet['A1'] = { t: 's', v: 'REPORTE KARDEX INVENTARIO FISICO VALORADO', s: { 
+            worksheet['A1'] = { t: 's', v: 'RESUMEN DE VENTAS POR DOCUMENTOS', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
                 alignment: { horizontal: 'center', vertical: 'center' },
                 fill: { fgColor: { rgb: '3669a8' } } } };
 
             // Estilo para la fecha
-            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
+            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
             // Fechas de inicio y fin
             worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
-            worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
-            worksheet['D2'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
-            worksheet['A3'] = { t: 's', v: `Codigo: ${this.articuloseleccionada.codigo}`, s: fechaStyle };
-            worksheet['B3'] = { t: 's', v: `Descripcion: ${this.articuloseleccionada.descripcion}`, s: fechaStyle };
+            worksheet['C2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+            worksheet['F2'] = { t: 's', v: `Sucursal: ${this.sucursalseleccionada.nombre}`, s: fechaStyle };
+            worksheet['A3'] = { t: 's', v: `Ventas: ${this.criterioEstado}`, s: fechaStyle };
+            worksheet['C3'] = { t: 's', v: `Cliente: ${this.clienteseleccionada.nombre}`, s: fechaStyle };
 
 
             // Estilo para los encabezados
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
             // Cabeceras de las columnas
-            const headers = ['C.C', 'Num comprobante', 'Fecha', 'Detalle','Entrada','Salida','Saldo','Costo unitario','Ingreso','Egreso','Saldo'];
+            const headers = ['Factura', 'Sucursal', 'Fecha', 'Tipo de cambio','Tipo de venta','Ejecutivo de Venta','Nombre Ejecutivo de Venta','Cliente','Importe Bs','Importe US'];
 
             // Añadir las cabeceras a la hoja de cálculo
             headers.forEach((header, index) => {
@@ -1491,15 +1744,18 @@ export default {
             });
 
             // Añadir los datos al kardex
-            Object.values(this.sortedResultados).forEach((item, rowIndex) => {
+            Object.values(this.arrayReporte).forEach((item, rowIndex) => {
                 const rowData = [
-                    item.tipo,
-                    item.num_comprobante,
+                    item.Factura,
+                    item.Nombre_sucursal,
                     item.fecha_hora,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacionFisico,
+                    item.Tipo_Cambio,
+                    item.Tipo_venta,
+                    item.nombre_rol,
+                    item.usuario,
+                    item.nombre,
+                    item.importe_BS,
+                    item.importe_usd,
                 ];
 
                 // Añadir la fila al kardex
@@ -1508,24 +1764,164 @@ export default {
 
             // Añadir el total ganado al final del reporte
             
-            const totalRow = [`Total Ganado: Bs. ${this.total_saldo}`];
-            worksheet['!merges'].push({ s: { r: startRow + Object.values(this.sortedResultados).length, c: 0 }, e: { r: startRow + Object.values(this.sortedResultados).length, c: 3 } });
+           // const totalRow = [`Total Ganado: Bs. ${this.total_saldo}`];
+            //worksheet['!merges'].push({ s: { r: startRow + Object.values(this.sortedResultados).length, c: 0 }, e: { r: startRow + Object.values(this.sortedResultados).length, c: 3 } });
 
             // Establecer el ancho de las columnas
             const columnWidths = [
-                { wch: 27.8 },
+                { wch: 21.56 },
                 { wch: 16.0 },   
-                { wch: 18.6 },
-                { wch: 15.2 }
+                { wch: 22.22 },
+                { wch: 15.14 },
+                { wch: 14.78 },
+                { wch: 17.11 },
+                { wch: 25.0 },
+                { wch: 26.67 },
+                { wch: 13.11 },
+                { wch: 12.78 },
+
             ];
             worksheet['!cols'] = columnWidths;
 
             // Añadir la hoja de cálculo al libro
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte Ventas');
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Resumen Ventas por Documento');
 
             // Descargar el archivo
-            XLSX.writeFile(workbook, 'reporte_kardex_fisico_valorado.xlsx');
+            XLSX.writeFile(workbook, 'reporte_resumen_ventas_por_documento.xlsx');
         },
+        
+        exportarExcelDetallado() {
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.aoa_to_sheet([]);
+            let startRow = 3;
+
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
+            // Título del reporte
+            worksheet['A1'] = {
+                    t: 's',
+                    v: 'DETALLE DE VENTAS POR DOCUMENTOS',
+                    s: {
+                        font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
+                        alignment: { horizontal: 'center', vertical: 'center' },
+                        fill: { fgColor: { rgb: '3669a8' } }
+                    }
+                };
+
+                // Estilo para la fecha
+                const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
+
+                // Fechas de inicio y fin
+                worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
+                worksheet['C2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+                worksheet['F2'] = { t: 's', v: `Sucursal: ${this.sucursalseleccionada.nombre}`, s: fechaStyle };
+                worksheet['A3'] = { t: 's', v: `Ventas: ${this.criterioEstado}`, s: fechaStyle };
+                worksheet['C3'] = { t: 's', v: `Cliente: ${this.clienteseleccionada.nombre}`, s: fechaStyle };
+
+            // Agrupar datos por 'id'
+            const groupedData = this.groupById();
+
+            groupedData.forEach((venta, index) => {
+                
+                // Encabezados generales
+                const headersGenerales = [
+                    'Factura', 'Sucursal', 'Fecha', 'Tipo_Cambio', 'Tipo de venta',
+                    'Ejecutivo de Venta', 'Nombre Ejecutivo de Venta', 'Cliente', 'Importe Bs', 'Importe Bs'
+                ];
+
+                // Estilo para los encabezados generales
+                const headerGeneralStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
+
+                // Obtener datos generales del primer elemento del grupo
+                const datosGenerales = headersGenerales.map((header) => (venta[0][header] !== undefined ? venta[0][header] : ''));
+
+                // Añadir los encabezados generales a la hoja de cálculo
+                headersGenerales.forEach((header, colIndex) => {
+                    worksheet[XLSX.utils.encode_cell({ r: startRow, c: colIndex })] = {
+                        t: 's',
+                        v: header,
+                        s: headerGeneralStyle
+                    };
+                    worksheet[XLSX.utils.encode_cell({ r: startRow + 1, c: colIndex })] = {
+                        t: 's',
+                        v: datosGenerales[colIndex],
+                        s: {}
+                    };
+                    
+                });
+
+                // Separador entre los encabezados generales y del detalle
+                worksheet[XLSX.utils.encode_cell({ r: startRow + 2, c: 0 })] = { t: 's', v: '', s: {} };
+
+                // Encabezados del detalle
+                const headersDetalle = ['Codigo item', 'Marca', 'Linea', 'Industria', 'Descripcion', 'Unidad', 'Cantidad', 'P/U', 'Importe Bs', 'Importe US'];
+
+                // Estilo para los encabezados del detalle
+                const headerDetalleStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '2F75B5' } } };
+
+                // Añadir las cabeceras del detalle a la hoja de cálculo
+                headersDetalle.forEach((header, colIndex) => {
+                    worksheet[XLSX.utils.encode_cell({ r: startRow + 3, c: colIndex })] = {
+                        t: 's',
+                        v: header,
+                        s: headerDetalleStyle
+                    };
+                });
+
+                // Datos del detalle de la venta
+                venta.forEach((item, rowIndex) => {
+                    const rowDataDetalle = [
+                        item.codigo_item,
+                        item.nombre_marca,
+                        item.nombre_categoria,
+                        item.nombre_industria,
+                        item.nombre_articulo,
+                        item.medida,
+                        item.cantidad,
+                        item.precio_unitario,
+                        item.precio,
+                        item.importe_usd
+                    ];
+                    XLSX.utils.sheet_add_aoa(worksheet, [rowDataDetalle], { origin: `A${startRow +5 + rowIndex}` });
+                });
+
+                startRow += 8 + venta.length;
+
+            });
+
+            // Establecer el ancho de las columnas
+            const columnWidths = [
+                { wch: 21.56 },
+                { wch: 16.0 },   
+                { wch: 22.22 },
+                { wch: 15.14 },
+                { wch: 28.44 },
+                { wch: 17.11 },
+                { wch: 25.0 },
+                { wch: 26.67 },
+                { wch: 13.11 },
+                { wch: 12.78 },
+            ];
+            worksheet['!cols'] = columnWidths;
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Resumen Documento Detallado');
+
+            // Descargar el archivo
+            XLSX.writeFile(workbook, 'reporte_resumen_ventas_por_documento_detallado.xlsx');
+        },
+
+        groupById() {
+            // Función para agrupar datos por 'id'
+            const groupedData = {};
+            this.arrayReporteDetallado.forEach((item) => {
+                const key = item.id;
+                if (!groupedData[key]) {
+                    groupedData[key] = [];
+                }
+                groupedData[key].push(item);
+            });
+            return Object.values(groupedData);
+        },
+
 
         formateaKardex(){
             let saldo = 0;
@@ -1578,7 +1974,7 @@ export default {
             //Actualiza la página actual
             me.pagination.current_page = page;
             //Envia la petición para visualizar la data de esa página
-            me.listarArticulo(page, buscar, criterio);
+            me.listarEjecutivo(page, buscar, criterio);
         },
         cambiarPaginaMedida(page, buscar, criterio) {
             let me = this;
@@ -1703,6 +2099,61 @@ export default {
 
             return this.errorArticulo;
         },
+        ocultarDetalle() {
+            this.listado = 1;
+            this.codigo = null;
+            this.arrayArticulo.length = 0;
+            this.precioseleccionado = null;
+            this.medida = null;
+            this.nombreCliente = null;
+            this.documento = null;
+            this.email = null;
+            this.idAlmacen = null;
+            this.arrayProductos = [];
+            this.arrayDetalle = [];
+            this.precioBloqueado = false;
+
+        },
+
+        verVenta(id) {
+            let me = this;
+            me.listado = 2;
+
+            //Obtener datos del ingreso
+            var arrayVentaT = [];
+            var url = '/venta/obtenerCabecera?id=' + id;
+
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                arrayVentaT = respuesta.venta;
+                console.log("VIENDO ", respuesta)
+
+                me.cliente = arrayVentaT[0]['nombre'];
+                me.tipo_comprobante = arrayVentaT[0]['tipo_comprobante'];
+                me.serie_comprobante = arrayVentaT[0]['serie_comprobante'];
+                me.num_comprobante = arrayVentaT[0]['num_comprobante'];
+                me.impuesto = arrayVentaT[0]['impuesto'];
+                me.total = arrayVentaT[0]['total'];
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+            //obtener datos de los detalles
+            var url = '/venta/obtenerDetalles?id=' + id;
+
+            axios.get(url).then(function (response) {
+                //console.log(response);
+                var respuesta = response.data;
+                me.arrayDetalle = respuesta.detalles;
+                console.log(array)
+
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
         cerrarModal() {
             this.modal = 0;
             this.tituloModal = '';
@@ -1721,12 +2172,10 @@ export default {
             this.descripcionVacio = false;
             this.fotografiaVacio = false;
             this.lineaseleccionadaVacio = false;
-            this.marcaseleccionadaVacio = false;
             this.industriaseleccionadaVacio = false;
             this.proveedorseleccionadaVacio = false;
             this.gruposeleccionadaVacio = false;
             this.medidaseleccionadaVacio = false;
-            this.sucursalseleccionadaVacio = false;
             this.articuloseleccionadaVacio = false;
             //
             this.codigo = '';
@@ -1740,13 +2189,14 @@ export default {
             this.fotografia = ''; //Pasando el valor limpio de la referencia
             this.fotoMuestra = null;
             this.lineaseleccionada.nombre = '';
-            this.marcaseleccionada.nombre = '';
             this.industriaseleccionada.nombre = '';
             this.proveedorseleccionada.nombre = '';
             this.gruposeleccionada.nombre_grupo = '';
             this.medidaseleccionada.descripcion_medida = '';
-            //this.articuloseleccionada.nombre = '';
-            this.sucursalseleccionada.nombre = '';
+            this.lineaseleccionada.nombre = '';
+            this.articuloseleccionada.nombre = '';
+            //this.sucursalseleccionada.nombre = '';
+
             this.errorArticulo = 0;
 
             this.idmedida = 0;
@@ -1775,12 +2225,9 @@ export default {
             // medidaseleccionadaVacio: false,
         },
         abrirModal(modelo, accion, data = []) {
+            this.ejecutivoseleccionado = false;
+            this.clienteseleccionada = false;
             this.sucursalseleccionada = false;
-            this.articuloseleccionada = false;
-            this.gruposeleccionada = false;
-            this.lineaseleccionada = false;
-            this.marcaseleccionada = false;
-            this.industriaseleccionada = false;
             this.fechaInicio = '';
             this.fechaFin ='';
             switch (modelo) {
@@ -1866,7 +2313,7 @@ export default {
                                     //this.lineaseleccionada = {nombre: data['nombre_categoria']};
                                     this.lineaseleccionada = { nombre: data['nombre_categoria'], id: data['idcategoria'] };
                                     //this.marcaseleccionada = {nombre: data['nombre_marca']};
-                                    this.marcaseleccionada = { nombre: data['nombre_marca'], id: data['idmarca'] };
+                                    this.clienteseleccionada = { nombre: data['nombre'], id: data['idmarca'] };
                                     this.proveedorseleccionada = { nombre: data['nombre_proveedor'], id: data['idproveedor'] };
                                     //this.gruposeleccionada = {nombre_grupo: data['nombre_grupo']};
                                     this.gruposeleccionada = { nombre_grupo: data['nombre_grupo'], id: data['idgrupo'] };
@@ -1953,36 +2400,7 @@ export default {
             this.errorMostrarMsjMedida = [];
             this.errorMedida = 0;
         },
-        //################Validar registros de industrial########
-        validarIndustria() {
-            this.errorIndustria = 0;
-            this.errorMostrarMsjIndustria = [];
 
-            if (this.tituloModal2 === 'Industrias') {
-                if (!this.nombre) this.errorMostrarMsjIndustria.push("El nombre de Industria no puede estar vacío.");
-            } else if (this.tituloModal2 === 'Marcas') {
-                if (!this.nombre) this.errorMostrarMsjIndustria.push("El nombre de Marca no puede estar vacío.");
-            } else if (this.tituloModal2 === 'Lineas') {
-                if (!this.nombreLinea) this.errorMostrarMsjIndustria.push("El nombre de Linea no puede estar vacío.");
-                if (!this.descripcion) this.errorMostrarMsjIndustria.push("La descripcion de Linea no puede estar vacío.");
-                if (!this.codigoProductoSin) this.errorMostrarMsjIndustria.push("El codigo de Linea no puede estar vacío.");
-            }
-
-            //if (!this.nombre) this.errorMostrarMsjIndustria.push("El nombre de Industria no puede estar vacío.");
-            if (this.errorMostrarMsjIndustria.length) this.errorIndustria = 1;
-
-            return this.errorIndustria;
-        },
-        //################Validar registros de medida########
-        validarMedida() {
-            this.errorMedida = 0;
-            this.errorMostrarMsjMedida = [];
-
-            if (!this.descripcion_medida) this.errorMostrarMsjMedida.push("El nombre de la Medida no puede estar vacío.");
-            if (this.errorMostrarMsjMedida.length) this.errorMedida = 1;
-
-            return this.errorMedida;
-        },
 
         //################placeholder mensaje si es indus►ria, marca o linea########
         placeholderInput(inputType) {
@@ -2231,6 +2649,8 @@ export default {
                 console.log("MostrarCostos: " + me.mostrarCostos);
                 console.log("ProveedorEstado: " + me.mostrarProveedores);
                 console.log("MostrarSaldosStock: " + me.mostrarSaldosStock);
+                console.log("Moneda principal; ",me.monedaPrincipal);
+                console.log("Moneda; ",me.monedaPrincipal[0]);
 
             })
                 .catch(function (error) {
@@ -2247,10 +2667,7 @@ export default {
         this.recuperarIdRol();
         this.datosConfiguracion();
         this.obtenerConfiguracionTrabajo();
-        this.listarArticulo(1, this.buscar, this.criterio);
         this.listarPrecio();//aumenTe 6julio
-        this.listaReporte();
-
     }
 }
 </script>

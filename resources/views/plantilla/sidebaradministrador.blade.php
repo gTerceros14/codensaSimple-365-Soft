@@ -183,6 +183,9 @@
                     <li @click="menu=45" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Diarias</a>
                     </li>
+                    <li @click="menu=62" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Detallado</a>
+                    </li>
                     <li @click="menu=55" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas x Documento</a>
                     </li>
@@ -211,9 +214,6 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Clientes Resumen Global</a>
                     </li>
 
-                    <li @click="menu=57" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas x Producto</a>
-                    </li>
                     
                 </ul>
             </li>

@@ -1573,13 +1573,26 @@ export default {
         format: 'letter',
     });
 
-    let startRow = 20;
+    let startRow = 40;
     const lineHeight = 2; // Altura de línea reducida
     const fontSize = 7; // Tamaño de fuente
     const spaceBetweenGroups = 10; // Espacio adicional entre grupos de ventas
     const maxRowsPerPage = 50; // Máximo número de filas por página
 
     const groupedData = this.groupById();
+
+    pdf.setFontSize(16);
+    pdf.setTextColor(0, 0, 0);  
+
+    pdf.text('DETALLE DE VENTAS POR DOCUMENTOS', 148, 15 ,{ align: 'center' });
+
+            // Fechas e información general (aparecerán en todas las páginas)
+    pdf.setFontSize(12);
+    pdf.text(`Fecha inicio: ${this.fechaInicio}`, 10, 25);
+    pdf.text(`Fecha fin: ${this.fechaFin}`, 70, 25);
+    pdf.text(`Sucursal: ${this.sucursalseleccionada.nombre}`, 140, 25);
+    pdf.text(`Ventas: ${this.criterioEstado}`, 10, 30);
+    pdf.text(`Cliente: ${this.clienteseleccionada.nombre}`, 70, 30);
 
     groupedData.forEach((venta, index) => {
         // Verificar si hay espacio suficiente en la página actual para los datos de este grupo
@@ -1594,15 +1607,16 @@ export default {
             pdf.setFontSize(16);
             pdf.setTextColor(0, 0, 0);
             
-            pdf.text('DETALLE DE VENTAS POR DOCUMENTOS', 148, startRow, { align: 'center' });
+            pdf.text('DETALLE DE VENTAS POR DOCUMENTOS', 148, 15, { align: 'center' });
 
             // Fechas e información general (aparecerán en todas las páginas)
             pdf.setFontSize(12);
-            pdf.text(`Fecha inicio: ${this.fechaInicio}`, 10, startRow + 10);
-            pdf.text(`Fecha fin: ${this.fechaFin}`, 70, startRow + 10);
-            pdf.text(`Sucursal: ${this.sucursalseleccionada.nombre}`, 140, startRow + 10);
-            pdf.text(`Ventas: ${this.criterioEstado}`, 10, startRow + 15);
-            pdf.text(`Cliente: ${this.clienteseleccionada.nombre}`, 70, startRow + 15);
+            pdf.text(`Fecha inicio: ${this.fechaInicio}`, 10, startRow + 15);
+            pdf.text(`Fecha fin: ${this.fechaFin}`, 70, startRow + 15); 
+            pdf.text(`Sucursal: ${this.sucursalseleccionada.nombre}`, 140, startRow + 15);
+            pdf.text(`Ventas: ${this.criterioEstado}`, 10, startRow + 20);
+            pdf.text(`Cliente: ${this.clienteseleccionada.nombre}`, 70, startRow + 20);
+
 
             startRow += 30; // Espacio adicional después del título y datos de filtro
         }
