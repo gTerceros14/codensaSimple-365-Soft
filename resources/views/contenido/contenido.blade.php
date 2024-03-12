@@ -204,6 +204,14 @@
     <reportefisicomovimientos></reportefisicomovimientos>
 </template>
 
+<template v-if="menu==62">
+    <reporteventasdetallado></reporteventasdetallado>
+</template>
+
+<template v-if="menu==63">
+    <reporteinventariofisicovalorado></reporteinventariofisicovalorado>
+</template>
+
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
     <dashboard></dashboard>
