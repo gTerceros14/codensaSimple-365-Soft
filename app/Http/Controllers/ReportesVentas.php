@@ -242,7 +242,7 @@ class ReportesVentas extends Controller
             'ventas.fecha_hora as Fecha',
             'personas.id as id_cliente',
             'personas.nombre as Cliente',
-            'users.usuario as Nombre Ejecutivo de Venta',
+            'users.usuario as Vendedor',
             'tipo_ventas.nombre_tipo_ventas as Tipo de venta',
             'roles.nombre as Ejecutivo de Venta',
             'sucursales.nombre as Sucursal',
