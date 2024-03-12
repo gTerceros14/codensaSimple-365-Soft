@@ -172,6 +172,9 @@
                     <li @click="menu=60" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Detallado Fisico de Movimientos</a>
                     </li>
+                    <li @click="menu=63" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventario Fisico Valorado</a>
+                    </li>
 
                 </ul>
             </li>
