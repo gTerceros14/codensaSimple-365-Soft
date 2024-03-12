@@ -142,7 +142,8 @@ class ReportesVentas extends Controller
             'categorias.nombre as nombre_categoria',
             'marcas.nombre as nombre_marca',
             'industrias.nombre as nombre_industria',
-            'medidas.descripcion_medida as medida'
+            'medidas.descripcion_medida as medida',
+            'almacens.sucursal as idSucursal'
         )
         ->join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
         ->join('marcas', 'articulos.idmarca', '=', 'marcas.id')
@@ -151,7 +152,7 @@ class ReportesVentas extends Controller
         ->join('inventarios','inventarios.idarticulo','=','articulos.id')
         ->join('almacens','inventarios.idalmacen','=','almacens.id')
         ->join('sucursales','almacens.sucursal','=','sucursales.id')
-        ->groupBy('articulos.id', 'articulos.nombre', 'articulos.codigo', 'articulos.descripcion', 'categorias.nombre', 'marcas.nombre', 'industrias.nombre', 'medidas.descripcion_medida');
+        ->groupBy('articulos.id', 'articulos.nombre', 'articulos.codigo', 'articulos.descripcion', 'categorias.nombre', 'marcas.nombre', 'industrias.nombre', 'medidas.descripcion_medida','almacens.sucursal');
 
         
         if ($request->has('articulo') && $request->articulo !== 'undefined') {
@@ -176,9 +177,27 @@ class ReportesVentas extends Controller
     $resultados = [];
     
     foreach ($productos as $producto) {
-        
+        $traspasos_ingreso = DB::table('detalle_traspasos')
+            ->join('traspasos', 'detalle_traspasos.idtraspaso', '=', 'traspasos.id')
+            ->join('inventarios','detalle_traspasos.idinventario','=','inventarios.id')
+            ->join('almacens','inventarios.idalmacen','=','almacens.id')
+            ->where('inventarios.idarticulo', $producto->id)
+            ->where('traspasos.tipo_traspaso', 'Entrada')
+            ->whereBetween('traspasos.fecha_traspaso', [$fechaInicio, $fechaFin])
+            ->sum('detalle_traspasos.cantidad_traspaso');
+        $traspasos_salida = DB::table('detalle_traspasos')
+            ->join('traspasos', 'detalle_traspasos.idtraspaso', '=', 'traspasos.id')
+            ->join('inventarios','detalle_traspasos.idinventario','=','inventarios.id')
+            ->join('almacens','inventarios.idalmacen','=','almacens.id')
+            ->where('inventarios.idarticulo', $producto->id)
+            ->where('traspasos.tipo_traspaso', 'Salida')
+            ->whereBetween('traspasos.fecha_traspaso', [$fechaInicio, $fechaFin])
+            ->sum('detalle_traspasos.cantidad_traspaso');
+
         $saldoAnterior = DB::table('detalle_ingresos')
             ->join('ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
+            ->join('users','ingresos.idusuario','=','users.id')
+            ->where('users.idsucursal',$producto->idSucursal)
             ->where('detalle_ingresos.idarticulo', $producto->id)
             ->where('ingresos.fecha_hora', '<', $fechaInicio)
             ->sum('detalle_ingresos.cantidad');
@@ -192,18 +211,22 @@ class ReportesVentas extends Controller
     
         $ingresos = DB::table('detalle_ingresos')
             ->join('ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
+            ->join('users','ingresos.idusuario','=','users.id')
+            ->where('users.idsucursal',$producto->idSucursal)
             ->where('detalle_ingresos.idarticulo', $producto->id)
             ->where('ingresos.fecha_hora', '>=', $fechaInicio)
             ->where('ingresos.fecha_hora', '<=', $fechaFin)
             ->sum('detalle_ingresos.cantidad');
-    
+        $ingresos+=$traspasos_ingreso;
         $ventas = DB::table('ventas')
             ->join('detalle_ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
+            ->join('users','ventas.idusuario','=','users.id')
+            ->where('users.idsucursal',$producto->idSucursal)
             ->where('detalle_ventas.idarticulo', $producto->id)
             ->where('ventas.fecha_hora', '>=', $fechaInicio)
             ->where('ventas.fecha_hora', '<=', $fechaFin)
             ->sum('detalle_ventas.cantidad');
-        
+        $ventas +=$traspasos_salida;
         $saldoActual = $saldoAnterior + $ingresos - $ventas;
     
         $resultado = [
@@ -218,13 +241,15 @@ class ReportesVentas extends Controller
             'saldo_anterior' => $saldoAnterior,
             'ingresos' => $ingresos,
             'ventas' => $ventas,
-            'saldo_actual' => $saldoActual
+            'saldo_actual' => $saldoActual,
+            'traspasos_entrada' =>$traspasos_ingreso,
+            'traspasos_salida' =>$traspasos_salida
         ];
     
         $resultados[] = $resultado;
     }
     
-        return ['resultados' => $resultados];
+        return ['resultados' => $resultados,'productos'=>$productos];
     
     }
     public function ResumenVentasPorDocumentoDetallado(Request $request){

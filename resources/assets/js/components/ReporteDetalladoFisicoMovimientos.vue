@@ -41,8 +41,9 @@
                                     <td v-text="articulo.nombre_producto"></td>
                                     <td v-text="articulo.saldo_anterior"></td>
                                     <td v-text="articulo.ingresos"></td>
-                                    <td v-text="0"></td>
-                                    <td v-text="0"></td>
+                                    <td v-text="articulo.traspasos_entrada"></td>
+                                    <td v-text="articulo.traspasos_salida"></td>
+                                    
                                     <td v-text="articulo.ventas"></td>
                                     <td v-text="0"></td>
                                     <td v-text="articulo.saldo_actual"></td>
