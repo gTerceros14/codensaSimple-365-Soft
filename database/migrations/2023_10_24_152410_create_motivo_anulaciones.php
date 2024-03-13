@@ -13,7 +13,7 @@ class CreateMotivoAnulaciones extends Migration
      */
     public function up()
     {
-        Schema::create('motivo_anulaciones', function (Blueprint $table) {
+        Schema::create('motivo_anulacions', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('codigo')->unsigned();
             $table->string('descripcion', 250)->nullable();

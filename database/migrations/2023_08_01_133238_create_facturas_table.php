@@ -16,6 +16,7 @@ class CreateFacturasTable extends Migration
         Schema::create('facturas', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('idcliente')->unsigned(); //new
+            $table->integer('idventa')->unsigned(); //new
 
             $table->integer('numeroFactura');
             $table->string('cuf', 255);
@@ -27,6 +28,7 @@ class CreateFacturasTable extends Migration
             $table->text('productos');
             $table->boolean('estado')->default(1);
             $table->foreign('idcliente')->references('id')->on('personas');
+            $table->foreign('idventa')->references('id')->on('ventas');
             $table->timestamps();
         });
     }

@@ -53,15 +53,12 @@
                     <li @click="menu=23" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Cotizaciones</a>
                     </li>
-                    <li @click="menu=29" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Facturas</a>
-                    </li>
                     <li @click="menu=38" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Eventos
                             Significativos</a>
                     </li>
                     <li @click="menu=39" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Factura Fuera de
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Fuera de
                             Línea</a>
                     </li>
                 </ul>

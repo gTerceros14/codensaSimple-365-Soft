@@ -229,7 +229,6 @@
                         options[motivo.codigo] = motivo.descripcion;
                     });
 
-                    // Muestra un segundo modal para seleccionar el motivo
                     swal({
                         title: 'Seleccione un motivo de anulación',
                         input: 'select',
@@ -247,7 +246,6 @@
                         }
                     }).then((result) => {
                         if (result.value) {
-                        // Aquí obtienes el motivo seleccionado y puedes realizar la solicitud para anular la factura
                         const motivoSeleccionado = result.value;
                         axios.get('/factura/anular/' + cuf +"/" + motivoSeleccionado)
                             .then(function(response) {

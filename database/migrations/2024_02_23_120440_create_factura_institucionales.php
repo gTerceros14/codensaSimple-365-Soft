@@ -16,7 +16,7 @@ class CreateFacturaInstitucionales extends Migration
         Schema::create('factura_institucionales', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('idcliente')->unsigned(); 
-            $table->integer('idventainstitucional');
+            $table->integer('idventainstitucional')->unsigned();
 
             $table->integer('numeroFactura');
             $table->string('cuf', 255);

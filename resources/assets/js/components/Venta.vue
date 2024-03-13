@@ -26,19 +26,21 @@
                 <template v-if="listado == 1">
                     <div class="card-body">
                         <div class="form-group row">
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
+                                    <select class="form-control col-md-5" v-model="criterio">
                                         <option value="tipo_comprobante">Tipo Comprobante</option>
-                                        <option value="num_comprobante">Número Comprobante</option>
+                                        <option value="num_comprobante">N° Comprobante</option>
                                         <option value="fecha_hora">Fecha-Hora</option>
                                     </select>
                                     <input type="text" v-model="buscar" @keyup="listarVenta(1, buscar, criterio)"
                                         class="form-control" placeholder="Texto a buscar">
-                                    <!--button type="submit" @click="listarVenta(1, buscar, criterio)" class="btn btn-primary"><i
-                                            class="fa fa-search"></i> Buscar</button-->
                                 </div>
                             </div>
+                        </div>  
+                        <div class="spinner-container" v-if="mostrarSpinner">
+                            <div class="spinner-message"><strong>EMITIENDO FACTURA...</strong></div>
+                            <TileSpinner color="blue" />
                         </div>
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-sm">
@@ -46,12 +48,13 @@
                                     <tr>
                                         <th>Opciones</th>
                                         <th>Usuario</th>
-                                        <th>Cliente</th>
-                                        <th>Tipo Comprobante</th>
-                                        <th>Número Comprobante</th>
+                                        <th>Razón Social</th>
+                                        <th>Documento</th>
+                                        <th>Número Factura</th>
                                         <th>Fecha Hora</th>
                                         <th>Total</th>
                                         <th>Estado</th>
+                                        <th> </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -72,8 +75,8 @@
                                             </template>
                                         </td>
                                         <td v-text="venta.usuario"></td>
-                                        <td v-text="venta.nombre"></td>
-                                        <td v-text="venta.tipo_comprobante"></td>
+                                        <td v-text="venta.razonSocial"></td>
+                                        <td v-text="venta.documentoid"></td>
                                         <td v-text="venta.num_comprobante"></td>
                                         <td v-text="venta.fecha_hora"></td>
                                         <td>
@@ -81,7 +84,13 @@
                                             }}
 
                                         </td>
-                                        <td v-text="venta.estado"></td>
+                                        <td>
+                                            <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank" class="btn btn-info"><i class="icon-note"></i></a>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary" type="button" @click="imprimirFactura(venta.id, venta.email)"><i class="icon-printer"></i></button>
+                                            <button class="btn btn-danger" type="button" @click="anularFactura(venta.id, venta.cuf)"><i class="icon-close"></i></button>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -114,7 +123,6 @@
                                 <div class="form-group">
                                     <label for="" class="font-weight-bold">Cliente
                                         <span class="text-danger">*</span>
-                                        <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                     </label>
 
                                     <v-select :on-search="selectCliente" label="nombre" :options="arrayCliente"
@@ -126,12 +134,10 @@
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Razon social
                                     <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                 </label>
-
-                                <input type="text" id="nombreCliente" class="form-control" v-model="nombreCliente"
-                                    ref="nombreRef" readonly>
+                                <input type="text" id="nombreCliente" class="form-control" v-model="nombreCliente" ref="nombreRef" readonly>
                             </div>
+
                             <input type="hidden" id="idcliente" class="form-control" v-model="idcliente" ref="idRef"
                                 readonly>
                             <input type="hidden" id="tipo_documento" class="form-control" v-model="tipo_documento"
@@ -140,29 +146,29 @@
                                 ref="complementoIdRef" readonly>
                             <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado"
                                 readonly>
+                            <input type="hidden" id="email" class="form-control" v-model="email" ref="emailRef" readonly>
+
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Documento
                                     <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                 </label>
-
-                                <input type="text" id="documento" class="form-control" v-model="documento"
-                                    ref="documentoRef" readonly>
+                                <input type="text" id="documento" class="form-control" v-model="documento" ref="documentoRef"
+                                    readonly>
                             </div>
 
                             <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Correo electronico
-                                    <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
-                                </label>
-
-                                <input type="text" id="email" class="form-control" v-model="email" ref="emailRef" readonly>
+                                <label for="" class="font-weight-bold">Casos especiales</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" v-model="casosEspeciales" id="casosEspecialesCheckbox" @change="habilitarNombreCliente">
+                                    <label class="form-check-label" for="casosEspecialesCheckbox">
+                                    Habilitar
+                                    </label>
+                                </div>
                             </div>
 
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Almacen
                                     <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                 </label>
                                 <v-select label="nombre_almacen" :options="arrayAlmacenes"
                                     placeholder="Seleccione un almacen" :onChange="getAlmacenProductos"></v-select>
@@ -171,7 +177,6 @@
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Tipo de comprobante
                                     <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                 </label>
 
                                 <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
@@ -184,14 +189,12 @@
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Numero de comprobante
                                     <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                 </label>
                                 <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" disabled>
                             </div>
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Aplicar impuesto:
                                     <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                 </label>
                                 <div class="input-group mb-3" id="seccionObjetivo">
                                     <div class="input-group-prepend">
@@ -201,18 +204,12 @@
                                     </div>
                                     <input disabled type="text" class="form-control" value="0.18">
                                 </div>
-
-
                             </div>
-
-
-
                         </div>
 
                         <div class="form-group row border">
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Buscar articulo
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                 </label>
                                 <div class="input-group mb-3">
                                     <input :disabled="!idAlmacen" type="text" class="form-control" v-model="codigo"
@@ -288,21 +285,10 @@
 
                                 </div>
 
-                                <!-- <div class="col-md-2" >
-                                <label>Stock disponible</label>
-                                <div class="input-group mb-2">
-                                    <input type="text" class="form-control" :value="arraySeleccionado.saldo_stock/unidadPaquete-cantidad">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">{{ unidadPaquete==1?"Unidades":"Paquetes" }}</span>
-                                    </div>
-                                </div>
-                            </div> -->
-
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="" class="font-weight-bold">Tipo de venta
                                             <span class="text-danger">*</span>
-                                            <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                         </label>
                                         <select class="form-select" v-model="unidadPaquete"
                                             aria-label="Default select example">
@@ -316,7 +302,6 @@
                                     <div class="form-group">
                                         <label for="" class="font-weight-bold">Categoria de precios
                                             <span class="text-danger">*</span>
-                                            <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                         </label>
                                         <select class="form-control" placeholder="Seleccione" v-model="precioseleccionado"
                                             @change="mostrarSeleccion" :disabled="precioBloqueado">
@@ -340,22 +325,11 @@
                                     <div class="form-group">
                                         <label for="" class="font-weight-bold">Cantidad
                                             <span class="text-danger">*</span>
-                                            <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                         </label>
                                         <input type="number" id="cantidad" value="1" class="form-control"
                                             v-model="cantidad">
                                     </div>
                                 </div>
-
-
-                                <!-- <div class="col-md-2">
-                                <div class="form-group">
-                                    <label>Descuento % </label>
-                                    <input type="number" id="descuento" value="0" class="form-control" v-model="descuento"
-                                        ref="descuentoRef">
-                                    <label for="">Shift + U</label>
-                                </div>
-                            </div> -->
 
                                 <div class="col-md-3">
                                     <div class="form-group d-flex">
@@ -435,11 +409,6 @@
                                                 <input type="number" v-model="detalle.descuento" max="99"
                                                 style="border: none; outline: none; width: 50px;" />
                                             </td>
-                                            <!--<span style="color:red;"
-                                                    v-show="detalle.descuento > (detalle.precioseleccionado * detalle.cantidad)">Descuento
-                                                    superior</span>
-                                                <input v-model="detalle.descuento" type="number" class="form-control">-->
-
                                             <td>
                                                 {{ (((detalle.precioseleccionado * detalle.cantidad) -
                                                     (detalle.precioseleccionado * detalle.cantidad * detalle.descuento / 100))
@@ -463,7 +432,7 @@
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="9" align="right"><strong>Descuento Gift Card: </strong></td>
                                             <input id="descuentoGiftCard" v-model="descuentoGiftCard" type="number"
-                                                class="form-control" @change="validarDescuentoGiftCard">
+                                                class="form-control">
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="9" align="right"><strong>Total Neto: </strong></td>
@@ -675,7 +644,7 @@
                                                         <td>
                                                             {{ ((articulo.precio_venta) *
                                                                 parseFloat(monedaVenta[0])).toFixed(2) }} {{
-        monedaVenta[1] }}
+                                                                monedaVenta[1] }}
 
                                                         </td>
                                                         <td v-text="articulo.saldo_stock"></td>
@@ -731,12 +700,6 @@
                                                         <td>
                                                             <icon-button icon="icon-check" size="small" color="success"
                                                                 @click="agregarKit(kit)" />
-
-                                                            <!-- <template v-if="new Date(kit.fecha_final) > new Date()">
-                      <icon-button v-if="kit.estado == 'Activo'" icon="icon-trash" size="small" color="danger"
-                        @click="desactivarKit(kit.id)" />
-                      <icon-button v-else icon="icon-check" size="small" color="info" @click="activarKit(kit.id)" />
-                    </template> -->
                                                             <icon-button icon="icon-eye" size="small" color="primary"
                                                                 @click="abrirModalDetallesKit(kit)" />
 
@@ -798,7 +761,7 @@
                         <p><strong>Tipo de pago:</strong></p>             
                         <div class="d-flex flex-column align-items-center">
                                 <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('EFECTIVO')">EFECTIVO</button>
-                                <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('TRANSFERENCIA BANCARIA')">TRANSFERENCIA BANCARIA</button>
+                                <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('TARJETA')">TARJETA</button>
                                 <button type="button" class="btn btn-primary mb-2" @click="seleccionarTipoPago('QR')">QR</button>
                         </div>       
                        
@@ -864,7 +827,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @click="cerrarModal2()">Volver</button>
                         <button type="button" v-if="tipoAccion2 == 1" class="btn btn-primary"
-                            @click="registrar()">Cobrar</button>
+                            @click="registrarVenta()">Cobrar</button>
                         <!-- <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarSucursal()">Actualizar</button> -->
                     </div>
                   </div>
@@ -974,7 +937,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @click="cerrarModal3()">Volver</button>
                         <button type="button" v-if="tipoAccion3 == 1" class="btn btn-primary"
-                            @click="registrar()">Registrar</button>
+                            @click="registrarVenta()">Registrar</button>
                     </div>
                 </div>
             </div>
@@ -1055,6 +1018,8 @@
 
 <script>
 import vSelect from 'vue-select';
+import { TileSpinner } from 'vue-spinners';
+
 export default {
     data() {
         return {
@@ -1137,6 +1102,11 @@ export default {
             valorMaximoDescuento: '',
             mostrarDireccion: true,
             mostrarCUFD: true,
+            casosEspeciales: false,
+            numeroTarjeta: '',
+            leyendaAl: '',
+            codigoExcepcion: 0,
+            mostrarSpinner: false,
 
             //almacenes
             arrayAlmacenes: [],
@@ -1184,7 +1154,7 @@ export default {
             tipoPago:'',
             tiposPago: {
                         EFECTIVO: 1,
-                       "TRANSFERENCIA BANCARIA": 2,
+                        TARJETA: 2,
                         QR: 3
                         },
 
@@ -1198,6 +1168,7 @@ export default {
         }
     },
     components: {
+        TileSpinner,
         vSelect
     },
     computed: {
@@ -1277,14 +1248,13 @@ export default {
                 })
                 .catch((error) => {
                     console.error(error);
-                    throw error; // Re-lanza el error para que pueda ser manejado en agregarKit
+                    throw error; 
                 });
         },
         seleccionarTipoPago(tipo) {
-                        // Esta función asigna el tipo de pago y actualiza el título del modal
                         this.tipoPago = tipo;
                       
-                        this.tituloModal2 = `TIPO DE PAGO : ${tipo}`; // Usamos '`' para interpolar el nombre del cliente
+                        this.tituloModal2 = `TIPO DE PAGO : ${tipo}`;
                         this.idtipo_pago = this.tiposPago[tipo];
                         console.log('idtipo_pago:', this.idtipo_pago);
             },
@@ -1332,7 +1302,7 @@ export default {
                                 stock: articulo.stock,
                                 precioseleccionado: articulo.precio_costo_unid
                             });
-                            let actividadEconomica = 474110;
+                            let actividadEconomica = 461021;
 
                             this.arrayProductos.push({
 
@@ -1493,13 +1463,21 @@ export default {
                 alert("El descuento adicional no puede ser mayor o igual al total.");
             }
         }, 
-        validarDescuentoGiftCard() {
-            
-            if (this.descuentoGiftCard >= this.calcularTotal) {
-                this.descuentoGiftCard = 0;
-                alert("El descuento Gift Card no puede ser mayor o igual al total.");
+
+        habilitarNombreCliente() {
+            if (this.casosEspeciales) {
+                this.$refs.nombreRef.removeAttribute("readonly");
+                this.documento = "99001";
+                this.idcliente = "8";
+                this.tipo_documento = "1";
+            } else {
+                this.$refs.nombreRef.setAttribute("readonly", true);
+                this.documento = "";
+                this.idcliente = "";
+                this.tipo_documento = "";
             }
-        }, 
+        },
+
         buscarPromocion(idArticulo) {
             // Supongamos que el ID del artículo es 1, ajusta según tus necesidades
 
@@ -1753,7 +1731,7 @@ export default {
         },
 
         agregarDetalle() {
-            let actividadEconomica = 474110;
+            let actividadEconomica = 461021;
             // let codigoProductoSin = document.getElementById("codigoProductoSin").value; si hay
             // let codigoProducto = document.getElementById("codigo").value; si 
             // let descripcion = document.getElementById("nombre_producto").value; nombre
@@ -1819,102 +1797,8 @@ export default {
                 this.unidadPaquete = 1;
                 this.codigo = '';
             }
-
-            // if (this.cantidad == 0 || this.precio == 0) {
-
-            // } else {
-            //     if (me.encuentra(me.idarticulo)) {
-            //         swal({
-            //             type: 'error',
-            //             title: 'Error...',
-            //             text: 'Este Artículo ya se encuentra agregado!',
-            //         })
-            //     } else {
-            //         console.log('saldo negativooo', me.saldosNegativos);
-            //         if (me.saldosNegativos === 0) {
-            //             if (this.selectedUnit > 1) {
-            //                 me.cantidad = me.cantidad * this.selectedUnit;
-            //                 console.log('cantidad agregado', me.cantidad);
-
-            //             }
-
-            //             if (me.stock < me.cantidad) {
-            //                 swal({
-            //                     type: 'error',
-            //                     title: 'Error...',
-            //                     text: 'No hay stock disponible!'
-            //                 });
-            //             } else {
-            //                 me.arrayDetalle.push({
-            //                     idarticulo: me.idarticulo,
-            //                     articulo: me.articulo,
-            //                     medida: me.medida,
-            //                     cantidad: me.cantidad,
-            //                     cantidad_paquetes: me.cantidad_paquetes,
-            //                     precio: me.precio,
-            //                     descuento: me.descuento,
-            //                     stock: me.saldo_stock,
-            //                     precioseleccionado: me.precioseleccionado//--aumenTe esTo
-
-            //                 });
-            //                 console.log("ARRAY_AGREGADO", me.arrayDetalle);
-
-
-
-            //                 me.codigo = '';
-            //                 me.idarticulo = 0;
-            //                 me.articulo = '';
-            //                 me.medida = '';
-            //                 me.cantidad = 0;
-            //                 me.precio = 0;
-            //                 me.descuento = 0;
-            //                 me.stock = 0;
-            //                 me.sTotal = 0;
-            //             }
-            //         } else if (me.saldosNegativos === 1) {
-            //             console.log('saldo negativo', me.saldosNegativos);
-            //             me.arrayDetalle.push({
-            //                 idarticulo: me.idarticulo,
-            //                 articulo: me.articulo,
-            //                 medida: me.medida,
-            //                 cantidad: me.cantidad,
-            //                 cantidad_paquetes: me.cantidad_paquetes,
-            //                 precio: me.precio,
-            //                 descuento: me.descuento,
-            //                 stock: me.saldo_stock,
-            //                 precioseleccionado: me.precioseleccionado
-            //             });
-            //             console.log("ARRAY_AGREGADO", me.arrayDetalle);
-
-            //             me.arrayProductos.push({
-            //                 actividadEconomica: actividadEconomica,
-            //                 codigoProductoSin: codigoProductoSin,
-            //                 codigoProducto: codigoProducto,
-            //                 descripcion: descripcion,
-            //                 cantidad: cantidad,
-            //                 unidadMedida: unidadMedida,
-            //                 precioUnitario: precioUnitario,
-            //                 montoDescuento: montoDescuento,
-            //                 subTotal: subTotal,
-            //                 numeroSerie: numeroSerie,
-            //                 numeroImei: numeroImei
-            //             });
-
-            //             me.codigo = '';
-            //             me.idarticulo = 0;
-            //             me.articulo = '';
-            //             me.medida = '';
-            //             me.cantidad = 0;
-            //             me.precio = 0;
-            //             me.descuento = 0;
-            //             me.stock = 0;
-            //             me.sTotal = 0;
-            //         }
-            //     }
-
-            // }
-
         },
+
         agregarDetalleModal(data) {
             this.scrollToSection();
             this.codigo = data.codigo;
@@ -1978,23 +1862,177 @@ export default {
                     console.error(error);
                 });
         },
-        registrar() {
-            this.registrarVenta();
-            this.emitirFactura();
-            //this.num_comprob;
+
+        verificarFactura(cuf, numeroFactura){
+                var url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=5153610012&cuf='+cuf+'&numero='+numeroFactura+'&t=2';
+                window.open(url);
+                
+            },
+
+            anularFactura(id, cuf) {
+            swal({
+                title: '¿Está seguro de anular la factura?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                let me = this;
+                axios.get('/factura/obtenerDatosMotivoAnulacion')
+                    .then(function(response) {
+                    var respuesta = response.data;
+                    me.arrayMotivosAnulacion = respuesta.motivo_anulaciones;
+                    
+                    console.log('Motivos obtenidos:', me.arrayMotivosAnulacion);
+
+                    let options = {};
+                    me.arrayMotivosAnulacion.forEach(function(motivo) {
+                        options[motivo.codigo] = motivo.descripcion;
+                    });
+
+                    // Muestra un segundo modal para seleccionar el motivo
+                    swal({
+                        title: 'Seleccione un motivo de anulación',
+                        input: 'select',
+                        inputOptions: options,
+                        inputPlaceholder: 'Seleccione un motivo',
+                        showCancelButton: true,
+                        inputValidator: function (value) {
+                        return new Promise(function (resolve, reject) {
+                            if (value !== '') {
+                            resolve();
+                            } else {
+                            reject('Debe seleccionar un motivo');
+                            }
+                        });
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                        // Aquí obtienes el motivo seleccionado y puedes realizar la solicitud para anular la factura
+                        const motivoSeleccionado = result.value;
+                        axios.get('/factura/anular/' + cuf +"/" + motivoSeleccionado)
+                            .then(function(response) {
+                            const data = response.data;
+                            if (data === 'ANULACION CONFIRMADA') {
+                                swal(
+                                'FACTURA ANULADA',
+                                data,
+                                'success'
+                                );
+                            } else {
+                                swal(
+                                'ANULACION RECHAZADA',
+                                data,
+                                'warning'
+                                );
+                            }
+                            })
+                            .catch(function(error) {
+                            console.log(error);
+                            });
+                        }
+                    });
+                    })
+                    .catch(function(error) {
+                    console.log(error);
+                    });
+                }
+            });
+            },
+
+            imprimirFactura(id, email) {
+            swal({
+                title: 'Selecciona un tamaño de factura',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'CARTA',
+                cancelButtonText: 'ROLLO',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    console.log("El boton CARTA fue presionado");
+                    axios.get('/factura/imprimirCarta/' + id + '/' + email, { responseType: 'blob' })
+                        .then(function (response) {
+                            window.location.href = "docs/facturaCarta.pdf";
+                            console.log("Se generó el factura en Carta correctamente");
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                } else if (result.dismiss === swal.DismissReason.cancel) {
+                    console.log("El boton ROLLO fue presionado");
+                    axios.get('/factura/imprimirRollo/' + id + '/' + email, { responseType: 'blob' })
+                        .then(function (response) {
+                            window.location.href = "docs/facturaRollo.pdf";
+                            console.log("Se generó el la factura en Rollo correctamente");
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
+            }).catch((error) => {
+                console.error('Error al mostrar el diálogo:', error);
+            });
         },
-        //-------------REGISTRARAR VENTA ------
+        //--------HASTA AQUI--------------------
+        selectAlmacen() {
+            let me = this;
+            let url = '/almacen/selectAlmacen';
+            axios.get(url).then(function (response) {
+                let respuesta = response.data;
+                me.arrayAlmacenes = respuesta.almacenes;
+                console.log(me.arrayAlmacenes);
+
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+        getAlmacenProductos(almacen) {
+            this.idAlmacen = almacen.id;
+        },
+        validarVenta() {
+            let me = this;
+            me.errorVenta = 0;
+            me.errorMostrarMsjVenta = [];
+            var art;
+
+            me.arrayDetalle.map(function (x) {
+                if (x.cantidad > x.stock) {
+                    art = x.articulo + " Stock insuficiente";
+                    me.errorMostrarMsjVenta.push(art);
+                }
+            });
+
+            if (me.idcliente == 0) me.errorMostrarMsjVenta.push("Seleccione un Cliente");
+            if (me.tipo_comprobante == 0) me.errorMostrarMsjVenta.push("Seleccione el Comprobante");
+            if (!me.impuesto) me.errorMostrarMsjVenta.push("Ingrese el impuesto de compra");
+            if (me.arrayDetalle.length <= 0) me.errorMostrarMsjVenta.push("Ingrese detalles");
+
+            if (me.errorMostrarMsjVenta.length) me.errorVenta = 1;
+
+            return me.errorVenta;
+        },
+
+        
         registrarVenta() {
             if (this.validarVenta()) {
                 return;
             }
 
             let me = this;
+            this.mostrarSpinner = true;
 
-            for (let i = 0; i < me.cuotas.length; i++) {
-                // console.log('INvENtARIO',me.cuotas[i].idinventario);
-                // console.log('ARtICULOID',me.cuotas[i].idarticulo);
-                // console.log(me.cuotas[i].cantidad_traspaso);                 
+            for (let i = 0; i < me.cuotas.length; i++) {                
                 console.log('LLEGA ARRAYDATA!', me.cuotas[i]);
             }
 
@@ -2008,7 +2046,6 @@ export default {
                 'idAlmacen': this.idAlmacen,
                 'idtipo_pago': this.idtipo_pago,
                 'idtipo_venta': this.idtipo_venta,
-                
                 //----creditos Ventas----
                 'idpersona': this.idcliente,
                 'numero_cuotas': this.numero_cuotas,
@@ -2020,8 +2057,10 @@ export default {
                 //-----hasta aqui-------
                 'data': this.arrayDetalle
 
-            }).then(function (response) {
-                //console.log(response.data.id);
+            }).then((response) => {
+                let idVentaRecienRegistrada = response.data.id;
+                this.emitirFactura(idVentaRecienRegistrada);
+
                 if (response.data.id > 0) {
                     me.listado = 1;
                     me.listarVenta(1, '', 'num_comprob');
@@ -2071,53 +2110,16 @@ export default {
                     //console.log(response.data.valorMaximo)
                 }
 
-            }).catch(function (error) {
+            }).catch((error) => {
                 console.log(error);
             });
         },
-        //--------HASTA AQUI--------------------
-        selectAlmacen() {
-            let me = this;
-            let url = '/almacen/selectAlmacen';
-            axios.get(url).then(function (response) {
-                let respuesta = response.data;
-                me.arrayAlmacenes = respuesta.almacenes;
-                console.log(me.arrayAlmacenes);
 
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        },
-        getAlmacenProductos(almacen) {
-            this.idAlmacen = almacen.id;
-        },
-        validarVenta() {
-            let me = this;
-            me.errorVenta = 0;
-            me.errorMostrarMsjVenta = [];
-            var art;
+        async emitirFactura(idVentaRecienRegistrada) {
 
-            me.arrayDetalle.map(function (x) {
-                if (x.cantidad > x.stock) {
-                    art = x.articulo + " Stock insuficiente";
-                    me.errorMostrarMsjVenta.push(art);
-                }
-            });
-
-            if (me.idcliente == 0) me.errorMostrarMsjVenta.push("Seleccione un Cliente");
-            if (me.tipo_comprobante == 0) me.errorMostrarMsjVenta.push("Seleccione el Comprobante");
-            if (!me.impuesto) me.errorMostrarMsjVenta.push("Ingrese el impuesto de compra");
-            if (me.arrayDetalle.length <= 0) me.errorMostrarMsjVenta.push("Ingrese detalles");
-
-            if (me.errorMostrarMsjVenta.length) me.errorVenta = 1;
-
-            return me.errorVenta;
-        },
-
-        emitirFactura() {
             let me = this;
 
+            let idventa = idVentaRecienRegistrada;
             let numeroFactura = document.getElementById("num_comprobante").value;
             let cuf = "464646464";
             let cufdValor = document.getElementById("cufdValor");
@@ -2128,20 +2130,46 @@ export default {
             let fechaEmision = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
             let id_cliente = document.getElementById("idcliente").value;
             let nombreRazonSocial = document.getElementById("nombreCliente").value;
-            //let tipoDocumentoIdentidad = document.getElementById("tipo_documento").value;
-            let tipoDocumentoIdentidad = 1;
             let numeroDocumento = document.getElementById("documento").value;
             let complemento = document.getElementById("complemento_id").value;
+            let tipoDocumentoIdentidad = document.getElementById("tipo_documento").value;
             let montoTotal = (this.calcularTotal * parseFloat(this.monedaVenta[0])).toFixed(2);
             let descuentoAdicional = document.getElementById("descuentoAdicional").value;
-            let leyenda = "Ley N° 453: El proveedor de servicios debe habilitar medios e instrumentos para efectuar consultas y reclamaciones.";
             let usuario = document.getElementById("usuarioAutenticado").value;
             //let codigoPuntoVenta = this.puntoVentaAutenticado;
             let codigoPuntoVenta = 0;
             let montoGiftCard = document.getElementById("descuentoGiftCard").value;
+            let codigoMetodoPago = this.idtipo_pago;
 
-            console.log("El tipo de documento es: " + tipoDocumentoIdentidad);
             console.log("El monto de Descuento de Gift Card es: " + montoGiftCard);
+            console.log("El tipo de documento es: " + tipoDocumentoIdentidad);
+
+            try {
+                const response = await axios.get('/factura/obtenerLeyendaAleatoria');
+                this.leyendaAl = response.data.descripcionLeyenda;
+                console.log("El dato de leyenda llegado es: " + this.leyendaAl);
+            } catch (error) {
+                console.error(error);
+                return '"Ley N° 453: Los servicios deben suministrarse en condiciones de inocuidad, calidad y seguridad."';
+            }
+
+            try {
+                    if (tipoDocumentoIdentidad === '5') {
+                        const response = await axios.post('/factura/verificarNit/' + numeroDocumento);
+                        if (response.data === 'NIT ACTIVO') {
+                            me.codigoExcepcion = 0;
+                            alert("NIT VÁLIDO.");
+                        } else {
+                            me.codigoExcepcion = 1;
+                            alert("NIT INVÁLIDO.");
+                        }
+                    }else{
+                        me.codigoExcepcion = 0;
+                    }
+                } catch (error) {
+                    console.error(error);
+                    return 'No se pudo verificar el NIT';
+                }
 
             var factura = [];
             factura.push({
@@ -2162,7 +2190,7 @@ export default {
                     numeroDocumento: numeroDocumento,
                     complemento: complemento,
                     codigoCliente: numeroDocumento,
-                    codigoMetodoPago: 1,
+                    codigoMetodoPago: codigoMetodoPago,
                     numeroTarjeta: null,
                     montoTotal: montoTotal,
                     montoTotalSujetoIva: montoTotal,
@@ -2171,9 +2199,9 @@ export default {
                     montoTotalMoneda: montoTotal,
                     montoGiftCard: montoGiftCard,
                     descuentoAdicional: descuentoAdicional,
-                    codigoExcepcion: 0,
+                    codigoExcepcion: this.codigoExcepcion,
                     cafc: null,
-                    leyenda: leyenda,
+                    leyenda: this.leyendaAl,
                     usuario: usuario,
                     codigoDocumentoSector: 1
                 }
@@ -2186,7 +2214,8 @@ export default {
 
             axios.post('/venta/emitirFactura', {
                 factura: datos,
-                id_cliente: id_cliente
+                id_cliente: id_cliente,
+                idventa: idventa
             })
                 .then(function (response) {
                     var data = response.data;
@@ -2198,11 +2227,14 @@ export default {
                             'success'
                         )
                         me.arrayProductos = [];
+                        me.codigoExcepcion = 0;
                         me.cerrarModal2();
                         me.cerrarModal3();
                         me.listarVenta(1, '', 'id');
+                        me.mostrarSpinner = false;
                     } else{
                         me.arrayProductos = [];
+                        me.codigoExcepcion = 0;
                         swal(
                             'FACTURA RECHAZADA',
                             data,
@@ -2216,6 +2248,7 @@ export default {
                         'INTENTE DE NUEVO',
                         'Comunicacion con SIAT fallida',
                         'error');
+                    me.mostrarSpinner = false;
                 });
         },
 
@@ -2551,7 +2584,9 @@ export default {
     }
 }
 </script>
-<style>    .modal-content {
+<style>    
+    
+    .modal-content {
         width: 100% !important;
         position: absolute !important;
     }
@@ -2585,6 +2620,27 @@ export default {
         border-top-right-radius: 8px;
         border-bottom-right-radius: 8px;
     }
+
+    .spinner-container {
+        position: relative;
+    }
+
+    .spinner-container > * {
+        position: absolute; 
+        top: 50%; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .spinner-message {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -170%);
+        z-index: 1;
+    }
+
+
 
     /* .negrita-input {
         font-weight: bold;

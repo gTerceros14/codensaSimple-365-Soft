@@ -21,9 +21,9 @@ class CreateEventosSignificativos extends Migration
             $table->string('cufdEvento', 80);
             $table->string('nit', 50);
             $table->integer('codigoMotivoEvento');
-            $table->string('cufd', 80);
+            $table->string('cufd', 80)->nullable();
             $table->text('inicioEvento');
-            $table->text('finEvento');
+            $table->text('finEvento')->nullable();
             $table->boolean('estado')->default(1);
             $table->foreign('idmotivoevento')->references('id')->on('motivo_eventos');
             $table->timestamps();
