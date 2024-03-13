@@ -172,3 +172,21 @@ export const esquemaCliente = yup.object().shape({
     .email("El correo electrónico debe tener un formato válido")
     .required("El correo electrónico es obligatorio"),
 });
+
+export const esquemaPuntoDeVenta = yup.object().shape({
+  nombre: yup
+    .string()
+    .required("El nombre del punto de venta es obligatorio")
+    .max(
+      100,
+      "El nombre del punto de venta no puede tener más de 100 caracteres"
+    ),
+  nit: yup.string().required("El NIT del punto de venta es obligatorio"),
+  descripcion: yup
+    .string()
+    .required("La descripción del punto de venta es obligatoria"),
+  idtipopuntoventa: yup
+    .string()
+    .required("El tipo de punto de venta es obligatorio"),
+  idsucursal: yup.string().required("La sucursal es obligatoria"),
+});
