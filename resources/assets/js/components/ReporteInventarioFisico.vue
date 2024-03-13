@@ -14,7 +14,6 @@
                     <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
                     <button @click="exportarExcel" class="btn btn-success">Exportar a EXCEL</button>
 
-
                     <div class="col-md-3">
                         <div class="d-flex flex-column">
                             <label class="mb-1"> MODO VISTA </label>
@@ -42,7 +41,6 @@
                                     <th>Producto</th>
                                     <th>Unidad X Paq.</th>                                   
                                     <th>Saldo_stock_total</th>
-                                    <th>Valor</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -59,7 +57,6 @@
                                     <td v-text="inventario.nombre_producto"></td>
                                     <td v-text="inventario.unidad_envase"></td>
                                     <td v-text="inventario.saldo_stock_total"></td>
-                                    <td v-text="inventario.costo_total"></td>
 
                                 </tr>                                
                             </tbody>
@@ -80,7 +77,6 @@
                                     <th>Costo Unidad</th>
                                     <th>Fecha Vencimiento</th>
                                     <th>Saldo Stock</th>
-                                    <th>Valor</th>
 
                                 </tr>
                             </thead>
@@ -96,7 +92,6 @@
                                     <td v-text="inventario.precio_costo_unid"></td>
                                     <td v-text="inventario.fecha_vencimiento"></td>
                                     <td v-text="inventario.saldo_stock"></td>
-                                    <td v-text="inventario.costo_total"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1243,7 +1238,7 @@ import * as XLSX from 'xlsx-js-style';
 
             const tableYPosition = 40;
 
-            const columns = ['Almacen', 'Marca', 'Linea','Industria','Producto','Unidad x Paquete','Stock','Valor'];
+            const columns = ['Almacen', 'Marca', 'Linea','Industria','Producto','Unidad x Paquete','Stock'];
             const rows = this.arrayReporte.map(item => [
                     item.nombre_almacen,
                     item.nombre_marca,
@@ -1252,7 +1247,6 @@ import * as XLSX from 'xlsx-js-style';
                     item.nombre_producto,
                     item.unidad_envase,
                     item.saldo_stock_total,
-                    item.costo_total,
                 ]);
 
 
@@ -1287,7 +1281,7 @@ import * as XLSX from 'xlsx-js-style';
 
             const tableYPosition = 40;
 
-            const columns = ['Almacen', 'Fecha Ingreso', 'Marca', 'Linea','Industria','Producto','Unidad x Paquete','Costo x Unidad', 'Fecha de Vencimiento', 'Stock','Valor'];
+            const columns = ['Almacen', 'Fecha Ingreso', 'Marca', 'Linea','Industria','Producto','Unidad x Paquete','Costo x Unidad', 'Fecha de Vencimiento', 'Stock'];
             const rows = this.arrayReporte.map(item => [
                     item.nombre_almacen,
                     item.fecha_ingreso,
@@ -1299,7 +1293,6 @@ import * as XLSX from 'xlsx-js-style';
                     item.precio_costo_unid,
                     item.fecha_vencimiento,
                     item.saldo_stock,
-                    item.costo_total,
                 ]);
 
             pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
@@ -1313,7 +1306,7 @@ import * as XLSX from 'xlsx-js-style';
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }];
             // Título del reporte
             worksheet['A1'] = { t: 's', v: 'INVENTARIO FISICO VALORADO', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
@@ -1334,7 +1327,7 @@ import * as XLSX from 'xlsx-js-style';
             // Estilo para los encabezados
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
             // Cabeceras de las columnas
-            const headers = ['Almacen', 'Marca', 'Linea','Industria','Producto','Unidad x Paquete','Stock','Valor'];
+            const headers = ['Almacen', 'Marca', 'Linea','Industria','Producto','Unidad x Paquete','Stock'];
 
             // Añadir las cabeceras a la hoja de cálculo
             headers.forEach((header, index) => {
@@ -1351,7 +1344,6 @@ import * as XLSX from 'xlsx-js-style';
                     item.nombre_producto,
                     item.unidad_envase,
                     item.saldo_stock_total,
-                    item.costo_total,
                 ];
 
                 // Añadir la fila al kardex
@@ -1368,7 +1360,6 @@ import * as XLSX from 'xlsx-js-style';
                 { wch: 38.78 },
                 { wch: 19.67 },
                 { wch: 10.22 },
-                { wch: 11.78 },
             ];
             worksheet['!cols'] = columnWidths;
 
@@ -1385,7 +1376,7 @@ import * as XLSX from 'xlsx-js-style';
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 10 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
             // Título del reporte
             worksheet['A1'] = { t: 's', v: 'INVENTARIO FISICO VALORADO', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
@@ -1406,7 +1397,7 @@ import * as XLSX from 'xlsx-js-style';
             // Estilo para los encabezados
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
             // Cabeceras de las columnas
-            const headers = ['Almacen', 'Fecha Ingreso', 'Marca', 'Linea','Industria','Producto','Unidad x Paquete','Costo x Unidad', 'Fecha de Vencimiento', 'Stock','Valor'];
+            const headers = ['Almacen', 'Fecha Ingreso', 'Marca', 'Linea','Industria','Producto','Unidad x Paquete','Costo x Unidad', 'Fecha de Vencimiento', 'Stock'];
 
             // Añadir las cabeceras a la hoja de cálculo
             headers.forEach((header, index) => {
@@ -1426,7 +1417,6 @@ import * as XLSX from 'xlsx-js-style';
                     item.precio_costo_unid,
                     item.fecha_vencimiento,
                     item.saldo_stock,
-                    item.costo_total,
                 ];
 
                 // Añadir la fila al kardex
@@ -1436,17 +1426,16 @@ import * as XLSX from 'xlsx-js-style';
 
             // Establecer el ancho de las columnas
             const columnWidths = [
-                { wch: 21.11 },
-                { wch: 12.56 },
-                { wch: 17.33 },
+                { wch: 25.44 },
+                { wch: 14.67 },
+                { wch: 18.56 },
                 { wch: 21.56 },
-                { wch: 17.33 },
+                { wch: 18.56 },
                 { wch: 37.56 },
-                { wch: 16.67 },
-                { wch: 13.14 },
+                { wch: 16.78 },
+                { wch: 13.22 },
                 { wch: 23.33 },
                 { wch: 8.78 },
-                { wch: 10.00 },
             ];
             worksheet['!cols'] = columnWidths;
 

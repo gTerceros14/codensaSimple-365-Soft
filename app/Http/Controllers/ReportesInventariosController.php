@@ -60,7 +60,10 @@ class ReportesInventariosController extends Controller
                     DB::raw('(inventarios.saldo_stock * articulos.precio_costo_unid) AS costo_total'), 
                     DB::raw('DATE_FORMAT(inventarios.created_at, "%Y-%m-%d") AS fecha_ingreso'),
                     'inventarios.fecha_vencimiento',
-                    'almacens.nombre_almacen'
+                    'almacens.nombre_almacen',
+                    'categorias.nombre AS nombre_categoria',
+                    'marcas.nombre AS nombre_marca',
+                    'industrias.nombre AS nombre_industria'
                 )
                 ->where('inventarios.fecha_vencimiento','<=',$fechaVencimiento)
                 ->orderBy('articulos.nombre');
