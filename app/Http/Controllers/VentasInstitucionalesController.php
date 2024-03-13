@@ -170,12 +170,12 @@ class VentasInstitucionalesController extends Controller
         if ($buscar==''){
             $facturas = FacturaInstitucional::join('personas', 'factura_institucionals.idcliente', '=', 'personas.id')
             ->select('factura_institucionals.*', 'personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
-            ->orderBy('factura_institucionals.id', 'desc')->paginate(3);
+            ->orderBy('factura_institucionals.id', 'desc')->paginate(6);
         }
         else{
             $facturas = FacturaInstitucional::join('personas', 'factura_institucionals.idcliente', '=', 'personas.id')
             ->select('factura_institucionals.*','personas.nombre', 'personas.email', 'personas.num_documento', 'personas.complemento.id')
-            ->orderBy('factura_institucionals.id', 'desc')->paginate(3);
+            ->orderBy('factura_institucionals.id', 'desc')->paginate(6);
         }
         
 
@@ -236,7 +236,7 @@ class VentasInstitucionalesController extends Controller
         $facturas = FacturaInstitucional::join('personas', 'factura_institucionals.idcliente', '=', 'personas.id')
         ->select('factura_institucionals.*','personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
         ->where('factura_institucionals.id', '=', $id)
-        ->orderBy('factura_institucionals.id', 'desc')->paginate(3);
+        ->orderBy('factura_institucionals.id', 'desc')->paginate(6);
 
         Log::info('Resultado', [
             //'facturas' => $facturas,

@@ -38,7 +38,7 @@ class InventarioController extends Controller
     //                 'articulos.unidad_envase',
 
     //             )
-    //             ->orderBy('inventarios.id', 'desc')->paginate(3);
+    //             ->orderBy('inventarios.id', 'desc')->paginate(6);
     //     } else {
     //         $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
     //             ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
@@ -55,7 +55,7 @@ class InventarioController extends Controller
     //                 'articulos.precio_costo_unid',
     //             )
     //             ->where('inventarios.' . $criterio, 'like', '%' . $buscar . '%')
-    //             ->orderBy('inventarios.id', 'desc')->paginate(3);
+    //             ->orderBy('inventarios.id', 'desc')->paginate(6);
     //     }
 
 
@@ -182,7 +182,7 @@ class InventarioController extends Controller
             $inventarios->where('inventarios.' . $criterio, 'like', '%' . $buscar . '%');
         }
     
-        $inventarios = $inventarios->paginate(3);
+        $inventarios = $inventarios->paginate(6);
     
         return [
             'pagination' => [
@@ -231,7 +231,7 @@ class InventarioController extends Controller
 
                 )
                 ->whereDate('inventarios.fecha_vencimiento', '<=', DB::raw('CURDATE()'))
-                ->orderBy('inventarios.id', 'desc')->paginate(3);
+                ->orderBy('inventarios.id', 'desc')->paginate(6);
         } else {
             $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
                 ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
@@ -254,7 +254,7 @@ class InventarioController extends Controller
                 )
                 ->whereDate('inventarios.fecha_vencimiento', '<=', DB::raw('CURDATE()'))
                 ->where('inventarios.' . $criterio, 'like', '%' . $buscar . '%')
-                ->orderBy('inventarios.id', 'desc')->paginate(3);
+                ->orderBy('inventarios.id', 'desc')->paginate(6);
         }
 
 
@@ -306,7 +306,7 @@ class InventarioController extends Controller
 
                 )
                 ->whereRaw('articulos.stock > inventarios.saldo_stock')
-                ->orderBy('inventarios.id', 'desc')->paginate(3);
+                ->orderBy('inventarios.id', 'desc')->paginate(6);
         } else {
             $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
                 ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
@@ -329,7 +329,7 @@ class InventarioController extends Controller
                 )
                 ->whereRaw('articulos.stock > inventarios.saldo_stock')
                 ->where('inventarios.' . $criterio, 'like', '%' . $buscar . '%')
-                ->orderBy('inventarios.id', 'desc')->paginate(3);
+                ->orderBy('inventarios.id', 'desc')->paginate(6);
         }
 
 

@@ -19,8 +19,8 @@
                     <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
 
                 </div>
-                <div class="card-body">
-                    <div style="overflow-x: auto;">
+                <div class="card-body"  style="max-height: 600px; overflow-y: auto;" >
+                    <div class = "table-resposive" > 
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
@@ -43,15 +43,13 @@
                                     <td v-else>0</td>
                                     <td v-if="articulo.tipo === 'Venta'" v-text="articulo.cantidad"></td>
                                     <td v-else>0</td>
-                                    <td v-text="articulo.resultado_operacion"></td>
+                                    <td v-text="articulo.resultado_operacionFisico"></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="text-right">
-                            <strong>Total Saldo Fisico: </strong> {{ total_saldofisico }} Unidades
-                        </div>
-                    <nav>
+                    
+                    <!--<nav>
                         <ul class="pagination">
                             <li class="page-item" v-if="pagination.current_page > 1">
                                 <a class="page-link" href="#"
@@ -67,9 +65,12 @@
                                     @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
                             </li>
                         </ul>
-                    </nav>
+                    </nav>-->
 
                 </div>
+                <div class="text-right">
+                            <strong>Total Saldo Fisico: </strong> {{ total_saldofisico }} Unidades
+                    </div>
             </div>
             <!-- Fin ejemplo de tabla Listado -->
         </div>
@@ -185,7 +186,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
-                            <button type="submit" @click="listaReporte" class="btn btn-primary">Visualizar Reporte</button>
+                            <button type="submit" @click="listaReporte(); cerrarModal()" class="btn btn-primary">Visualizar Reporte</button>
                         </div>
                     </form>
 
@@ -298,8 +299,9 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select class="form-control col-md-3">
+                                    <select class="form-control col-md-3" v-model="criterioA">
                                         <option v-if="tituloModal2 !== 'Grupos'" value="nombre">Nombre</option>
+                                        <option v-if="tituloModal2 == 'Articulo'" value="descripcion">Descripcion</option>
                                         <option v-else-if="tituloModal2 == 'Grupos'" value="nombre_grupo">Grupo</option>
                                         <!-- <option v-if="tituloModal2=='Grupos'" value="nombre_grupo">Nombre_grupo</option> -->
                                     </select>
@@ -321,8 +323,9 @@
                                     <input v-if="tituloModal2 == 'Sucursal'" type="text" v-model="buscarA"
                                         @keyup="listarSucursal(1, buscarA, criterioA)" class="form-control"
                                         placeholder="Texto a buscar">
-                                    <!--button type="submit" @click="listarArticulo(buscarA, criterioA)"
-                                        class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button-->
+                                    <input v-if="tituloModal2 == 'Articulo'" type="text" v-model="buscarA"
+                                        @keyup="listarArticulo(1, buscarA, criterioA)" class="form-control"
+                                        placeholder="Texto a buscar">
                                 </div>
                             </div>
                         </div>
@@ -501,416 +504,6 @@
             <!-- /.modal-dialog -->
         </div>
         <!--Fin del modal-->
-        <!--######################################-aqui registro de industria,Marca,Linea#####################-->
-        <div class="modal " tabindex="-1" :class="{ 'mostrar': modal3 }" role="dialog" aria-labelledby="myModalLabel"
-            style="display: none;" aria-hidden="true">
-            <div class="modal-dialog modal-primary modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" v-text="tituloModal3"></h4>
-                        <button type="button" class="close" @click="cerrarModal3()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div v-if="tituloModal2 !== 'Proveedors'" class="modal-body">
-                        <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                            <div v-if="tituloModal2 !== 'Grupos' && tituloModal2 !== 'Lineas'" class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Nombre</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="nombre" class="form-control1"
-                                        :placeholder="placeholderInput()">
-                                </div>
-                            </div>
-                            <div v-else-if="tituloModal2 == 'Grupos'" class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Nombre Grupo</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="nombre_grupo" class="form-control"
-                                        :placeholder="placeholderInput()">
-                                </div>
-                            </div>
-                            <div v-if="tituloModal2 == 'Lineas'" class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Nombre Linea</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="nombreLinea" class="form-control1"
-                                        :placeholder="placeholderInput('nombre')">
-                                </div>
-                                <label class="col-md-3 form-control-label" for="text-input">Descripcion</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="descripcion" class="form-control1"
-                                        :placeholder="placeholderInput('descripcion')">
-                                </div>
-                                <label class="col-md-3 form-control-label" for="text-input">Codigo</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="codigoProductoSin" class="form-control1"
-                                        :placeholder="placeholderInput('codigoProductoSin')">
-                                </div>
-                            </div>
-                            <!-- prueba de habilitar  -->
-                            <div v-if="tituloModal2 == 'Industrias'" class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Estado</label>
-                                <div class="col-md-9">
-                                    <input type="checkbox" v-model="estado" v-bind:value="1" />
-                                    <span>{{ estado ? 'Habilitar' : 'Inhabilitado' }}</span>
-                                </div>
-                            </div>
-                            <div v-if="tituloModal2 == 'Marcas'" class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Estado</label>
-                                <div class="col-md-9">
-                                    <input type="checkbox" v-model="condicion" v-bind:value="1" />
-                                    <span>{{ condicion ? 'Habilitar' : 'Inhabilitado' }}</span>
-                                </div>
-                            </div>
-                            <div v-if="tituloModal2 == 'Lineas'" class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Estado</label>
-                                <div class="col-md-9">
-                                    <input type="checkbox" v-model="condicion" v-bind:value="1" />
-                                    <span>{{ condicion ? 'Habilitar' : 'Inhabilitado' }}</span>
-                                </div>
-                            </div>
-
-                            <div v-show="errorIndustria" class="form-group row div-error">
-                                <div class="text-center text-error">
-                                    <div v-for="error in errorMostrarMsjIndustria" :key="error" v-text="error"></div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <!--############################## registro de proveedor####################################3---->
-                    <div v-else-if="tituloModal2 == 'Proveedors'" class="modal-body">
-                        <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                            <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Nombre (*)</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="nombre" class="form-control"
-                                        placeholder="Nombre de la persona">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Tipo Documento</label>
-                                <div class="col-md-9">
-                                    <select v-model="tipo_documento" class="form-control">
-                                        <option value="DNI">DNI</option>
-                                        <option value="RUC">RUC</option>
-                                        <option value="PASS">PASS</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Número</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="num_documento" class="form-control"
-                                        placeholder="Número de documento">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="email-input">Dirección</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="direccion" class="form-control" placeholder="Dirección">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="email-input">Teléfono</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="telefono" class="form-control" placeholder="Teléfono">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="email-input">Email</label>
-                                <div class="col-md-9">
-                                    <input type="email" v-model="email" class="form-control" placeholder="Email">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="email-input">Contacto</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="contacto" class="form-control"
-                                        placeholder="Nombre del contacto">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="email-input">Teléfono de contacto</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="telefono_contacto" class="form-control"
-                                        placeholder="Teléfono del contacto">
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <!--######################################-hasta aqui###############################-->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="cerrarModal3()">Cerrar</button>
-                        <!-- <button type="button" class="btn btn-secondary" @click="modal3=0">Cerrar</button> -->
-                        <button type="button" v-if="tipoAccion2 == 3" class="btn btn-primary"
-                            @click="registrarIndustria()">Guardar</button>
-                        <button type="button" v-if="tipoAccion2 == 4" class="btn btn-primary"
-                            @click="actualizarIndustria()">Actualizar</button>
-                        <button type="button" v-if="tipoAccion2 == 5" class="btn btn-primary"
-                            @click="registrarMarca()">Guardar</button>
-                        <button type="button" v-if="tipoAccion2 == 6" class="btn btn-primary"
-                            @click="actualizarMarca()">Actualizar</button>
-                        <button type="button" v-if="tipoAccion2 == 7" class="btn btn-primary"
-                            @click="registrarLinea()">Guardar</button>
-                        <button type="button" v-if="tipoAccion2 == 8" class="btn btn-primary"
-                            @click="actualizarLinea()">Actializar</button>
-                        <button type="button" v-if="tipoAccion2 == 9" class="btn btn-primary"
-                            @click="registrarProveedor()">Guardar</button>
-                        <button type="button" v-if="tipoAccion2 == 10" class="btn btn-primary"
-                            @click="actualizarProveedor()">Actializar</button>
-                        <button type="button" v-if="tipoAccion2 == 11" class="btn btn-primary"
-                            @click="registrarGrupo()">Guardar</button>
-                        <button type="button" v-if="tipoAccion2 == 12" class="btn btn-primary"
-                            @click="actualizarGrupo()">Actializar</button>
-                    </div>
-                </div>
-                <!-- /.modal-content -->
-            </div>
-            <!-- /.modal-dialog -->
-        </div>
-        <!--Fin del modal-->
-        <!--######################################hasta aqui registro de industria#####################-->
-
-        <!--######################################-aqui registro de medida#####################-->
-        <div class="modal " tabindex="-1" :class="{ 'mostrar': modal7 }" role="dialog" aria-labelledby="myModalLabel"
-            style="display: none;" aria-hidden="true">
-            <div class="modal-dialog modal-primary modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" v-text="tituloModal7"></h4>
-                        <button type="button" class="close" @click="cerrarModal6()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                            <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Medida</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="descripcion_medida" class="form-control"
-                                        :placeholder="placeholderInput()">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Descripción Corta</label>
-                                <div class="col-md-9">
-                                    <input type="text" v-model="descripcion_corta" class="form-control"
-                                        :placeholder="placeholderInput()">
-                                </div>
-                            </div>
-                            <!-- prueba de habilitar  -->
-                            <div v-if="tituloModal2 == 'Medidas'" class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Estado</label>
-                                <div class="col-md-9">
-                                    <input type="checkbox" v-model="estado" v-bind:value="1" />
-                                    <span>{{ estado ? 'Habilitar' : 'Inhabilitado' }}</span>
-                                </div>
-                            </div>
-
-                            <div v-show="errorMedida" class="form-group row div-error">
-                                <div class="text-center text-error">
-                                    <div v-for="error in errorMostrarMsjMedida" :key="error" v-text="error"></div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="cerrarModal7()">Cerrar</button>
-                        <!-- <button type="button" class="btn btn-secondary" @click="modal3=0">Cerrar</button> -->
-                        <button type="button" v-if="tipoAccion6 == 6" class="btn btn-primary"
-                            @click="registrarMedida()">Guardar</button>
-                        <button type="button" v-if="tipoAccion6 == 7" class="btn btn-primary"
-                            @click="actualizarMedida()">Actualizar</button>
-                    </div>
-                </div>
-                <!-- /.modal-content -->
-            </div>
-            <!-- /.modal-dialog -->
-        </div>
-        <div class="modal " tabindex="-1" :class="{ 'mostrar': modalImportar }" role="dialog" aria-labelledby="myModalLabel"
-            style="display: none;" aria-hidden="true">
-            <div class="modal-dialog modal-primary modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Importar productos</h4>
-                        <button type="button" class="close" @click="cerrarModalImportar()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div>
-                            <form @submit.prevent="submitForm">
-                                <div v-if="pageImportar == 0">
-                                    <div class="border border-dashed border-3 p-3 text-center" style="cursor: pointer"
-                                        v-if="!selectedFile">
-                                        <label class="custom-file" for="customFile">
-                                            <i class="fa fa-cloud-upload fa-2x" aria-hidden="true"></i>
-                                            <p class="custom-file-label">Seleccionar archivo CSV</p>
-                                            <input type="file" class="custom-file-input" id="customFile" ref="fileInput"
-                                                @change="handleFileChange" />
-                                        </label>
-                                    </div>
-                                    <div v-else class="text-center">
-                                        <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
-                                        <p> {{ selectedFile.name }}</p>
-                                        <button @click="removeFile" type="button" class="btn btn-danger">Eliminar
-                                            archivo</button>
-                                        <div class="" style="display:flex;margin-top:10px;">
-                                            <label for="delimiterSelector">Selecciona el delimitador: </label>
-                                            <select class="form-control col-md-3" v-model="selectedDelimiter"
-                                                id="delimiterSelector">
-                                                <option value=";">Punto y coma (;)</option>
-                                                <option value=",">Coma (,)</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-check mt-3">
-                                            <input type="checkbox" id="headerCheckbox" class="form-check-input"
-                                                v-model="includeHeader" />
-                                            <label for="headerCheckbox" class="form-check-label">
-                                                El archivo incluye encabezados
-                                            </label>
-                                        </div>
-                                        <button type="button" @click="confirmCsv" class="btn btn-success">Confirmar</button>
-
-                                    </div>
-                                </div>
-                                <div v-if="pageImportar == 1">
-
-                                    <button @click="selectAllHeaders" type="button" class="btn btn-success mt-2">Seleccionar
-                                        Todos</button>
-                                    <div v-if="csvHeaders && csvHeaders.length > 0" class="csv-headers-container">
-                                        <p>Encabezados del archivo: </p>
-                                        <ul class="csv-headers-list">
-                                            <li v-for="(header, index) in csvHeaders" :key="index" class="csv-header">
-                                                <label>
-                                                    <input type="checkbox" v-model="selectedHeadersFromFile"
-                                                        :value="header" />
-                                                    {{ header }}
-                                                </label>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <div v-if="selectedHeadersFromFile.length > 0" style="overflow-x: auto;">
-
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th v-for="(header, index) in headersArray" :key="index">{{ header }}
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="selected-header"
-                                                        v-for="(selectedHeader, index) in selectedHeadersFromFile"
-                                                        :key="index">{{ selectedHeader }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <button @click="assignHeaders" type="button" class="btn btn-success mt-2">Asignar
-                                            Encabezados</button>
-                                    </div>
-
-
-                                </div>
-
-                                <div v-if="pageImportar == 2">
-                                    <div v-if="previewCsv && previewCsv.length > 0" class="mt-4">
-                                        <h5>Vista previa:</h5>
-                                        <p>Este contenido se importara en la base de datos</p>
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th v-for="(header, index) in headersArray" :key="index">{{ header
-                                                        }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="(row, rowIndex) in parsedPreviewCsv" :key="rowIndex">
-                                                        <td v-for="(value, columnIndex) in row" :key="columnIndex">{{ value
-                                                        }}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <!-- <button @click="downloadCsv" class="btn btn-primary mt-2">Descargar CSV</button> -->
-                                    </div>
-                                    <button v-if="selectedFile" type="submit" class="btn btn-success mt-2">Importar
-                                        CSV</button>
-                                </div>
-                                <div v-if="pageImportar == 3">
-                                    <div v-if="errorsImport.length == 0 && erroresNoExiste.length == 0 && !successImport">
-                                        <span class="loader"></span>
-                                        <h5 style="text-align:center;">Importando Datos</h5>
-                                    </div>
-                                    <div v-if="errorsImport.length > 0">
-                                        <div class="card-error">
-                                            <h4 style="text-align: center;">Error</h4>
-                                            <div
-                                                style="background-color: red; height: 2px;margin-bottom: 10px;margin-top: 10px;">
-                                            </div>
-                                            <p>No se pudo realizar la importación, verifique los datos del archivo</p>
-                                        </div>
-                                        <div v-for="(item, index) in errorsImport" :key="index">
-                                            <div class="card-error">
-                                                <i class="fa fa-exclamation-triangle" style="color:red"
-                                                    aria-hidden="true"></i>
-                                                {{ item }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div v-if="errorsImport.length == 0 && erroresNoExiste.length > 0">
-                                        <h2>Datos no encontrados en la base de datos</h2>
-                                        <table class="table">
-                                            <!-- <thead>
-        <tr>
-          <th scope="col">Elemento</th>
-        </tr>
-      </thead> -->
-                                            <tbody>
-                                                <tr v-for="(item, index) in erroresNoExiste" :key="index">
-                                                    <td
-                                                        v-html="`<span style='font-weight: bold'>${item.split(' ')[0]}</span>: ${item.split(' ').slice(1).join(' ')}`">
-                                                    </td>
-                                                </tr>
-
-                                            </tbody>
-                                        </table>
-
-                                        <div v-if="erroresNoExiste.length > 0">
-                                            <p>¿Desea registrar estos datos?</p>
-                                            <button class="btn btn-success" type="button"
-                                                @click="confirmarRegistro">Confirmar</button>
-                                            <button class="btn btn-danger" type="button"
-                                                @click="cancelarRegistro">Cancelar</button>
-                                        </div>
-                                    </div>
-                                    <div v-if="erroresNoExiste.length == 0 && errorsImport.length == 0 && successImport">
-                                        <div class="success-checkmark">
-                                            <div class="check-icon">
-                                                <span class="icon-line line-tip"></span>
-                                                <span class="icon-line line-long"></span>
-                                                <div class="icon-circle"></div>
-                                                <div class="icon-fix"></div>
-                                            </div>
-                                        </div>
-                                        <h5 style="text-align:center;">Importación exitosa</h5>
-
-
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="cerrarModalImportar()">Cerrar</button>
-                    </div>
-                </div>
-                <!-- /.modal-content -->
-            </div>
-            <!-- /.modal-dialog -->
-        </div>
 
     </main>
 </template>
@@ -1268,61 +861,8 @@ export default {
                     console.error('Error al obtener configuración de trabajo:', error);
                 });
         },
-        agregarMarca(nombre) {
-            console.log("Se registrara la marca " + nombre)
-            axios.post('/marca/registrar', {
-                'nombre': nombre,
 
-            }).then(function (response) {
-                this.registrosSuccess.push("Se registro la marca " + nombre);
 
-                console.log(response);
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-
-        agregarGrupo(nombre) {
-            console.log("Se registrara la marca " + nombre)
-
-            axios.post('/grupos/registrar', {
-                'nombre_grupo': nombre
-            }).then(function (response) {
-                this.registrosSuccess.push("Se registro el grupo " + nombre);
-
-                console.log(response)
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        agregarLinea(nombre) {
-            console.log("Se registrara la linea " + nombre)
-
-            axios.post('/categoria/registrar', {
-                'nombre': nombre,
-                'descripcion': "",
-                'codigoProductoSin': 0
-
-            }).then(function (response) {
-                this.registrosSuccess.push("Se registro la linea " + nombre);
-
-                console.log(response)
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        agregarIndustria(nombre) {
-            console.log("Se registrara la marca " + nombre)
-
-            axios.post('/industria/registrar', {
-                'nombre': nombre
-            }).then(function (response) {
-                this.registrosSuccess.push("Se registro la industria " + nombre);
-                console.log(response)
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
         confirmarRegistro() {
             this.erroresNoExiste.forEach((elemento) => {
                 const palabras = elemento.split(' ');
@@ -1378,16 +918,6 @@ export default {
             this.selectedHeadersFromFile = [...this.csvHeaders];
         },
 
-        cerrarModalImportar() {
-            this.modalImportar = 0;
-            this.pageImportar = 0;
-            this.errorsImport = [];
-            this.erroresNoExiste = [];
-            this.successImport = false;
-            this.listarArticulo(1, '', 'nombre');
-
-            this.removeFile();
-        },
 
         handleFileChange(event) {
             this.selectedFile = event.target.files[0];
@@ -1771,7 +1301,7 @@ export default {
                 this.tituloModal2 = titulo;
                 this.gruposeleccionadaVacio = false;
             }else if (titulo == "Articulo") {
-                this.listarArticulo(1, '', 'nombre');
+                this.listarArticulo(1, '', '');
                 this.modal2 = true;
                 this.tituloModal2 = titulo;
                 this.articuloseleccionadaVacio = false;
@@ -1847,55 +1377,8 @@ export default {
                     console.log(error);
                 });
         },
-        registrarProveedor() {
-            // if (this.validarPersona()){
-            //     return;
-            // }
 
-            let me = this;
-
-            axios.post('/proveedor/registrar', {
-                'nombre': this.nombre,
-                'tipo_documento': this.tipo_documento,
-                'num_documento': this.num_documento,
-                'direccion': this.direccion,
-                'telefono': this.telefono,
-                'email': this.email,
-                'contacto': this.contacto,
-                'telefono_contacto': this.telefono_contacto,
-
-            }).then(function (response) {
-                me.cerrarModal3();
-                me.listarproveedor(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        actualizarProveedor() {
-            // if (this.validarPersona()){
-            //         return;
-            // }
-
-            let me = this;
-
-            axios.put('/proveedor/actualizar', {
-                'id': this.proveedor_id,
-                'nombre': this.nombre,
-                'tipo_documento': this.tipo_documento,
-                'num_documento': this.num_documento,
-                'direccion': this.direccion,
-                'telefono': this.telefono,
-                'email': this.email,
-                'contacto': this.contacto,
-                'telefono_contacto': this.telefono_contacto,
-            }).then(function (response) {
-                me.cerrarModal3();
-                me.listarproveedor(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //--------------------hasta aqui proveedor--------
+       
         //--grupo listado ,registro y actualizar
         listargrupo(page, buscar, criterio) {
             let me = this;
@@ -1913,16 +1396,25 @@ export default {
                     console.log('ERRORES', error);
                 });
         },
-        listaReporte(){
+
+
+        listaReporte() {
             let me = this;
-            var url = '/reporte-kardex-fisico?sucursal='+this.sucursalseleccionada.id+'&articulo='+this.articuloseleccionada.id+'&fechaInicio='+this.fechaInicio+'&fechaFin='+this.fechaFin
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                me.total_saldofisico = respuesta.total_saldo;
-                me.arrayReporte = respuesta.resultados;
-                console.log("array reporte",me.arrayReporte)
-                //me.formateaKardex();
-            })
+            var url = '/reporte-kardex-fisico?';
+
+            // Agregar los parámetros obligatorios
+            url += 'sucursal=' + this.sucursalseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id +  '&grupo=' + this.gruposeleccionada.id;
+
+            // Agregar las fechas de inicio y fin
+            url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
+
+            axios.get(url)
+                .then(function (response) {
+                    var respuesta = response.data;
+                    me.total_saldofisico = respuesta.total_saldo;
+                    me.arrayReporte = respuesta.resultados;
+                    console.log("array reporte",me.arrayReporte);
+                })
                 .catch(function (error) {
                     console.log('ERRORES', error);
                 });
@@ -1952,13 +1444,13 @@ export default {
             const tableYPosition = 40;
 
             const columns = ['C.C.', 'Num Comprobante', 'Fecha', 'Detalle', 'Entrada', 'Salida', 'Saldo'];
-            const rows = this.arrayReporte.map(item => [item.tipo,
+            const rows = this.sortedResultados.map(item => [item.tipo,
                     item.num_comprobante,
                     item.fecha_hora,
                     item.tipo_comprobante,
                     item.tipo === 'Ingreso' ? item.cantidad : '',
                     item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacion,]);
+                    item.resultado_operacionFisico,]);
 
             pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
 
@@ -2007,7 +1499,7 @@ export default {
                     item.tipo_comprobante,
                     item.tipo === 'Ingreso' ? item.cantidad : '',
                     item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacion,
+                    item.resultado_operacionFisico,
                 ];
 
                 // Añadir la fila al kardex
@@ -2051,38 +1543,7 @@ export default {
 
             console.log("KARDEX",me.arrayReporte);
         },  
-        registrarGrupo() {
-            // if (this.validarPersona()){
-            //     return;
-            // }                
-            let me = this;
-
-            axios.post('/grupos/registrar', {
-                'nombre_grupo': this.nombre_grupo,
-            }).then(function (response) {
-                me.cerrarModal3();
-                me.listargrupo(1, '', 'nombre_grupo');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
         
-        actualizarGrupo() {
-            // if (this.validarPersona()){
-            //         return;
-            // }               
-            let me = this;
-
-            axios.put('/grupos/actualizar', {
-                'id': this.grupo_id,
-                'nombre_grupo': this.nombre_grupo,
-            }).then(function (response) {
-                me.cerrarModal3();
-                me.listargrupo(1, '', 'nombre_grupo');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
         //----listar precio 4_julio-------
         listarPrecio() {
             let me = this;
@@ -2192,118 +1653,8 @@ export default {
         convertDolar(precio) {
             return (precio / parseFloat(this.monedaPrincipal))
         },
-        registrarArticulo(data) {
-            let me = this;
-
-            axios.post('/articulo/registrar', data).then(function (response) {
-                console.log("Registro")
-                me.cerrarModal();
-                me.listarArticulo(1, '', 'nombre');
-                me.toastSuccess("Articulo registrado correctamente")
-
-            }).catch(function (error) {
-                console.log(error);
-                me.toastError("Hubo un error al registrar el articulo")
-            });
-
-        },
-        //---actuslizar articulo
-        actualizarArticulo(data) {
-
-            let me = this;
 
 
-
-            axios.post('/articulo/actualizar', data).then(function (response) {
-                //alert("Datos actualizados con éxito");
-                //console.log("datos actuales",formData);
-                me.cerrarModal();
-                me.listarArticulo(1, '', 'nombre');
-                me.toastSuccess("Articulo actualizado correctamente")
-                console.log(response)
-            }).catch(function (error) {
-                console.log(error);
-                me.toastError("No se puedo actualizar el articulo")
-            });
-        },
-        desactivarArticulo(id) {
-            swal({
-                title: 'Esta seguro de desactivar este artículo?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar!',
-                cancelButtonText: 'Cancelar',
-                confirmButtonClass: 'btn btn-success',
-                cancelButtonClass: 'btn btn-danger',
-                buttonsStyling: false,
-                reverseButtons: true
-            }).then((result) => {
-                if (result.value) {
-                    let me = this;
-
-                    axios.put('/articulo/desactivar', {
-                        'id': id
-                    }).then(function (response) {
-                        me.listarArticulo(1, '', 'nombre');
-                        swal(
-                            'Desactivado!',
-                            'El registro ha sido desactivado con éxito.',
-                            'success'
-                        )
-                    }).catch(function (error) {
-                        console.log(error);
-                    });
-
-
-                } else if (
-                    // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
-                ) {
-
-                }
-            })
-        },
-        activarArticulo(id) {
-            swal({
-                title: 'Esta seguro de activar este artículo?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar!',
-                cancelButtonText: 'Cancelar',
-                confirmButtonClass: 'btn btn-success',
-                cancelButtonClass: 'btn btn-danger',
-                buttonsStyling: false,
-                reverseButtons: true
-            }).then((result) => {
-                if (result.value) {
-                    let me = this;
-
-                    axios.put('/articulo/activar', {
-                        'id': id
-                    }).then(function (response) {
-                        me.listarArticulo(1, '', 'nombre');
-                        swal(
-                            'Activado!',
-                            'El registro ha sido activado con éxito.',
-                            'success'
-                        )
-                    }).catch(function (error) {
-                        console.log(error);
-                    });
-
-
-                } else if (
-                    // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
-                ) {
-
-                }
-            })
-        },
         advertenciaInactiva(nombre) {
             swal({
                 title: 'Opción Inactiva',
@@ -2323,166 +1674,7 @@ export default {
 
             });
         },
-        //#################registro industria############
-        registrarIndustria() {
-            if (this.validarIndustria()) {
-                return;
-            }
-            let me = this;
 
-            axios.post('/industria/registrar', {
-                'nombre': this.nombre,
-                'estado': this.estado
-            }).then(function (response) {
-                me.cerrarModal3();
-                //me.modal3=0;
-                console.log(response)
-                me.listarIndustria(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //#################hasta aqui####################
-        //#################Actualizar Industria####################
-        actualizarIndustria() {
-            if (this.validarIndustria()) {
-                return;
-            }
-
-            let me = this;
-
-            axios.put('/industria/actualizar', {
-                'nombre': this.nombre,
-                'estado': this.estado,
-                'id': this.industria_id
-            }).then(function (response) {
-                me.cerrarModal3();
-                me.listarIndustria(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //#################hasta aqui####################
-        //#################registro industria############
-        registrarMarca() {
-            if (this.validarIndustria()) {
-                return;
-            }
-            let me = this;
-
-            axios.post('/marca/registrar', {
-                'nombre': this.nombre,
-                'condicion': this.condicion
-            }).then(function (response) {
-                me.cerrarModal3();
-                //me.modal3=0;
-                console.log(response)
-                me.listarMarca(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //#################hasta aqui####################
-        //#################-Actualizar Industria-####################
-        actualizarMarca() {
-            if (this.validarIndustria()) {
-                return;
-            }
-            let me = this;
-
-            axios.put('/marca/actualizar', {
-                'nombre': this.nombre,
-                'condicion': this.condicion,
-                'id': this.marca_id
-            }).then(function (response) {
-                me.cerrarModal3();
-                me.listarMarca(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //#################hasta aqui####################
-        //##############registrar linea##########
-        registrarLinea() {
-            if (this.validarIndustria()) {
-                return;
-            }
-            let me = this;
-
-            axios.post('/categoria/registrar', {
-                'nombre': this.nombreLinea,
-                'condicion': this.condicion,
-                'descripcion': this.descripcion,
-                'codigoProductoSin': this.codigoProductoSin
-            }).then(function (response) {
-                me.cerrarModal3();
-                //me.modal3=0;
-                console.log(response)
-                me.listarLinea(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //#################hasta aqui####################
-        actualizarLinea() {
-            if (this.validarIndustria()) {
-                return;
-            }
-            let me = this;
-
-            axios.put('/categoria/actualizar', {
-                'nombre': this.nombreLinea,
-                'condicion': this.condicion,
-                'descripcion': this.descripcion,
-                'codigoProductoSin': this.codigoProductoSin,
-                'id': this.linea_id
-            }).then(function (response) {
-                me.cerrarModal3();
-                me.listarLinea(1, '', 'nombre');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-
-        //#################registro medida############
-        registrarMedida() {
-            if (this.validarMedida()) {
-                return;
-            }
-            let me = this;
-
-            axios.post('/medida/registrar', {
-                'descripcion_medida': this.descripcion_medida,
-                'descripcion_corta': this.descripcion_corta,
-                'estado': this.estado
-            }).then(function (response) {
-                me.cerrarModal7();
-                console.log(response)
-                me.listarMedida(1, '', 'descripcion_medida');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        //#################hasta aqui####################
-        actualizarMedida() {
-            if (this.validarMedida()) {
-                return;
-            }
-
-            let me = this;
-
-            axios.put('/medida/actualizar', {
-                'descripcion_medida': this.descripcion_medida,
-                'descripcion_corta': this.descripcion_corta,
-                'estado': this.estado,
-                'id': this.medida_id
-            }).then(function (response) {
-                me.cerrarModal7();
-                me.listarMedida(1, '', 'descripcion_medida');
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
         //#################hasta aqui####################
         validarArticulo() {
             this.errorArticulo = 0;
@@ -2535,6 +1727,7 @@ export default {
             this.gruposeleccionadaVacio = false;
             this.medidaseleccionadaVacio = false;
             this.sucursalseleccionadaVacio = false;
+            this.articuloseleccionadaVacio = false;
             //
             this.codigo = '';
             this.nombre_producto = '';
@@ -2552,7 +1745,8 @@ export default {
             this.proveedorseleccionada.nombre = '';
             this.gruposeleccionada.nombre_grupo = '';
             this.medidaseleccionada.descripcion_medida = '';
-            this.lineaseleccionada.nombre = '';
+            //this.articuloseleccionada.nombre = '';
+            this.sucursalseleccionada.nombre = '';
             this.errorArticulo = 0;
 
             this.idmedida = 0;
@@ -2562,7 +1756,7 @@ export default {
             this.precio_dos = 0;
             this.precio_tres = 0;
             this.precio_cuatro = 0;
-
+            
             // unidad_envaseVacio: false,
             // nombre_genericoVacio: false,
             // precio_costo_unidVacio: false,
@@ -2581,6 +1775,14 @@ export default {
             // medidaseleccionadaVacio: false,
         },
         abrirModal(modelo, accion, data = []) {
+            this.sucursalseleccionada = false;
+            this.articuloseleccionada = false;
+            this.gruposeleccionada = false;
+            this.lineaseleccionada = false;
+            this.marcaseleccionada = false;
+            this.industriaseleccionada = false;
+            this.fechaInicio = '';
+            this.fechaFin ='';
             switch (modelo) {
                 case "articulo":
                     {
@@ -3047,6 +2249,8 @@ export default {
         this.obtenerConfiguracionTrabajo();
         this.listarArticulo(1, this.buscar, this.criterio);
         this.listarPrecio();//aumenTe 6julio
+        this.listaReporte();
+
     }
 }
 </script>

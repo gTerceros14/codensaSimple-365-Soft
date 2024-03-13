@@ -82,7 +82,7 @@ class ArticuloController extends Controller
                     'articulos.codigo_alfanumerico',
                     'articulos.descripcion_fabrica'
                 )
-                ->orderBy('articulos.id', 'desc')->paginate(3);
+                ->orderBy('articulos.id', 'desc')->paginate(6);
         } else {
             $articulos = Articulo::join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
                 ->join('personas', 'proveedores.id', '=', 'personas.id')
@@ -124,7 +124,7 @@ class ArticuloController extends Controller
                     'articulos.descripcion_fabrica'
                 )
                 ->where('articulos.' . $criterio, 'like', '%' . $buscar . '%')
-                ->orderBy('articulos.id', 'desc')->paginate(3);
+                ->orderBy('articulos.id', 'desc')->paginate(6);
         }
 
 
@@ -560,7 +560,7 @@ class ArticuloController extends Controller
                 $query->where('articulos.' . $criterio, 'like', '%' . $buscar . '%');
             });
         }
-        $articulos = $articulos->orderBy('articulos.id', 'desc')->paginate(4);
+        $articulos = $articulos->orderBy('articulos.id', 'desc')->paginate(6);
         return [
             'pagination' => [
                 'total' => $articulos->total(),

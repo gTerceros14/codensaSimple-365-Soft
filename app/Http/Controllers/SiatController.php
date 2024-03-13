@@ -23,12 +23,12 @@ class SiatController extends Controller
         if ($buscar==''){
             $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
             ->select('facturas.*','personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
-            ->orderBy('facturas.id', 'desc')->paginate(3);
+            ->orderBy('facturas.id', 'desc')->paginate(6);
         }
         else{
             $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
             ->select('facturas.*','personas.nombre', 'personas.email', 'personas.num_documento', 'personas.complemento.id')
-            ->orderBy('facturas.id', 'desc')->paginate(3);
+            ->orderBy('facturas.id', 'desc')->paginate(6);
         }
         
 
@@ -50,7 +50,7 @@ class SiatController extends Controller
             $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
             ->select('facturas.*','personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
             ->where('facturas.id', '=', $id)
-            ->orderBy('facturas.id', 'desc')->paginate(3);
+            ->orderBy('facturas.id', 'desc')->paginate(6);
 
         return [    
             'facturas' => $facturas

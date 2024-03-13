@@ -31,7 +31,7 @@ class OfertaController extends Controller
         $ofertas = $query->where('tipo_promocion', 1)
             ->withCount('promocionArticulos as cantidad_articulos')
             ->orderBy('id', 'desc')
-            ->paginate(3);
+            ->paginate(6);
 
         return response()->json([
             'pagination' => [
@@ -64,7 +64,7 @@ class OfertaController extends Controller
         $ofertas = $query->where('tipo_promocion', 0)
             ->withCount('promocionArticulos as cantidad_articulos')
             ->orderBy('id', 'desc')
-            ->paginate(3);
+            ->paginate(6);
 
         return response()->json([
             'pagination' => [

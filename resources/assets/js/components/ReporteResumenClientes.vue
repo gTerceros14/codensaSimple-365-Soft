@@ -28,9 +28,10 @@
 
                         <div class="col-md-2">
                             <div class="form-group">
-                                <label>EJECUTIVOS(*)</label>
+                                <label>VENDEDORES(*)</label>
                                 <select class="form-control" v-model="vendedorId" @change="">
                                     <option value="0" disabled>Seleccione</option>
+                                    <option value="todos">TODOS</option>
                                     <option v-for="opcion in arrayEjecutivos" :key="opcion.id" :value="opcion.id">{{ opcion.nombre }}</option>
                                 </select>
                             </div>
@@ -40,6 +41,7 @@
                                 <label>SUCURSAL(*)</label>
                                 <select class="form-control" v-model="sucursalId" @change="">
                                     <option value="0" disabled>Seleccione</option>
+                                    <option value="todos">TODOS</option>
                                     <option v-for="opcion in arraySucursales" :key="opcion.id" :value="opcion.id">{{ opcion.nombre }}</option>
                                 </select>
                             </div>
@@ -62,76 +64,39 @@
                                     <tr>
                                         <th>Codigo</th>
                                         <th>Nombre cliente</th>
-                                        <th>Saldo anterior</th>
+                                        <th>Num Documento</th>
                                         <th>Ventas</th>
                                         <th>Cobros</th>
-                                        <th>Diferencia</th>
-                                        <th>Saldo actual</th>
+                                        <th>Total cuotas</th>
+                                        <th>Saldo Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr  v-for="cliente in clientes" :key="cliente.id_cliente">
-                                        <td>{{ cliente.id_cliente }}</td>
-                                        <td>{{ cliente.nombre_cliente }}</td>
-                                        <td>{{ cliente.precio_cuota }}</td>
-                                        <td>{{ cliente.total }}</td>
-                                        <td>{{ cliente.total_cancelado }}</td>
-                                        <td>{{ cliente.total - cliente.total_cancelado }}</td>
-                                        <td>{{ cliente.saldo }}</td>
+                                        <td>{{ cliente.cliente_id }}</td>
+                                        <td>{{ cliente.cliente_nombre }}</td>
+                                        <td>{{ cliente.num_documento }}</td>
+                                        <td>{{ cliente.total_ventas }}</td>
+                                        <td>{{ cliente.cobros }}</td>
+                                        <td>{{ cliente.numero_cuotas }}</td>
+                                        <td>{{ cliente.total_deuda }}</td>
                                     </tr>
                                 </tbody>
                         </table>
 
-                        <nav>
-                            <ul class="pagination">
-                                <li v-if="clientes.prev_page_url">
-                                    <a href="#" @click.prevent="fetchData(clientes.prev_page_url)">Anterior</a>
-                                </li>
-                                <li v-for="page in clientes.links" :key="page.url" :class="{ 'active': page.active }">
-                                    <a href="#" @click.prevent="fetchData(page.url)">{{ page.label }}</a>
-                                </li>
-                                <li v-if="clientes.next_page_url">
-                                    <a href="#" @click.prevent="fetchData(clientes.next_page_url)">Siguiente</a>
-                                </li>
-                            </ul>
-                        </nav>
-
                         <br>
                         <div class="text-right">
-                            <strong>Total Saldo Anterior: </strong>Bs. {{ calcularTotal('precio_cuota') }}
+                            <strong>Total Ventas: </strong>Bs. {{ calcularTotal('total_ventas') }}
                         </div>
                         <div class="text-right">
-                            <strong>Total Ventas: </strong>Bs. {{ calcularTotal('total') }}
+                            <strong>Total Cobros: </strong>Bs. {{ calcularTotalCobros() }}
                         </div>
                         <div class="text-right">
-                            <strong>Total Cobros: </strong>Bs. {{ calcularTotal('total_cancelado') }}
+                            <strong>Total Cuotas: </strong> {{ calcularTotal('numero_cuotas') }}
                         </div>
                         <div class="text-right">
-                            <strong>Total Diferencia: </strong>Bs. {{ calcularTotalDiferencia() }}
+                            <strong>Saldo Total: </strong>Bs. {{ calcularTotal('total_deuda') }}
                         </div>
-                        <div class="text-right">
-                            <strong>Total Saldo Actual: </strong>Bs. {{ calcularTotal('saldo') }}
-                        </div>
-
-                        
-
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item" v-if="pagination.current_page > 1">
-                                    <a class="page-link" href="#"
-                                        @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
-                                </li>
-                                <li class="page-item" v-for="page in pagesNumber" :key="page"
-                                    :class="[page == isActived ? 'active' : '']">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                        v-text="page"></a>
-                                </li>
-                                <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                    <a class="page-link" href="#"
-                                        @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
-                                </li>
-                            </ul>
-                        </nav> 
 
                         <hr>
                         <div class="d-flex justify-content-between mt-3">
@@ -164,11 +129,11 @@ data() {
         offset: 3,
         currentPage: 1,
         
-        SucursalSeleccionado : 0,
         arraySucursales : [],
         arrayEjecutivos : [],
 
         clientes: [],
+        filtrosSeleccionados: [],
         vendedorId: null,
         sucursalId: null,
         fechaInicio: '2024-01-01',
@@ -208,11 +173,14 @@ methods: {
             return total + (+cliente[campo]);
         }, 0);
     },
-    calcularTotalDiferencia() {
+
+    calcularTotalCobros() {
         return this.clientes.reduce((total, cliente) => {
-            return total + (cliente.total - cliente.total_cancelado);
+            const cobros = cliente.total_deuda === 0 ? cliente.total_ventas : (cliente.total_ventas - cliente.total_deuda);
+            return total + Number(cobros);
         }, 0);
     },
+
 
     selectSucursal() {
         let me = this;
@@ -220,7 +188,7 @@ methods: {
         axios.get(url).then(function (response) {
             var respuesta = response.data;
             me.arraySucursales = respuesta.sucursales;
-            console.log('ALAMCEN',me.arraySucursales);
+            console.log('SUCURSAL',me.arraySucursales);
         })
         .catch(function (error) {
             console.log(error);
@@ -241,19 +209,31 @@ methods: {
 
     obtenerClientesPorVendedor() {
         let me = this;
-        var url = '/cliente/clientesPorVendedor?vendedorId=' + this.vendedorId + '&sucursalId=' + this.sucursalId + '&fechaInicio=' + this.fechaInicio  + '&fechaFin=' + this.fechaFin;
+        
+        if (this.vendedorId == null) {
+            this.vendedorId = 'todos';
+        }
+        
+        if (this.sucursalId == null) {
+            this.sucursalId = 'todos';
+        }
+        
+        var url = '/reporte-resumen-clientes?vendedorId=' + this.vendedorId + '&sucursalId=' + this.sucursalId + '&fechaInicio=' + this.fechaInicio  + '&fechaFin=' + this.fechaFin;
         
         axios.get(url).then(function (response) {
             var respuesta = response.data;
             me.clientes = respuesta.clientes;
+            me.filtrosSeleccionados = respuesta.filtros;
+
             console.log('CLIENTES: ', me.clientes);
+            console.log('FILTROS: ', me.filtrosSeleccionados);
         })
         .catch(function (error) {
             console.log(error);
         });
         },
 
-        exportarExcel() {
+    exportarExcel() {
         const workbook = XLSX.utils.book_new();
         const worksheet = XLSX.utils.aoa_to_sheet([]);
 
@@ -268,7 +248,7 @@ methods: {
         const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
         worksheet['A2'] = { t: 's', v: `Fecha: ${new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' })}`, s: fechaStyle };
 
-        const headers = ['Fecha Venta', 'Nombre Cliente', 'Tipo Comprobante', 'Total', 'Impuesto', 'Precio Cuota', 'Total Cancelado', 'Saldo'];
+        const headers = ['Codigo Cliente', 'Nombre Cliente', 'Num Documento', 'Total Ventas', 'Cobros', 'Num Cuotas', 'Total Deuda'];
         const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
 
         headers.forEach((header, index) => {
@@ -276,62 +256,14 @@ methods: {
         });
 
         for (let i = 0; i < this.clientes.length; i++) {
-            const { fecha_venta, nombre_cliente, tipo_comprobante, total, impuesto, precio_cuota, total_cancelado, saldo } = this.clientes[i];
-            const rowData = [fecha_venta, nombre_cliente, tipo_comprobante, total, impuesto, precio_cuota, total_cancelado, saldo];
+            const { cliente_id, cliente_nombre, num_documento, total_ventas, cobros, numero_cuotas, total_deuda } = this.clientes[i];
+            const rowData = [cliente_id, cliente_nombre, num_documento, total_ventas, cobros, numero_cuotas, total_deuda ];
             XLSX.utils.sheet_add_aoa(worksheet, [rowData], { origin: `A${startRow + i}` });
         }
 
         const columnWidths = [
             { wch: 25 },
             { wch: 25 },
-            { wch: 20 },
-            { wch: 12 },
-            { wch: 10 },
-            { wch: 12 },
-            { wch: 15 },
-            { wch: 15 }
-        ];
-        worksheet['!cols'] = columnWidths;
-
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Resumen de clientes');
-
-        XLSX.writeFile(workbook, 'resumen_clientes.xlsx');
-    },
-
-
-
-    exportarExcel2() {
-        const workbook = XLSX.utils.book_new();
-        const worksheet = XLSX.utils.aoa_to_sheet([]);
-
-        const startRow = 5;
-
-        worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
-        worksheet['A1'] = { t: 's', v: 'RESUMEN DE CLIENTES', s: { 
-            font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
-            alignment: { horizontal: 'center', vertical: 'center' },
-            fill: { fgColor: { rgb: '3669a8' } } } };
-
-        const fechaStyle = { font: { bold: true, color: { rgb: '000000' } }, border: { top: { style: 'thin', color: { auto: 1 } }, right: { style: 'thin', color: { auto: 1 } }, bottom: { style: 'thin', color: { auto: 1 } }, left: { style: 'thin', color: { auto: 1 } } } };
-        worksheet['A2'] = { t: 's', v: `Fecha: ${new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' })}`, s: fechaStyle };
-
-        const headers = ['Fecha Venta', 'Nombre Cliente', 'ID Cliente', 'ID Vendedor', 'Tipo Comprobante', 'Total', 'Impuesto', 'Precio Cuota', 'Total Cancelado', 'Saldo'];
-        const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
-
-        headers.forEach((header, index) => {
-            worksheet[XLSX.utils.encode_cell({ r: 3, c: index })] = { t: 's', v: header, s: headerStyle };
-        });
-
-        for (let i = 0; i < this.clientes.length; i++) {
-            const rowData = Object.values(this.clientes[i]);
-            XLSX.utils.sheet_add_aoa(worksheet, [rowData], { origin: `A${startRow + i}` });
-        }
-
-        const columnWidths = [
-            { wch: 25 },
-            { wch: 25 },
-            { wch: 10 },
-            { wch: 10 },
             { wch: 20 },
             { wch: 12 },
             { wch: 10 },
@@ -365,8 +297,8 @@ methods: {
 
         const tableYPosition = 30;
 
-        const columns = ['Codigo', 'Nombre cliente', 'Saldo anterior', 'Ventas', 'Cobros', 'Diferencia', 'Saldo actual'];
-        const rows = this.clientes.map(datos => [datos.id_cliente, datos.nombre_cliente, datos.precio_cuota, datos.total, datos.total_cancelado, (datos.total - datos.total_cancelado), datos.saldo]);
+        const columns = ['Codigo Cliente', 'Nombre cliente', 'Num Documento', 'Total Ventas', 'Cobros', 'Num Cuotas', 'Total Deuda'];
+        const rows = this.clientes.map(datos => [datos.cliente_id, datos.cliente_nombre, datos.num_documento, datos.total_ventas, datos.cobros, datos.numero_cuotas, datos.total_deuda]);
         pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
 
         pdf.setFont('helvetica');
@@ -377,7 +309,7 @@ methods: {
 mounted() {
         this.selectSucursal();
         this.selectEjecutivos();
-        //this.obtenerClientesPorVendedor();
+        this.obtenerClientesPorVendedor();
     },
 }
 </script>

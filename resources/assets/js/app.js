@@ -26,10 +26,13 @@ Vue.component(
   require("./components/dashboard/TopVendedores.vue")
 );
 Vue.component("TopClientes", require("./components/dashboard/TopClientes.vue"));
+Vue.component("ventacredito", require("./components/VentaCredito.vue"));
 Vue.component(
   "TopArticulos",
   require("./components/dashboard/TopArticulos.vue")
 );
+
+Vue.component("AbonarCuota", require("./components/creditos/AbonarCuota.vue"));
 
 Vue.component("icon-button", require("./components/buttons/IconButton.vue"));
 
@@ -157,9 +160,46 @@ Vue.component(
   require("./components/ReporteVentasDiarias.vue")
 );
 
-Vue.component("reportekardexfisicovalorado",require("./components/ReporteKardexFisicoValorado.vue"));
-Vue.component("reportekardexfisico",require("./components/ReporteKardexFisico.vue"));
-Vue.component("resumenclientes",require("./components/ReporteResumenClientes.vue"));
+Vue.component(
+  "reportekardexfisicovalorado",
+  require("./components/ReporteKardexFisicoValorado.vue")
+);
+Vue.component(
+  "reportekardexfisico",
+  require("./components/ReporteKardexFisico.vue")
+);
+Vue.component(
+  "resumenclientes",
+  require("./components/ReporteResumenClientes.vue")
+);
+Vue.component(
+  "kardexclientesdetalladoglobal",
+  require("./components/ReporteKardexClientesDetalleGlobal.vue")
+);
+Vue.component(
+  "kardexclientesresumenglobal",
+  require("./components/ReporteKardexClientesResumenGlobal.vue")
+);
+Vue.component(
+  "resumenventaxdocumento",
+  require("./components/ReporteResumenVentasXDocumento.vue")
+);
+
+Vue.component(
+  "resumenventaxproducto",
+  require("./components/ReporteResumenVentasXProducto.vue")
+);
+
+Vue.component(
+  "resumenfisico",
+  require("./components/ReporteResumenFisico.vue")
+);
+
+Vue.component(
+  "reportefisicomovimientos",
+  require("./components/ReporteDetalladoFisicoMovimientos.vue")
+);
+
 
 Vue.component(
   "ventasinstitucionales",
@@ -175,6 +215,17 @@ Vue.component(
   "reporteventas",
   require("./components/ReporteVentasDiarias.vue")
 );
+
+Vue.component(
+  "reporteventasdetallado",
+  require("./components/ReporteVentasDetallado.vue")
+);
+
+Vue.component(
+  "reporteinventariofisicovalorado",
+  require("./components/ReporteInventarioFisicoValorado.vue")
+);
+
 Vue.component(
   "ventasinstitucionales",
   require("./components/VentasInstitucionales.vue")

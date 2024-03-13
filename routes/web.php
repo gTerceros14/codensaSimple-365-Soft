@@ -15,7 +15,6 @@ Route::group(['middleware' => ['guest']], function () {
     Route::get('/', 'Auth\LoginController@showLoginForm');
     Route::post('/', 'Auth\LoginController@login')->name('login');
 });
-
 Route::group(['middleware' => ['auth']], function () {
 
     Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
@@ -139,7 +138,6 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/cliente/actualizar', 'ClienteController@update');
         Route::get('/cliente/selectCliente', 'ClienteController@selectCliente');
         Route::get('/cliente/listarReporteClienteExcel', 'ClienteController@listarReporteClienteExcel');
-        Route::get('/cliente/clientesPorVendedor', 'ClienteController@clientesPorVendedor');
 
         Route::get('/cliente/selectUusarioVend', 'ClienteController@selectUsuarioVendedor');
         Route::get('/cliente/usuario', 'ClienteController@indexUsuario');
@@ -170,6 +168,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/credito/registrar', 'CreditoVentaController@store');
         Route::put('/credito/actualizar', 'CreditoVentaController@update');
         Route::get('/credito/eliminar', 'CreditoVentaController@destroy');
+        Route::post('/credito/cuotas', 'CreditoVentaController@obtenerCuotasCredito');
+        Route::post('/credito/cuotas/registrar', 'CreditoVentaController@registrarPagoCuota');
+        Route::get('/credito/cuotas/venta/{idventa}', 'CreditoVentaController@obtenerCreditoYCuotas');
         // cuota_credito
         Route::get('/cuota', 'CuotasCreditoController@index');
         Route::post('/cuota/registrar', 'CuotasCreditoController@store');
@@ -394,12 +395,19 @@ Route::group(['middleware' => ['auth']], function () {
         //REPORTES
         Route::get('/ventas-diarias', 'VentaController@reporteVentasDiarias');
         Route::get('/reporte-almacen', 'InventarioController@reporteAlmacenes');
-        Route::get('/reporte-kardex-fisico-valorado','ReporteKardexFisicoInventarioController@generarReporte');
+        Route::get('/reporte-kardex-fisico-valorado', 'ReporteKardexFisicoInventarioController@generarReporte');
         Route::get('/reporte-kardex-fisico', 'ReporteKardexFisicoInventarioController@generarReporteFisico');
         Route::get('/top-vendedores', 'VentaController@topVendedores');
         Route::get('/top-clientes', 'VentaController@topClientes');
         Route::get('/top-articulos', 'VentaController@topProductos');
-        
+        Route::get('/resumen-ventas-documento','ReportesVentas@ResumenVentasPorDocumento');
+        Route::get('/reporte-resumen-clientes', 'ReporteResumenClientesController@clientesPorVendedor');
+        Route::get('/kardex-clientes-detallado-global', 'ReporteKardexClientesDetalladoGlobalController@articulosPorCliente');
+        Route::get('/kardex-clientes-resumen-global', 'ReporteKardexClientesResumenGlobalController@ventasPorCliente');
+        Route::get('/reporte-ventas-producto', 'ReportesVentas@ventasPorProducto');
+        Route::get('/reporte-resumen-fisico-movimientos', 'ReportesVentas@resumenFisicoMovimientos');
+        Route::get('/resumen-ventas-documento-detallado','ReportesVentas@ResumenVentasPorDocumentoDetallado');
+        Route::get('/reporte-inventario-fisico-valorado/{tipo}','ReportesInventariosController@inventarioFisicoValorado');
 
 
 

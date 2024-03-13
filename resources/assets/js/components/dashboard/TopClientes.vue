@@ -38,7 +38,7 @@
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ cliente.nombreCliente }}</td>
                     <td>{{ cliente.cantidadCompras }}</td>
-                    <td>{{ cliente.totalGastado }}</td>
+                    <td>{{ (cliente.totalGastado*moneda[0]).toFixed(2) }} {{ moneda[1] }}</td>
                 </tr>
             </tbody>
         </table>
@@ -62,7 +62,11 @@ export default {
         fechaFin: {
             type: String,
             required: true
-        }
+        },
+        moneda: {
+            type: Array,
+            required: true
+        },
     },
     data() {
         return {

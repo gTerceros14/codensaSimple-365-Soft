@@ -15,10 +15,10 @@ class RolController extends Controller
         $criterio = $request->criterio;
         
         if ($buscar==''){
-            $roles = Rol::orderBy('id', 'desc')->paginate(3);
+            $roles = Rol::orderBy('id', 'desc')->paginate(6);
         }
         else{
-            $roles = Rol::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(3);
+            $roles = Rol::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(6);
         }
         
 

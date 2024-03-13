@@ -20,9 +20,9 @@ class GrupoController extends Controller
         //$criterio = $request->criterio;
         
         if ($buscar == '') {
-            $grupos = Grupo::orderBy('id', 'desc')->paginate(3);
+            $grupos = Grupo::orderBy('id', 'desc')->paginate(6);
         } else {
-            $grupos = Grupo::where('nombre_grupo', 'like', '%' . $buscar . '%')->orderBy('id', 'desc')->paginate(3);
+            $grupos = Grupo::where('nombre_grupo', 'like', '%' . $buscar . '%')->orderBy('id', 'desc')->paginate(6);
         }
         
 

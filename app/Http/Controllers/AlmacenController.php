@@ -25,7 +25,7 @@ class AlmacenController extends Controller
                 return $query->where('personas.nombre', 'like', '%' . $buscar . '%');
             })
             ->orderBy('almacens.id', 'desc')
-            ->paginate(3);
+            ->paginate(6);
 
         return [
             'pagination' => [

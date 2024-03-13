@@ -7,160 +7,99 @@ use Illuminate\Support\Facades\DB;
 
 class ReporteKardexFisicoInventarioController extends Controller
 {
-    public function generarReporte(Request $request){
-        $idarticulo = $request->articulo;
-        $idmarca = $request->marca;
-        $idlinea = $request->linea;
-        $idindustria = $request->industria;
-        $idgrupo = $request->grupo;
+    public function generarReporte(Request $request) {
+        // Obtener los parámetros de la solicitud
         $fechainicio = $request->fechainicio;
         $fechafin = $request->fechafin;
         $fechaInicioCompleta = $fechainicio . ' 00:00:00';
         $fechaFinCompleta = $fechafin . ' 23:59:59';
-        if ($idarticulo!=''){
-            $ingresos = DB::table('ingresos')
-                ->join('detalle_ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
-                ->join('articulos','detalle_ingresos.idarticulo','=', 'articulos.id')
-                ->select(DB::raw("'Ingreso' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ingresos.precio AS precio_ingreso')
-                ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59'])
-                ->where('articulos.id' , $idarticulo);
-
-            $ventas = DB::table('ventas')
-                ->join('detalle_ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
-                ->join('articulos','detalle_ventas.idarticulo','=', 'articulos.id')
-                ->select(DB::raw("'Venta' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ventas.precio  AS precio_venta')
-                ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59'])
-                ->where('articulos.id' , $idarticulo);
-            if($idmarca !=''){
-                $ingresos = DB::table('ingresos')
-                    ->join('detalle_ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
-                    ->join('articulos','detalle_ingresos.idarticulo','=', 'articulos.id')
-                    ->select(DB::raw("'Ingreso' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ingresos.precio AS precio_ingreso')
-                    ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59'])
-                    ->where('articulos.id' , $idarticulo)
-                    ->where('articulos.idmarca' , $idmarca);
-
-                $ventas = DB::table('ventas')
-                    ->join('detalle_ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
-                    ->join('articulos','detalle_ventas.idarticulo','=', 'articulos.id')
-                    ->select(DB::raw("'Venta' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ventas.precio  AS precio_venta')
-                    ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59'])
-                    ->where('articulos.id' , $idarticulo)
-                    ->where('articulos.idmarca' , $idmarca);
-            }
-            if ($idlinea !=''){
-                $ingresos = DB::table('ingresos')
-                    ->join('detalle_ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
-                    ->join('articulos','detalle_ingresos.idarticulo','=', 'articulos.id')
-                    ->select(DB::raw("'Ingreso' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ingresos.precio AS precio_ingreso')
-                    ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59'])
-                    ->where('articulos.id' , $idarticulo)
-                    ->where('articulos.idmarca' , $idmarca)
-                    ->where('articulos.idcategoria' , $idlinea);
-
-                $ventas = DB::table('ventas')
-                    ->join('detalle_ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
-                    ->join('articulos','detalle_ventas.idarticulo','=', 'articulos.id')
-                    ->select(DB::raw("'Venta' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ventas.precio  AS precio_venta')
-                    ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59'])
-                    ->where('articulos.id' , $idarticulo)
-                    ->where('articulos.idmarca' , $idmarca)
-                    ->where('articulos.idcategoria' , $idlinea);
-            }
-            if ($idindustria !=''){
-                $ingresos = DB::table('ingresos')
-                    ->join('detalle_ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
-                    ->join('articulos','detalle_ingresos.idarticulo','=', 'articulos.id')
-                    ->select(DB::raw("'Ingreso' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ingresos.precio AS precio_ingreso')
-                    ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59'])
-                    ->where('articulos.id' , $idarticulo)
-                    ->where('articulos.idmarca' , $idmarca)
-                    ->where('articulos.idcategoria' , $idlinea)
-                    ->where('articulos.idindustria' , $idindustria);
-
-                $ventas = DB::table('ventas')
-                    ->join('detalle_ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
-                    ->join('articulos','detalle_ventas.idarticulo','=', 'articulos.id')
-                    ->select(DB::raw("'Venta' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ventas.precio  AS precio_venta')
-                    ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59'])
-                    ->where('articulos.id' , $idarticulo)
-                    ->where('articulos.idmarca' , $idmarca)
-                    ->where('articulos.idcategoria' , $idlinea)
-                    ->where('articulos.idindustria' , $idindustria);
-            }
-            if ($idgrupo !=''){
-                $ingresos = DB::table('ingresos')
-                    ->join('detalle_ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
-                    ->join('articulos','detalle_ingresos.idarticulo','=', 'articulos.id')
-                    ->select(DB::raw("'Ingreso' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ingresos.precio AS precio_ingreso')
-                    ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59'])
-                    ->where('articulos.id' , $idarticulo)
-                    ->where('articulos.idmarca' , $idmarca)
-                    ->where('articulos.idcategoria' , $idlinea)
-                    ->where('articulos.idindustria' , $idindustria)
-                    ->where('articulos.idgrupo' , $idgrupo);
-
-                $ventas = DB::table('ventas')
-                    ->join('detalle_ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
-                    ->join('articulos','detalle_ventas.idarticulo','=', 'articulos.id')
-                    ->select(DB::raw("'Venta' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ventas.precio  AS precio_venta')
-                    ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59'])
-                    ->where('articulos.id' , $idarticulo)
-                    ->where('articulos.idmarca' , $idmarca)
-                    ->where('articulos.idcategoria' , $idlinea)
-                    ->where('articulos.idindustria' , $idindustria)
-                    ->where('articulos.idgrupo' , $idgrupo);
-            }
-        }
-       
-
     
+        // Iniciar las consultas
+        $ingresos = DB::table('ingresos')
+            ->join('detalle_ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
+            ->join('articulos','detalle_ingresos.idarticulo','=', 'articulos.id')
+            ->join('almacens','almacens.encargado','=','ingresos.idusuario')
+            ->join('sucursales','sucursales.id','=','almacens.sucursal')
+            ->select(DB::raw("'Ingreso' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ingresos.precio AS precio_ingreso')
+            ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59']);
+            
     
-    // Realizar la consulta
-    $ingresos = $ingresos->get();
-    $ventas = $ventas->get();
-
-    // Combinar los resultados de ingresos y ventas
-    $resultados = $ingresos->concat($ventas)->sortBy('fecha_hora');
-
-    // Calcular el saldo
-    $saldo = 0;
-    $saldoFisico = 0;
-    /*foreach ($resultados as &$resultado) {
-        if ($resultado->tipo === 'Ingreso') {
-            $saldo += $resultado->cantidad;
-        } else {
-            $saldo -= $resultado->cantidad;
+        $ventas = DB::table('ventas')
+            ->join('detalle_ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
+            ->join('articulos','detalle_ventas.idarticulo','=', 'articulos.id')
+            ->join('users','ventas.idusuario','=','users.id')
+            ->join('sucursales','users.idsucursal','=','sucursales.id')
+            ->select(DB::raw("'Venta' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ventas.precio  AS precio_venta')
+            ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59']);
+            
+    
+        if ($request->has('articulo') && $request->articulo !== 'undefined') {
+            $idarticulo = $request->articulo;
+            $ingresos->where('articulos.id' , $idarticulo);
+            $ventas->where('articulos.id' , $idarticulo);
         }
-        $resultado->resultado_operacion = $saldo;
-    }*/
-
-    foreach ($resultados as &$resultado) {
-        if ($resultado->tipo === 'Ingreso') {
-            $resultado->subtotal = $resultado->cantidad * $resultado->precio_ingreso;
-            $saldo += $resultado->subtotal;
-            $saldoFisico += $resultado->cantidad;
-        } else {
-            $resultado->subtotal = $resultado->cantidad * $resultado->precio_venta;
-            $saldo -= $resultado->subtotal;
-            $saldoFisico -= $resultado->cantidad;
+        if ($request->has('sucursal') && $request->sucursal !== 'undefined') {
+            $sucursal = $request->sucursal;
+            $ingresos->where('sucursales.id', $sucursal);
+            $ventas->where('sucursales.id', $sucursal);
         }
-        $resultado->resultado_operacionValorado = $saldo;
-        $resultado->resultado_operacionFisico = $saldoFisico;
+        // Agregar filtros opcionales si se proporcionan otros parámetros
+        if ($request->has('marca') && $request->marca !== 'undefined') {
+            $idmarca = $request->marca;
+            $ingresos->where('articulos.idmarca' , $idmarca);
+            $ventas->where('articulos.idmarca' , $idmarca);
+        }
+        if ($request->has('linea') && $request->linea !== 'undefined') {
+            $idlinea = $request->linea;
+            $ingresos->where('articulos.idcategoria' , $idlinea);
+            $ventas->where('articulos.idcategoria' , $idlinea);
+        }
+        if ($request->has('industria') && $request->industria !== 'undefined') {
+            $idindustria = $request->industria;
+            $ingresos->where('articulos.idindustria' , $idindustria);
+            $ventas->where('articulos.idindustria' , $idindustria);
+        }
+        if ($request->has('grupo') && $request->grupo !== 'undefined') {
+            $idgrupo = $request->grupo;
+            $ingresos->where('articulos.idgrupo' , $idgrupo);
+            $ventas->where('articulos.idgrupo' , $idgrupo);
+        }
+    
+        // Realizar las consultas
+        $ingresos = $ingresos->get();
+        $ventas = $ventas->get();
+    
+        // Combinar los resultados de ingresos y ventas
+        $resultados = $ingresos->concat($ventas)->sortBy('fecha_hora');
+    
+        // Calcular el saldo
+        $saldo = 0;
+        $saldoFisico = 0;
+    
+        foreach ($resultados as &$resultado) {
+            if ($resultado->tipo === 'Ingreso') {
+                $resultado->subtotal = $resultado->cantidad * $resultado->precio_ingreso;
+                $saldo += $resultado->subtotal;
+                $saldoFisico += $resultado->cantidad;
+            } else {
+                $resultado->subtotal = $resultado->cantidad * $resultado->precio_venta;
+                $saldo -= $resultado->subtotal;
+                $saldoFisico -= $resultado->cantidad;
+            }
+            $resultado->resultado_operacionValorado = $saldo;
+            $resultado->resultado_operacionFisico = $saldoFisico;
+        }
+        $total_saldo = $saldoFisico; // Total físico como saldo total
+    
+        return ['resultados' => $resultados, 'total_saldo' => $total_saldo];
     }
-    $total_saldo = $resultado->resultado_operacionFisico;
-    return ['resultados' => $resultados,
-            'total_saldo' => $total_saldo
-            ];
-}
+    
+    
 
 public function generarReporteFisico(Request $request)
 {
-    $idArticulo = $request->articulo;
     $fechaInicio = $request->fechaInicio;
     $fechaFin = $request->fechaFin;
-    $sucursal = $request->sucursal;
-
 
     $ingresos = DB::table('ingresos')
         ->join('detalle_ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
@@ -168,43 +107,70 @@ public function generarReporteFisico(Request $request)
         ->join('almacens','almacens.encargado','=','ingresos.idusuario')
         ->join('sucursales','sucursales.id','=','almacens.sucursal')
         ->select(DB::raw("'Ingreso' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante')
-        ->where('articulos.id', $idArticulo)
-        ->where('sucursales.id', $sucursal)
         ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
         
-       
-
     $ventas = DB::table('ventas')
         ->join('detalle_ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
         ->join('articulos','detalle_ventas.idarticulo','=','articulos.id')
-        ->join('almacens','almacens.encargado','=','ventas.idusuario')
-        ->join('sucursales','sucursales.id','=','almacens.sucursal')
+        ->join('users','ventas.idusuario','=','users.id')
+        ->join('sucursales','users.idsucursal','=','sucursales.id')
         ->select(DB::raw("'Venta' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante')
-        ->where('articulos.id', $idArticulo)
-        ->where('sucursales.id', $sucursal)
         ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
         
-    
-    $ingresos = $ingresos->get();
-    $ventas = $ventas->get();
-
-    $resultados = $ingresos->concat($ventas)->sortBy('fecha_hora');
-
-    $saldo = 0;
-
-    foreach ($resultados as &$resultado) {
-        if ($resultado->tipo === 'Ingreso') {
-            $saldo += $resultado->cantidad;
-        } else {
-            $saldo -= $resultado->cantidad;
+        if ($request->has('articulo') && $request->articulo !== 'undefined') {
+            $idarticulo = $request->articulo;
+            $ingresos->where('articulos.id' , $idarticulo);
+            $ventas->where('articulos.id' , $idarticulo);
         }
-        $resultado->resultado_operacion = $saldo;
-    }
-    $total_saldo = $resultado->resultado_operacion;
-
-
-    return ['resultados' => $resultados,
-    'total_saldo' => $total_saldo
-    ];}
+        if ($request->has('sucursal') && $request->sucursal !== 'undefined') {
+            $sucursal = $request->sucursal;
+            $ingresos->where('sucursales.id', $sucursal);
+            $ventas->where('sucursales.id', $sucursal);
+        }
+        // Agregar filtros opcionales si se proporcionan otros parámetros
+        if ($request->has('marca') && $request->marca !== 'undefined') {
+            $idmarca = $request->marca;
+            $ingresos->where('articulos.idmarca' , $idmarca);
+            $ventas->where('articulos.idmarca' , $idmarca);
+        }
+        if ($request->has('linea') && $request->linea !== 'undefined') {
+            $idlinea = $request->linea;
+            $ingresos->where('articulos.idcategoria' , $idlinea);
+            $ventas->where('articulos.idcategoria' , $idlinea);
+        }
+        if ($request->has('industria') && $request->industria !== 'undefined') {
+            $idindustria = $request->industria;
+            $ingresos->where('articulos.idindustria' , $idindustria);
+            $ventas->where('articulos.idindustria' , $idindustria);
+        }
+        if ($request->has('grupo') && $request->grupo !== 'undefined') {
+            $idgrupo = $request->grupo;
+            $ingresos->where('articulos.idgrupo' , $idgrupo);
+            $ventas->where('articulos.idgrupo' , $idgrupo);
+        }
+    
+    
+      // Realizar las consultas
+        $ingresos = $ingresos->get();
+        $ventas = $ventas->get();
+    
+        // Combinar los resultados de ingresos y ventas
+        $resultados = $ingresos->concat($ventas)->sortBy('fecha_hora');
+    
+        // Calcular el saldo
+        $saldo = 0;
+        $saldoFisico = 0;
+    
+        foreach ($resultados as &$resultado) {
+            if ($resultado->tipo === 'Ingreso') {
+                $saldoFisico += $resultado->cantidad;
+            } else {
+                $saldoFisico -= $resultado->cantidad;
+            }
+            $resultado->resultado_operacionFisico = $saldoFisico;
+        }
+        $total_saldo = $saldoFisico; // Total físico como saldo total
+    
+        return ['resultados' => $resultados, 'total_saldo' => $total_saldo];}
 
 }

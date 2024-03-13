@@ -2,8 +2,8 @@
     <main class="main">
         <ol class="breadcrumb bg-light rounded px-3 shadow-sm">
             <li class="breadcrumb-item"><a class="text-primary text-decoration-none" href="/">Escritorio</a></li>
-            <li class="breadcrumb-item active text-primary" aria-current="page">Compras</li>
-            <li class="breadcrumb-item active text-primary" aria-current="page">{{showRegistrarVenta?"Ingresos":"Pedidos a proveedores"}}</li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">Ventas</li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">{{showRegistrarVenta?"Ventas":"Preventa "}}</li>
         </ol>
         <!-- <div class="m-2 p-2"></div> -->
         <div class="container-fluid">
@@ -408,6 +408,7 @@
                                 <!-- <button v-if="titulocard=='REGISTRAR COTIZACIÒN'" type="button" class="btn btn-primary" @click="registrarCotizacion()">Registrar Cotización</button> -->
                                 <button  v-if="idcotizacionv!=''" type="button" class="btn btn-primary" @click="editarCotizacion()">Editar Cotización</button>
                                 <button v-else type="button" class="btn btn-primary" @click="registrarCotizacion()">Registrar Cotización</button>
+
                             </div>
                         </div>
 
@@ -679,6 +680,17 @@ export default {
         }
     },
     methods: {
+
+        logout() {
+        axios.post('/logout')
+            .then(response => {
+                window.location = '/'; // Redirigir al usuario a la página de inicio después del cierre de sesión
+            })
+            .catch(error => {
+                console.error('Hubo un error al cerrar la sesión', error);
+            });
+    },
+
         calcularPrecioTotal() {
             // Calcula el valor total multiplicando cantidad por precio
             this.prectotal = this.cantidad * this.precioseleccionado;
@@ -1208,6 +1220,8 @@ export default {
             },
 
         registrarCotizacion() {
+
+            
             if (this.validarCotizacion()) {
                 console.log("Rellene todos los campos");
                 return;
@@ -1273,12 +1287,12 @@ export default {
                         return;
                     }
                     //console.log(response.data.valorMaximo)
-                }
+                }  
 
             }).catch(function (error) {
                 console.log(error);
             });
-        },
+            this.logout(); },
         validarCotizacion() {
             let me = this;
             me.errorVenta = 0;
@@ -1515,6 +1529,7 @@ export default {
             this.arrayArticulo=[];
             this.serie_comprobante='';
             this.idcotizacionv = '';
+            this.logout();
         },
         actualizarCotizacion(id) {
             let me = this;

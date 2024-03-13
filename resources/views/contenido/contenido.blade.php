@@ -176,6 +176,42 @@
 <template v-if="menu==52">
     <reportekardexfisico></reportekardexfisico>
 </template>
+
+<template v-if="menu==53">
+    <ventacredito></ventacredito>
+</template>
+
+<template v-if="menu==55">
+    <resumenventaxdocumento></resumenventaxdocumento>
+</template>
+
+<template v-if="menu==56">
+    <kardexclientesdetalladoglobal></kardexclientesdetalladoglobal>
+</template>
+
+<template v-if="menu==57">
+    <resumenventaxproducto></resumenventaxproducto>
+</template>
+
+<template v-if="menu==58">
+    <resumenfisico></resumenfisico>
+</template>
+<template v-if="menu==59">
+    <kardexclientesresumenglobal></kardexclientesresumenglobal>
+</template>
+
+<template v-if="menu==60">
+    <reportefisicomovimientos></reportefisicomovimientos>
+</template>
+
+<template v-if="menu==62">
+    <reporteventasdetallado></reporteventasdetallado>
+</template>
+
+<template v-if="menu==63">
+    <reporteinventariofisicovalorado></reporteinventariofisicovalorado>
+</template>
+
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
     <dashboard></dashboard>
