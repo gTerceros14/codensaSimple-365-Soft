@@ -172,6 +172,9 @@
                     <li @click="menu=63" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventario Fisico Valorado</a>
                     </li>
+                    <li @click="menu=64" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventario Fisico</a>
+                    </li>
 
                 </ul>
             </li>

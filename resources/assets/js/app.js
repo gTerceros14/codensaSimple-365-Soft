@@ -227,6 +227,11 @@ Vue.component(
 );
 
 Vue.component(
+  "reporteinventariofisico",
+  require("./components/ReporteInventarioFisico.vue")
+);
+
+Vue.component(
   "ventasinstitucionales",
   require("./components/VentasInstitucionales.vue")
 );

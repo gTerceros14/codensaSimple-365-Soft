@@ -212,6 +212,10 @@
     <reporteinventariofisicovalorado></reporteinventariofisicovalorado>
 </template>
 
+<template v-if="menu==64">
+    <reporteinventariofisico></reporteinventariofisico>
+</template>
+
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
     <dashboard></dashboard>
