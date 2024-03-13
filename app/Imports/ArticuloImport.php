@@ -8,6 +8,7 @@ use App\Articulo;
 use App\Categoria;
 use App\Grupo;
 use App\Proveedor;
+use App\Persona;
 use App\Medida;
 use App\Marca;
 use App\Industria;
@@ -22,6 +23,8 @@ class ArticuloImport implements ToCollection
     private $medidaMapping;
     private $marcaMapping;
     private $industriaMapping;
+    private $personaMapping;
+
 
     private $errors = [];
 
@@ -33,11 +36,18 @@ class ArticuloImport implements ToCollection
         $this->medidaMapping = $this->createMedidaMapping();
         $this->marcaMapping = $this->createMarcaMapping();
         $this->industriaMapping = $this->createIndustriaMapping();
+        $this->personaMapping = $this->createPersonaMapping();
+
     }
 
     private function createCategoriaMapping()
     {
         return Categoria::pluck('nombre', 'id')->toArray();
+    }
+
+    private function createPersonaMapping()
+    {
+        return Persona::pluck('nombre', 'id')->toArray();
     }
 
     private function createGrupoMapping()
@@ -68,83 +78,72 @@ class ArticuloImport implements ToCollection
     public function collection(Collection $rows)
     {
         $rowNumber = 1;
-        $importacionExitosa = true; // Bandera para seguir si la importación es exitosa
+        $importacionExitosa = true;
 
         try {
             \DB::beginTransaction();
 
             foreach ($rows as $row) {
-                Log::info('Nombre de categoría en CSV: ' . $row[0]);
-                Log::info('Nombre de grupo en CSV: ' . $row[1]);
-                Log::info('Nombre de proveedor en CSV: ' . $row[2]);
-                Log::info('Descripción de medida en CSV: ' . $row[3]);
-                Log::info('Nombre de marca en CSV: ' . $row[20]);
-                Log::info('Nombre de industria en CSV: ' . $row[21]);
 
-                $idCategoria = $this->getCategoriaId($row[0]);
-                Log::info('ID de categoría obtenido: ' . $idCategoria);
+                $idCategoria = $this->getCategoriaId($row[16]);
 
-                $idGrupo = $this->getGrupoId($row[1]);
-                Log::info('ID de grupo obtenido: ' . $idGrupo);
+                $idGrupo = $this->getGrupoId($row[17]);
 
-                $idProveedor = $this->getProveedorId($row[2]);
-                Log::info('ID de proveedor obtenido: ' . $idProveedor);
+                $idProveedor = $this->getProveedorId($row[18]);
 
-                $idMedida = $this->getMedidaId($row[3]);
-                Log::info('ID de medida obtenido: ' . $idMedida);
+                $idMedida = $this->getMedidaId($row[19]);
 
                 $idMarca = $this->getMarcaId($row[20]);
-                Log::info('ID de marca obtenido: ' . $idMarca);
 
                 $idIndustria = $this->getIndustriaId($row[21]);
-                Log::info('ID de industria obtenido: ' . $idIndustria);
 
                 try {
                     Articulo::create([
+                        'codigo' => $row[0],
+                        'nombre' => $row[1],
+                        'nombre_generico' => $row[2],
+                        'descripcion' => $row[3],
+                        'unidad_envase' => $row[4],
+                        'precio_list_unid' => $row[5],
+                        'precio_costo_unid' => $row[6],
+                        'precio_costo_paq' => $row[7],
+                        'precio_venta' => $row[8],
+                        'precio_uno' => $row[9],
+                        'precio_dos' => $row[10],
+                        'precio_tres' => $row[11],
+                        'precio_cuatro' => $row[12],
+                        'costo_compra' => $row[13],
+                        'stock' => $row[14],
+                        'condicion' => $row[15],
+                        'fotografia' => null,
                         'idcategoria' => $idCategoria,
                         'idgrupo' => $idGrupo,
                         'idproveedor' => $idProveedor,
                         'idmedida' => $idMedida,
-                        'codigo' => $row[4],
-                        'nombre' => $row[5],
-                        'nombre_generico' => $row[6],
-                        'unidad_envase' => $row[7],
-                        'precio_list_unid' => $row[8],
-                        'precio_costo_unid' => $row[9],
-                        'precio_costo_paq' => $row[10],
-                        'precio_venta' => $row[11],
-                        'precio_uno' => $row[12],
-                        'precio_dos' => $row[13],
-                        'precio_tres' => $row[14],
-                        'precio_cuatro' => $row[15],
-                        'stock' => $row[16],
-                        'descripcion' => $row[17],
-                        'condicion' => $row[18],
-                        'costo_compra' => $row[19],
-                        'fotografia' => null,
                         'idmarca' => $idMarca,
                         'idindustria' => $idIndustria,
+
                     ]);
                 } catch (Exception $e) {
                     if (!$idCategoria) {
-                        $this->errors[] = "Error fila $rowNumber: No existe 'Linea $row[0]' ";
+                        $this->errors[] = "Error fila $rowNumber: No existe 'Linea $row[16]' ";
                     } else if (!$idGrupo) {
-                        $this->errors[] = "Error fila $rowNumber: No existe 'Grupo $row[1]'";
+                        $this->errors[] = "Error fila $rowNumber: No existe 'Grupo $row[17]'";
                     } else if (!$idProveedor) {
-                        $this->errors[] = "Error fila $rowNumber: El proveedor '$row[2]' no está registrado";
+                        $this->errors[] = "Error fila $rowNumber: El proveedor '$row[18]' no está registrado";
                     } else if (!$idMedida) {
-                        $this->errors[] = "Error fila $rowNumber: La medida '$row[3]' no está registrado en la base de datos";
+                        $this->errors[] = "Error fila $rowNumber: La medida '$row[19]' no está registrado en la base de datos";
                     } else if (!$idMarca) {
                         $this->errors[] = "Error fila $rowNumber: No existe 'Marca $row[20]'";
                     } else if (!$idIndustria) {
                         $this->errors[] = "Error fila $rowNumber: No existe 'Industria $row[21]'";
                     } else if (strpos($e->getMessage(), "Integrity constraint violation: 1062") !== false) {
-                        $this->errors[] = "Error fila $rowNumber: El producto '$row[5]' ya existe";
+                        $this->errors[] = "Error fila $rowNumber: El producto '$row[1]' ya existe";
                     } else {
                         $this->errors[] = "Error al procesar fila: " . $e->getMessage();
                     }
 
-                    $importacionExitosa = false; // Si hay un error, la importación no es exitosa
+                    $importacionExitosa = false;
                 }
 
                 $rowNumber++;
@@ -194,10 +193,11 @@ class ArticuloImport implements ToCollection
 
     private function getProveedorId($nombreProveedor)
     {
-        $idProveedor = array_search($nombreProveedor, $this->proveedorMapping);
+        $idProveedor = array_search($nombreProveedor, $this->personaMapping);
 
         return $idProveedor !== false ? $idProveedor : null;
     }
+
 
     private function getMedidaId($descripcionMedida)
     {

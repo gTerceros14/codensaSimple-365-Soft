@@ -49,7 +49,8 @@
                                     <th>COSTO UNITARIO</th>
                                     <th>COSTO PAQUETE</th>
                                     <!-- <th>Presio1</th> -->
-                                    <th v-for="precio in precios" :key="precio.id">PRECIO {{ precio.nombre_precio }}</th>
+                                    <th v-for="precio in precios" :key="precio.id">PRECIO {{ precio.nombre_precio }}
+                                    </th>
 
                                     <!-- <th v-if="rolUsuario === 1">Presio venta</th> -->
                                     <th v-if="rolUsuario === 1 && mostrarCostos === 1">PRECIO VENTA</th>
@@ -94,12 +95,13 @@
                                     <td v-text="articulo.nombre_generico"></td>
                                     <td v-text="articulo.unidad_envase"></td>
                                     <td>
-                                        {{ (articulo.precio_costo_unid * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
-                                            monedaPrincipal[1] }}
+                                        {{ (articulo.precio_costo_unid * parseFloat(monedaPrincipal[0])).toFixed(2) }}
+                                        {{
+                        monedaPrincipal[1] }}
                                     </td>
                                     <td>
                                         {{ (articulo.precio_costo_paq * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
-                                            monedaPrincipal[1] }}
+                        monedaPrincipal[1] }}
 
                                     </td>
                                     <!-- <td v-text="articulo.precio1"></td> -->
@@ -110,23 +112,24 @@
                                         <span v-if="index === 0">
 
                                             {{ (articulo.precio_uno * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
-                                                monedaPrincipal[1] }}
+                        monedaPrincipal[1] }}
 
                                         </span>
                                         <span v-if="index === 1">
                                             {{ (articulo.precio_dos * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
-                                                monedaPrincipal[1] }}
+                        monedaPrincipal[1] }}
 
                                         </span>
                                         <span v-if="index === 2">
                                             {{ (articulo.precio_tres * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
-                                                monedaPrincipal[1] }}
+                        monedaPrincipal[1] }}
 
 
                                         </span>
                                         <span v-if="index === 3">
-                                            {{ (articulo.precio_cuatro * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
-                                                monedaPrincipal[1] }}
+                                            {{ (articulo.precio_cuatro * parseFloat(monedaPrincipal[0])).toFixed(2) }}
+                                            {{
+                        monedaPrincipal[1] }}
 
                                         </span>
                                     </td>
@@ -134,7 +137,7 @@
                                     <!-- <td v-if="rolUsuario === 1" v-text="articulo.precio_venta"></td> -->
                                     <td v-if="rolUsuario === 1 && mostrarCostos === 1">
                                         {{ (articulo.precio_venta * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
-                                            monedaPrincipal[1] }}
+                        monedaPrincipal[1] }}
 
                                     </td>
 
@@ -143,7 +146,8 @@
                                     <td v-text="articulo.nombre_marca"></td>
 
                                     <!-- <td v-if="rolUsuario === 1" v-text="articulo.stock"></td> -->
-                                    <td v-if="rolUsuario === 1 && mostrarSaldosStock === 1" v-text="articulo.stock"></td>
+                                    <td v-if="rolUsuario === 1 && mostrarSaldosStock === 1" v-text="articulo.stock">
+                                    </td>
 
                                     <!-- <td v-if="rolUsuario === 1" v-text="articulo.nombre_proveedor"></td> -->
                                     <td v-if="rolUsuario === 1 && mostrarProveedores === 1"
@@ -226,10 +230,12 @@
                                         <label for="" class="font-weight-bold">Nombre Genérico
                                             <span class="text-danger">*</span>
                                         </label>
-                                        <input type="text" v-model="datosFormulario.nombre_generico" class="form-control"
-                                            placeholder="Ej. Ibuprofeno" :class="{ 'is-invalid': errores.nombre_generico }"
+                                        <input type="text" v-model="datosFormulario.nombre_generico"
+                                            class="form-control" placeholder="Ej. Ibuprofeno"
+                                            :class="{ 'is-invalid': errores.nombre_generico }"
                                             @input="validarCampo('nombre_generico')" />
-                                        <p class="text-danger" v-if="errores.nombre_generico">{{ errores.nombre_generico }}
+                                        <p class="text-danger" v-if="errores.nombre_generico">{{ errores.nombre_generico
+                                            }}
                                         </p>
 
 
@@ -272,11 +278,13 @@
                                         <span class="font-weight-normal text-sm text-secondary">(Opcional)</span>
 
                                     </label>
-                                    <input type="text" v-model="datosFormulario.codigo_alfanumerico" class="form-control"
-                                        placeholder="Ej. ABC123" :class="{ 'is-invalid': errores.codigo_alfanumerico }"
+                                    <input type="text" v-model="datosFormulario.codigo_alfanumerico"
+                                        class="form-control" placeholder="Ej. ABC123"
+                                        :class="{ 'is-invalid': errores.codigo_alfanumerico }"
                                         @input="validarCampo('codigo_alfanumerico')" />
-                                    <p class="text-danger" v-if="errores.codigo_alfanumerico">{{ errores.codigo_alfanumerico
-                                    }}</p>
+                                    <p class="text-danger" v-if="errores.codigo_alfanumerico">{{
+                        errores.codigo_alfanumerico
+                    }}</p>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="" class="font-weight-bold">Código del Producto <span
@@ -286,8 +294,10 @@
                                         @input="validarCampo('codigo')" />
                                     <p class="text-danger" v-if="errores.codigo">{{ errores.codigo }}</p>
 
-                                    <div class="d-flex mt-4 justify-content-center" style="width:250px;overflow-x: auto;">
-                                        <barcode :value="datosFormulario.codigo" :options="{ format: 'EAN-13' }"></barcode>
+                                    <div class="d-flex mt-4 justify-content-center"
+                                        style="width:250px;overflow-x: auto;">
+                                        <barcode :value="datosFormulario.codigo" :options="{ format: 'EAN-13' }">
+                                        </barcode>
                                     </div>
 
                                 </div>
@@ -304,8 +314,9 @@
                                         class="form-control" placeholder="Ej. Producto fabricado por Laboratorios XYZ"
                                         :class="{ 'is-invalid': errores.descripcion_fabrica }"
                                         @input="validarCampo('descripcion_fabrica')" />
-                                    <p class="text-danger" v-if="errores.descripcion_fabrica">{{ errores.descripcion_fabrica
-                                    }}</p>
+                                    <p class="text-danger" v-if="errores.descripcion_fabrica">{{
+                        errores.descripcion_fabrica
+                    }}</p>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="" class="font-weight-bold">Proveedor <span
@@ -313,7 +324,8 @@
                                     <div class="input-group">
                                         <input class="form-control" type="text" placeholder="Seleccione un proveedor"
                                             disabled v-model="proveedorseleccionada.nombre"
-                                            :class="{ 'is-invalid': errores.idproveedor }" @input="validarCampo('codigo')">
+                                            :class="{ 'is-invalid': errores.idproveedor }"
+                                            @input="validarCampo('codigo')">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button"
                                                 @click="abrirModal2('Proveedors')">...</button>
@@ -326,11 +338,13 @@
                             <div class="form-group row">
 
                                 <div class="col-md-6">
-                                    <label for="" class="font-weight-bold">Linea <span class="text-danger">*</span></label>
+                                    <label for="" class="font-weight-bold">Linea <span
+                                            class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <input class="form-control" type="text" placeholder="Seleccione una linea" disabled
-                                            v-model="lineaseleccionada.nombre"
-                                            :class="{ 'is-invalid': errores.idcategoria }" @input="validarCampo('codigo')">
+                                        <input class="form-control" type="text" placeholder="Seleccione una linea"
+                                            disabled v-model="lineaseleccionada.nombre"
+                                            :class="{ 'is-invalid': errores.idcategoria }"
+                                            @input="validarCampo('codigo')">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button"
                                                 @click="abrirModal2('Lineas')">...</button>
@@ -340,11 +354,12 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="" class="font-weight-bold">Marca <span class="text-danger">*</span></label>
+                                    <label for="" class="font-weight-bold">Marca <span
+                                            class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <input class="form-control" type="text" placeholder="Seleccione una marca" disabled
-                                            v-model="marcaseleccionada.nombre" :class="{ 'is-invalid': errores.idmarca }"
-                                            @input="validarCampo('idmarca')">
+                                        <input class="form-control" type="text" placeholder="Seleccione una marca"
+                                            disabled v-model="marcaseleccionada.nombre"
+                                            :class="{ 'is-invalid': errores.idmarca }" @input="validarCampo('idmarca')">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button"
                                                 @click="abrirModal2('Marcas')">...</button>
@@ -361,7 +376,8 @@
                                     <div class="input-group">
                                         <input class="form-control" type="text" placeholder="Seleccione una industria"
                                             disabled v-model="industriaseleccionada.nombre"
-                                            :class="{ 'is-invalid': errores.idindustria }" @input="validarCampo('codigo')">
+                                            :class="{ 'is-invalid': errores.idindustria }"
+                                            @input="validarCampo('codigo')">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button"
                                                 @click="abrirModal2('Industrias')">...</button>
@@ -370,10 +386,11 @@
                                     <p class="text-danger" v-if="errores.idindustria">{{ errores.idindustria }}</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="" class="font-weight-bold">Grupo <span class="text-danger">*</span></label>
+                                    <label for="" class="font-weight-bold">Grupo <span
+                                            class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <input class="form-control" type="text" placeholder="Seleccione un grupo" disabled
-                                            v-model="gruposeleccionada.nombre_grupo"
+                                        <input class="form-control" type="text" placeholder="Seleccione un grupo"
+                                            disabled v-model="gruposeleccionada.nombre_grupo"
                                             :class="{ 'is-invalid': errores.idgrupo }" @input="validarCampo('codigo')">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button"
@@ -404,10 +421,11 @@
                                     <p class="text-danger" v-if="errores.unidad_envase">{{ errores.unidad_envase }}</p>
                                 </div>
                                 <div class="col-md-4">
-                                    <label for="" class="font-weight-bold">Medida <span class="text-danger">*</span></label>
+                                    <label for="" class="font-weight-bold">Medida <span
+                                            class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <input class="form-control" type="text" placeholder="Seleccione un medida" disabled
-                                            v-model="medidaseleccionada.descripcion_medida"
+                                        <input class="form-control" type="text" placeholder="Seleccione un medida"
+                                            disabled v-model="medidaseleccionada.descripcion_medida"
                                             :class="{ 'is-invalid': errores.idmedida }" @input="validarCampo('codigo')">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button"
@@ -434,15 +452,16 @@
                                                 type="button">Calcular</button>
                                         </div>
                                     </div>
-                                    <p class="text-danger" v-if="errores.precio_costo_unid">{{ errores.precio_costo_unid }}
+                                    <p class="text-danger" v-if="errores.precio_costo_unid">{{ errores.precio_costo_unid
+                                        }}
                                     </p>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="" class="font-weight-bold">Precio paquete <span
                                             class="text-danger">*</span></label>
                                     <div class="input-group ">
-                                        <input type="number" v-model="datosFormulario.precio_costo_paq" class="form-control"
-                                            placeholder="Ej. precio_costo_paq@dominio.com"
+                                        <input type="number" v-model="datosFormulario.precio_costo_paq"
+                                            class="form-control" placeholder="Ej. precio_costo_paq@dominio.com"
                                             :class="{ 'is-invalid': errores.precio_costo_paq }"
                                             @input="validarCampo('precio_costo_paq')" />
                                         <div class="input-group-append">
@@ -453,7 +472,8 @@
 
 
 
-                                    <p class="text-danger" v-if="errores.precio_costo_paq">{{ errores.precio_costo_paq }}
+                                    <p class="text-danger" v-if="errores.precio_costo_paq">{{ errores.precio_costo_paq
+                                        }}
                                     </p>
                                 </div>
 
@@ -484,27 +504,31 @@
 
                             <div v-for="(precio, index) in precios" :key="precio.id" class="d-flex form-group row">
 
-                                <label for="" class="font-weight-bold col-md-3 form-control-label">{{ precio.nombre_precio
-                                }} :
+                                <label for="" class="font-weight-bold col-md-3 form-control-label">{{
+                        precio.nombre_precio
+                    }} :
                                 </label>
                                 <div class="col-md-4">
                                     <div v-if="index === 0" class=" input-group" style="width: 150px">
 
-                                        <input type="text" class="form-control" placeholder="Precio" v-model="precio_uno">
+                                        <input type="text" class="form-control" placeholder="Precio"
+                                            v-model="precio_uno">
                                         <div class="input-group-append">
                                             <span class="input-group-text">{{ monedaPrincipal[1] }}</span>
                                         </div>
                                     </div>
                                     <div v-if="index === 1" class=" input-group" style="width: 150px">
 
-                                        <input type="text" class="form-control" placeholder="Precio" v-model="precio_dos">
+                                        <input type="text" class="form-control" placeholder="Precio"
+                                            v-model="precio_dos">
                                         <div class="input-group-append">
                                             <span class="input-group-text">{{ monedaPrincipal[1] }}</span>
                                         </div>
                                     </div>
                                     <div v-if="index === 2" class=" input-group" style="width: 150px">
 
-                                        <input type="text" class="form-control" placeholder="Precio" v-model="precio_tres">
+                                        <input type="text" class="form-control" placeholder="Precio"
+                                            v-model="precio_tres">
                                         <div class="input-group-append">
                                             <span class="input-group-text">{{ monedaPrincipal[1] }}</span>
                                         </div>
@@ -774,7 +798,8 @@
                                 </tbody>
                             </table>
                             <!--###########################################################-->
-                            <table class="table table-bordered table-striped table-sm" v-else-if="tituloModal2 == 'Grupos'">
+                            <table class="table table-bordered table-striped table-sm"
+                                v-else-if="tituloModal2 == 'Grupos'">
                                 <thead>
                                     <tr>
                                         <th>Opciones</th>
@@ -845,7 +870,8 @@
                                 <li class="page-item" v-for="page in pagesNumber" :key="page"
                                     :class="[page == isActivedMar ? 'active' : '']">
                                     <a class="page-link" href="#"
-                                        @click.prevent="cambiarPaginaIndustria(page, buscar, criterio)" v-text="page"></a>
+                                        @click.prevent="cambiarPaginaIndustria(page, buscar, criterio)"
+                                        v-text="page"></a>
                                 </li>
                                 <li class="page-item" v-if="pagination.current_page < pagination.last_page">
                                     <a class="page-link" href="#"
@@ -862,7 +888,8 @@
                                 <li class="page-item" v-for="page in pagesNumber" :key="page"
                                     :class="[page == isActivedMar ? 'active' : '']">
                                     <a class="page-link" href="#"
-                                        @click.prevent="cambiarPaginaProveedor(page, buscar, criterio)" v-text="page"></a>
+                                        @click.prevent="cambiarPaginaProveedor(page, buscar, criterio)"
+                                        v-text="page"></a>
                                 </li>
                                 <li class="page-item" v-if="pagination.current_page < pagination.last_page">
                                     <a class="page-link" href="#"
@@ -1024,7 +1051,8 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="email-input">Teléfono de contacto</label>
+                                <label class="col-md-3 form-control-label" for="email-input">Teléfono de
+                                    contacto</label>
                                 <div class="col-md-9">
                                     <input type="text" v-model="telefono_contacto" class="form-control"
                                         placeholder="Teléfono del contacto">
@@ -1121,197 +1149,15 @@
             </div>
             <!-- /.modal-dialog -->
         </div>
-        <div class="modal " tabindex="-1" :class="{ 'mostrar': modalImportar }" role="dialog" aria-labelledby="myModalLabel"
-            style="display: none;" aria-hidden="true">
-            <div class="modal-dialog modal-primary modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Importar productos</h4>
-                        <button type="button" class="close" @click="cerrarModalImportar()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div>
-                            <form @submit.prevent="submitForm">
-                                <div v-if="pageImportar == 0">
-                                    <div class="border border-dashed border-3 p-3 text-center" style="cursor: pointer"
-                                        v-if="!selectedFile">
-                                        <label class="custom-file" for="customFile">
-                                            <i class="fa fa-cloud-upload fa-2x" aria-hidden="true"></i>
-                                            <p class="custom-file-label">Seleccionar archivo CSV</p>
-                                            <input type="file" class="custom-file-input" id="customFile" ref="fileInput"
-                                                @change="handleFileChange" />
-                                        </label>
-                                    </div>
-                                    <div v-else class="text-center">
-                                        <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
-                                        <p> {{ selectedFile.name }}</p>
-                                        <button @click="removeFile" type="button" class="btn btn-danger">Eliminar
-                                            archivo</button>
-                                        <div class="" style="display:flex;margin-top:10px;">
-                                            <label for="delimiterSelector">Selecciona el delimitador: </label>
-                                            <select class="form-control col-md-3" v-model="selectedDelimiter"
-                                                id="delimiterSelector">
-                                                <option value=";">Punto y coma (;)</option>
-                                                <option value=",">Coma (,)</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-check mt-3">
-                                            <input type="checkbox" id="headerCheckbox" class="form-check-input"
-                                                v-model="includeHeader" />
-                                            <label for="headerCheckbox" class="form-check-label">
-                                                El archivo incluye encabezados
-                                            </label>
-                                        </div>
-                                        <button type="button" @click="confirmCsv" class="btn btn-success">Confirmar</button>
-
-                                    </div>
-                                </div>
-                                <div v-if="pageImportar == 1">
-
-                                    <button @click="selectAllHeaders" type="button" class="btn btn-success mt-2">Seleccionar
-                                        Todos</button>
-                                    <div v-if="csvHeaders && csvHeaders.length > 0" class="csv-headers-container">
-                                        <p>Encabezados del archivo: </p>
-                                        <ul class="csv-headers-list">
-                                            <li v-for="(header, index) in csvHeaders" :key="index" class="csv-header">
-                                                <label>
-                                                    <input type="checkbox" v-model="selectedHeadersFromFile"
-                                                        :value="header" />
-                                                    {{ header }}
-                                                </label>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <div v-if="selectedHeadersFromFile.length > 0" style="overflow-x: auto;">
-
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th v-for="(header, index) in headersArray" :key="index">{{ header }}
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="selected-header"
-                                                        v-for="(selectedHeader, index) in selectedHeadersFromFile"
-                                                        :key="index">{{ selectedHeader }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <button @click="assignHeaders" type="button" class="btn btn-success mt-2">Asignar
-                                            Encabezados</button>
-                                    </div>
-
-
-                                </div>
-
-                                <div v-if="pageImportar == 2">
-                                    <div v-if="previewCsv && previewCsv.length > 0" class="mt-4">
-                                        <h5>Vista previa:</h5>
-                                        <p>Este contenido se importara en la base de datos</p>
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th v-for="(header, index) in headersArray" :key="index">{{ header
-                                                        }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="(row, rowIndex) in parsedPreviewCsv" :key="rowIndex">
-                                                        <td v-for="(value, columnIndex) in row" :key="columnIndex">{{ value
-                                                        }}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <!-- <button @click="downloadCsv" class="btn btn-primary mt-2">Descargar CSV</button> -->
-                                    </div>
-                                    <button v-if="selectedFile" type="submit" class="btn btn-success mt-2">Importar
-                                        CSV</button>
-                                </div>
-                                <div v-if="pageImportar == 3">
-                                    <div v-if="errorsImport.length == 0 && erroresNoExiste.length == 0 && !successImport">
-                                        <span class="loader"></span>
-                                        <h5 style="text-align:center;">Importando Datos</h5>
-                                    </div>
-                                    <div v-if="errorsImport.length > 0">
-                                        <div class="card-error">
-                                            <h4 style="text-align: center;">Error</h4>
-                                            <div
-                                                style="background-color: red; height: 2px;margin-bottom: 10px;margin-top: 10px;">
-                                            </div>
-                                            <p>No se pudo realizar la importación, verifique los datos del archivo</p>
-                                        </div>
-                                        <div v-for="(item, index) in errorsImport" :key="index">
-                                            <div class="card-error">
-                                                <i class="fa fa-exclamation-triangle" style="color:red"
-                                                    aria-hidden="true"></i>
-                                                {{ item }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div v-if="errorsImport.length == 0 && erroresNoExiste.length > 0">
-                                        <h2>Datos no encontrados en la base de datos</h2>
-                                        <table class="table">
-                                            <!-- <thead>
-        <tr>
-          <th scope="col">Elemento</th>
-        </tr>
-      </thead> -->
-                                            <tbody>
-                                                <tr v-for="(item, index) in erroresNoExiste" :key="index">
-                                                    <td
-                                                        v-html="`<span style='font-weight: bold'>${item.split(' ')[0]}</span>: ${item.split(' ').slice(1).join(' ')}`">
-                                                    </td>
-                                                </tr>
-
-                                            </tbody>
-                                        </table>
-
-                                        <div v-if="erroresNoExiste.length > 0">
-                                            <p>¿Desea registrar estos datos?</p>
-                                            <button class="btn btn-success" type="button"
-                                                @click="confirmarRegistro">Confirmar</button>
-                                            <button class="btn btn-danger" type="button"
-                                                @click="cancelarRegistro">Cancelar</button>
-                                        </div>
-                                    </div>
-                                    <div v-if="erroresNoExiste.length == 0 && errorsImport.length == 0 && successImport">
-                                        <div class="success-checkmark">
-                                            <div class="check-icon">
-                                                <span class="icon-line line-tip"></span>
-                                                <span class="icon-line line-long"></span>
-                                                <div class="icon-circle"></div>
-                                                <div class="icon-fix"></div>
-                                            </div>
-                                        </div>
-                                        <h5 style="text-align:center;">Importación exitosa</h5>
-
-
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="cerrarModalImportar()">Cerrar</button>
-                    </div>
-                </div>
-                <!-- /.modal-content -->
-            </div>
-            <!-- /.modal-dialog -->
+        <div v-if="modalImportar">
+            <ImportarExcel @cerrar="cerrarModalImportar"></ImportarExcel>
         </div>
 
     </main>
 </template>
 
 <script>
+
 import { esquemaArticulos } from '../constants/validations';
 
 import VueBarcode from 'vue-barcode';
@@ -1346,48 +1192,7 @@ export default {
 
             monedaPrincipal: [],
 
-            successImport: false,
-            registrosSuccess: [],
-            errorsImport: [],
-            erroresNoExiste: [],
-
-            parsedPreviewCsv: [],
-            selectedDelimiter: ';',
-            includeHeader: true,
-
-            pageImportar: 0,
             modalImportar: 0,
-            selectedFile: null,
-            csvHeaders: null,
-            selectedHeadersFromFile: [],
-            selectedHeadersToAssign: [],
-            headersAssigned: false,
-            previewCsv: "",
-            headersArray: [
-                "Linea",
-                "Grupo",
-                "Proveedor",
-                "Medida",
-                "Codigo",
-                "Nombre",
-                "Nombre generico",
-                "Unidad envase",
-                "Precio List unidad",
-                "Precio costo unidad",
-                "Precio costo paquete",
-                "Precio venta",
-                "Precio uno",
-                "Precio dos",
-                "Precio tres",
-                "Precio cuatro",
-                "Stock minimo",
-                "Descripciòn",
-                "Estado",
-                "Costo compra",
-                "Marca",
-                "Industria"
-            ],
-
 
             criterioA: 'nombre',
             buscarA: '',
@@ -1546,36 +1351,34 @@ export default {
             return this.calculatePages(this.paginationMedida, this.offset.paginationMedida);
         },
         imagen() {
-            console.log(this.fotoMuestra);
             return this.fotoMuestra;
         },
     },
     watch: {
-        selectedDelimiter: 'updateData',
         previewCsv: 'parseCsv', // Llama a parseCsv cuando previewCsv cambie
     },
     methods: {
-        toastSuccess(mensaje){
+        toastSuccess(mensaje) {
             this.$toasted.show(`
     <div style="height: 60px;font-size:16px;">
         <br>
-        `+mensaje+`.<br>
+        `+ mensaje + `.<br>
     </div>`, {
-                    type: "success",
-                    position: "bottom-right",
-                    duration: 4000
-                });
+                type: "success",
+                position: "bottom-right",
+                duration: 4000
+            });
         },
-        toastError(mensaje){
+        toastError(mensaje) {
             this.$toasted.show(`
     <div style="height: 60px;font-size:16px;">
         <br>
-        `+mensaje+`<br>
+        `+ mensaje + `<br>
     </div>`, {
-                    type: "error",
-                    position: "bottom-right",
-                    duration: 4000
-                });
+                type: "error",
+                position: "bottom-right",
+                duration: 4000
+            });
         },
         asignarCampos() {
             this.datosFormulario.idcategoria = this.lineaseleccionada.id
@@ -1584,9 +1387,6 @@ export default {
             this.datosFormulario.idindustria = this.industriaseleccionada.id
             this.datosFormulario.idmedida = this.medidaseleccionada.id
             this.datosFormulario.idgrupo = this.gruposeleccionada.id
-
-
-
             this.datosFormulario.precio_costo_unid = this.convertDolar(this.datosFormulario.precio_costo_unid);
             this.datosFormulario.precio_costo_paq = this.convertDolar(this.datosFormulario.precio_costo_paq);
             this.datosFormulario.precio_venta = this.convertDolar(this.datosFormulario.precio_venta);
@@ -1613,7 +1413,6 @@ export default {
                 .then(() => {
                     this.datosFormulario.fotografia = this.fotografia
 
-                    console.log(this.datosFormulario)
                     if (this.tipoAccion == 2) {
                         this.actualizarArticulo(this.datosFormulario)
                     } else {
@@ -1634,309 +1433,21 @@ export default {
             // Utiliza Axios para realizar la solicitud al backend
             axios.get('/configuracion')
                 .then(response => {
-                    console.log("Esta es la configuracion: ", response.data.configuracionTrabajo)
+                    console.log(response)
                 })
                 .catch(error => {
                     console.error('Error al obtener configuración de trabajo:', error);
                 });
         },
-        agregarMarca(nombre) {
-            console.log("Se registrara la marca " + nombre)
-            axios.post('/marca/registrar', {
-                'nombre': nombre,
 
-            }).then(function (response) {
-                this.registrosSuccess.push("Se registro la marca " + nombre);
-
-                console.log(response);
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-
-        agregarGrupo(nombre) {
-            console.log("Se registrara la marca " + nombre)
-
-            axios.post('/grupos/registrar', {
-                'nombre_grupo': nombre
-            }).then(function (response) {
-                this.registrosSuccess.push("Se registro el grupo " + nombre);
-
-                console.log(response)
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        agregarLinea(nombre) {
-            console.log("Se registrara la linea " + nombre)
-
-            axios.post('/categoria/registrar', {
-                'nombre': nombre,
-                'descripcion': "",
-                'codigoProductoSin': 0
-
-            }).then(function (response) {
-                this.registrosSuccess.push("Se registro la linea " + nombre);
-
-                console.log(response)
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        agregarIndustria(nombre) {
-            console.log("Se registrara la marca " + nombre)
-
-            axios.post('/industria/registrar', {
-                'nombre': nombre
-            }).then(function (response) {
-                this.registrosSuccess.push("Se registro la industria " + nombre);
-                console.log(response)
-            }).catch(function (error) {
-                console.log(error);
-            });
-        },
-        confirmarRegistro() {
-            this.erroresNoExiste.forEach((elemento) => {
-                const palabras = elemento.split(' ');
-                const primeraPalabra = palabras.shift();
-                const restoDelString = palabras.join(' ');
-                console.log(palabras)
-                if ("Linea" === primeraPalabra) {
-                    console.log("Se encontro " + restoDelString)
-                    this.agregarLinea(restoDelString)
-                } else if ("Marca" === primeraPalabra) {
-                    this.agregarMarca(restoDelString)
-                    console.log("Se encontro " + restoDelString)
-
-
-                } else if ("Grupo" === primeraPalabra) {
-                    this.agregarGrupo(restoDelString)
-                    console.log("Se encontro " + restoDelString)
-
-                } else if ("Industria" === primeraPalabra) {
-                    this.agregarIndustria(restoDelString)
-                    console.log("Se encontro " + restoDelString)
-
-
-
-                }
-
-            });
-
-            this.submitForm();
-
-            // Puedes realizar alguna acción adicional aquí
-        },
-        cancelarRegistro() {
-            alert("Registro cancelado");
-            // Puedes realizar alguna acción adicional aquí
-        },
-        updateData() {
-            this.extractCSVHeaders(this.selectedFile)
-                .then(headers => {
-                    this.csvHeaders = headers;
-                })
-                .catch(error => {
-                    console.error('Error al extraer encabezados:', error);
-                });
-        },
-        parseCsv() {
-            // Divide la cadena de vista previa en filas y luego cada fila en columnas
-            this.parsedPreviewCsv = this.previewCsv.split('\n').map(row => row.split(this.selectedDelimiter));
-        },
-
-        selectAllHeaders() {
-            // Seleccionar todos los encabezados automáticamente
-            this.selectedHeadersFromFile = [...this.csvHeaders];
-        },
         abrirModalImportar() {
             this.modalImportar = 1;
         },
         cerrarModalImportar() {
             this.modalImportar = 0;
-            this.pageImportar = 0;
-            this.errorsImport = [];
-            this.erroresNoExiste = [];
-            this.successImport = false;
             this.listarArticulo(1, '', 'nombre');
-
-            this.removeFile();
         },
 
-        handleFileChange(event) {
-            this.selectedFile = event.target.files[0];
-            this.extractCSVHeaders(this.selectedFile)
-                .then(headers => {
-                    this.csvHeaders = headers;
-                })
-                .catch(error => {
-                    console.error('Error al extraer encabezados:', error);
-                });
-            this.selectedHeadersFromFile = [];
-            this.selectedHeadersToAssign = [];
-            this.headersAssigned = false;
-        },
-        removeFile() {
-            this.selectedFile = null;
-            this.csvHeaders = null;
-            this.selectedHeadersFromFile = [];
-            this.selectedHeadersToAssign = [];
-            this.headersAssigned = false;
-            this.$refs.fileInput.value = '';
-            this.previewCsv = "";
-        },
-        confirmCsv() {
-            this.pageImportar += 1;
-
-            if (!this.includeHeader) {
-                const mapping = {};
-                this.csvHeaders.forEach((item, index) => {
-                    mapping[item] = (index + 1).toString();
-                });
-                const newArray = this.csvHeaders.map(item => mapping[item]);
-                this.csvHeaders = newArray;
-                console.log(this.csvHeaders);
-            }
-            console.log(this.selectedDelimiter);
-        },
-        assignHeaders() {
-            if (!this.selectedFile) {
-                console.error("No se ha seleccionado un archivo.");
-                return;
-            }
-            this.pageImportar += 1;
-
-            const reader = new FileReader();
-
-            reader.onload = (event) => {
-                let csvContent = event.target.result;
-                if (!this.includeHeader) {
-                    const primeraFila = this.csvHeaders.join(',');
-                    csvContent = `${primeraFila}\n${csvContent}`;
-
-                }
-
-                const newCsvContent = this.getCsvSubset(csvContent, this.selectedHeadersFromFile);
-
-                this.previewCsv = newCsvContent;
-            };
-
-            reader.readAsText(this.selectedFile);
-        },
-
-        getCsvSubset(csvContent, selectedHeaders) {
-            const rows = csvContent.split("\n");
-            const headerIndices = selectedHeaders.map((header) => rows[0].split(this.selectedDelimiter).indexOf(header));
-
-            let newRows;
-
-            newRows = rows.slice(1).map((row) => {
-                const columns = row.split(this.selectedDelimiter);
-                return headerIndices.map((index) => columns[index]).join(",");
-            });
-
-
-            const newCsvContent = newRows.join("\n");
-            console.log(newCsvContent);
-            console.log(this.includeHeader)
-            return newCsvContent;
-        },
-
-
-        downloadCsv() {
-            const blob = new Blob([this.previewCsv], { type: "text/csv" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "nuevo_csv.csv";
-            link.click();
-        },
-        createNewCsvData() {
-            const selectedHeadersFromFile = this.selectedHeadersFromFile;
-            const selectedHeadersToAssign = this.selectedHeadersToAssign;
-            console.log("xd")
-
-            const newData = this.csvData.map((row) => {
-                const newRow = {};
-
-                selectedHeadersFromFile.forEach((header) => {
-                    newRow[header] = row[header];
-                });
-
-                selectedHeadersToAssign.forEach((header) => {
-                    newRow[header] = '';
-                });
-
-                return newRow;
-            });
-
-            const newCsvContent = [selectedHeadersToAssign.concat(selectedHeadersFromFile).join(',')];
-            newData.forEach((row) => {
-                const values = selectedHeadersToAssign.concat(selectedHeadersFromFile).map((header) => row[header]);
-                newCsvContent.push(values.join(','));
-            });
-
-            return newCsvContent.join('\n');
-        },
-        extractCSVHeaders(file) {
-            console.log("XDDD esta por acaaaa")
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-
-                reader.onload = (e) => {
-                    const content = e.target.result;
-                    const rows = content.split('\n');
-                    const headers = rows[0].split(this.selectedDelimiter);
-                    resolve(headers);
-                };
-
-                reader.onerror = (error) => {
-                    reject(error);
-                };
-
-                reader.readAsText(file);
-            });
-        },
-        submitForm() {
-            if (!this.previewCsv) {
-                alert('No hay un nuevo CSV para importar.');
-                return;
-            }
-            this.pageImportar = 3;
-
-
-            const blob = new Blob([this.previewCsv], { type: 'text/csv' });
-            const newCsvFile = new File([blob], 'nuevo_csv.csv', { type: 'text/csv' });
-            const formData = new FormData();
-            formData.append('archivo', newCsvFile);
-            axios.post('/articulos/importar', formData)
-                .then(response => {
-                    console.log(response);
-                    this.erroresNoExiste = [];
-                    this.errorsImport = [];
-                    this.successImport = true;
-
-                })
-                .catch(error => {
-                    if (error.response && error.response.status === 422) {
-                        const datos = error.response.data.errors;
-                        console.log(datos);
-                        this.erroresNoExiste = datos.flatMap(item => {
-                            const match = item.match(/No existe '([^']+)'/);
-                            return match ? [match[1]] : [];
-                        });
-                        console.log("Estos no existen: ", this.erroresNoExiste)
-                        this.errorsImport = datos.filter(item => !item.includes("No existe"));
-                        this.erroresNoExiste = this.erroresNoExiste.filter((valor, indice, array) => array.indexOf(valor) === indice);
-                        // Mostrar el nuevo array con los elementos filtrados
-                        console.log(this.erroresNoExiste);
-                        console.log(this.errorsImport)
-
-                    } else {
-                        console.error(error);
-                    }
-                });
-
-        },
         calculatePages: function (paginationObject, offset) {
             if (!paginationObject.to) {
                 return [];
@@ -2015,8 +1526,6 @@ export default {
                     this.advertenciaInactiva('Lineas');
                 }
             } else if (this.tituloModal2 == "Proveedors") {
-                // this.proveedorseleccionada.id = selected.id;
-                // this.proveedorseleccionada.nombre = selected.nombre;
                 this.proveedorseleccionada = selected;
                 this.validarCampo("idproveedor");
 
@@ -2025,12 +1534,7 @@ export default {
                 this.validarCampo("idgrupo");
 
             }
-            // if (this.marcaseleccionada.condicion == 1 ){
-            //     console.log("selcciona", selected);
-            // }else if (this.marcaseleccionada.condicion == 0 ){
-            //     console.log("Estado invalido", this.marcaseleccionada.condicion);
-            // }
-            console.log("Seleccionado", selected);
+
             this.arrayBuscador = [];
             this.modal2 = false;
         },
@@ -2142,7 +1646,6 @@ export default {
                 var respuesta = response.data;
                 me.arrayArticulo = respuesta.articulos.data;
                 me.pagination = respuesta.pagination;
-                console.log(me.arrayArticulo);
             })
                 .catch(function (error) {
                     console.log(error);
@@ -2151,18 +1654,14 @@ export default {
 
         listarMarca(page, buscar, criterio) {
             let me = this;
-            console.log("Listano");
             var url = '/marca?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
 
             axios.get(url).then(function (response) {
 
                 var respuesta = response.data;
-                console.log(respuesta);
 
                 me.arrayBuscador = respuesta.marcas.data;
                 me.pagination = respuesta.pagination;
-                console.log("Listad0");
-
             })
                 .catch(function (error) {
                     console.log(error);
@@ -2171,14 +1670,11 @@ export default {
         //------listado proveedor, Registro Proveedor y editar-----------
         listarproveedor(page, buscar, criterio) {
             let me = this;
-            console.log("ListanoProveedor");
             var url = '/proveedor?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                console.log(respuesta);
                 me.arrayBuscador = respuesta.personas.data;
                 me.pagination = respuesta.pagination;
-                console.log("Listad0");
             })
                 .catch(function (error) {
                     console.log(error);
@@ -2236,23 +1732,18 @@ export default {
         //--grupo listado ,registro y actualizar
         listargrupo(page, buscar, criterio) {
             let me = this;
-            console.log("ListanoGrupos");
             var url = '/grupos?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                console.log(respuesta);
                 me.arrayBuscador = respuesta.grupos.data;
                 me.pagination = respuesta.pagination;
-                console.log("Listad::");
             })
                 .catch(function (error) {
                     console.log('ERRORES', error);
                 });
         },
         registrarGrupo() {
-            // if (this.validarPersona()){
-            //     return;
-            // }                
+
             let me = this;
 
             axios.post('/grupos/registrar', {
@@ -2287,7 +1778,6 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.precios = respuesta.precio.data;
-                console.log('PRECIOS', me.precios);
                 //me.precioCount = me.arrayBuscador.length;
             }).catch(function (error) {
                 console.log(error);
@@ -2302,7 +1792,6 @@ export default {
             let me = this;
             var url = '/medida/selectMedida';
             axios.get(url).then(function (response) {
-                //console.log(response);
                 var respuesta = response.data;
                 me.arrayMedida = respuesta.medidas;
             })
@@ -2385,7 +1874,6 @@ export default {
             reader.readAsDataURL(file);
         },
         calcularPrecioValorMoneda(precio) {
-            console.log(precio)
             return ((precio * parseFloat(this.monedaPrincipal)).toFixed(2))
         },
         convertDolar(precio) {
@@ -2395,7 +1883,6 @@ export default {
             let me = this;
 
             axios.post('/articulo/registrar', data).then(function (response) {
-                console.log("Registro")
                 me.cerrarModal();
                 me.listarArticulo(1, '', 'nombre');
                 me.toastSuccess("Articulo registrado correctamente")
@@ -2420,7 +1907,6 @@ export default {
                 me.cerrarModal();
                 me.listarArticulo(1, '', 'nombre');
                 me.toastSuccess("Articulo actualizado correctamente")
-                console.log(response)
             }).catch(function (error) {
                 console.log(error);
                 me.toastError("No se puedo actualizar el articulo")
@@ -2536,7 +2022,6 @@ export default {
             }).then(function (response) {
                 me.cerrarModal3();
                 //me.modal3=0;
-                console.log(response)
                 me.listarIndustria(1, '', 'nombre');
             }).catch(function (error) {
                 console.log(error);
@@ -2576,7 +2061,6 @@ export default {
             }).then(function (response) {
                 me.cerrarModal3();
                 //me.modal3=0;
-                console.log(response)
                 me.listarMarca(1, '', 'nombre');
             }).catch(function (error) {
                 console.log(error);
@@ -2617,7 +2101,6 @@ export default {
             }).then(function (response) {
                 me.cerrarModal3();
                 //me.modal3=0;
-                console.log(response)
                 me.listarLinea(1, '', 'nombre');
             }).catch(function (error) {
                 console.log(error);
@@ -2657,7 +2140,6 @@ export default {
                 'estado': this.estado
             }).then(function (response) {
                 me.cerrarModal7();
-                console.log(response)
                 me.listarMedida(1, '', 'descripcion_medida');
             }).catch(function (error) {
                 console.log(error);
@@ -2760,23 +2242,6 @@ export default {
             this.precio_dos = 0;
             this.precio_tres = 0;
             this.precio_cuatro = 0;
-
-            // unidad_envaseVacio: false,
-            // nombre_genericoVacio: false,
-            // precio_costo_unidVacio: false,
-            // precio_costo_paqVacio: false,
-            // precio_ventaVacio: false,
-            // costo_compraVacio: false,
-            // stockVacio: false,
-            // descripcionVacio: false,
-            // fecha_vencimientoVacio: false,
-            // fotografiaVacio: false,
-            // lineaseleccionadaVacio: false,
-            // marcaseleccionadaVacio: false,
-            // industriaseleccionadaVacio: false,
-            // proveedorseleccionadaVacio: false,
-            // gruposeleccionadaVacio: false,
-            // medidaseleccionadaVacio: false,
         },
         abrirModal(modelo, accion, data = []) {
             switch (modelo) {
@@ -2821,7 +2286,6 @@ export default {
                                 }
                             case 'actualizar':
                                 {
-                                    console.log("datass", data);
                                     this.modal = 1;
                                     this.tituloModal = 'Actualizar Artículo';
                                     this.tipoAccion = 2;
@@ -2894,7 +2358,6 @@ export default {
 
         calcularPrecio(precio, index) {
             if (isNaN(this.datosFormulario.precio_costo_unid) || isNaN(parseFloat(precio.porcentage))) {
-                console.log('El valor de precio_costo_unid o porcentaje no es válido');
                 return;
             }
             const margen_ganancia = parseFloat(this.datosFormulario.precio_costo_unid) * (parseFloat(precio.porcentage) / 100);
@@ -2909,8 +2372,6 @@ export default {
             } else if (index === 3) {
                 this.precio_cuatro = precio_publico.toFixed(2);
             }
-            console.log('Precio público:', precio_publico);
-            console.log('precio_dos:', this.precio_dos);
         },
 
         cerrarModal3() {
@@ -3194,9 +2655,6 @@ export default {
                 me.mostrarProveedores = respuesta.configuracionTrabajo.mostrarProveedores;
 
                 me.monedaPrincipal = [respuesta.configuracionTrabajo.valor_moneda_principal, respuesta.configuracionTrabajo.simbolo_moneda_principal]
-                console.log("MostrarCostos: " + me.mostrarCostos);
-                console.log("ProveedorEstado: " + me.mostrarProveedores);
-                console.log("MostrarSaldosStock: " + me.mostrarSaldosStock);
 
             })
                 .catch(function (error) {
@@ -3205,7 +2663,6 @@ export default {
         },
         recuperarIdRol() {
             this.rolUsuario = window.userData.rol;
-            console.log('ID_ROL: ' + this.rolUsuario);
         },
 
     },
@@ -3218,57 +2675,58 @@ export default {
     }
 }
 </script>
-<style>    .card-error {
-        margin-bottom: 10px;
-        width: 100%;
-        padding: 15px;
-        border-radius: 15px;
-        border: 2px solid #ab7078;
-        background-color: #fec0ca;
+<style>
+.card-error {
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 15px;
+    border-radius: 15px;
+    border: 2px solid #ab7078;
+    background-color: #fec0ca;
 
-    }
+}
 
-    .csv-headers-container {
-        margin-top: 10px;
-    }
+.csv-headers-container {
+    margin-top: 10px;
+}
 
-    .csv-headers-list {
-        list-style-type: none;
-        padding: 0;
-        display: flex;
-        flex-wrap: wrap;
-    }
+.csv-headers-list {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
 
-    .csv-header {
-        background-color: #3498db;
-        color: white;
-        padding: 5px 10px;
-        margin: 5px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
+.csv-header {
+    background-color: #3498db;
+    color: white;
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
-    .csv-header label {
-        display: flex;
-        align-items: center;
-    }
+.csv-header label {
+    display: flex;
+    align-items: center;
+}
 
-    .csv-header input {
-        margin-right: 5px;
-    }
+.csv-header input {
+    margin-right: 5px;
+}
 
-    .selected-headers-container {
-        margin-top: 10px;
-    }
+.selected-headers-container {
+    margin-top: 10px;
+}
 
-    .selected-headers-list {
-        list-style-type: none;
-        padding: 10px;
-        display: flex;
-        flex-wrap: wrap;
-    }
+.selected-headers-list {
+    list-style-type: none;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+}
 
-    /* .selected-header {
+/* .selected-header {
         box-shadow: 10px 5px 5px black;
         color: black;
 
@@ -3277,245 +2735,42 @@ export default {
         box-shadow: 3px -7px 38px -1px rgba(27, 209, 11, 0.69);
     } */
 
-    .modal-content {
-        width: 100% !important;
-        position: absolute !important;
-    }
+.modal-content {
+    width: 100% !important;
+    position: absolute !important;
+}
 
-    .mostrar {
+.mostrar {
 
-        display: list-item !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        background-color: #3c29297a !important;
-    }
+    display: list-item !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    background-color: #3c29297a !important;
+}
 
-    .div-error {
-        display: flex;
-        justify-content: center;
-    }
+.div-error {
+    display: flex;
+    justify-content: center;
+}
 
-    .text-error {
-        color: red !important;
-        font-weight: bold;
-    }
+.text-error {
+    color: red !important;
+    font-weight: bold;
+}
 
-    .table-responsive {
-        overflow-x: auto;
-    }
+.table-responsive {
+    overflow-x: auto;
+}
 
 
-    .sticky-column {
-        position: sticky;
-        left: 0;
-        z-index: 1;
-        background-color: white;
-    }
+.sticky-column {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: white;
+}
 
-    .border-red {
-        border-color: red !important;
-    }
-
-    .loader {
-        display: block;
-        position: relative;
-        height: 12px;
-        width: 100%;
-        border: 1px solid #fff;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .loader::after {
-        content: '';
-        width: 40%;
-        height: 100%;
-        background: #FF3D00;
-        position: absolute;
-        top: 0;
-        left: 0;
-        box-sizing: border-box;
-        animation: animloader 2s linear infinite;
-    }
-
-    @keyframes animloader {
-        0% {
-            left: 0;
-            transform: translateX(-100%);
-        }
-
-        100% {
-            left: 100%;
-            transform: translateX(0%);
-        }
-    }
-
-    /**
- * Extracted from: SweetAlert
- * Modified by: Istiak Tridip
- */
-    .success-checkmark {
-        width: 80px;
-        height: 115px;
-        margin: 0 auto;
-
-        .check-icon {
-            width: 80px;
-            height: 80px;
-            position: relative;
-            border-radius: 50%;
-            box-sizing: content-box;
-            border: 4px solid #4CAF50;
-
-            &::before {
-                top: 3px;
-                left: -2px;
-                width: 30px;
-                transform-origin: 100% 50%;
-                border-radius: 100px 0 0 100px;
-            }
-
-            &::after {
-                top: 0;
-                left: 30px;
-                width: 60px;
-                transform-origin: 0 50%;
-                border-radius: 0 100px 100px 0;
-                animation: rotate-circle 4.25s ease-in;
-            }
-
-            &::before,
-            &::after {
-                content: '';
-                height: 100px;
-                position: absolute;
-                background: #FFFFFF;
-                transform: rotate(-45deg);
-            }
-
-            .icon-line {
-                height: 5px;
-                background-color: #4CAF50;
-                display: block;
-                border-radius: 2px;
-                position: absolute;
-                z-index: 10;
-
-                &.line-tip {
-                    top: 46px;
-                    left: 14px;
-                    width: 25px;
-                    transform: rotate(45deg);
-                    animation: icon-line-tip 0.75s;
-                }
-
-                &.line-long {
-                    top: 38px;
-                    right: 8px;
-                    width: 47px;
-                    transform: rotate(-45deg);
-                    animation: icon-line-long 0.75s;
-                }
-            }
-
-            .icon-circle {
-                top: -4px;
-                left: -4px;
-                z-index: 10;
-                width: 80px;
-                height: 80px;
-                border-radius: 50%;
-                position: absolute;
-                box-sizing: content-box;
-                border: 4px solid rgba(76, 175, 80, .5);
-            }
-
-            .icon-fix {
-                top: 8px;
-                width: 5px;
-                left: 26px;
-                z-index: 1;
-                height: 85px;
-                position: absolute;
-                transform: rotate(-45deg);
-                background-color: #FFFFFF;
-            }
-        }
-    }
-
-    @keyframes rotate-circle {
-        0% {
-            transform: rotate(-45deg);
-        }
-
-        5% {
-            transform: rotate(-45deg);
-        }
-
-        12% {
-            transform: rotate(-405deg);
-        }
-
-        100% {
-            transform: rotate(-405deg);
-        }
-    }
-
-    @keyframes icon-line-tip {
-        0% {
-            width: 0;
-            left: 1px;
-            top: 19px;
-        }
-
-        54% {
-            width: 0;
-            left: 1px;
-            top: 19px;
-        }
-
-        70% {
-            width: 50px;
-            left: -8px;
-            top: 37px;
-        }
-
-        84% {
-            width: 17px;
-            left: 21px;
-            top: 48px;
-        }
-
-        100% {
-            width: 25px;
-            left: 14px;
-            top: 45px;
-        }
-    }
-
-    @keyframes icon-line-long {
-        0% {
-            width: 0;
-            right: 46px;
-            top: 54px;
-        }
-
-        65% {
-            width: 0;
-            right: 46px;
-            top: 54px;
-        }
-
-        84% {
-            width: 55px;
-            right: 0px;
-            top: 35px;
-        }
-
-        100% {
-            width: 47px;
-            right: 8px;
-            top: 38px;
-        }
-    }
+.border-red {
+    border-color: red !important;
+}
 </style>
