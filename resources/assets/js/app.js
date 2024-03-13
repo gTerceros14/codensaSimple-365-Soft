@@ -33,6 +33,10 @@ Vue.component(
 );
 
 Vue.component("AbonarCuota", require("./components/creditos/AbonarCuota.vue"));
+Vue.component(
+  "ImportarExcel",
+  require("./components/productos/ImportarExcel.vue")
+);
 
 Vue.component("icon-button", require("./components/buttons/IconButton.vue"));
 
@@ -200,7 +204,6 @@ Vue.component(
   require("./components/ReporteDetalladoFisicoMovimientos.vue")
 );
 
-
 Vue.component(
   "ventasinstitucionales",
   require("./components/VentasInstitucionales.vue")
@@ -224,6 +227,11 @@ Vue.component(
 Vue.component(
   "reporteinventariofisicovalorado",
   require("./components/ReporteInventarioFisicoValorado.vue")
+);
+
+Vue.component(
+  "reporteinventariofisico",
+  require("./components/ReporteInventarioFisico.vue")
 );
 
 Vue.component(

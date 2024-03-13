@@ -17,6 +17,7 @@ use App\CuotasCredito;
 use App\Empresa;
 use App\Caja;
 use App\Factura;
+use App\FacturaFueraLinea;
 use App\FacturaInstitucional;
 use App\Http\Controllers\CifrasEnLetrasController;
 use Illuminate\Support\Facades\Log;
@@ -60,40 +61,48 @@ class VentaController extends Controller
         $usuario = \Auth::user();
 
         if ($buscar == '') {
-            $ventas = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
+            $ventas = Factura::join('ventas', 'facturas.idventa', '=', 'ventas.id')
+                ->join('personas', 'facturas.idcliente', '=', 'personas.id')
                 ->join('users', 'ventas.idusuario', '=', 'users.id')
                 ->select(
-                    'ventas.id',
-                    'ventas.tipo_comprobante',
+                    'facturas.*',
+                    'ventas.tipo_comprobante as tipo_comprobante',
                     'ventas.serie_comprobante',
-                    'ventas.num_comprobante',
-                    'ventas.fecha_hora',
-                    'ventas.impuesto',
-                    'ventas.total',
+                    'ventas.num_comprobante as num_comprobante',
+                    'ventas.fecha_hora as fecha_hora',
+                    'ventas.impuesto as impuesto',
+                    'ventas.total as total',
                     'ventas.idtipo_venta',
-                    'ventas.estado',
-                    'personas.nombre',
-                    'users.usuario'
+                    'ventas.estado as estado',
+                    'personas.nombre as razonSocial', 
+                    'personas.email as email', 
+                    'personas.num_documento as documentoid', 
+                    'personas.complemento_id as complementoid',
+                    'users.usuario as usuario'
                 )
-                ->orderBy('ventas.id', 'desc')->paginate(6);
+                ->orderBy('facturas.id', 'desc')->paginate(3);
         } else {
-            $ventas = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
-                ->join('users', 'ventas.idusuario', '=', 'users.id')
-                ->select(
-                    'ventas.id',
-                    'ventas.tipo_comprobante',
-                    'ventas.serie_comprobante',
-                    'ventas.num_comprobante',
-                    'ventas.fecha_hora',
-                    'ventas.impuesto',
-                    'ventas.total',
+            $ventas = Factura::join('ventas', 'facturas.idventa', '=', 'ventas.id')
+            ->join('personas', 'facturas.idcliente', '=', 'personas.id')
+            ->join('users', 'ventas.idusuario', '=', 'users.id')
+            ->select(
+                'facturas.*',
+                'ventas.tipo_comprobante as tipo_comprobante',
+                'ventas.serie_comprobante',
+                'ventas.num_comprobante as num_comprobante',
+                'ventas.fecha_hora as fecha_hora',
+                'ventas.impuesto as impuesto',
+                'ventas.total as total',
                     'ventas.idtipo_venta',
-                    'ventas.estado',
-                    'personas.nombre',
-                    'users.usuario'
-                )
-                ->where('ventas.' . $criterio, 'like', '%' . $buscar . '%')
-                ->orderBy('ventas.id', 'desc')->paginate(6);
+                'ventas.estado as estado',
+                'personas.nombre as razonSocial', 
+                'personas.email as email', 
+                'personas.num_documento as documentoid', 
+                'personas.complemento_id as complementoid',
+                'users.usuario as usuario'
+            )
+                ->where('facturas.' . $criterio, 'like', '%' . $buscar . '%')
+                ->orderBy('facturas.id', 'desc')->paginate(6);
         }
 
         return [
@@ -109,6 +118,73 @@ class VentaController extends Controller
             'usuario' => $usuario
         ];
     }
+
+    public function ventaOffline(Request $request)
+    {
+        if (!$request->ajax())
+            return redirect('/');
+
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+        $usuario = \Auth::user();
+
+        if ($buscar == '') {
+            $facturasOffline = FacturaFueraLinea::join('ventas', 'factura_fuera_lineas.idventa', '=', 'ventas.id')
+                ->join('personas', 'factura_fuera_lineas.idcliente', '=', 'personas.id')
+                ->join('users', 'ventas.idusuario', '=', 'users.id')
+                ->select(
+                    'factura_fuera_lineas.*',
+                    'ventas.tipo_comprobante as tipo_comprobante',
+                    'ventas.serie_comprobante',
+                    'ventas.num_comprobante as num_comprobante',
+                    'ventas.fecha_hora as fecha_hora',
+                    'ventas.impuesto as impuesto',
+                    'ventas.total as total',
+                    'ventas.estado as estado',
+                    'personas.nombre as razonSocial', 
+                    'personas.email as email', 
+                    'personas.num_documento as documentoid', 
+                    'personas.complemento_id as complementoid',
+                    'users.usuario as usuario'
+                )
+                ->orderBy('factura_fuera_lineas.id', 'desc')->paginate(3);
+        } else {
+            $facturasOffline = FacturaFueraLinea::join('ventas', 'factura_fuera_lineas.idventa', '=', 'ventas.id')
+                ->join('personas', 'factura_fuera_lineas.idcliente', '=', 'personas.id')
+                ->join('users', 'ventas.idusuario', '=', 'users.id')
+                ->select(
+                    'factura_fuera_lineas.*',
+                    'ventas.tipo_comprobante as tipo_comprobante',
+                    'ventas.serie_comprobante',
+                    'ventas.num_comprobante as num_comprobante',
+                    'ventas.fecha_hora as fecha_hora',
+                    'ventas.impuesto as impuesto',
+                    'ventas.total as total',
+                    'ventas.estado as estado',
+                    'personas.nombre as razonSocial', 
+                    'personas.email as email', 
+                    'personas.num_documento as documentoid', 
+                    'personas.complemento_id as complementoid',
+                    'users.usuario as usuario'
+                )
+                ->where('factura_fuera_lineas.' . $criterio, 'like', '%' . $buscar . '%')
+                ->orderBy('factura_fuera_lineas.id', 'desc')->paginate(3);
+        }
+
+        return [
+            'pagination' => [
+                'total' => $facturasOffline->total(),
+                'current_page' => $facturasOffline->currentPage(),
+                'per_page' => $facturasOffline->perPage(),
+                'last_page' => $facturasOffline->lastPage(),
+                'from' => $facturasOffline->firstItem(),
+                'to' => $facturasOffline->lastItem(),
+            ],
+            'facturasOffline' => $facturasOffline,
+            'usuario' => $usuario
+        ];
+    }
+
     public function indexBuscar(Request $request)
     {
         if (!$request->ajax()) {
@@ -219,20 +295,27 @@ class VentaController extends Controller
 
     public function obtenerUltimoComprobante(Request $request)
     {
-        $ultimoComprobante = DB::table('Facturas')
+        $ultimoComprobanteFacturas = DB::table('Facturas')
             ->select('numeroFactura')
             ->orderBy('numeroFactura', 'desc')
             ->limit(1)
             ->first();
 
-        if ($ultimoComprobante) {
-            $lastComprobante = $ultimoComprobante->numeroFactura;
-        } else {
-            $lastComprobante = 1;
-        }
+        $ultimoComprobanteFueraLineas = DB::table('factura_fuera_lineas')
+            ->select('numeroFactura')
+            ->orderBy('numeroFactura', 'desc')
+            ->limit(1)
+            ->first();
+
+        $lastComprobanteFacturas = $ultimoComprobanteFacturas ? $ultimoComprobanteFacturas->numeroFactura : 0;
+        $lastComprobanteFueraLineas = $ultimoComprobanteFueraLineas ? $ultimoComprobanteFueraLineas->numeroFactura : 0;
+
+        // Obtener el número mayor entre las dos tablas
+        $lastComprobante = max($lastComprobanteFacturas, $lastComprobanteFueraLineas);
 
         return response()->json(['last_comprobante' => $lastComprobante]);
     }
+
 
     public function obtenerCabecera(Request $request)
     {
@@ -323,6 +406,8 @@ class VentaController extends Controller
     {
         if (!$request->ajax())
             return redirect('/');
+
+        $idtipoventa = $request->idtipo_venta;
 
         try {
             DB::beginTransaction();
@@ -877,6 +962,24 @@ class VentaController extends Controller
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
     }
 
+    public function verificarNit($numeroDocumento)
+    {
+        $user = Auth::user();
+        $sucursal = $user->sucursal;
+        $codSucursal = $sucursal->codigoSucursal;
+
+        require "SiatController.php";
+        $siat = new SiatController();
+        $res = $siat->verificarNit($codSucursal, $numeroDocumento);
+        if ($res->RespuestaVerificarNit->transaccion === true) {
+            $mensaje = $res->RespuestaVerificarNit->mensajesList->descripcion;
+        }else if($res->RespuestaVerificarNit->transaccion === false){
+            $mensaje = $res->RespuestaVerificarNit->transaccion;
+        }
+
+        echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
+    }
+
     public function verificacionEstadoFactura($cuf)
     {
         $user = Auth::user();
@@ -904,6 +1007,7 @@ class VentaController extends Controller
 
         $datos = $request->input('factura');
         $id_cliente = $request->input('id_cliente');
+        $idventa = $request->input('idventa');
 
         $valores = $datos['factura'][0]['cabecera'];
         $nitEmisor = str_pad($valores['nitEmisor'], 13, "0", STR_PAD_LEFT);
@@ -936,7 +1040,7 @@ class VentaController extends Controller
         $datos['factura'][0]['cabecera']['cuf'] = $cuf;
 
         $temporal = $datos['factura'];
-        //dd($temporal);
+        dd($temporal);
         $xml_temporal = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><facturaComputarizadaCompraVenta xsi:noNamespaceSchemaLocation=\"facturaComputarizadaCompraVenta.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"></facturaComputarizadaCompraVenta>");
 
         $this->formato_xml($temporal, $xml_temporal);
@@ -955,8 +1059,8 @@ class VentaController extends Controller
         $descuentoAdicional = $valores['descuentoAdicional'];
         $productos = file_get_contents(public_path("docs/facturaxml.xml"));
 
-
-        $data = $this->insertarFactura($request, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
+            
+        $data = $this->insertarFactura($request, $idventa, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
 
         if ($data) {
             // Registro exitoso
@@ -1081,6 +1185,7 @@ class VentaController extends Controller
         $datos = $request->input('factura');
         $id_cliente = $request->input('id_cliente');
         $cafc = $request->input('cafc');
+        $idventa = $request->input('idventa');
         $_SESSION['scafc'] = $cafc;
 
         $valores = $datos['factura'][0]['cabecera'];
@@ -1123,6 +1228,7 @@ class VentaController extends Controller
 
         // Guardar el archivo XML en la carpeta temporal
         $temporal = $datos['factura'];
+        //dd($temporal);
         $xml_temporal = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><facturaComputarizadaCompraVenta xsi:noNamespaceSchemaLocation=\"facturaComputarizadaCompraVenta.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"></facturaComputarizadaCompraVenta>");
         $this->formato_xml($temporal, $xml_temporal);
         $nombreArchivo = "facturaxml" . $fecha_formato . ".xml";
@@ -1135,7 +1241,7 @@ class VentaController extends Controller
         $descuentoAdicional = $valores['descuentoAdicional'];
         $productos = file_get_contents(public_path("docs/temporal/" . $nombreArchivo));
 
-        $data = $this->insertarFactura($request, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
+        $data = $this->insertarFacturaOffline($request, $idventa, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
         if ($data === true) {
             // Si la inserción fue exitosa, devolver una respuesta JSON
             return response()->json(['message' => 'Factura registrada correctamente']);
@@ -1375,13 +1481,14 @@ class VentaController extends Controller
         rmdir($directorio);
     }
 
-    public function insertarFactura(Request $request, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
+    public function insertarFactura(Request $request, $idventa, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
     {
         if (!$request->ajax()) {
             return response()->json(['error' => 'Acceso no autorizado'], 401);
         }
 
         $factura = new Factura();
+        $factura->idventa = $idventa;
         $factura->idcliente = $id_cliente;
         $factura->numeroFactura = $numeroFactura;
         $factura->cuf = $cuf;
@@ -1394,6 +1501,54 @@ class VentaController extends Controller
         $factura->estado = 1;
 
         $success = $factura->save();
+
+        return $success;
+    }
+
+    public function insertarFacturaOffline(Request $request, $idventa, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
+    {
+        if (!$request->ajax()) {
+            return response()->json(['error' => 'Acceso no autorizado'], 401);
+        }
+
+        $facturaOff = new FacturaFueraLinea();
+        $facturaOff->idventa = $idventa;
+        $facturaOff->idcliente = $id_cliente;
+        $facturaOff->numeroFactura = $numeroFactura;
+        $facturaOff->cuf = $cuf;
+        $facturaOff->fechaEmision = $fechaEmision;
+        $facturaOff->codigoMetodoPago = $codigoMetodoPago;
+        $facturaOff->montoTotal = $montoTotal;
+        $facturaOff->montoTotalSujetoIva = $montoTotalSujetoIva;
+        $facturaOff->descuentoAdicional = $descuentoAdicional;
+        $facturaOff->productos = $productos;
+        $facturaOff->estado = 1;
+
+        $success = $facturaOff->save();
+
+        return $success;
+    }
+
+    public function insertarFacturaOffline(Request $request, $idventa, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
+    {
+        if (!$request->ajax()) {
+            return response()->json(['error' => 'Acceso no autorizado'], 401);
+        }
+
+        $facturaOff = new FacturaFueraLinea();
+        $facturaOff->idventa = $idventa;
+        $facturaOff->idcliente = $id_cliente;
+        $facturaOff->numeroFactura = $numeroFactura;
+        $facturaOff->cuf = $cuf;
+        $facturaOff->fechaEmision = $fechaEmision;
+        $facturaOff->codigoMetodoPago = $codigoMetodoPago;
+        $facturaOff->montoTotal = $montoTotal;
+        $facturaOff->montoTotalSujetoIva = $montoTotalSujetoIva;
+        $facturaOff->descuentoAdicional = $descuentoAdicional;
+        $facturaOff->productos = $productos;
+        $facturaOff->estado = 1;
+
+        $success = $facturaOff->save();
 
         return $success;
     }
@@ -1539,12 +1694,11 @@ class VentaController extends Controller
             $mensaje = $res->RespuestaCierrePuntoVenta->mensajesList->descripcion;
         }
 
-        // Imprimir o retornar el mensaje, o realizar otras acciones según tu necesidad
         echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
         //var_dump($res);
     }
 
-    public function imprimirFactura($id)
+    public function imprimirFactura($id, $email)
     {
 
         $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
@@ -1642,7 +1796,7 @@ class VentaController extends Controller
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell(38, 5, 'NIT/CI/CEX:    ', 0, 0, 'R');
         $pdf->SetFont('Arial', '', 8);
-        $pdf->Cell(32, 5, $documentoid . "-" . $complementoid, 0, 1, 'L');
+        $pdf->Cell(32, 5, $documentoid . $complementoid, 0, 1, 'L');
 
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell(40, 5, utf8_decode('Nombre/Razón Social:'), 0, 0, 'L');
@@ -1734,10 +1888,17 @@ class VentaController extends Controller
         $pdf->Cell(170, 5, utf8_decode('"Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación en línea"'), 0, 1, 'C');
 
         $pdf->Output(public_path('docs/facturaCarta.pdf'), 'F');
+
+        $pdfPath = public_path('docs/facturaCarta.pdf');
+        $xmlPath = public_path("docs/facturaxml.xml");
+
+        \Mail::to($email)->send(new \App\Mail\MailPrueba($xmlPath, $pdfPath));
+
         return response()->download(public_path('docs/facturaCarta.pdf'));
+
     }
 
-    public function imprimirFacturaRollo($id)
+    public function imprimirFacturaRollo($id, $email)
     {
 
         $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
@@ -1935,6 +2096,418 @@ class VentaController extends Controller
         $pdf->Cell(0, 3, utf8_decode('Este documento es la Representación Gráfica de un'), 0, 1, 'C');
         $pdf->Cell(0, 3, utf8_decode('Documento Fiscal Digital emitido en una modalidad de'), 0, 1, 'C');
         $pdf->Cell(0, 3, utf8_decode('facturación en línea'), 0, 1, 'C');
+        $pdf->Ln(3);
+
+        $textY = $pdf->GetY();
+
+        $imageWidth = 25;
+        $pageWidth = $pdf->GetPageWidth();
+        $imageX = ($pageWidth - $imageWidth) / 2;
+        $pdf->Image(public_path('qr/qrcode.png'), $imageX, $textY + 3, $imageWidth, 0, 'PNG');
+
+
+
+        $pdf->Output(public_path('docs/facturaRollo.pdf'), 'F');
+
+        $pdfPath = public_path('docs/facturaRollo.pdf');
+        $xmlPath = public_path("docs/facturaxml.xml");
+
+        \Mail::to($email)->send(new \App\Mail\MailPrueba($xmlPath, $pdfPath));
+
+        return response()->download(public_path('docs/facturaRollo.pdf'));
+    }
+
+    public function imprimirFacturaOffline($id) 
+    {
+
+        $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
+            ->select('facturas.*', 'personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
+            ->where('facturas.id', '=', $id)
+            ->orderBy('facturas.id', 'desc')->paginate(3);
+
+        Log::info('Resultado', [
+            //'facturas' => $facturas,
+            'idFactura' => $id,
+        ]);
+
+        $xml = $facturas[0]->productos;
+        $archivoXML = new SimpleXMLElement($xml);
+        $nitEmisor = $archivoXML->cabecera[0]->nitEmisor;
+        $numeroFactura = str_pad($archivoXML->cabecera[0]->numeroFactura, 5, "0", STR_PAD_LEFT);
+        $cuf = $archivoXML->cabecera[0]->cuf;
+        $direccion = $archivoXML->cabecera[0]->direccion;
+        $telefono = $archivoXML->cabecera[0]->telefono;
+        $municipio = $archivoXML->cabecera[0]->municipio;
+        $fechaEmision = $archivoXML->cabecera[0]->fechaEmision;
+        $documentoid = $archivoXML->cabecera[0]->numeroDocumento;
+        $razonSocial = $archivoXML->cabecera[0]->nombreRazonSocial;
+        $codigoCliente = $archivoXML->cabecera[0]->codigoCliente;
+        $montoTotal = $archivoXML->cabecera[0]->montoTotal;
+        $descuentoAdicional = $archivoXML->cabecera[0]->descuentoAdicional;
+        $leyenda = $archivoXML->cabecera[0]->leyenda;
+        $complementoid = $archivoXML->cabecera[0]->complemento;
+
+
+        $totalpagar = number_format(floatval($montoTotal), 2);
+        $totalpagar = str_replace(',', '', $totalpagar);
+        $totalpagar = str_replace('.', ',', $totalpagar);
+        $cifrasEnLetras = new CifrasEnLetrasController();
+        $letra = ($cifrasEnLetras->convertirBolivianosEnLetras($totalpagar));
+
+
+        $url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=' . $nitEmisor . '&cuf=' . $cuf . '&numero=' . $numeroFactura . '&t=2';
+        $options = new QROptions([
+            'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+            'imageBase64' => false,
+            'scale' => 10,
+        ]);
+        $qrCode = new QRCode($options);
+        $qrCode->render($url, public_path('qr/qrcode.png'));
+
+
+        $pdf = new FPDF('P', 'mm', 'Letter');
+        $pdf->AddPage();
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(60, 4, utf8_decode('CONTAB SRL'), 0, 0, 'C');
+        $pdf->Cell(40, 4, '', 0, 0, 'C');
+        $pdf->Cell(27, 4, '', 0, 0, 'C');
+        $pdf->Cell(38, 4, 'NIT', 0, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(32, 4, $nitEmisor, 0, 1, 'L');
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(60, 4, utf8_decode('CASA MATRIZ'), 0, 0, 'C');
+        $pdf->Cell(40, 4, '', 0, 0, 'C');
+        $pdf->Cell(27, 4, '', 0, 0, 'C');
+        $pdf->Cell(38, 4, utf8_decode('FACTURA N°'), 0, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(32, 4, $numeroFactura, 0, 1, 'L');
+
+        $pdf->Cell(60, 4, utf8_decode('N° Punto de Venta 0'), 0, 0, 'C');
+        $pdf->Cell(40, 4, '', 0, 0, 'C');
+        $pdf->Cell(27, 4, '', 0, 0, 'C');
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(38, 4, utf8_decode('CÓD. AUTORIZACIÓN'), 0, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $y = $pdf->GetY();
+        $pdf->MultiCell(32, 4, $cuf, 0, 'L');
+
+        $pdf->SetY($y + 4);
+        $pdf->MultiCell(60, 3, utf8_decode($direccion), 0, 'C');
+
+        $pdf->Cell(60, 4, utf8_decode('Teléfono: ' . $telefono), 0, 1, 'C');
+        $pdf->Cell(60, 4, utf8_decode($municipio), 0, 1, 'C');
+
+        $pdf->Ln(5);
+        $pdf->SetFont('Arial', 'B', 14);
+        $pdf->Cell(0, 6, utf8_decode('FACTURA'), 0, 1, 'C');
+
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(0, 4, utf8_decode('(Con Derecho a Crédito Fiscal)'), 0, 1, 'C');
+
+        $pdf->Ln(5);
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(40, 5, utf8_decode('Fecha:'), 0, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(60, 5, $fechaEmision, 0, 0, 'L');
+
+        $pdf->Cell(27, 5, '', 0, 0, 'C');
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(38, 5, 'NIT/CI/CEX:    ', 0, 0, 'R');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(32, 5, $documentoid . $complementoid, 0, 1, 'L');
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(40, 5, utf8_decode('Nombre/Razón Social:'), 0, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(60, 5, utf8_decode($razonSocial), 0, 0, 'L');
+        $pdf->Cell(27, 5, '', 0, 0, 'C');
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(38, 5, 'Cod. Cliente:    ', 0, 0, 'R');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(32, 5, $documentoid, 0, 1, 'L');
+
+        $pdf->Ln(5);
+        $pdf->SetFont('Arial', 'B', 8);
+        $y = $pdf->GetY();
+        $pdf->MultiCell(25, 3.5, utf8_decode('CÓDIGO PRODUCTO / SERVICIO'), 1, 'C');
+        $pdf->SetY($y);
+        $pdf->SetX(35);
+        $pdf->MultiCell(25, 3.5, utf8_decode("\nCANTIDAD\n "), 1, 'C');
+        $pdf->SetY($y);
+        $pdf->SetX(60);
+        $pdf->MultiCell(20, 3.5, utf8_decode("\nUNIDAD DE MEDIDA"), 1, 'C');
+        $pdf->SetY($y);
+        $pdf->SetX(80);
+        $pdf->MultiCell(50, 3.5, utf8_decode("\nDESCRIPCIÓN\n "), 1, 'C');
+        $pdf->SetY($y);
+        $pdf->SetX(130);
+        $pdf->MultiCell(25, 3.5, utf8_decode("\nPRECIO UNITARIO"), 1, 'C');
+        $pdf->SetY($y);
+        $pdf->SetX(155);
+        $pdf->MultiCell(25, 3.5, utf8_decode("\nDESCUENTO\n "), 1, 'C');
+        $pdf->SetY($y);
+        $pdf->SetX(180);
+        $pdf->MultiCell(27, 3.5, utf8_decode("\nSUBTOTAL\n "), 1, 'C');
+
+
+        $pdf->SetFont('Arial', '', 8);
+        $detalle = $archivoXML->detalle;
+        $sumaSubTotales = 0.0;
+        foreach ($detalle as $p) {
+            $pdf->Cell(25, 5, $p->codigoProducto, 1, 0, 'L');
+            $pdf->Cell(25, 5, $p->cantidad, 1, 0, 'R');
+            $pdf->Cell(20, 5, $p->unidadMedida, 1, 0, 'L');
+            $pdf->Cell(50, 5, $p->descripcion, 1, 0, 'L');
+            $pdf->Cell(25, 5, number_format(floatval($p->precioUnitario), 2), 1, 0, 'R');
+            $pdf->Cell(25, 5, number_format(floatval($p->montoDescuento), 2), 1, 0, 'R');
+            $pdf->Cell(27, 5, number_format(floatval($p->subTotal), 2), 1, 1, 'R');
+
+            //Sumar el subTotal actual
+            $sumaSubTotales += floatval($p->subTotal);
+        }
+
+        $pdf->Cell(120, 5, '', 0, 0, 'L');
+        $pdf->Cell(50, 5, 'SUBTOTAL Bs.', 1, 0, 'R');
+        $pdf->Cell(27, 5, number_format(floatval($sumaSubTotales), 2), 1, 1, 'R');
+
+        $pdf->Cell(120, 5, '', 0, 0, 'L');
+        $pdf->Cell(50, 5, 'DESCUENTO Bs.', 1, 0, 'R');
+        $pdf->Cell(27, 5, number_format(floatval($descuentoAdicional), 2), 1, 1, 'R');
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(120, 5, 'Son: ' . ucfirst($letra), 0, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(50, 5, 'TOTAL Bs.', 1, 0, 'R');
+        $pdf->Cell(27, 5, number_format(floatval(($montoTotal)), 2), 1, 1, 'R');
+
+        $pdf->Cell(120, 5, '', 0, 0, 'L');
+        $pdf->Cell(50, 5, 'MONTO GIFT CARD Bs.', 1, 0, 'R');
+        $pdf->Cell(27, 5, '0.00', 1, 1, 'R');
+
+        $pdf->Cell(120, 5, '', 0, 0, 'L');
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(50, 5, 'MONTO A PAGAR Bs.', 1, 0, 'R');
+        $pdf->Cell(27, 5, number_format(floatval(($montoTotal)), 2), 1, 1, 'R');
+
+        $pdf->Cell(120, 5, '', 0, 0, 'L');
+        $pdf->Cell(50, 5, utf8_decode('IMPORTE BASE CRÉDITO FISCAL'), 1, 0, 'R');
+        $pdf->Cell(27, 5, number_format(floatval(($montoTotal)), 2), 1, 1, 'R');
+        -
+            $pdf->Ln(10);
+        $y = $pdf->GetY();
+        $pdf->SetFont('Arial', '', 7);
+        $pdf->Cell(170, 5, utf8_decode('ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS, EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE ACUERDO A LEY'), 0, 1, 'C');
+        $pdf->Image(public_path('qr/qrcode.png'), 182, $y - 3, 25, 'PNG');
+
+        $pdf->Ln(4);
+        $pdf->Cell(170, 5, utf8_decode($leyenda), 0, 1, 'C');
+
+        $pdf->Ln(2);
+        $pdf->Cell(170, 5, utf8_decode('"Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación fuera de línea"'), 0, 1, 'C');
+
+        $pdf->Output(public_path('docs/facturaCarta.pdf'), 'F');
+        return response()->download(public_path('docs/facturaCarta.pdf'));
+    }
+
+    public function imprimirFacturaRolloOffline($id)
+    {
+
+        $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
+            ->select('facturas.*', 'personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
+            ->where('facturas.id', '=', $id)
+            ->orderBy('facturas.id', 'desc')->paginate(3);
+
+        Log::info('Resultado', [
+            //'facturas' => $facturas,
+            'idFactura' => $id,
+        ]);
+
+        $xml = $facturas[0]->productos;
+        $archivoXML = new SimpleXMLElement($xml);
+        $nitEmisor = $archivoXML->cabecera[0]->nitEmisor;
+        $numeroFactura = str_pad($archivoXML->cabecera[0]->numeroFactura, 5, "0", STR_PAD_LEFT);
+        $cuf = $archivoXML->cabecera[0]->cuf;
+        $direccion = $archivoXML->cabecera[0]->direccion;
+        $telefono = $archivoXML->cabecera[0]->telefono;
+        $municipio = $archivoXML->cabecera[0]->municipio;
+        $fechaEmision = $archivoXML->cabecera[0]->fechaEmision;
+        $fechaFormateada = date("d/m/Y h:i A", strtotime($fechaEmision));
+        $documentoid = $archivoXML->cabecera[0]->numeroDocumento;
+        $razonSocial = $archivoXML->cabecera[0]->nombreRazonSocial;
+        $codigoCliente = $archivoXML->cabecera[0]->codigoCliente;
+        $montoTotal = $archivoXML->cabecera[0]->montoTotal;
+        $descuentoAdicional = $archivoXML->cabecera[0]->descuentoAdicional;
+        $leyenda = $archivoXML->cabecera[0]->leyenda;
+        $complementoid = $archivoXML->cabecera[0]->complemento;
+
+
+        $totalpagar = number_format(floatval($montoTotal), 2);
+        $totalpagar = str_replace(',', '', $totalpagar);
+        $totalpagar = str_replace('.', ',', $totalpagar);
+        $cifrasEnLetras = new CifrasEnLetrasController();
+        $letra = ($cifrasEnLetras->convertirBolivianosEnLetras($totalpagar));
+
+
+        $url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=' . $nitEmisor . '&cuf=' . $cuf . '&numero=' . $numeroFactura . '&t=2';
+        $options = new QROptions([
+            'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+            'imageBase64' => false,
+            'scale' => 10,
+        ]);
+        $qrCode = new QRCode($options);
+        $qrCode->render($url, public_path('qr/qrcode.png'));
+
+        //$pdf = new FPDF('P', 'mm', array(80, 0));
+        $pdf = new FPDF('P', 'mm', array(80, 250));
+        //$pdf = new FPDF();
+
+        $pdf->SetAutoPageBreak(true, 10);
+        $pdf->SetMargins(10, 10);
+        $pdf->AddPage();
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(0, 3, 'FACTURA', 0, 1, 'C');
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(0, 3, utf8_decode('CON DERECHO A CRÉDITO FISCAL'), 0, 1, 'C');
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->Cell(0, 3, utf8_decode('365 SOFT'), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode('Casa Matriz'), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode('No. Punto de Venta 0'), 0, 1, 'C');
+
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->MultiCell(0, 3, utf8_decode($direccion), 0, 'C');
+
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->Cell(0, 3, utf8_decode('Tel. ' . $telefono), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode($municipio), 0, 1, 'C');
+
+        $y = $pdf->GetY();
+        $pdf->SetY($y + 2);
+        $pdf->SetLineWidth(0.2);
+        $pdf->SetDrawColor(0, 0, 0);
+        $pdf->Cell(0, 3, '', 'T', 1, 'C');
+
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(0, 3, 'NIT', 0, 1, 'C');
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->Cell(0, 3, utf8_decode($documentoid), 0, 1, 'C');
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(0, 3, utf8_decode('FACTURA N°'), 0, 1, 'C');
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->Cell(0, 3, utf8_decode($numeroFactura), 0, 1, 'C');
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(0, 3, utf8_decode('CÓD. AUTORIZACIÓN'), 0, 1, 'C');
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->MultiCell(0, 3, utf8_decode($cuf), 0, 'C');
+
+        $y = $pdf->GetY();
+        $pdf->SetY($y + 2);
+        $pdf->SetLineWidth(0.2);
+        $pdf->SetDrawColor(0, 0, 0);
+        $pdf->Cell(0, 3, '', 'T', 1, 'C');
+
+        $spacing = 2;
+
+        $pdf->SetX(($pdf->GetPageWidth() - $pdf->GetStringWidth('NOMBRE/RAZON SOCIAL:') - $pdf->GetStringWidth($razonSocial)) / 2);
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(10, 3, 'NOMBRE/RAZON SOCIAL:', 0, 0, 'C');
+        $pdf->SetX($pdf->GetX() + $spacing);
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->Cell(0, 3, utf8_decode($razonSocial), 0, 1, 'C');
+
+        $spacingBetweenColumns = 10;
+        $pdf->SetX(($pdf->GetPageWidth() - $pdf->GetStringWidth('NIT/CI/CEX:') - $pdf->GetStringWidth($documentoid)) / 2);
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(2.5, 3, 'NIT/CI/CEX:', 0, 0, 'C');
+        $pdf->SetX($pdf->GetX() + $spacingBetweenColumns);
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->Cell(5.5, 3, utf8_decode($documentoid), 0, 1, 'C');
+
+        $spacingBetweenColumns = 10;
+        $pdf->SetX(($pdf->GetPageWidth() - $pdf->GetStringWidth('COD. CLIENTE:') - $pdf->GetStringWidth($codigoCliente)) / 2);
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(2.5, 3, 'COD. CLIENTE:', 0, 0, 'C');
+        $pdf->SetX($pdf->GetX() + $spacingBetweenColumns);
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->Cell(9, 3, utf8_decode($codigoCliente), 0, 1, 'C');
+
+        $spacingBetweenColumns = 10;
+        $pdf->SetX(($pdf->GetPageWidth() - $pdf->GetStringWidth('FECHA DE EMISIÓN:') - $pdf->GetStringWidth($fechaEmision)) / 2);
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(21.5, 3, utf8_decode('FECHA DE EMISIÓN:'), 0, 0, 'C');
+        $pdf->SetX($pdf->GetX() + $spacingBetweenColumns);
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->Cell(10, 3, utf8_decode($fechaFormateada), 0, 1, 'C');
+
+        $y = $pdf->GetY();
+        $pdf->SetY($y + 2);
+        $pdf->SetLineWidth(0.2);
+        $pdf->SetDrawColor(0, 0, 0);
+        $pdf->Cell(0, 3, '', 'T', 1, 'C');
+
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(0, 3, 'DETALLE', 0, 1, 'C');
+
+        $detalle = $archivoXML->detalle;
+        $sumaSubTotales = 0.0;
+        foreach ($detalle as $p) {
+            $pdf->SetFont('Arial', 'B', 6);
+            $pdf->Cell(0, 3, $p->codigoProducto . " - " . $p->descripcion, 0, 1, 'L');
+
+            $medida = $p->unidadMedida;
+            $nombreMedida = Medida::where('codigoClasificador', $medida)->value('descripcion_medida');
+
+            $pdf->SetFont('Arial', '', 6);
+            $pdf->Cell(0, 3, "Unidad de Medida: " . $nombreMedida, 0, 1, 'L');
+            $pdf->Cell(0, 3, number_format(floatval($p->cantidad), 2) . " X " . number_format(floatval($p->precioUnitario), 2) . " - " . number_format(floatval($p->montoDescuento), 2), 0, 0, 'L');
+            $pdf->Cell(0, 3, number_format(floatval($p->subTotal), 2), 0, 1, 'R');
+
+            $sumaSubTotales += floatval($p->subTotal);
+        }
+
+        $y = $pdf->GetY();
+        $pdf->SetY($y + 2);
+        $pdf->SetLineWidth(0.2);
+        $pdf->SetDrawColor(0, 0, 0);
+        $pdf->Cell(0, 3, '', 'T', 1, 'C');
+
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->Cell(0, 3, 'SUBTOTAL Bs', 0, 0, 'C');
+        $pdf->Cell(0, 3, number_format(floatval($sumaSubTotales), 2), 0, 1, 'R');
+        $pdf->Cell(0, 3, 'DESCUENTO Bs', 0, 0, 'C');
+        $pdf->Cell(0, 3, number_format(floatval($descuentoAdicional), 2), 0, 1, 'R');
+        $pdf->Cell(0, 3, 'TOTAL Bs', 0, 0, 'C');
+        $pdf->Cell(0, 3, number_format(floatval($montoTotal), 2), 0, 1, 'R');
+        $pdf->Cell(0, 3, 'MONTO GIFT CARD Bs', 0, 0, 'C');
+        $pdf->Cell(0, 3, '0.00', 0, 1, 'R');
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(0, 3, 'MONTO A PAGAR Bs', 0, 0, 'C');
+        $pdf->Cell(0, 3, number_format(floatval($montoTotal), 2), 0, 1, 'R');
+        $pdf->SetFont('Arial', 'B', 5);
+        $pdf->Cell(0, 3, utf8_decode('IMPORTE BASE CRÉDITO FISCAL Bs'), 0, 0, 'C');
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(0, 3, number_format(floatval($montoTotal), 2), 0, 1, 'R');
+        $pdf->Ln(6);
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->Cell(0, 3, 'Son: ' . $letra, 0, 1, 'L');
+
+        $y = $pdf->GetY();
+        $pdf->SetY($y + 2);
+        $pdf->SetLineWidth(0.2);
+        $pdf->SetDrawColor(0, 0, 0);
+        $pdf->Cell(0, 3, '', 'T', 1, 'C');
+
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->Cell(0, 3, utf8_decode('ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS,'), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode('EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE'), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode('ACUERDO A LA LEY'), 0, 1, 'C');
+        $pdf->Ln(3);
+        $pdf->SetFont('Arial', '', 5);
+        $pdf->MultiCell(0, 3, utf8_decode($leyenda), 0, 'C');
+        $pdf->Ln(3);
+        $pdf->Cell(0, 3, utf8_decode('Este documento es la Representación Gráfica de un'), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode('Documento Fiscal Digital emitido en una modalidad de'), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode('facturación fuera de línea'), 0, 1, 'C');
         $pdf->Ln(3);
 
         $textY = $pdf->GetY();

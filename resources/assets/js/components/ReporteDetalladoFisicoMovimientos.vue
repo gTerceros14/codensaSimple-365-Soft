@@ -43,7 +43,6 @@
                                     <td v-text="articulo.ingresos"></td>
                                     <td v-text="articulo.traspasos_entrada"></td>
                                     <td v-text="articulo.traspasos_salida"></td>
-                                    
                                     <td v-text="articulo.ventas"></td>
                                     <td v-text="0"></td>
                                     <td v-text="articulo.saldo_actual"></td>
@@ -1473,18 +1472,18 @@ export default {
 
             const tableYPosition = 40;
 
-            const columns = ['Codigo Item', 'Fecha', 'Descripcion', 'Detalle','Marca','Linea','Saldo Anterior','Entrada','Salida','Saldo Actual'];
+            const columns = ['Codigo Item', 'Descripcion', 'Saldo Inicial','Compras', 'Transferencia','Recepcion', 'Ventas', 'Ajuste', 'Saldo Actual'];
             const rows = this.arrayReporte.map(item => [
                     item.codigo,
-                    item.fecha_hora,
-                    item.descripcion,
-                    item.tipo_comprobante,
-                    item.nombre_marca,
-                    item.nombre_categoria,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacionFisico,
+                    item.nombre_producto,
+                    item.saldo_anterior,
+                    item.ingresos,
+                    item.traspasos_entrada,
+                    item.traspasos_salida,
+                    item.ventas,
+                    item.bb,
+                    item.saldo_actual,
+
                 ]);
 
             pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
@@ -1498,7 +1497,7 @@ export default {
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }];
             // Título del reporte
             worksheet['A1'] = { t: 's', v: 'RESUMEN FISICO DE MOVIMIENTOS', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
@@ -1519,7 +1518,7 @@ export default {
             // Estilo para los encabezados
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
             // Cabeceras de las columnas
-            const headers = ['Codigo Item', 'Fecha', 'Descripcion', 'Detalle','Marca','Linea','Saldo Anterior','Entrada','Salida','Saldo Actual'];
+            const headers = ['Codigo Item', 'Descripcion', 'Saldo Inicial','Compras', 'Transferencia','Recepcion', 'Ventas', 'Ajuste', 'Saldo Actual'];
 
             // Añadir las cabeceras a la hoja de cálculo
             headers.forEach((header, index) => {
@@ -1530,15 +1529,14 @@ export default {
             Object.values(this.sortedResultados).forEach((item, rowIndex) => {
                 const rowData = [
                     item.codigo,
-                    item.fecha_hora,
-                    item.descripcion,
-                    item.tipo_comprobante,
-                    item.nombre_marca,
-                    item.nombre_categoria,
-                    item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
-                    item.resultado_operacionFisico,
+                    item.nombre_producto,
+                    item.saldo_anterior,
+                    item.ingresos,
+                    item.traspasos_entrada,
+                    item.traspasos_salida,
+                    item.ventas,
+                    item.bb,
+                    item.saldo_actual,
                 ];
 
                 // Añadir la fila al kardex
@@ -1552,16 +1550,15 @@ export default {
 
             // Establecer el ancho de las columnas
             const columnWidths = [
-                { wch: 37.22 },
-                { wch: 21.33 },   
-                { wch: 36.67 },
-                { wch: 28.33 },
-                { wch: 8.56 },
-                { wch: 23.89 },
-                { wch: 13.68 },
-                { wch: 9.11 },
-                { wch: 9.0 },
-                { wch: 10.78 },
+                { wch: 28.00 },
+                { wch: 36.11 },   
+                { wch: 20.44 },
+                { wch: 13.00 },
+                { wch: 15.78 },
+                { wch: 21.89 },
+                { wch: 11.56 },
+                { wch: 10.0 },
+                { wch: 12.56 },
             ];
             worksheet['!cols'] = columnWidths;
 

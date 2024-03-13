@@ -1204,6 +1204,8 @@ export default {
             valorMaximoDescuento: '',
             mostrarDireccion: true,
             mostrarCUFD: true,
+            leyendaAl: '',
+            codigoExcepcion: 0,
 
             //almacenes
             arrayAlmacenes: [],
@@ -1954,6 +1956,7 @@ export default {
                         idventa: idVentaRecienRegistrada,
                         id: me.idVentaInstitucional
                     }).then(function (responseModificacion) {
+                        me.listarFactura(1, '');
                         console.log("Venta Institucional regisstrada correctamente");
                     }).catch(function (errorModificacion) {
                         console.error(errorModificacion);
@@ -2054,7 +2057,7 @@ export default {
             return me.errorVenta;
         },
 
-        emitirFactura() {
+        async emitirFactura() {
             let me = this;
 
             let numeroFactura = document.getElementById("num_comprobante").value;
@@ -2067,8 +2070,7 @@ export default {
             let fechaEmision = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
             let id_cliente = document.getElementById("idcliente").value;
             let nombreRazonSocial = document.getElementById("nombreCliente").value;
-            //let tipoDocumentoIdentidad = document.getElementById("tipo_documento").value;
-            let tipoDocumentoIdentidad = 1;
+            let tipoDocumentoIdentidad = document.getElementById("tipo_documento").value;
             let numeroDocumento = document.getElementById("documento").value;
             let complemento = document.getElementById("complemento_id").value;
             let montoTotal = (this.calcularTotal * parseFloat(this.monedaVenta[0])).toFixed(2);
@@ -2082,6 +2084,31 @@ export default {
             console.log("El tipo de documento es: " + tipoDocumentoIdentidad);
             console.log("El monto total es: " + montoTotal);
             console.log("El id de la venta es: " + idventainstitucional);
+
+            try {
+                const response = await axios.get('/factura/obtenerLeyendaAleatoria');
+                this.leyendaAl = response.data.descripcionLeyenda;
+                console.log("El dato de leyenda llegado es: " + this.leyendaAl);
+            } catch (error) {
+                console.error(error);
+                return '"Ley N° 453: Los servicios deben suministrarse en condiciones de inocuidad, calidad y seguridad."';
+            }
+
+            try {
+                    if (tipoDocumentoIdentidad === '5') {
+                        const response = await axios.post('/factura/verificarNit/' + numeroDocumento);
+                        if (response.data === 'NIT ACTIVO') {
+                            me.codigoExcepcion = 0;
+                            alert("NIT VÁLIDO.");
+                        } else {
+                            me.codigoExcepcion = 1;
+                            alert("NIT INVÁLIDO.");
+                        }
+                    }
+                } catch (error) {
+                    console.error(error);
+                    return 'No se pudo verificar el NIT';
+                }
 
             var factura = [];
             factura.push({
@@ -2111,9 +2138,9 @@ export default {
                     montoTotalMoneda: montoTotal,
                     montoGiftCard: null,
                     descuentoAdicional: descuentoAdicional,
-                    codigoExcepcion: 0,
+                    codigoExcepcion: this.codigoExcepcion,
                     cafc: null,
-                    leyenda: leyenda,
+                    leyenda: this.leyendaAl,
                     usuario: usuario,
                     codigoDocumentoSector: 1
                 }
@@ -2139,6 +2166,7 @@ export default {
                             'success'
                         )
                         me.arrayProductos = [];
+                        me.codigoExcepcion = 0;
                         me.cerrarModal2();
                         me.cerrarModal3();
                         me.listarVenta(1, '', 'id');
@@ -2159,6 +2187,7 @@ export default {
                     });
                     }
                     me.arrayProductos = [];
+                    me.codigoExcepcion = 0;
                     }
                 })
                 .catch(function (error) {

@@ -6,42 +6,14 @@
         <div class="container-fluid">
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
-                <!--<div class="card-header">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label> ALMACEN DE TRABAJO </label>
-                                <select class="form-control" v-model="AlmacenSeleccionado" @change="getDatosAlmacen">
-                                    <option value="0" disabled>Seleccione</option>
-                                    <option v-for="opcion in arrayAlmacenes" :key="opcion.id" :value="opcion.id">{{ opcion.nombre_almacen }}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="d-flex flex-column">
-                                <label class="mb-1"> MODO VISTA </label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" v-model="tipoSeleccionado" value="item" @change="cambiarTipo">
-                                    <label class="form-check-label ms-2">Por Item</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" v-model="tipoSeleccionado" value="lote" @change="cambiarTipo">
-                                    <label class="form-check-label ms-2">Por Lote</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>-->
-
                 <div class="card-header">
                     <i class="fa fa-align-justify"></i> Inventario Fisico Valorado
                     <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()"
                     class="btn btn-primary">
-                        <i class="fa fa-search"></i>&nbsp;Filtros</button>
-                    <!--<button type="button" @click="exportarExcel" class="btn btn-success">
-                        <i class="icon-doc"></i>&nbsp;Exportar a Excel
-                    </button>
-                    <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>-->
+                    <i class="fa fa-search"></i>&nbsp;Filtros</button>
+                    <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
+                    <button @click="exportarExcel" class="btn btn-success">Exportar a EXCEL</button>
+
 
                     <div class="col-md-3">
                         <div class="d-flex flex-column">
@@ -56,7 +28,6 @@
                                 </div>
                         </div>
                      </div>
-
                 </div>
                 <div class="card-body">
                     <div v-if="tipoSeleccionado == 'item'" class="table-responsive">
@@ -71,22 +42,25 @@
                                     <th>Producto</th>
                                     <th>Unidad X Paq.</th>                                   
                                     <th>Saldo_stock_total</th>
+                                    <th>Valor</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="inventario in arrayInventario" :key="inventario.id">
+                                <tr v-for="inventario in arrayReporte" :key="inventario.id">
                                     <!-- <td>
                                         <button type="button" @click="abrirModal('almacenes','actualizar',inventario)" class="btn btn-warning btn-sm">
                                         <i class="icon-pencil"></i>
                                         </button> &nbsp;
                                     </td> -->
                                     <td v-text="inventario.nombre_almacen"></td>
-                                    <td v-text="0"></td>
-                                    <td v-text="0"></td>
-                                    <td v-text="0"></td>
+                                    <td v-text="inventario.nombre_marca"></td>
+                                    <td v-text="inventario.nombre_categoria"></td>
+                                    <td v-text="inventario.nombre_industria"></td>
                                     <td v-text="inventario.nombre_producto"></td>
                                     <td v-text="inventario.unidad_envase"></td>
                                     <td v-text="inventario.saldo_stock_total"></td>
+                                    <td v-text="inventario.costo_total"></td>
+
                                 </tr>                                
                             </tbody>
                         </table>
@@ -104,22 +78,25 @@
                                     <th>Producto</th>
                                     <th>Unid.X.Paq</th>
                                     <th>Costo Unidad</th>
-                                    <th>Saldo Stock</th>
                                     <th>Fecha Vencimiento</th>
+                                    <th>Saldo Stock</th>
+                                    <th>Valor</th>
+
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="inventario in arrayInventario" :key="inventario.id">
+                                <tr v-for="inventario in arrayReporte" :key="inventario.id">
                                     <td v-text="inventario.nombre_almacen"></td>
                                     <td v-text="inventario.fecha_ingreso"></td>
-                                    <td v-text="0"></td>
-                                    <td v-text="0"></td>
-                                    <td v-text="0"></td>
+                                    <td v-text="inventario.nombre_marca"></td>
+                                    <td v-text="inventario.nombre_categoria"></td>
+                                    <td v-text="inventario.nombre_industria"></td>
                                     <td v-text="inventario.nombre_producto"></td>
                                     <td v-text="inventario.unidad_envase"></td>
                                     <td v-text="inventario.precio_costo_unid"></td>
-                                    <td v-text="inventario.saldo_stock"></td>
                                     <td v-text="inventario.fecha_vencimiento"></td>
+                                    <td v-text="inventario.saldo_stock"></td>
+                                    <td v-text="inventario.costo_total"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -521,6 +498,10 @@
     </main>
 </template>
 <script>
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import * as XLSX from 'xlsx-js-style';
+
     export default {
         data (){
             return {
@@ -597,6 +578,8 @@
                 lineaseleccionada: [],
 
                 arrayBuscador: [],
+                arrayReporte:[],
+
 
                 //fechas
                 fechaInicio:'',
@@ -754,7 +737,7 @@
                 }
             },
             cambiarTipo() {
-                this.getDatosAlmacen(); // Actualizar datos de almacén
+                this.listaReporte(); // Actualizar datos de almacén
                 //this.listarInventario(); // Listar inventario basado en almacén seleccionado
             },
             
@@ -1057,7 +1040,7 @@
             var url = '/reporte-inventario-fisico-valorado/'+me.tipoSeleccionado +'?&fecha_vencimiento=2026-01-01 ';
 
             // Agregar los parámetros obligatorios
-            //url += 'almacen=' + this.almacenseleccionada.id + '&articulo=' + this.articuloseleccionada.id + '&marca=' + this.marcaseleccionada.id + '&linea=' + this.lineaseleccionada.id + '&industria=' + this.industriaseleccionada.id ;
+            url += '&idAlmacen=' + this.almacenseleccionada.id + '&idArticulo=' + this.articuloseleccionada.id + '&idMarca=' + this.marcaseleccionada.id + '&idLinea=' + this.lineaseleccionada.id + '&idIndustria=' + this.industriaseleccionada.id ;
 
             // Agregar las fechas de inicio y fin
             //url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
@@ -1218,6 +1201,263 @@
             me.listarAlmacen(page, buscar, criterio);
         },
 
+        exportarPDF() {
+            if (this.tipoSeleccionado === 'item') {
+                this.exportarPDFITEM();
+            } else if (this.tipoSeleccionado === 'lote') {
+                this.exportarPDFLOTE();
+            }
+        },
+
+        exportarExcel() {
+            if (this.tipoSeleccionado === 'item') {
+                this.exportarExcelITEM();
+            } else if (this.tipoSeleccionado === 'lote') {
+                this.exportarExcelLOTE();
+            }
+        },
+
+        exportarPDFITEM() {
+            const pdf = new jsPDF('landscape');
+            
+            const titulo = 'INVENTARIO FISICO VALORADO';
+            const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
+            const articulo = `Articulo: ${this.articuloseleccionada.nombre}`;
+            const almacen = `Almacen: ${this.almacenseleccionada.nombre_almacen}`;
+            const linea = `Linea: ${this.lineaseleccionada.nombre}`;
+            const marca = `Marca: ${this.marcaseleccionada.nombre}`;
+            const industria = `Industria: ${this.industriaseleccionada.nombre}`;
+
+
+            pdf.setFont('helvetica');
+            pdf.setFontSize(16); // Tamaño de letra más grande para el título
+            pdf.text(titulo, 100, 10);
+
+            pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
+            pdf.text(fechaInicio, 15, 20);
+            pdf.text(almacen, 125, 20);
+            pdf.text(articulo, 240, 20);
+            pdf.text(industria, 15, 30);
+            pdf.text(linea, 125, 30);
+            pdf.text(marca, 240, 30);
+
+            const tableYPosition = 40;
+
+            const columns = ['Almacen', 'Marca', 'Linea','Industria','Producto','Unidad x Paquete','Stock','Valor'];
+            const rows = this.arrayReporte.map(item => [
+                    item.nombre_almacen,
+                    item.nombre_marca,
+                    item.nombre_categoria,
+                    item.nombre_industria,
+                    item.nombre_producto,
+                    item.unidad_envase,
+                    item.saldo_stock_total,
+                    item.costo_total,
+                ]);
+
+
+            pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
+
+            pdf.save('resumen_movimientos_fisicos.pdf');
+        },
+
+        exportarPDFLOTE() {
+            const pdf = new jsPDF('landscape');
+            
+            const titulo = 'INVENTARIO FISICO VALORADO';
+            const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
+            const articulo = `Articulo: ${this.articuloseleccionada.nombre}`;
+            const almacen = `Almacen: ${this.almacenseleccionada.nombre_almacen}`;
+            const linea = `Linea: ${this.lineaseleccionada.nombre}`;
+            const marca = `Marca: ${this.marcaseleccionada.nombre}`;
+            const industria = `Industria: ${this.industriaseleccionada.nombre}`;
+
+
+            pdf.setFont('helvetica');
+            pdf.setFontSize(16); // Tamaño de letra más grande para el título
+            pdf.text(titulo, 100, 10);
+
+            pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
+            pdf.text(fechaInicio, 15, 20);
+            pdf.text(almacen, 125, 20);
+            pdf.text(articulo, 240, 20);
+            pdf.text(industria, 15, 30);
+            pdf.text(linea, 125, 30);
+            pdf.text(marca, 240, 30);
+
+            const tableYPosition = 40;
+
+            const columns = ['Almacen', 'Fecha Ingreso', 'Marca', 'Linea','Industria','Producto','Unidad x Paquete','Costo x Unidad', 'Fecha de Vencimiento', 'Stock','Valor'];
+            const rows = this.arrayReporte.map(item => [
+                    item.nombre_almacen,
+                    item.fecha_ingreso,
+                    item.nombre_marca,
+                    item.nombre_categoria,
+                    item.nombre_industria,
+                    item.nombre_producto,
+                    item.unidad_envase,
+                    item.precio_costo_unid,
+                    item.fecha_vencimiento,
+                    item.saldo_stock,
+                    item.costo_total,
+                ]);
+
+            pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
+
+            pdf.save('resumen_movimientos_fisicos.pdf');
+        },
+
+        exportarExcelITEM() {
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.aoa_to_sheet([]);
+            const startRow = 5;
+            
+            // Merge de celdas para el título
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }];
+            // Título del reporte
+            worksheet['A1'] = { t: 's', v: 'INVENTARIO FISICO VALORADO', s: { 
+                font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
+                alignment: { horizontal: 'center', vertical: 'center' },
+                fill: { fgColor: { rgb: '3669a8' } } } };
+
+            // Estilo para la fecha
+            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
+            // Fechas de inicio y fin
+            worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
+            worksheet['C2'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
+            worksheet['F2'] = { t: 's', v: `Almacen: ${this.almacenseleccionada.nombre_almacen}`, s: fechaStyle };
+            worksheet['A3'] = { t: 's', v: `Industria: ${this.industriaseleccionada.nombre}`, s: fechaStyle };
+            worksheet['C3'] = { t: 's', v: `Marca: ${this.marcaseleccionada.nombre}`, s: fechaStyle };
+            worksheet['F3'] = { t: 's', v: `Linea: ${this.lineaseleccionada.nombre}`, s: fechaStyle };
+
+
+            // Estilo para los encabezados
+            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
+            // Cabeceras de las columnas
+            const headers = ['Almacen', 'Marca', 'Linea','Industria','Producto','Unidad x Paquete','Stock','Valor'];
+
+            // Añadir las cabeceras a la hoja de cálculo
+            headers.forEach((header, index) => {
+                worksheet[XLSX.utils.encode_cell({ r: 3, c: index })] = { t: 's', v: header, s: headerStyle };
+            });
+
+            // Añadir los datos al kardex
+            Object.values(this.arrayReporte).forEach((item, rowIndex) => {
+                const rowData = [
+                item.nombre_almacen,
+                    item.nombre_marca,
+                    item.nombre_categoria,
+                    item.nombre_industria,
+                    item.nombre_producto,
+                    item.unidad_envase,
+                    item.saldo_stock_total,
+                    item.costo_total,
+                ];
+
+                // Añadir la fila al kardex
+                XLSX.utils.sheet_add_aoa(worksheet, [rowData], { origin: `A${startRow + rowIndex}` });
+            });
+
+
+            // Establecer el ancho de las columnas
+            const columnWidths = [
+                { wch: 29.33 },
+                { wch: 26.33 },
+                { wch: 29.56 },
+                { wch: 21.11 },
+                { wch: 38.78 },
+                { wch: 19.67 },
+                { wch: 10.22 },
+                { wch: 11.78 },
+            ];
+            worksheet['!cols'] = columnWidths;
+
+            // Añadir la hoja de cálculo al libro
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'HOJA 1');
+
+            // Descargar el archivo
+            XLSX.writeFile(workbook, 'inventario_fisico_valorado.xlsx');
+        },
+
+        exportarExcelLOTE() {
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.aoa_to_sheet([]);
+            const startRow = 5;
+            
+            // Merge de celdas para el título
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 10 } }];
+            // Título del reporte
+            worksheet['A1'] = { t: 's', v: 'INVENTARIO FISICO VALORADO', s: { 
+                font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
+                alignment: { horizontal: 'center', vertical: 'center' },
+                fill: { fgColor: { rgb: '3669a8' } } } };
+
+            // Estilo para la fecha
+            const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
+            // Fechas de inicio y fin
+            worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
+            worksheet['C2'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
+            worksheet['F2'] = { t: 's', v: `Almacen: ${this.almacenseleccionada.nombre_almacen}`, s: fechaStyle };
+            worksheet['A3'] = { t: 's', v: `Industria: ${this.industriaseleccionada.nombre}`, s: fechaStyle };
+            worksheet['C3'] = { t: 's', v: `Marca: ${this.marcaseleccionada.nombre}`, s: fechaStyle };
+            worksheet['F3'] = { t: 's', v: `Linea: ${this.lineaseleccionada.nombre}`, s: fechaStyle };
+
+
+            // Estilo para los encabezados
+            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
+            // Cabeceras de las columnas
+            const headers = ['Almacen', 'Fecha Ingreso', 'Marca', 'Linea','Industria','Producto','Unidad x Paquete','Costo x Unidad', 'Fecha de Vencimiento', 'Stock','Valor'];
+
+            // Añadir las cabeceras a la hoja de cálculo
+            headers.forEach((header, index) => {
+                worksheet[XLSX.utils.encode_cell({ r: 3, c: index })] = { t: 's', v: header, s: headerStyle };
+            });
+
+            // Añadir los datos al kardex
+            Object.values(this.arrayReporte).forEach((item, rowIndex) => {
+                const rowData = [
+                    item.nombre_almacen,
+                    item.fecha_ingreso,
+                    item.nombre_marca,
+                    item.nombre_categoria,
+                    item.nombre_industria,
+                    item.nombre_producto,
+                    item.unidad_envase,
+                    item.precio_costo_unid,
+                    item.fecha_vencimiento,
+                    item.saldo_stock,
+                    item.costo_total,
+                ];
+
+                // Añadir la fila al kardex
+                XLSX.utils.sheet_add_aoa(worksheet, [rowData], { origin: `A${startRow + rowIndex}` });
+            });
+
+
+            // Establecer el ancho de las columnas
+            const columnWidths = [
+                { wch: 21.11 },
+                { wch: 12.56 },
+                { wch: 17.33 },
+                { wch: 21.56 },
+                { wch: 17.33 },
+                { wch: 37.56 },
+                { wch: 16.67 },
+                { wch: 13.14 },
+                { wch: 23.33 },
+                { wch: 8.78 },
+                { wch: 10.00 },
+            ];
+            worksheet['!cols'] = columnWidths;
+
+            // Añadir la hoja de cálculo al libro
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'HOJA 1');
+
+            // Descargar el archivo
+            XLSX.writeFile(workbook, 'inventario_fisico_valorado.xlsx');
+        },
+
+
         },
         mounted() {
             //this.listarInventario(1,this.buscar,this.criterio);
@@ -1225,7 +1465,6 @@
             //this.listarInventario(1,this.buscar,this.criterio);
             this.listarInventario();
             this.selectAlmacen();
-            this.listarPrecio();//aumenTe 6julio
             this.listarArticulo(1, this.buscar, this.criterio);
 
 
