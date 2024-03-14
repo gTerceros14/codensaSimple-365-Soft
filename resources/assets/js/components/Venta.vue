@@ -37,7 +37,7 @@
                                         class="form-control" placeholder="Texto a buscar">
                                 </div>
                             </div>
-                        </div>  
+                        </div>
                         <div class="spinner-container" v-if="mostrarSpinner">
                             <div class="spinner-message"><strong>EMITIENDO FACTURA...</strong></div>
                             <TileSpinner color="blue" />
@@ -97,11 +97,16 @@
 
                                         </td>
                                         <td>
-                                            <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank" class="btn btn-info"><i class="icon-note"></i></a>
+                                            <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank"
+                                                class="btn btn-info"><i class="icon-note"></i></a>
                                         </td>
                                         <td>
-                                            <button class="btn btn-primary" type="button" @click="imprimirFactura(venta.id, venta.email)"><i class="icon-printer"></i></button>
-                                            <button class="btn btn-danger" type="button" @click="anularFactura(venta.id, venta.cuf)"><i class="icon-close"></i></button>
+                                            <button class="btn btn-primary" type="button"
+                                                @click="imprimirFactura(venta.id, venta.email)"><i
+                                                    class="icon-printer"></i></button>
+                                            <button class="btn btn-danger" type="button"
+                                                @click="anularFactura(venta.id, venta.cuf)"><i
+                                                    class="icon-close"></i></button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -147,7 +152,8 @@
                                 <label for="" class="font-weight-bold">Razon social
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" id="nombreCliente" class="form-control" v-model="nombreCliente" ref="nombreRef" readonly>
+                                <input type="text" id="nombreCliente" class="form-control" v-model="nombreCliente"
+                                    ref="nombreRef" readonly>
                             </div>
 
                             <input type="hidden" id="idcliente" class="form-control" v-model="idcliente" ref="idRef"
@@ -156,350 +162,366 @@
                                 ref="tipoDocumentoRef" readonly>
                             <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id"
                                 ref="complementoIdRef" readonly>
-                            <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado"
+                            <input type="hidden" id="usuarioAutenticado" class="form-control"
+                                v-model="usuarioAutenticado" readonly>
+                            <input type="hidden" id="email" class="form-control" v-model="email" ref="emailRef"
                                 readonly>
-                            <input type="hidden" id="email" class="form-control" v-model="email" ref="emailRef" readonly>
 
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Documento
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" id="documento" class="form-control" v-model="documento" ref="documentoRef"
-                                    readonly>
+                                <input type="text" id="documento" class="form-control" v-model="documento"
+                                    ref="documentoRef" readonly>
                             </div>
 
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Casos especiales</label>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" v-model="casosEspeciales" id="casosEspecialesCheckbox" @change="habilitarNombreCliente">
+                                    <input class="form-check-input" type="checkbox" v-model="casosEspeciales"
+                                        id="casosEspecialesCheckbox" @change="habilitarNombreCliente">
                                     <label class="form-check-label" for="casosEspecialesCheckbox">
-                                    Habilitar
+                                        Habilitar
                                     </label>
                                 </div>
-                                
-                            <div v-if="clienteDeudas > 0" class="alert alert-danger text-center " role="alert"
-                                style="width: 100%;">
-                                Este cliente tiene <b>{{ clienteDeudas }}</b> pagos pendientes de crédito.
-                                <button type="button" class="close" @click="clienteDeudas = 0">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+
+                                <div v-if="clienteDeudas > 0" class="alert alert-danger text-center " role="alert"
+                                    style="width: 100%;">
+                                    Este cliente tiene <b>{{ clienteDeudas }}</b> pagos pendientes de crédito.
+                                    <button type="button" class="close" @click="clienteDeudas = 0">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="" class="font-weight-bold">Almacen
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <v-select label="nombre_almacen" :options="arrayAlmacenes"
+                                        placeholder="Seleccione un almacen" :onChange="getAlmacenProductos"></v-select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="" class="font-weight-bold">Tipo de comprobante
+                                        <span class="text-danger">*</span>
+                                    </label>
+
+                                    <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
+                                        <option disabled value="0">Seleccione</option>
+                                        <option value="FACTURA">Factura</option>
+                                        <option value="BOLETA">Boleta</option>
+                                        <option value="TICKET">Ticket</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="" class="font-weight-bold">Numero de comprobante
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob"
+                                        disabled>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="" class="font-weight-bold">Aplicar impuesto:
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group mb-3" id="seccionObjetivo">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text" style="height: 100%;">
+                                                <input type="checkbox" aria-label="Checkbox for following text input">
+                                            </div>
+                                        </div>
+                                        <input disabled type="text" class="form-control" value="0.18">
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Almacen
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <v-select label="nombre_almacen" :options="arrayAlmacenes"
-                                    placeholder="Seleccione un almacen" :onChange="getAlmacenProductos"></v-select>
-                            </div>
+                            <div class="form-group row border">
+                                <div class="col-md-3">
+                                    <label for="" class="font-weight-bold">Buscar articulo
+                                    </label>
+                                    <div class="input-group mb-3">
+                                        <input :disabled="!idAlmacen" type="text" class="form-control" v-model="codigo"
+                                            placeholder="Codigo del articulo" aria-label="Codigo del articulo"
+                                            @keyup="buscarArticulo()">
+                                        <button :disabled="!idAlmacen" class="btn btn-primary" type="button"
+                                            @click="abrirModal()">...</button>
+                                    </div>
 
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Tipo de comprobante
-                                    <span class="text-danger">*</span>
-                                </label>
 
-                                <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
-                                    <option disabled value="0">Seleccione</option>
-                                    <option value="FACTURA">Factura</option>
-                                    <option value="BOLETA">Boleta</option>
-                                    <option value="TICKET">Ticket</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Numero de comprobante
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob"
-                                    disabled>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Aplicar impuesto:
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group mb-3" id="seccionObjetivo">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text" style="height: 100%;">
-                                            <input type="checkbox" aria-label="Checkbox for following text input">
+
+
+                                </div>
+
+
+                                <!-- Desde aca comienza el seleccionado -->
+                                <template v-if="arraySeleccionado && arraySeleccionado.id">
+
+                                    <div class="col-md-6">
+                                        <div class="card-body">
+                                            <h3 style="margin:0px">{{ arraySeleccionado.nombre }}</h3>
+                                            <span class="badge bg-primary">Medida: {{ arraySeleccionado.medida }}</span>
+                                            <span class="badge bg-primary">Linea: {{ arraySeleccionado.nombre_categoria
+                                                }}</span>
+                                            <p>
+                                                {{ arraySeleccionado.descripcion }}
+
+                                            </p>
+                                            <p><b>Cantidad por empaque: </b>{{ arraySeleccionado.unidad_envase }}</p>
+
+                                            <h3 v-if="arrayPromocion && arrayPromocion.id"
+                                                style="display:flex;align-items:center;margin:0px;">
+                                                <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
+                                                <b v-else>{{ (calcularPrecioConDescuento(resultadoMultiplicacion,
+                        arrayPromocion.porcentaje) * parseFloat(monedaVenta[0])).toFixed(2)
+                                                    }}
+                                                    {{
+                        monedaVenta[1] }}</b>
+                                                <s style="font-size:15px" class="lead">{{
+                        (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                                    {{
+                        monedaVenta[1] }}</s>
+                                            </h3>
+
+                                            <h3 v-else style="display:flex;align-items:center;margin:0px;">
+                                                <b>{{ (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2)
+                                                    }}
+                                                    {{
+                        monedaVenta[1] }}</b>
+                                            </h3>
+                                            <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id"
+                                                class="lead">
+                                                {{ arrayPromocion.porcentaje }} % de descuento
+                                            </p>
+                                            <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id"
+                                                class="text-danger">
+                                                <i class="fa fa-clock-o" aria-hidden="true"></i> Esta oferta termina en
+                                                {{
+                        calcularDiasRestantes(arrayPromocion.fecha_final) }} días
+                                            </p>
                                         </div>
                                     </div>
-                                    <input disabled type="text" class="form-control" value="0.18">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row border">
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Buscar articulo
-                                </label>
-                                <div class="input-group mb-3">
-                                    <input :disabled="!idAlmacen" type="text" class="form-control" v-model="codigo"
-                                        placeholder="Codigo del articulo" aria-label="Codigo del articulo"
-                                        @keyup="buscarArticulo()">
-                                    <button :disabled="!idAlmacen" class="btn btn-primary" type="button"
-                                        @click="abrirModal()">...</button>
-                                </div>
+                                    <div class="col-md-3 d-flex flex-column align-items-center">
+                                        <img v-if="arraySeleccionado.length > 0 && arraySeleccionado.fotografia"
+                                            :src="'img/articulo/' + arraySeleccionado.fotografia + '?t=' + new Date().getTime()"
+                                            width="50" height="50" ref="imagen" class="card-img" />
+                                        <img v-else src="img/productoSinImagen.png" alt="Imagen del Card"
+                                            class="card-img">
 
 
-
-
-                            </div>
-
-
-                            <!-- Desde aca comienza el seleccionado -->
-                            <template v-if="arraySeleccionado && arraySeleccionado.id">
-
-                                <div class="col-md-6">
-                                    <div class="card-body">
-                                        <h3 style="margin:0px">{{ arraySeleccionado.nombre }}</h3>
-                                        <span class="badge bg-primary">Medida: {{ arraySeleccionado.medida }}</span>
-                                        <span class="badge bg-primary">Linea: {{ arraySeleccionado.nombre_categoria
-                                            }}</span>
-                                        <p>
-                                            {{ arraySeleccionado.descripcion }}
-
-                                        </p>
-                                        <p><b>Cantidad por empaque: </b>{{ arraySeleccionado.unidad_envase }}</p>
-
-                                        <h3 v-if="arrayPromocion && arrayPromocion.id"
-                                            style="display:flex;align-items:center;margin:0px;">
-                                            <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
-                                            <b v-else>{{ (calcularPrecioConDescuento(resultadoMultiplicacion,
-                        arrayPromocion.porcentaje) * parseFloat(monedaVenta[0])).toFixed(2) }}
-                                                {{
-                        monedaVenta[1] }}</b>
-                                            <s style="font-size:15px" class="lead">{{
-                        (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                        monedaVenta[1] }}</s>
-                                        </h3>
-
-                                        <h3 v-else style="display:flex;align-items:center;margin:0px;">
-                                            <b>{{ (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }}
-                                                {{
-                        monedaVenta[1] }}</b>
-                                        </h3>
-                                        <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id" class="lead">
-                                            {{ arrayPromocion.porcentaje }} % de descuento
-                                        </p>
-                                        <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id"
-                                            class="text-danger">
-                                            <i class="fa fa-clock-o" aria-hidden="true"></i> Esta oferta termina en {{
-                        calcularDiasRestantes(arrayPromocion.fecha_final) }} días
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 d-flex flex-column align-items-center">
-                                    <img v-if="arraySeleccionado.length > 0 && arraySeleccionado.fotografia"
-                                        :src="'img/articulo/' + arraySeleccionado.fotografia + '?t=' + new Date().getTime()"
-                                        width="50" height="50" ref="imagen" class="card-img" />
-                                    <img v-else src="img/productoSinImagen.png" alt="Imagen del Card" class="card-img">
-
-
-                                    <div :class="{
+                                        <div :class="{
                         'alert': true,
                         'alert-success': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) > arraySeleccionado.stock / unidadPaquete,
                         'alert-warning': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= arraySeleccionado.stock / unidadPaquete,
                         'alert-danger': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= 0
                     }" role="alert">
-                                        <p style="margin:0px">Stock disponible</p>
-                                        <b>{{ arraySeleccionado.saldo_stock / unidadPaquete - cantidad }} {{
+                                            <p style="margin:0px">Stock disponible</p>
+                                            <b>{{ arraySeleccionado.saldo_stock / unidadPaquete - cantidad }} {{
                         unidadPaquete == 1 ? "Unidades" : "Paquetes" }}</b>
+                                        </div>
+
                                     </div>
 
-                                </div>
-
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="" class="font-weight-bold">Tipo de venta
-                                            <span class="text-danger">*</span>
-                                        </label>
-                                        <select class="form-select" v-model="unidadPaquete"
-                                            aria-label="Default select example">
-                                            <option :value="arraySeleccionado.unidad_envase">Por paquete</option>
-                                            <option value="1">Por unidad</option>
-                                        </select>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="" class="font-weight-bold">Tipo de venta
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-select" v-model="unidadPaquete"
+                                                aria-label="Default select example">
+                                                <option :value="arraySeleccionado.unidad_envase">Por paquete</option>
+                                                <option value="1">Por unidad</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="" class="font-weight-bold">Categoria de precios
-                                            <span class="text-danger">*</span>
-                                        </label>
-                                        <select class="form-control" placeholder="Seleccione"
-                                            v-model="precioseleccionado" @change="mostrarSeleccion"
-                                            :disabled="precioBloqueado">
-                                            <option>Selecciona un precio: </option>
-                                            <option :value="arraySeleccionado.precio_uno" v-if="arrayPrecios[0]">{{
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="" class="font-weight-bold">Categoria de precios
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-control" placeholder="Seleccione"
+                                                v-model="precioseleccionado" @change="mostrarSeleccion"
+                                                :disabled="precioBloqueado">
+                                                <option>Selecciona un precio: </option>
+                                                <option :value="arraySeleccionado.precio_uno" v-if="arrayPrecios[0]">{{
                         arrayPrecios[0].nombre_precio
                     }}</option>
-                                            <option :value="arraySeleccionado.precio_dos" v-if="arrayPrecios[1]">{{
+                                                <option :value="arraySeleccionado.precio_dos" v-if="arrayPrecios[1]">{{
                         arrayPrecios[1].nombre_precio
                     }}
-                                            </option>
-                                            <option :value="arraySeleccionado.precio_tres" v-if="arrayPrecios[2]">
-                                                {{ arrayPrecios[2].nombre_precio }}</option>
-                                            <option :value="arraySeleccionado.precio_cuatro" v-if="arrayPrecios[3]">
-                                                {{ arrayPrecios[3].nombre_precio }}</option>
-                                        </select>
+                                                </option>
+                                                <option :value="arraySeleccionado.precio_tres" v-if="arrayPrecios[2]">
+                                                    {{ arrayPrecios[2].nombre_precio }}</option>
+                                                <option :value="arraySeleccionado.precio_cuatro" v-if="arrayPrecios[3]">
+                                                    {{ arrayPrecios[3].nombre_precio }}</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="" class="font-weight-bold">Cantidad
-                                            <span class="text-danger">*</span>
-                                        </label>
-                                        <input type="number" id="cantidad" value="1" class="form-control"
-                                            v-model="cantidad">
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="" class="font-weight-bold">Cantidad
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="number" id="cantidad" value="1" class="form-control"
+                                                v-model="cantidad">
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="col-md-3">
-                                    <div class="form-group d-flex">
-                                        <button @click="agregarDetalle()" class="btn btn-success flex-fill btnagregar">
-                                            <i class="icon-plus"></i> Agregar
-                                        </button>
-                                        <button @click="eliminarSeleccionado()"
-                                            class="btn btn-danger flex-fill btnagregar ml-2">
-                                            <i class="icon-minus"></i> Eliminar
-                                        </button>
+                                    <div class="col-md-3">
+                                        <div class="form-group d-flex">
+                                            <button @click="agregarDetalle()"
+                                                class="btn btn-success flex-fill btnagregar">
+                                                <i class="icon-plus"></i> Agregar
+                                            </button>
+                                            <button @click="eliminarSeleccionado()"
+                                                class="btn btn-danger flex-fill btnagregar ml-2">
+                                                <i class="icon-minus"></i> Eliminar
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
 
-                            </template>
+                                </template>
 
-                        </div>
-                        <div class="form-group row border">
-                            <div class="table-responsive col-md-12">
-                                <table class="table table-bordered table-striped table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Opciones</th>
-                                            <th>Artículo</th>
-                                            <th>Unidad Medida</th>
-                                            <th>Unidades por paquete</th>
-                                            <th>Precio Unidad </th>
-                                            <th>Unidades</th>
-                                            <th>Cantidad Paquetes</th>
-                                            <th>Total S/Descuento</th>
-                                            <th>Descuento %</th>
-                                            <th>Total C/Descuento</th>
+                            </div>
+                            <div class="form-group row border">
+                                <div class="table-responsive col-md-12">
+                                    <table class="table table-bordered table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Opciones</th>
+                                                <th>Artículo</th>
+                                                <th>Unidad Medida</th>
+                                                <th>Unidades por paquete</th>
+                                                <th>Precio Unidad </th>
+                                                <th>Unidades</th>
+                                                <th>Cantidad Paquetes</th>
+                                                <th>Total S/Descuento</th>
+                                                <th>Descuento %</th>
+                                                <th>Total C/Descuento</th>
 
-                                        </tr>
-                                    </thead>
-                                    <tbody v-if="arrayDetalle.length">
-                                        <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
-                                            <td>
-                                                <button v-if="detalle.medida != 'KIT'" @click="eliminarDetalle(index)"
-                                                    type="button" class="btn btn-danger btn-sm">
-                                                    <i class="icon-close"></i>
-                                                </button>
-                                                <button v-else @click="eliminarKit(detalle.idkit)" type="button"
-                                                    class="btn btn-danger btn-sm">
-                                                    <i class="icon-close"></i>
-                                                </button>
-                                            </td>
-                                            <td v-text="detalle.articulo">
-                                            </td>
-                                            <td v-text="detalle.medida">
-                                            </td>
-                                            <td>{{ detalle.unidad_envase }}
-                                            </td>
-                                            <td>
-                                                {{ (detalle.precioseleccionado * parseFloat(monedaVenta[0])).toFixed(2)
-                                                }}
-                                                {{
+                                            </tr>
+                                        </thead>
+                                        <tbody v-if="arrayDetalle.length">
+                                            <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
+                                                <td>
+                                                    <button v-if="detalle.medida != 'KIT'"
+                                                        @click="eliminarDetalle(index)" type="button"
+                                                        class="btn btn-danger btn-sm">
+                                                        <i class="icon-close"></i>
+                                                    </button>
+                                                    <button v-else @click="eliminarKit(detalle.idkit)" type="button"
+                                                        class="btn btn-danger btn-sm">
+                                                        <i class="icon-close"></i>
+                                                    </button>
+                                                </td>
+                                                <td v-text="detalle.articulo">
+                                                </td>
+                                                <td v-text="detalle.medida">
+                                                </td>
+                                                <td>{{ detalle.unidad_envase }}
+                                                </td>
+                                                <td>
+                                                    {{ (detalle.precioseleccionado *
+                        parseFloat(monedaVenta[0])).toFixed(2)
+                                                    }}
+                                                    {{
                         monedaVenta[1] }}
 
-                                            </td>
-                                            <td>
-                                                <input type="number" v-model="detalle.cantidad" min="1"
-                                                    @input="actualizarDetalle(index)"
-                                                    style="border: none; outline: none; width: 50px;" />
-                                            </td>
+                                                </td>
+                                                <td>
+                                                    <input type="number" v-model="detalle.cantidad" min="1"
+                                                        @input="actualizarDetalle(index)"
+                                                        style="border: none; outline: none; width: 50px;" />
+                                                </td>
 
-                                            <td> {{ (detalle.cantidad / detalle.unidad_envase).toFixed(2) }} </td>
+                                                <td> {{ (detalle.cantidad / detalle.unidad_envase).toFixed(2) }} </td>
 
 
-                                            <td>
+                                                <td>
 
-                                                {{ ((detalle.precioseleccionado * detalle.cantidad)
+                                                    {{ ((detalle.precioseleccionado * detalle.cantidad)
                         * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
 
 
-                                            </td>
+                                                </td>
 
 
-                                            <td>
-                                                <input type="number" v-model="detalle.descuento" max="99"
-                                                    style="border: none; outline: none; width: 50px;" />
-                                            </td>
-                                            <td>
-                                                {{ (((detalle.precioseleccionado * detalle.cantidad) -
+                                                <td>
+                                                    <input type="number" v-model="detalle.descuento" max="99"
+                                                        style="border: none; outline: none; width: 50px;" />
+                                                </td>
+                                                <td>
+                                                    {{ (((detalle.precioseleccionado * detalle.cantidad) -
                         (detalle.precioseleccionado * detalle.cantidad * detalle.descuento /
                             100))
                         * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
 
-                                            </td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Sub Total: </strong></td>
-                                            <td id="subTotal">
-                                                {{ ((totalParcial = (calcularSubTotal))
+                                                </td>
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="9" align="right"><strong>Sub Total: </strong></td>
+                                                <td id="subTotal">
+                                                    {{ ((totalParcial = (calcularSubTotal))
                         * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
 
-                                            </td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Descuento Adicional: </strong></td>
-                                            <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
-                                                class="form-control" @change="validarDescuentoAdicional">
-                                        </tr>
+                                                </td>
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="9" align="right"><strong>Descuento Adicional: </strong>
+                                                </td>
+                                                <input id="descuentoAdicional" v-model="descuentoAdicional"
+                                                    type="number" class="form-control"
+                                                    @change="validarDescuentoAdicional">
+                                            </tr>
 
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Descuento Gift Card: </strong></td>
-                                            <input id="descuentoGiftCard" v-model="descuentoGiftCard" type="number"
-                                                class="form-control">
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Total Neto: </strong></td>
-                                            <td id="montoTotal">
-                                                {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="9" align="right"><strong>Descuento Gift Card: </strong>
+                                                </td>
+                                                <input id="descuentoGiftCard" v-model="descuentoGiftCard" type="number"
+                                                    class="form-control">
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="9" align="right"><strong>Total Neto: </strong></td>
+                                                <td id="montoTotal">
+                                                    {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
                         monedaVenta[1] }}
 
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                    <tbody v-else>
-                                        <tr>
-                                            <td colspan="10">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody v-else>
+                                            <tr>
+                                                <td colspan="10">
 
-                                                No hay articulos agregados
-                                            </td>
+                                                    No hay articulos agregados
+                                                </td>
 
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
+                            <div class="d-flex justify-content-between">
+                                <div class="col-md-4">
+                                    <label class="col-form-label" for="tipoVenta"><strong>Tipo de Venta</strong></label>
+                                    <select class="form-control" v-model="idtipo_venta">
+                                        <option value="1">Contado</option>
+                                        <option value="2">Crédito</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex align-items-end">
+                                    <button type="button" @click="ocultarDetalle()"
+                                        class="btn btn-secondary btn-block mr-2">Cerrar</button>
+                                    <button type="button" class="btn btn-primary btn-block "
+                                        @click="abrirTipoVenta()">Confirmar</button>
+                                </div>
+                            </div>
+
+
                         </div>
-                        <div class="d-flex justify-content-between">
-                            <div class="col-md-4">
-                                <label class="col-form-label" for="tipoVenta"><strong>Tipo de Venta</strong></label>
-                                <select class="form-control" v-model="idtipo_venta">
-                                    <option value="1">Contado</option>
-                                    <option value="2">Crédito</option>
-                                </select>
-                            </div>
-                            <div class="d-flex align-items-end">
-                                <button type="button" @click="ocultarDetalle()"
-                                    class="btn btn-secondary btn-block mr-2">Cerrar</button>
-                                <button type="button" class="btn btn-primary btn-block "
-                                    @click="abrirTipoVenta()">Confirmar</button>
-                            </div>
-                        </div>
-
-
                     </div>
+
                 </template>
                 <!-- Fin Detalle-->
                 <!--Ver ingreso-->
@@ -679,8 +701,8 @@
                                                         <td v-text="articulo.nombre_categoria"></td>
                                                         <td>
                                                             {{ ((articulo.precio_venta) *
-                                                                parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                                monedaVenta[1] }}
+                        parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                        monedaVenta[1] }}
 
                                                         </td>
                                                         <td v-text="articulo.saldo_stock"></td>
@@ -1123,7 +1145,7 @@
 
                                             </td>
                                             <td>{{ cuota.fecha_cancelado ? new Date(cuota.fecha_cancelado
-                    ).toLocaleDateString('es-ES') : "Sin fecha" }}</td>
+                                                ).toLocaleDateString('es-ES') : "Sin fecha" }}</td>
 
                                             <td>{{ cuota.estado }}</td>
                                         </tr>
@@ -1371,10 +1393,10 @@ export default {
             habilitarPrimeraCuota: false,
             tipoPago: 'EFECTIVO',
             tiposPago: {
-                        EFECTIVO: 1,
-                        TARJETA: 2,
-                        QR: 3
-                        },
+                EFECTIVO: 1,
+                TARJETA: 2,
+                QR: 3
+            },
 
         }
     },
@@ -1500,7 +1522,7 @@ export default {
                 })
                 .catch((error) => {
                     console.error(error);
-                    throw error; 
+                    throw error;
                 });
         },
         seleccionarTipoPago(tipo) {
@@ -1703,7 +1725,7 @@ export default {
                 this.descuentoAdicional = 0;
                 alert("El descuento adicional no puede ser mayor o igual al total.");
             }
-        }, 
+        },
 
         habilitarNombreCliente() {
             if (this.casosEspeciales) {
@@ -1717,7 +1739,7 @@ export default {
                 this.idcliente = "";
                 this.tipo_documento = "";
             }
-            },
+        },
         validarDescuentoGiftCard() {
 
             if (this.descuentoGiftCard >= this.calcularTotal) {
@@ -2108,13 +2130,13 @@ export default {
                 });
         },
 
-        verificarFactura(cuf, numeroFactura){
-                var url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=5153610012&cuf='+cuf+'&numero='+numeroFactura+'&t=2';
-                window.open(url);
-                
-            },
+        verificarFactura(cuf, numeroFactura) {
+            var url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=5153610012&cuf=' + cuf + '&numero=' + numeroFactura + '&t=2';
+            window.open(url);
 
-            anularFactura(id, cuf) {
+        },
+
+        anularFactura(id, cuf) {
             swal({
                 title: '¿Está seguro de anular la factura?',
                 type: 'warning',
@@ -2129,70 +2151,70 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.value) {
-                let me = this;
-                axios.get('/factura/obtenerDatosMotivoAnulacion')
-                    .then(function(response) {
-                    var respuesta = response.data;
-                    me.arrayMotivosAnulacion = respuesta.motivo_anulaciones;
-                    
-                    console.log('Motivos obtenidos:', me.arrayMotivosAnulacion);
+                    let me = this;
+                    axios.get('/factura/obtenerDatosMotivoAnulacion')
+                        .then(function (response) {
+                            var respuesta = response.data;
+                            me.arrayMotivosAnulacion = respuesta.motivo_anulaciones;
 
-                    let options = {};
-                    me.arrayMotivosAnulacion.forEach(function(motivo) {
-                        options[motivo.codigo] = motivo.descripcion;
-                    });
+                            console.log('Motivos obtenidos:', me.arrayMotivosAnulacion);
 
-                    // Muestra un segundo modal para seleccionar el motivo
-                    swal({
-                        title: 'Seleccione un motivo de anulación',
-                        input: 'select',
-                        inputOptions: options,
-                        inputPlaceholder: 'Seleccione un motivo',
-                        showCancelButton: true,
-                        inputValidator: function (value) {
-                        return new Promise(function (resolve, reject) {
-                            if (value !== '') {
-                            resolve();
-                            } else {
-                            reject('Debe seleccionar un motivo');
-                            }
-                        });
-                        }
-                    }).then((result) => {
-                        if (result.value) {
-                        // Aquí obtienes el motivo seleccionado y puedes realizar la solicitud para anular la factura
-                        const motivoSeleccionado = result.value;
-                        axios.get('/factura/anular/' + cuf +"/" + motivoSeleccionado)
-                            .then(function(response) {
-                            const data = response.data;
-                            if (data === 'ANULACION CONFIRMADA') {
-                                swal(
-                                'FACTURA ANULADA',
-                                data,
-                                'success'
-                                );
-                            } else {
-                                swal(
-                                'ANULACION RECHAZADA',
-                                data,
-                                'warning'
-                                );
-                            }
-                            })
-                            .catch(function(error) {
-                            console.log(error);
+                            let options = {};
+                            me.arrayMotivosAnulacion.forEach(function (motivo) {
+                                options[motivo.codigo] = motivo.descripcion;
                             });
-                        }
-                    });
-                    })
-                    .catch(function(error) {
-                    console.log(error);
-                    });
+
+                            // Muestra un segundo modal para seleccionar el motivo
+                            swal({
+                                title: 'Seleccione un motivo de anulación',
+                                input: 'select',
+                                inputOptions: options,
+                                inputPlaceholder: 'Seleccione un motivo',
+                                showCancelButton: true,
+                                inputValidator: function (value) {
+                                    return new Promise(function (resolve, reject) {
+                                        if (value !== '') {
+                                            resolve();
+                                        } else {
+                                            reject('Debe seleccionar un motivo');
+                                        }
+                                    });
+                                }
+                            }).then((result) => {
+                                if (result.value) {
+                                    // Aquí obtienes el motivo seleccionado y puedes realizar la solicitud para anular la factura
+                                    const motivoSeleccionado = result.value;
+                                    axios.get('/factura/anular/' + cuf + "/" + motivoSeleccionado)
+                                        .then(function (response) {
+                                            const data = response.data;
+                                            if (data === 'ANULACION CONFIRMADA') {
+                                                swal(
+                                                    'FACTURA ANULADA',
+                                                    data,
+                                                    'success'
+                                                );
+                                            } else {
+                                                swal(
+                                                    'ANULACION RECHAZADA',
+                                                    data,
+                                                    'warning'
+                                                );
+                                            }
+                                        })
+                                        .catch(function (error) {
+                                            console.log(error);
+                                        });
+                                }
+                            });
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
                 }
             });
-            },
+        },
 
-            imprimirFactura(id, email) {
+        imprimirFactura(id, email) {
             swal({
                 title: 'Selecciona un tamaño de factura',
                 type: 'warning',
@@ -2268,7 +2290,7 @@ export default {
             return me.errorVenta;
         },
 
-        
+
         registrarVenta() {
             if (this.validarVenta()) {
                 return;
@@ -2277,7 +2299,7 @@ export default {
             let me = this;
             this.mostrarSpinner = true;
 
-            for (let i = 0; i < me.cuotas.length; i++) {                
+            for (let i = 0; i < me.cuotas.length; i++) {
                 console.log('LLEGA ARRAYDATA!', me.cuotas[i]);
             }
 
@@ -2406,22 +2428,22 @@ export default {
             }
 
             try {
-                    if (tipoDocumentoIdentidad === '5') {
-                        const response = await axios.post('/factura/verificarNit/' + numeroDocumento);
-                        if (response.data === 'NIT ACTIVO') {
-                            me.codigoExcepcion = 0;
-                            alert("NIT VÁLIDO.");
-                        } else {
-                            me.codigoExcepcion = 1;
-                            alert("NIT INVÁLIDO.");
-                        }
-                    }else{
+                if (tipoDocumentoIdentidad === '5') {
+                    const response = await axios.post('/factura/verificarNit/' + numeroDocumento);
+                    if (response.data === 'NIT ACTIVO') {
                         me.codigoExcepcion = 0;
+                        alert("NIT VÁLIDO.");
+                    } else {
+                        me.codigoExcepcion = 1;
+                        alert("NIT INVÁLIDO.");
                     }
-                } catch (error) {
-                    console.error(error);
-                    return 'No se pudo verificar el NIT';
+                } else {
+                    me.codigoExcepcion = 0;
                 }
+            } catch (error) {
+                console.error(error);
+                return 'No se pudo verificar el NIT';
+            }
 
             var factura = [];
             factura.push({
@@ -2484,7 +2506,7 @@ export default {
                         me.cerrarModal3();
                         me.listarVenta(1, '', 'id');
                         me.mostrarSpinner = false;
-                    } else{
+                    } else {
                         me.arrayProductos = [];
                         me.codigoExcepcion = 0;
                         swal(
@@ -2813,9 +2835,7 @@ export default {
     }
 }
 </script>
-<style>    
-    
-
+<style>
 .custom-btn {
     width: 100%;
     text-align: center;
@@ -2900,24 +2920,24 @@ export default {
     border-bottom-right-radius: 8px;
 }
 
-    .spinner-container {
-        position: relative;
-    }
+.spinner-container {
+    position: relative;
+}
 
-    .spinner-container > * {
-        position: absolute; 
-        top: 50%; 
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
+.spinner-container>* {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 
-    .spinner-message {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translate(-50%, -170%);
-        z-index: 1;
-    }
+.spinner-message {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -170%);
+    z-index: 1;
+}
 
 
 

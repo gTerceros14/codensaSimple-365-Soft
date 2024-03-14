@@ -20,7 +20,7 @@ class CreateMotivoAnulaciones extends Migration
             $table->timestamps();
         });
 
-        DB::table('motivo_anulaciones')->insert([
+        DB::table('motivo_anulacions')->insert([
             ['codigo' => 1, 'descripcion' => 'FACTURA MAL EMITIDA'],
             ['codigo' => 2, 'descripcion' => 'NOTA DE CREDITO-DEBITO MAL EMITIDA'],
             ['codigo' => 3, 'descripcion' => 'DATOS DE EMISION INCORRECTOS'],
