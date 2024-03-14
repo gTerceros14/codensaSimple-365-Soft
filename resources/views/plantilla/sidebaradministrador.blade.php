@@ -23,13 +23,28 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Puntos de
                             Venta</a>
                     </li>
-                    <li @click="menu=15" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Moneda</a>
-                    </li>
+               
+                </ul>
+            </li>
+            <li class="nav-item nav-dropdown">
+                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-usd" ></i>    
+                 Finanzas</a>
+                <ul class="nav-dropdown-items">
                     <li @click="menu=16" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Apertura/Cierre
                             Caja</a>
                     </li>
+                    <li @click="menu=65" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Transferencias</a>
+                    </li>
+                    <li @click="menu=65" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Bancos</a>
+                    </li>
+
+                    <li @click="menu=15" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Moneda</a>
+                    </li>
+                    
                 </ul>
             </li>
             <li class="nav-item nav-dropdown">
