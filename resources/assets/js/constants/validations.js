@@ -190,3 +190,15 @@ export const esquemaPuntoDeVenta = yup.object().shape({
     .required("El tipo de punto de venta es obligatorio"),
   idsucursal: yup.string().required("La sucursal es obligatoria"),
 });
+
+export const esquemaBanco = yup.object().shape({
+  nombre_cuenta: yup.string().required("El nombre de la cuenta es obligatorio"),
+
+  nombre_banco: yup.string().required("El nombre del banco es obligatorio"),
+  numero_cuenta: yup
+    .number()
+    .typeError("El número de cuenta debe ser un número")
+    .required("El número de cuenta es obligatorio")
+    .min(1, "El número de cuenta no puede ser igual o menor a cero"),
+  tipo_cuenta: yup.string().required("El tipo de cuenta es obligatorio"),
+});
