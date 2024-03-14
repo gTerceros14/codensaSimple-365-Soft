@@ -113,7 +113,7 @@ class MonedaController extends Controller
 
         $monedas = Moneda::join('empresas', 'monedas.idempresa', '=', 'empresas.id')
             ->where('monedas.activo', 1)
-            ->select('monedas.id', 'monedas.nombre', 'monedas.simbolo')
+            ->select('monedas.id', 'monedas.nombre', 'monedas.simbolo', 'monedas.tipo_cambio')
             ->orderBy('monedas.nombre', 'asc')
             ->get();
 

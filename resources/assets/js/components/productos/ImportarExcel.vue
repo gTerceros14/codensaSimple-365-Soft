@@ -101,7 +101,22 @@
                             </div>
                             <div v-if="pageImportar == 2">
                                 <div class="mt-4">
-                                    <h5><i class="fa fa-eye"></i> Vista previa:</h5>
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5><i class="fa fa-eye"></i> Vista previa:</h5>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label for="exampleSelect">Selecciona la moneda</label>
+                                                <select class="form-select" v-model="monedaSeleccionada"
+                                                    id="exampleSelect">
+                                                    <option v-for="(option, index) in arrayMonedas" :key="index"
+                                                        :value="option">{{ option.nombre }}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <p class="text-muted">Este contenido se importará en la base de datos</p>
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
@@ -113,7 +128,12 @@
                                             </thead>
                                             <tbody>
                                                 <tr v-for="(row, rowIndex) in previewCsv" :key="rowIndex">
-                                                    <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell }}
+                                                    <td v-for="(cell, cellIndex) in row" :key="cellIndex">
+                                                        {{
+        [5, 6, 7, 8, 9, 10, 11, 12, 13].includes(cellIndex) ?
+            cell + " " + monedaSeleccionada.simbolo : cell
+    }}
+
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -203,6 +223,13 @@ import * as XLSX from 'xlsx';
 export default {
     data() {
         return {
+            arrayMonedas: [],
+            monedaSeleccionada: {
+                id: 1,
+                nombre: "Dolar estadounidense",
+                simbolo: "USD",
+                tipo_cambio: "1.00"
+            },
             registrosSuccess: [],
 
             headersOrigin: [
@@ -252,6 +279,17 @@ export default {
 
     },
     methods: {
+        listarMonedas() {
+            let url = '/moneda/selectMoneda';
+            axios.get(url).then((response) => {
+                let respuesta = response.data;
+                this.arrayMonedas = respuesta.monedas;
+                console.log(this.arrayMonedas)
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
         resetState() {
             this.pageImportar = 0;
             this.selectedHeadersFromFile = [];
@@ -486,6 +524,8 @@ export default {
             };
 
             reader.readAsArrayBuffer(this.selectedFile);
+            this.listarMonedas();
+
         },
 
         getCsvSubset(csvContent, selectedHeaders) {
@@ -540,14 +580,27 @@ export default {
 
             return newCsvContent.join('\n');
         },
-
+        dividirElementos(array) {
+            return array.map(subarray => {
+                return subarray.map((valor, indice) => {
+                    if (indice >= 5 && indice <= 13) {
+                        return parseInt(valor) / this.monedaSeleccionada.tipo_cambio;
+                    } else {
+                        return valor;
+                    }
+                });
+            });
+        },
         submitForm() {
             if (!this.previewCsv) {
                 return;
             }
+            let contentCsv = this.dividirElementos(this.previewCsv)
+
+
             this.pageImportar = 3;
 
-            const blob = new Blob([this.previewCsv], { type: 'text/csv' });
+            const blob = new Blob([contentCsv], { type: 'text/csv' });
             const newCsvFile = new File([blob], 'nuevo_csv.csv', { type: 'text/csv' });
             const formData = new FormData();
             formData.append('archivo', newCsvFile);

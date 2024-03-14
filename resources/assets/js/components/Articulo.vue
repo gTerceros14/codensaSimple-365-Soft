@@ -403,11 +403,20 @@
 
                             <div class="form-group row">
                                 <div class="col-md-4">
-                                    <label for="" class="font-weight-bold">Stock minimo(Unidades) <span
+                                    <label for="" class="font-weight-bold">Stock minimo <span
                                             class="text-danger">*</span></label>
-                                    <input type="number" v-model="datosFormulario.stock" class="form-control"
-                                        placeholder="Ej. 123456789" :class="{ 'is-invalid': errores.stock }"
-                                        @input="validarCampo('stock')" />
+
+                                    <div class="input-group">
+                                        <input type="number" v-model="datosFormulario.stock" class="form-control"
+                                            placeholder="Ej. 123456789" :class="{ 'is-invalid': errores.stock }"
+                                            @input="validarCampo('stock')">
+                                        <select class="custom-select" v-model="tipo_stock">
+                                            <option value="unidades">Unidades</option>
+                                            <option value="paquetes">Paquetes</option>
+                                        </select>
+
+                                    </div>
+
                                     <p class="text-danger" v-if="errores.stock">{{ errores.stock }}
                                     </p>
                                 </div>
@@ -1164,6 +1173,7 @@ import VueBarcode from 'vue-barcode';
 export default {
     data() {
         return {
+            tipo_stock: "paquetes",
             datosFormulario: {
                 nombre: '',
                 descripcion: '',
@@ -1412,6 +1422,9 @@ export default {
             await esquemaArticulos.validate(this.datosFormulario, { abortEarly: false })
                 .then(() => {
                     this.datosFormulario.fotografia = this.fotografia
+                    if (this.tipo_stock == "paquetes") {
+                        this.datosFormulario.stock = this.datosFormulario.unidad_envase * this.datosFormulario.stock
+                    }
 
                     if (this.tipoAccion == 2) {
                         this.actualizarArticulo(this.datosFormulario)
@@ -2301,11 +2314,11 @@ export default {
                                         precio_dos: 0,
                                         precio_tres: 0,
                                         precio_cuatro: 0,
-                                        stock: data['stock'],
+                                        stock: this.tipo_stock == "paquetes" ? data['stock'] / data['unidad_envase'] : data['stock'],
                                         costo_compra: this.calcularPrecioValorMoneda(data['costo_compra']),
                                         codigo: data['codigo'],
-                                        codigo_alfanumerico: data['codigo_alfanumerico'],
-                                        descripcion_fabrica: data['descripcion_fabrica'],
+                                        codigo_alfanumerico: data['codigo_alfanumerico'] ? data['codigo_alfanumerico'] : "",
+                                        descripcion_fabrica: data['descripcion_fabrica'] ? data['descripcion_fabrica'] : "",
                                         idcategoria: null,
                                         idmarca: null,
                                         idindustria: null,
