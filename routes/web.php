@@ -277,7 +277,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/factura/sincronizarParametricaUnidadMedida', 'VentaController@sincronizarParametricaUnidadMedida');
         Route::get('/factura/obtenerDatosMotivoAnulacion', 'FacturaController@obtenerDatosMotivoAnulacion');
         Route::get('/factura/obtenerLeyendaAleatoria', 'FacturaController@obtenerLeyendaAleatoria');
-        Route::post('/factura/verificarNit/{numeroDocumento}', 'VentaController@verificarNit');    
+        Route::post('/factura/verificarNit/{numeroDocumento}', 'VentaController@verificarNit');
 
 
         //--INDUSTRIA--
@@ -311,6 +311,9 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/backup', 'BackupDbController@createBackup');
 
+        Route::get('/bancos', 'BancoController@index');
+        Route::post('/bancos/registrar', 'BancoController@store');
+        Route::put('/bancos/actualizar', 'BancoController@update');
 
         //grupo
         Route::get('/grupos', 'GrupoController@index');
@@ -400,14 +403,14 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/top-vendedores', 'VentaController@topVendedores');
         Route::get('/top-clientes', 'VentaController@topClientes');
         Route::get('/top-articulos', 'VentaController@topProductos');
-        Route::get('/resumen-ventas-documento','ReportesVentas@ResumenVentasPorDocumento');
+        Route::get('/resumen-ventas-documento', 'ReportesVentas@ResumenVentasPorDocumento');
         Route::get('/reporte-resumen-clientes', 'ReporteResumenClientesController@clientesPorVendedor');
         Route::get('/kardex-clientes-detallado-global', 'ReporteKardexClientesDetalladoGlobalController@articulosPorCliente');
         Route::get('/kardex-clientes-resumen-global', 'ReporteKardexClientesResumenGlobalController@ventasPorCliente');
         Route::get('/reporte-ventas-producto', 'ReportesVentas@ventasPorProducto');
         Route::get('/reporte-resumen-fisico-movimientos', 'ReportesVentas@resumenFisicoMovimientos');
-        Route::get('/resumen-ventas-documento-detallado','ReportesVentas@ResumenVentasPorDocumentoDetallado');
-        Route::get('/reporte-inventario-fisico-valorado/{tipo}','ReportesInventariosController@inventarioFisicoValorado');
+        Route::get('/resumen-ventas-documento-detallado', 'ReportesVentas@ResumenVentasPorDocumentoDetallado');
+        Route::get('/reporte-inventario-fisico-valorado/{tipo}', 'ReportesInventariosController@inventarioFisicoValorado');
 
 
 
