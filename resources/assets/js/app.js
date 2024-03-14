@@ -50,6 +50,8 @@ Vue.component("articulo", require("./components/Articulo.vue"));
 Vue.component("ofertas", require("./components/Ofertas.vue"));
 Vue.component("kits", require("./components/Kits.vue"));
 
+Vue.component("bancos", require("./components/Bancos.vue"));
+
 Vue.component("ingreso", require("./components/Ingreso.vue"));
 Vue.component("cliente", require("./components/Cliente.vue"));
 Vue.component("proveedor", require("./components/Proveedor.vue"));

@@ -937,32 +937,32 @@
                                             <input class="form-check-input border-dark" type="radio"
                                                 name="inlineRadioOptions" id="inlineRadio1" value="option1">
                                             <label class="form-check-label" for="inlineRadio1">
-                                                <img src="./../../../../public/img/bancos/logo_banco_union.jpg"
-                                                    width="80px" alt="Imagen 1">
+                                                <!-- <img src="./../../../../public/img/bancos/logo_banco_union.jpg"
+                                                    width="80px" alt="Imagen 1"> -->
                                             </label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input border-dark" type="radio"
                                                 name="inlineRadioOptions" id="inlineRadio2" value="option2">
                                             <label class="form-check-label" for="inlineRadio2">
-                                                <img src="./../../../../public/img/bancos/logo_mercantil_santacruz.jpg"
-                                                    width="80px" alt="Imagen 2">
+                                                <!-- <img src="./../../../../public/img/bancos/logo_mercantil_santacruz.jpg"
+                                                    width="80px" alt="Imagen 2"> -->
                                             </label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input border-dark" type="radio"
                                                 name="inlineRadioOptions" id="inlineRadio3" value="option3">
                                             <label class="form-check-label" for="inlineRadio3">
-                                                <img src="./../../../../public/img/bancos/logo_bnb.png" width="80px"
-                                                    alt="Imagen 3">
+                                                <!-- <img src="./../../../../public/img/bancos/logo_bnb.png" width="80px"
+                                                    alt="Imagen 3"> -->
                                             </label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input border-dark" type="radio"
                                                 name="inlineRadioOptions" id="inlineRadio4" value="option4">
                                             <label class="form-check-label" for="inlineRadio4">
-                                                <img src="./../../../../public/img/bancos/logo_banco_bisa.png"
-                                                    width="80px" alt="Imagen 4">
+                                                <!-- <img src="./../../../../public/img/bancos/logo_banco_bisa.png"
+                                                    width="80px" alt="Imagen 4"> -->
                                             </label>
                                         </div>
                                     </div>

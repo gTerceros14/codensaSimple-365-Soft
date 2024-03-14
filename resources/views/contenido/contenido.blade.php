@@ -216,6 +216,11 @@
     <reporteinventariofisico></reporteinventariofisico>
 </template>
 
+
+<template v-if="menu==65">
+    <bancos></bancos>
+</template>
+
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
     <dashboard></dashboard>
