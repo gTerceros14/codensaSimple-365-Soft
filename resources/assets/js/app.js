@@ -168,6 +168,7 @@ Vue.component(
   "reportekardexfisico",
   require("./components/ReporteKardexFisico.vue")
 );
+
 Vue.component(
   "resumenclientes",
   require("./components/ReporteResumenClientes.vue")
@@ -180,6 +181,11 @@ Vue.component(
   "kardexclientesresumenglobal",
   require("./components/ReporteKardexClientesResumenGlobal.vue")
 );
+Vue.component(
+  "reciboclientexdocumento",
+  require("./components/ReporteReciboClienteDocumento.vue")
+);
+
 Vue.component(
   "resumenventaxdocumento",
   require("./components/ReporteResumenVentasXDocumento.vue")

@@ -211,6 +211,10 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Clientes Resumen Global</a>
                     </li>
 
+                    <li @click="menu=61" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Detalle - Recibo Cliente Por Documento</a>
+                    </li>
+
                     <li @click="menu=57" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas x Producto</a>
                     </li>

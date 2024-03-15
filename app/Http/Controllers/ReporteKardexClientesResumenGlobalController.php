@@ -27,7 +27,6 @@ class ReporteKardexClientesResumenGlobalController extends Controller
 
         $detalles = DetalleVenta::join('ventas', 'detalle_ventas.idventa','=','ventas.id')
             ->join('articulos', 'articulos.id','=','detalle_ventas.idarticulo')
-            ->join('inventarios', 'inventarios.idarticulo','=','articulos.id')
             ->join('users', 'users.id','=','ventas.idusuario')
             ->join('personas', 'personas.id','=','ventas.idcliente')
             ->join('sucursales', 'sucursales.id','=','users.idsucursal')
@@ -66,12 +65,10 @@ class ReporteKardexClientesResumenGlobalController extends Controller
                 'detalle_ventas.descuento',
                 'articulos.codigo',
                 'articulos.nombre',
-                'inventarios.fecha_vencimiento',
                 'tipo_ventas.nombre_tipo_ventas',
                 'tipo_pagos.nombre_tipo_pago',
                 'users.usuario as nombre_vendedor',
                 'personas.nombre as nombre_cliente'
-
             )
             ->addSelect(DB::raw('ROUND(detalle_ventas.precio / detalle_ventas.cantidad, 2) as precio_por_unidad'))
             ->addSelect(DB::raw('(SELECT IFNULL(SUM(numero_cuotas), 0) FROM credito_ventas WHERE idventa = ventas.id AND estado = "Pendiente") as total_cuotas'))
@@ -86,7 +83,7 @@ class ReporteKardexClientesResumenGlobalController extends Controller
 
         if ($condicion == 0) {
             $detalles = $detalles->orderBy('ventas.id', 'ASC')->paginate(5);
-
+            
             return [
                 'pagination' => [
                     'total' => $detalles->total(),
