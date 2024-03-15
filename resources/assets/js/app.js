@@ -33,6 +33,10 @@ Vue.component(
 );
 
 Vue.component("AbonarCuota", require("./components/creditos/AbonarCuota.vue"));
+Vue.component(
+  "ImportarExcel",
+  require("./components/productos/ImportarExcel.vue")
+);
 
 Vue.component("icon-button", require("./components/buttons/IconButton.vue"));
 
@@ -45,6 +49,8 @@ Vue.component("articulo", require("./components/Articulo.vue"));
 
 Vue.component("ofertas", require("./components/Ofertas.vue"));
 Vue.component("kits", require("./components/Kits.vue"));
+
+Vue.component("bancos", require("./components/Bancos.vue"));
 
 Vue.component("ingreso", require("./components/Ingreso.vue"));
 Vue.component("cliente", require("./components/Cliente.vue"));
@@ -206,7 +212,6 @@ Vue.component(
   require("./components/ReporteDetalladoFisicoMovimientos.vue")
 );
 
-
 Vue.component(
   "ventasinstitucionales",
   require("./components/VentasInstitucionales.vue")
@@ -221,6 +226,22 @@ Vue.component(
   "reporteventas",
   require("./components/ReporteVentasDiarias.vue")
 );
+
+Vue.component(
+  "reporteventasdetallado",
+  require("./components/ReporteVentasDetallado.vue")
+);
+
+Vue.component(
+  "reporteinventariofisicovalorado",
+  require("./components/ReporteInventarioFisicoValorado.vue")
+);
+
+Vue.component(
+  "reporteinventariofisico",
+  require("./components/ReporteInventarioFisico.vue")
+);
+
 Vue.component(
   "ventasinstitucionales",
   require("./components/VentasInstitucionales.vue")

@@ -12,7 +12,8 @@
             </div>
             <div class="card-body">
               <div>
-                  <pre>{{ result }}</pre>
+                <p><strong>Última sincronización: {{ result.lastSync }}</strong></p>
+                <pre>{{ result.data }}</pre>
               </div>            
              </div>
             </div>
@@ -24,14 +25,19 @@
     export default {
         data (){
             return {
-              result: '', // Variable para almacenar el contenido del XML
+              result: {
+                data: [],
+                lastSync: null 
+              }
             }
         },
         methods : {
           async obtenerActividades() {
             try {
               const response = await axios.get('/factura/sincronizarListaProductosServicios'); // Cambia la ruta
-              this.result = response.data; // Almacenar el contenido del XML
+              this.result.data = response.data;
+              
+              this.result.lastSync = new Date().toLocaleString();
             } catch (error) {
               console.error('Error al obtener actividades', error);
             }

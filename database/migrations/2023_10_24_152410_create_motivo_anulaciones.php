@@ -13,14 +13,14 @@ class CreateMotivoAnulaciones extends Migration
      */
     public function up()
     {
-        Schema::create('motivo_anulaciones', function (Blueprint $table) {
+        Schema::create('motivo_anulacions', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('codigo')->unsigned();
             $table->string('descripcion', 250)->nullable();
             $table->timestamps();
         });
 
-        DB::table('motivo_anulaciones')->insert([
+        DB::table('motivo_anulacions')->insert([
             ['codigo' => 1, 'descripcion' => 'FACTURA MAL EMITIDA'],
             ['codigo' => 2, 'descripcion' => 'NOTA DE CREDITO-DEBITO MAL EMITIDA'],
             ['codigo' => 3, 'descripcion' => 'DATOS DE EMISION INCORRECTOS'],

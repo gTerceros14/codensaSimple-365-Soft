@@ -136,9 +136,13 @@
                             <div class="form-group">
                                 <label class="form-control-label" for="text-input">Tipo documento</label>
                                 <select v-model="tipo_documento" class="form-control">
-                                    <option value="CEDULA">CEDULA</option>
-                                    <option value="PASAPORTE">PASAPORTE</option>
-                                </select>
+                                            <option value="" disabled>Selecciona una tipo de documento</option>
+                                            <option value="1">CI - CEDULA DE IDENTIDAD</option>
+                                            <option value="2">CEX - CEDULA DE IDENTIDAD DE EXTRANJERO</option>
+                                            <option value="5">NIT - NÚMERO DE IDENTIFICACIÓN TRIBUTARIA</option>
+                                            <option value="3">PAS - PASAPORTE</option>
+                                            <option value="4">OD - OTRO DOCUMENTO DE IDENTIDAD</option>   
+                                        </select> 
                             </div>
                             <div class="form-group">
                                 <label class="form-control-label" for="email-input">Teléfono</label>

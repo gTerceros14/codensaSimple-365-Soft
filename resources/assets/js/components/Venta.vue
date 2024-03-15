@@ -26,19 +26,21 @@
                 <template v-if="listado == 1">
                     <div class="card-body">
                         <div class="form-group row">
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
+                                    <select class="form-control col-md-5" v-model="criterio">
                                         <option value="tipo_comprobante">Tipo Comprobante</option>
-                                        <option value="num_comprobante">Número Comprobante</option>
+                                        <option value="num_comprobante">N° Comprobante</option>
                                         <option value="fecha_hora">Fecha-Hora</option>
                                     </select>
                                     <input type="text" v-model="buscar" @keyup="listarVenta(1, buscar, criterio)"
                                         class="form-control" placeholder="Texto a buscar">
-                                    <!--button type="submit" @click="listarVenta(1, buscar, criterio)" class="btn btn-primary"><i
-                                            class="fa fa-search"></i> Buscar</button-->
                                 </div>
                             </div>
+                        </div>
+                        <div class="spinner-container" v-if="mostrarSpinner">
+                            <div class="spinner-message"><strong>EMITIENDO FACTURA...</strong></div>
+                            <TileSpinner color="blue" />
                         </div>
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-sm">
@@ -53,6 +55,7 @@
                                         <th>Tipo de Venta</th>
                                         <th>Total</th>
                                         <th>Estado</th>
+                                        <th> </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -80,19 +83,31 @@
                                             </template>
                                         </td>
                                         <td v-text="venta.usuario"></td>
-                                        <td v-text="venta.nombre"></td>
-                                        <td v-text="venta.tipo_comprobante"></td>
+                                        <td v-text="venta.razonSocial"></td>
+                                        <td v-text="venta.documentoid"></td>
                                         <td v-text="venta.num_comprobante"></td>
                                         <td v-text="venta.fecha_hora"></td>
                                         <td>
                                             {{ venta.idtipo_venta == 1 ? "Contado" : "Credito" }}
                                         </td>
                                         <td>
-                                            {{ ((venta.total) * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
-                                            }}
+                                            {{ ((venta.total) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                        monedaVenta[1]
+                    }}
 
                                         </td>
-                                        <td v-text="venta.estado"></td>
+                                        <td>
+                                            <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank"
+                                                class="btn btn-info"><i class="icon-note"></i></a>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary" type="button"
+                                                @click="imprimirFactura(venta.id, venta.email)"><i
+                                                    class="icon-printer"></i></button>
+                                            <button class="btn btn-danger" type="button"
+                                                @click="anularFactura(venta.id, venta.cuf)"><i
+                                                    class="icon-close"></i></button>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -125,7 +140,6 @@
                                 <div class="form-group">
                                     <label for="" class="font-weight-bold">Cliente
                                         <span class="text-danger">*</span>
-                                        <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                     </label>
 
                                     <v-select :on-search="selectCliente" label="nombre" :options="arrayCliente"
@@ -137,386 +151,377 @@
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Razon social
                                     <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                 </label>
-
                                 <input type="text" id="nombreCliente" class="form-control" v-model="nombreCliente"
                                     ref="nombreRef" readonly>
                             </div>
+
                             <input type="hidden" id="idcliente" class="form-control" v-model="idcliente" ref="idRef"
                                 readonly>
                             <input type="hidden" id="tipo_documento" class="form-control" v-model="tipo_documento"
                                 ref="tipoDocumentoRef" readonly>
                             <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id"
                                 ref="complementoIdRef" readonly>
-                            <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado"
+                            <input type="hidden" id="usuarioAutenticado" class="form-control"
+                                v-model="usuarioAutenticado" readonly>
+                            <input type="hidden" id="email" class="form-control" v-model="email" ref="emailRef"
                                 readonly>
+
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Documento
                                     <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
                                 </label>
-
                                 <input type="text" id="documento" class="form-control" v-model="documento"
                                     ref="documentoRef" readonly>
                             </div>
 
                             <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Correo electronico
-                                    <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
-                                </label>
+                                <label for="" class="font-weight-bold">Casos especiales</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" v-model="casosEspeciales"
+                                        id="casosEspecialesCheckbox" @change="habilitarNombreCliente">
+                                    <label class="form-check-label" for="casosEspecialesCheckbox">
+                                        Habilitar
+                                    </label>
+                                </div>
 
-                                <input type="text" id="email" class="form-control" v-model="email" ref="emailRef" readonly>
-                            </div>
-                            <div v-if="clienteDeudas > 0" class="alert alert-danger text-center " role="alert"
-                                style="width: 100%;">
-                                Este cliente tiene <b>{{ clienteDeudas }}</b> pagos pendientes de crédito.
-                                <button type="button" class="close" @click="clienteDeudas = 0">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                <div v-if="clienteDeudas > 0" class="alert alert-danger text-center " role="alert"
+                                    style="width: 100%;">
+                                    Este cliente tiene <b>{{ clienteDeudas }}</b> pagos pendientes de crédito.
+                                    <button type="button" class="close" @click="clienteDeudas = 0">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="" class="font-weight-bold">Almacen
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <v-select label="nombre_almacen" :options="arrayAlmacenes"
+                                        placeholder="Seleccione un almacen" :onChange="getAlmacenProductos"></v-select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="" class="font-weight-bold">Tipo de comprobante
+                                        <span class="text-danger">*</span>
+                                    </label>
+
+                                    <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
+                                        <option disabled value="0">Seleccione</option>
+                                        <option value="FACTURA">Factura</option>
+                                        <option value="BOLETA">Boleta</option>
+                                        <option value="TICKET">Ticket</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="" class="font-weight-bold">Numero de comprobante
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob"
+                                        disabled>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="" class="font-weight-bold">Aplicar impuesto:
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group mb-3" id="seccionObjetivo">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text" style="height: 100%;">
+                                                <input type="checkbox" aria-label="Checkbox for following text input">
+                                            </div>
+                                        </div>
+                                        <input disabled type="text" class="form-control" value="0.18">
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Almacen
-                                    <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
-                                </label>
-                                <v-select label="nombre_almacen" :options="arrayAlmacenes"
-                                    placeholder="Seleccione un almacen" :onChange="getAlmacenProductos"></v-select>
-                            </div>
+                            <div class="form-group row border">
+                                <div class="col-md-3">
+                                    <label for="" class="font-weight-bold">Buscar articulo
+                                    </label>
+                                    <div class="input-group mb-3">
+                                        <input :disabled="!idAlmacen" type="text" class="form-control" v-model="codigo"
+                                            placeholder="Codigo del articulo" aria-label="Codigo del articulo"
+                                            @keyup="buscarArticulo()">
+                                        <button :disabled="!idAlmacen" class="btn btn-primary" type="button"
+                                            @click="abrirModal()">...</button>
+                                    </div>
 
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Tipo de comprobante
-                                    <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
-                                </label>
 
-                                <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
-                                    <option disabled value="0">Seleccione</option>
-                                    <option value="FACTURA">Factura</option>
-                                    <option value="BOLETA">Boleta</option>
-                                    <option value="TICKET">Ticket</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Numero de comprobante
-                                    <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
-                                </label>
-                                <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" disabled>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Aplicar impuesto:
-                                    <span class="text-danger">*</span>
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
-                                </label>
-                                <div class="input-group mb-3" id="seccionObjetivo">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text" style="height: 100%;">
-                                            <input type="checkbox" aria-label="Checkbox for following text input">
+
+
+                                </div>
+
+
+                                <!-- Desde aca comienza el seleccionado -->
+                                <template v-if="arraySeleccionado && arraySeleccionado.id">
+
+                                    <div class="col-md-6">
+                                        <div class="card-body">
+                                            <h3 style="margin:0px">{{ arraySeleccionado.nombre }}</h3>
+                                            <span class="badge bg-primary">Medida: {{ arraySeleccionado.medida }}</span>
+                                            <span class="badge bg-primary">Linea: {{ arraySeleccionado.nombre_categoria
+                                                }}</span>
+                                            <p>
+                                                {{ arraySeleccionado.descripcion }}
+
+                                            </p>
+                                            <p><b>Cantidad por empaque: </b>{{ arraySeleccionado.unidad_envase }}</p>
+
+                                            <h3 v-if="arrayPromocion && arrayPromocion.id"
+                                                style="display:flex;align-items:center;margin:0px;">
+                                                <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
+                                                <b v-else>{{ (calcularPrecioConDescuento(resultadoMultiplicacion,
+                        arrayPromocion.porcentaje) * parseFloat(monedaVenta[0])).toFixed(2)
+                                                    }}
+                                                    {{
+                        monedaVenta[1] }}</b>
+                                                <s style="font-size:15px" class="lead">{{
+                        (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                                    {{
+                        monedaVenta[1] }}</s>
+                                            </h3>
+
+                                            <h3 v-else style="display:flex;align-items:center;margin:0px;">
+                                                <b>{{ (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2)
+                                                    }}
+                                                    {{
+                        monedaVenta[1] }}</b>
+                                            </h3>
+                                            <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id"
+                                                class="lead">
+                                                {{ arrayPromocion.porcentaje }} % de descuento
+                                            </p>
+                                            <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id"
+                                                class="text-danger">
+                                                <i class="fa fa-clock-o" aria-hidden="true"></i> Esta oferta termina en
+                                                {{
+                        calcularDiasRestantes(arrayPromocion.fecha_final) }} días
+                                            </p>
                                         </div>
                                     </div>
-                                    <input disabled type="text" class="form-control" value="0.18">
+                                    <div class="col-md-3 d-flex flex-column align-items-center">
+                                        <img v-if="arraySeleccionado.length > 0 && arraySeleccionado.fotografia"
+                                            :src="'img/articulo/' + arraySeleccionado.fotografia + '?t=' + new Date().getTime()"
+                                            width="50" height="50" ref="imagen" class="card-img" />
+                                        <img v-else src="img/productoSinImagen.png" alt="Imagen del Card"
+                                            class="card-img">
+
+
+                                        <div :class="{
+                        'alert': true,
+                        'alert-success': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) > arraySeleccionado.stock / unidadPaquete,
+                        'alert-warning': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= arraySeleccionado.stock / unidadPaquete,
+                        'alert-danger': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= 0
+                    }" role="alert">
+                                            <p style="margin:0px">Stock disponible</p>
+                                            <b>{{ arraySeleccionado.saldo_stock / unidadPaquete - cantidad }} {{
+                        unidadPaquete == 1 ? "Unidades" : "Paquetes" }}</b>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="" class="font-weight-bold">Tipo de venta
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-select" v-model="unidadPaquete"
+                                                aria-label="Default select example">
+                                                <option :value="arraySeleccionado.unidad_envase">Por paquete</option>
+                                                <option value="1">Por unidad</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="" class="font-weight-bold">Categoria de precios
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-control" placeholder="Seleccione"
+                                                v-model="precioseleccionado" @change="mostrarSeleccion"
+                                                :disabled="precioBloqueado">
+                                                <option>Selecciona un precio: </option>
+                                                <option :value="arraySeleccionado.precio_uno" v-if="arrayPrecios[0]">{{
+                        arrayPrecios[0].nombre_precio
+                    }}</option>
+                                                <option :value="arraySeleccionado.precio_dos" v-if="arrayPrecios[1]">{{
+                        arrayPrecios[1].nombre_precio
+                    }}
+                                                </option>
+                                                <option :value="arraySeleccionado.precio_tres" v-if="arrayPrecios[2]">
+                                                    {{ arrayPrecios[2].nombre_precio }}</option>
+                                                <option :value="arraySeleccionado.precio_cuatro" v-if="arrayPrecios[3]">
+                                                    {{ arrayPrecios[3].nombre_precio }}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="" class="font-weight-bold">Cantidad
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="number" id="cantidad" value="1" class="form-control"
+                                                v-model="cantidad">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="form-group d-flex">
+                                            <button @click="agregarDetalle()"
+                                                class="btn btn-success flex-fill btnagregar">
+                                                <i class="icon-plus"></i> Agregar
+                                            </button>
+                                            <button @click="eliminarSeleccionado()"
+                                                class="btn btn-danger flex-fill btnagregar ml-2">
+                                                <i class="icon-minus"></i> Eliminar
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </template>
+
+                            </div>
+                            <div class="form-group row border">
+                                <div class="table-responsive col-md-12">
+                                    <table class="table table-bordered table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Opciones</th>
+                                                <th>Artículo</th>
+                                                <th>Unidad Medida</th>
+                                                <th>Unidades por paquete</th>
+                                                <th>Precio Unidad </th>
+                                                <th>Unidades</th>
+                                                <th>Cantidad Paquetes</th>
+                                                <th>Total S/Descuento</th>
+                                                <th>Descuento %</th>
+                                                <th>Total C/Descuento</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody v-if="arrayDetalle.length">
+                                            <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
+                                                <td>
+                                                    <button v-if="detalle.medida != 'KIT'"
+                                                        @click="eliminarDetalle(index)" type="button"
+                                                        class="btn btn-danger btn-sm">
+                                                        <i class="icon-close"></i>
+                                                    </button>
+                                                    <button v-else @click="eliminarKit(detalle.idkit)" type="button"
+                                                        class="btn btn-danger btn-sm">
+                                                        <i class="icon-close"></i>
+                                                    </button>
+                                                </td>
+                                                <td v-text="detalle.articulo">
+                                                </td>
+                                                <td v-text="detalle.medida">
+                                                </td>
+                                                <td>{{ detalle.unidad_envase }}
+                                                </td>
+                                                <td>
+                                                    {{ (detalle.precioseleccionado *
+                        parseFloat(monedaVenta[0])).toFixed(2)
+                                                    }}
+                                                    {{
+                        monedaVenta[1] }}
+
+                                                </td>
+                                                <td>
+                                                    <input type="number" v-model="detalle.cantidad" min="1"
+                                                        @input="actualizarDetalle(index)"
+                                                        style="border: none; outline: none; width: 50px;" />
+                                                </td>
+
+                                                <td> {{ (detalle.cantidad / detalle.unidad_envase).toFixed(2) }} </td>
+
+
+                                                <td>
+
+                                                    {{ ((detalle.precioseleccionado * detalle.cantidad)
+                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+
+
+                                                </td>
+
+
+                                                <td>
+                                                    <input type="number" v-model="detalle.descuento" max="99"
+                                                        style="border: none; outline: none; width: 50px;" />
+                                                </td>
+                                                <td>
+                                                    {{ (((detalle.precioseleccionado * detalle.cantidad) -
+                        (detalle.precioseleccionado * detalle.cantidad * detalle.descuento /
+                            100))
+                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+
+                                                </td>
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="9" align="right"><strong>Sub Total: </strong></td>
+                                                <td id="subTotal">
+                                                    {{ ((totalParcial = (calcularSubTotal))
+                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+
+                                                </td>
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="9" align="right"><strong>Descuento Adicional: </strong>
+                                                </td>
+                                                <input id="descuentoAdicional" v-model="descuentoAdicional"
+                                                    type="number" class="form-control"
+                                                    @change="validarDescuentoAdicional">
+                                            </tr>
+
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="9" align="right"><strong>Descuento Gift Card: </strong>
+                                                </td>
+                                                <input id="descuentoGiftCard" v-model="descuentoGiftCard" type="number"
+                                                    class="form-control">
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="9" align="right"><strong>Total Neto: </strong></td>
+                                                <td id="montoTotal">
+                                                    {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                        monedaVenta[1] }}
+
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody v-else>
+                                            <tr>
+                                                <td colspan="10">
+
+                                                    No hay articulos agregados
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
-
-
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <div class="col-md-4">
+                                    <label class="col-form-label" for="tipoVenta"><strong>Tipo de Venta</strong></label>
+                                    <select class="form-control" v-model="idtipo_venta">
+                                        <option value="1">Contado</option>
+                                        <option value="2">Crédito</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex align-items-end">
+                                    <button type="button" @click="ocultarDetalle()"
+                                        class="btn btn-secondary btn-block mr-2">Cerrar</button>
+                                    <button type="button" class="btn btn-primary btn-block "
+                                        @click="abrirTipoVenta()">Confirmar</button>
+                                </div>
                             </div>
 
 
-
-                        </div>
-
-                        <div class="form-group row border">
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Buscar articulo
-                                    <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
-                                </label>
-                                <div class="input-group mb-3">
-                                    <input :disabled="!idAlmacen" type="text" class="form-control" v-model="codigo"
-                                        placeholder="Codigo del articulo" aria-label="Codigo del articulo"
-                                        @keyup="buscarArticulo()">
-                                    <button :disabled="!idAlmacen" class="btn btn-primary" type="button"
-                                        @click="abrirModal()">...</button>
-                                </div>
-
-
-
-
-                            </div>
-
-
-                            <!-- Desde aca comienza el seleccionado -->
-                            <template v-if="arraySeleccionado && arraySeleccionado.id">
-
-                                <div class="col-md-6">
-                                    <div class="card-body">
-                                        <h3 style="margin:0px">{{ arraySeleccionado.nombre }}</h3>
-                                        <span class="badge bg-primary">Medida: {{ arraySeleccionado.medida }}</span>
-                                        <span class="badge bg-primary">Linea: {{ arraySeleccionado.nombre_categoria
-                                        }}</span>
-                                        <p>
-                                            {{ arraySeleccionado.descripcion }}
-
-                                        </p>
-                                        <p><b>Cantidad por empaque: </b>{{ arraySeleccionado.unidad_envase }}</p>
-
-                                        <h3 v-if="arrayPromocion && arrayPromocion.id"
-                                            style="display:flex;align-items:center;margin:0px;">
-                                            <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
-                                            <b v-else>{{ (calcularPrecioConDescuento(resultadoMultiplicacion,
-                                                arrayPromocion.porcentaje) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-        monedaVenta[1] }}</b>
-                                            <s style="font-size:15px" class="lead">{{
-                                                (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-        monedaVenta[1] }}</s>
-                                        </h3>
-
-                                        <h3 v-else style="display:flex;align-items:center;margin:0px;">
-                                            <b>{{ (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                monedaVenta[1] }}</b>
-                                        </h3>
-                                        <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id" class="lead">
-                                            {{ arrayPromocion.porcentaje }} % de descuento
-                                        </p>
-                                        <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id"
-                                            class="text-danger">
-                                            <i class="fa fa-clock-o" aria-hidden="true"></i> Esta oferta termina en {{
-                                                calcularDiasRestantes(arrayPromocion.fecha_final) }} días
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 d-flex flex-column align-items-center">
-                                    <img v-if="arraySeleccionado.length > 0 && arraySeleccionado.fotografia"
-                                        :src="'img/articulo/' + arraySeleccionado.fotografia + '?t=' + new Date().getTime()"
-                                        width="50" height="50" ref="imagen" class="card-img" />
-                                    <img v-else src="img/productoSinImagen.png" alt="Imagen del Card" class="card-img">
-
-
-                                    <div :class="{
-                                        'alert': true,
-                                        'alert-success': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) > arraySeleccionado.stock / unidadPaquete,
-                                        'alert-warning': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= arraySeleccionado.stock / unidadPaquete,
-                                        'alert-danger': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= 0
-                                    }" role="alert">
-                                        <p style="margin:0px">Stock disponible</p>
-                                        <b>{{ arraySeleccionado.saldo_stock / unidadPaquete - cantidad }} {{
-                                            unidadPaquete == 1 ? "Unidades" : "Paquetes" }}</b>
-                                    </div>
-
-                                </div>
-
-                                <!-- <div class="col-md-2" >
-                                <label>Stock disponible</label>
-                                <div class="input-group mb-2">
-                                    <input type="text" class="form-control" :value="arraySeleccionado.saldo_stock/unidadPaquete-cantidad">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">{{ unidadPaquete==1?"Unidades":"Paquetes" }}</span>
-                                    </div>
-                                </div>
-                            </div> -->
-
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="" class="font-weight-bold">Tipo de venta
-                                            <span class="text-danger">*</span>
-                                            <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
-                                        </label>
-                                        <select class="form-select" v-model="unidadPaquete"
-                                            aria-label="Default select example">
-                                            <option :value="arraySeleccionado.unidad_envase">Por paquete</option>
-                                            <option value="1">Por unidad</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="" class="font-weight-bold">Categoria de precios
-                                            <span class="text-danger">*</span>
-                                            <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
-                                        </label>
-                                        <select class="form-control" placeholder="Seleccione" v-model="precioseleccionado"
-                                            @change="mostrarSeleccion" :disabled="precioBloqueado">
-                                            <option>Selecciona un precio: </option>
-                                            <option :value="arraySeleccionado.precio_uno" v-if="arrayPrecios[0]">{{
-                                                arrayPrecios[0].nombre_precio
-                                            }}</option>
-                                            <option :value="arraySeleccionado.precio_dos" v-if="arrayPrecios[1]">{{
-                                                arrayPrecios[1].nombre_precio
-                                            }}
-                                            </option>
-                                            <option :value="arraySeleccionado.precio_tres" v-if="arrayPrecios[2]">
-                                                {{ arrayPrecios[2].nombre_precio }}</option>
-                                            <option :value="arraySeleccionado.precio_cuatro" v-if="arrayPrecios[3]">
-                                                {{ arrayPrecios[3].nombre_precio }}</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="" class="font-weight-bold">Cantidad
-                                            <span class="text-danger">*</span>
-                                            <!-- <span class="font-weight-normal text-sm text-secondary">(Opcional)</span> -->
-                                        </label>
-                                        <input type="number" id="cantidad" value="1" class="form-control"
-                                            v-model="cantidad">
-                                    </div>
-                                </div>
-
-
-                                <!-- <div class="col-md-2">
-                                <div class="form-group">
-                                    <label>Descuento % </label>
-                                    <input type="number" id="descuento" value="0" class="form-control" v-model="descuento"
-                                        ref="descuentoRef">
-                                    <label for="">Shift + U</label>
-                                </div>
-                            </div> -->
-
-                                <div class="col-md-3">
-                                    <div class="form-group d-flex">
-                                        <button @click="agregarDetalle()" class="btn btn-success flex-fill btnagregar">
-                                            <i class="icon-plus"></i> Agregar
-                                        </button>
-                                        <button @click="eliminarSeleccionado()"
-                                            class="btn btn-danger flex-fill btnagregar ml-2">
-                                            <i class="icon-minus"></i> Eliminar
-                                        </button>
-                                    </div>
-                                </div>
-
-                            </template>
-
-                        </div>
-                        <div class="form-group row border">
-                            <div class="table-responsive col-md-12">
-                                <table class="table table-bordered table-striped table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Opciones</th>
-                                            <th>Artículo</th>
-                                            <th>Unidad Medida</th>
-                                            <th>Unidades por paquete</th>
-                                            <th>Precio Unidad </th>
-                                            <th>Unidades</th>
-                                            <th>Cantidad Paquetes</th>
-                                            <th>Total S/Descuento</th>
-                                            <th>Descuento %</th>
-                                            <th>Total C/Descuento</th>
-
-                                        </tr>
-                                    </thead>
-                                    <tbody v-if="arrayDetalle.length">
-                                        <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
-                                            <td>
-                                                <button v-if="detalle.medida != 'KIT'" @click="eliminarDetalle(index)"
-                                                    type="button" class="btn btn-danger btn-sm">
-                                                    <i class="icon-close"></i>
-                                                </button>
-                                                <button v-else @click="eliminarKit(detalle.idkit)" type="button"
-                                                    class="btn btn-danger btn-sm">
-                                                    <i class="icon-close"></i>
-                                                </button>
-                                            </td>
-                                            <td v-text="detalle.articulo">
-                                            </td>
-                                            <td v-text="detalle.medida">
-                                            </td>
-                                            <td>{{ detalle.unidad_envase }}
-                                            </td>
-                                            <td>
-                                                {{ (detalle.precioseleccionado * parseFloat(monedaVenta[0])).toFixed(2) }}
-                                                {{
-                                                    monedaVenta[1] }}
-
-                                            </td>
-                                            <td>
-                                                <input type="number" v-model="detalle.cantidad" min="1"
-                                                    @input="actualizarDetalle(index)"
-                                                    style="border: none; outline: none; width: 50px;" />
-                                            </td>
-
-                                            <td> {{ (detalle.cantidad / detalle.unidad_envase).toFixed(2) }} </td>
-
-
-                                            <td>
-
-                                                {{ ((detalle.precioseleccionado * detalle.cantidad)
-                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
-
-
-                                            </td>
-
-
-                                            <td>
-                                                <input type="number" v-model="detalle.descuento" max="99"
-                                                    style="border: none; outline: none; width: 50px;" />
-                                            </td>
-                                            <!--<span style="color:red;"
-                                                    v-show="detalle.descuento > (detalle.precioseleccionado * detalle.cantidad)">Descuento
-                                                    superior</span>
-                                                <input v-model="detalle.descuento" type="number" class="form-control">-->
-
-                                            <td>
-                                                {{ (((detalle.precioseleccionado * detalle.cantidad) -
-                                                    (detalle.precioseleccionado * detalle.cantidad * detalle.descuento / 100))
-                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
-
-                                            </td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Sub Total: </strong></td>
-                                            <td id="subTotal">
-                                                {{ ((totalParcial = (calcularSubTotal))
-                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
-
-                                            </td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Descuento Adicional: </strong></td>
-                                            <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
-                                                class="form-control" @change="validarDescuentoAdicional">
-                                        </tr>
-
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Descuento Gift Card: </strong></td>
-                                            <input id="descuentoGiftCard" v-model="descuentoGiftCard" type="number"
-                                                class="form-control" @change="validarDescuentoGiftCard">
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Total Neto: </strong></td>
-                                            <td id="montoTotal">
-                                                {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                    monedaVenta[1] }}
-
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                    <tbody v-else>
-                                        <tr>
-                                            <td colspan="10">
-
-                                                No hay articulos agregados
-                                            </td>
-
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col" for=""><strong>Tipo de Venta </strong></label>
-                            <div class="col-md-12">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
-                                <button type="button" class="btn btn-primary"
-                                    @click="registrarAbrilModal()">Contado</button>
-                                <button type="button" class="btn btn-primary"
-                                    @click="registrarAbrilModal2()">Credito</button>
-                            </div>
                         </div>
                     </div>
+
                 </template>
                 <!-- Fin Detalle-->
                 <!--Ver ingreso-->
@@ -571,7 +576,7 @@
 
                                             <td>
                                                 {{ ((detalle.precio) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                    monedaVenta[1] }}
+                        monedaVenta[1] }}
 
                                             </td>
                                             <td v-text="detalle.cantidad">
@@ -580,7 +585,7 @@
                                             </td>
                                             <td>
                                                 {{ ((detalle.precio * detalle.cantidad - detalle.descuento)
-                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
 
                                             </td>
                                         </tr>
@@ -589,7 +594,7 @@
                                             </td>
                                             <td>
                                                 {{ ((totalParcial = (total - totalImpuesto))
-                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
                                             </td>
 
                                         </tr>
@@ -597,14 +602,15 @@
                                             <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
                                             <td>
                                                 {{ ((totalImpuesto = (total * impuesto))
-                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
 
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="4" align="right"><strong>Total Neto:</strong></td>
                                             <td>
-                                                {{ ((total) * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                                                {{ ((total) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                        monedaVenta[1] }}
 
                                             </td>
                                         </tr>
@@ -621,7 +627,8 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-md-12">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                                <button type="button" @click="ocultarDetalle()"
+                                    class="btn btn-secondary">Cerrar</button>
                             </div>
                         </div>
                     </div>
@@ -694,8 +701,8 @@
                                                         <td v-text="articulo.nombre_categoria"></td>
                                                         <td>
                                                             {{ ((articulo.precio_venta) *
-                                                                parseFloat(monedaVenta[0])).toFixed(2) }} {{
-        monedaVenta[1] }}
+                        parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                        monedaVenta[1] }}
 
                                                         </td>
                                                         <td v-text="articulo.saldo_stock"></td>
@@ -751,12 +758,6 @@
                                                         <td>
                                                             <icon-button icon="icon-check" size="small" color="success"
                                                                 @click="agregarKit(kit)" />
-
-                                                            <!-- <template v-if="new Date(kit.fecha_final) > new Date()">
-                      <icon-button v-if="kit.estado == 'Activo'" icon="icon-trash" size="small" color="danger"
-                        @click="desactivarKit(kit.id)" />
-                      <icon-button v-else icon="icon-check" size="small" color="info" @click="activarKit(kit.id)" />
-                    </template> -->
                                                             <icon-button icon="icon-eye" size="small" color="primary"
                                                                 @click="abrirModalDetallesKit(kit)" />
 
@@ -765,9 +766,10 @@
                                                         <td v-text="kit.codigo"></td>
                                                         <td v-text="kit.nombre"></td>
                                                         <td>
-                                                            {{ (kit.precio * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                                monedaVenta[1]
-                                                            }}
+                                                            {{ (kit.precio * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                                            {{
+                        monedaVenta[1]
+                    }}
                                                         </td>
                                                         <td>
                                                             {{ new Date(kit.fecha_final).toLocaleDateString('es-ES') }}
@@ -778,7 +780,7 @@
                                                             <i class="fa fa-circle"
                                                                 :style="{ color: getColorForEstado(kit.estado, kit.fecha_final) }"></i>&nbsp;
                                                             {{ new Date(kit.fecha_final) < new Date() ? 'Inactivo' :
-                                                                kit.estado }} </td>
+                        kit.estado }} </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -807,90 +809,230 @@
         <div class="modal " tabindex="-1" :class="{ 'mostrar': modal2 }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" v-text="tituloModal2"></h4>
+                <div class="modal-content" style="max-height: 90vh;min-height: 90vh">
+                    <div class=" modal-header">
+                        <h4 class="modal-title">Detalle de pago</h4>
                         <button type="button" class="close" @click="cerrarModal2()" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <div v-if="!tipoPago" class="row col-md-12">
-                        <p><strong>Tipo de pago:</strong></p>
-                        <div class="d-flex flex-column align-items-center">
-                            <button type="button" class="btn btn-primary mb-2"
-                                @click="seleccionarTipoPago('EFECTIVO')">EFECTIVO</button>
-                            <button type="button" class="btn btn-primary mb-2"
-                                @click="seleccionarTipoPago('TRANSFERENCIA BANCARIA')">TRANSFERENCIA BANCARIA</button>
-                            <button type="button" class="btn btn-primary mb-2"
-                                @click="seleccionarTipoPago('QR')">QR</button>
-                        </div>
+                    <div class="">
+                        <b-tabs content-class="" fill>
+                            <b-tab>
+                                <template #title>
+                                    <span class="d-flex align-items-center">
+                                        <i class="fa fa-money fa-2x icon-color mr-2" aria-hidden="true"></i>
+                                        <label>Efectivo</label>
+                                    </span>
+                                </template>
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <div class="card shadow-sm">
+                                                <div class="card-body">
 
-                    </div>
-                    <div v-else>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Recibido
-                                            {{ monedaVenta[1] }}(*)</label>
-                                        <div class="input-group">
-                                            <input type="number" v-model="recibido">
+                                                    <form>
+                                                        <div class="form-group">
+                                                            <label for="montoEfectivo"><i class="fa fa-money mr-2"></i>
+                                                                Monto
+                                                                Recibido:</label>
+                                                            <div class="input-group mb-3">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        {{
+                        monedaVenta[1] }}
+                                                                    </span>
+                                                                </div>
+                                                                <input type="number" class="form-control"
+                                                                    id="montoEfectivo" v-model="recibido"
+                                                                    placeholder="Ingrese el monto recibido">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="cambioRecibir"><i
+                                                                    class="fa fa-exchange mr-2"></i>
+                                                                Cambio a Entregar:</label>
+                                                            <input type="text" class="form-control" id="cambioRecibir"
+                                                                placeholder="Se calculará automáticamente"
+                                                                :value="recibido - calcularTotal * parseFloat(monedaVenta[0])"
+                                                                readonly>
+                                                        </div>
+
+
+                                                    </form>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Calcular</label>
-                                        <div class="input-group">
-                                            <button type="button" class="btn btn-primary"
-                                                @click="calcularCambio()">Calcular</button>
+                                        <div class="col-md-5">
+                                            <div class="card shadow-sm">
+                                                <div class="card-body">
+                                                    <div class=" mb-3">
+                                                        <h5 class="mb-0"> Detalle
+                                                            de Venta
+                                                        </h5>
+
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span><i class="fa fa-dollar mr-2"></i> Monto Total:</span>
+                                                        <span class="font-weight-bold">
+                                                            {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)
+                                                            }} {{
+                        monedaVenta[1] }}</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span><i class="fa fa-tag mr-2 text-success"></i>
+                                                            Descuento:</span>
+                                                        <span class="font-weight-bold text-success">0.00</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-3">
+                                                        <span><i class="fa fa-percent mr-2 text-danger"></i>
+                                                            Impuestos:</span>
+                                                        <span class="font-weight-bold text-danger">0.00</span>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="codigoDescuento"><i class="fa fa-gift mr-2"></i>
+                                                            Código
+                                                            de Descuento:</label>
+                                                        <div class="input-group mb-3">
+                                                            <input type="text" class="form-control" id="codigoDescuento"
+                                                                placeholder="Ingrese el código de descuento (si aplica)">
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-outline-secondary" type="button"
+                                                                    id="aplicarDescuento"><i
+                                                                        class="fa fa-check"></i></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span><i class="fa fa-money mr-2"></i> Total a Pagar:</span>
+                                                        <span class="font-weight-bold h5">
+
+                                                            {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)
+                                                            }} {{
+                        monedaVenta[1] }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="registrar()"
+                                                class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i>
+                                                Registrar Pago</button>
                                         </div>
                                     </div>
                                 </div>
-
-
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">ToTal(*)</label>
-                                        <div class="input-group">
-                                            <input type="number"
-                                                :value="((calcularTotal) * parseFloat(monedaVenta[0])).toFixed(2)"
-                                                class="font-weight-bold">
-                                            <!-- <input type="number"  v-model="totalprue" class="negrita-input"> -->
+                            </b-tab>
+                            <b-tab>
+                                <template #title>
+                                    <span class="d-flex align-items-center">
+                                        <i class="fa fa-university fa-2x icon-color mr-2" aria-hidden="true"></i>
+                                        <label>Transferencia bancaria</label>
+                                    </span>
+                                </template>
+                                <div>
+                                    <span class="text-secondary">SELECCIONE EL BANCO</span>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input border-dark" type="radio"
+                                                name="inlineRadioOptions" id="inlineRadio1" value="option1">
+                                            <label class="form-check-label" for="inlineRadio1">
+                                                <!-- <img src="./../../../../public/img/bancos/logo_banco_union.jpg"
+                                                    width="80px" alt="Imagen 1"> -->
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input border-dark" type="radio"
+                                                name="inlineRadioOptions" id="inlineRadio2" value="option2">
+                                            <label class="form-check-label" for="inlineRadio2">
+                                                <!-- <img src="./../../../../public/img/bancos/logo_mercantil_santacruz.jpg"
+                                                    width="80px" alt="Imagen 2"> -->
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input border-dark" type="radio"
+                                                name="inlineRadioOptions" id="inlineRadio3" value="option3">
+                                            <label class="form-check-label" for="inlineRadio3">
+                                                <!-- <img src="./../../../../public/img/bancos/logo_bnb.png" width="80px"
+                                                    alt="Imagen 3"> -->
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input border-dark" type="radio"
+                                                name="inlineRadioOptions" id="inlineRadio4" value="option4">
+                                            <label class="form-check-label" for="inlineRadio4">
+                                                <!-- <img src="./../../../../public/img/bancos/logo_banco_bisa.png"
+                                                    width="80px" alt="Imagen 4"> -->
+                                            </label>
                                         </div>
                                     </div>
-                                    <!-- {{((articulo.precio_venta) *parseFloat(monedaVenta[0])).toFixed(2)}} {{ monedaVenta[1] }} -->
+                                    <div class="mt-4">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="numeroCuenta"><i class="fa fa-credit-card mr-2"></i> Número
+                                                    de
+                                                    Cuenta:</label>
+                                                <div class="input-group mb-3">
 
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Efec(*)</label>
-                                        <div class="input-group">
-                                            <input type="number" disabled
-                                                :value="(efectivo * parseFloat(monedaVenta[0])).toFixed(2)">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Cambio(*)</label>
-                                        <div class="input-group">
-                                            <input type="number" disabled
-                                                :value="(cambio * parseFloat(monedaVenta[0])).toFixed(2)">
-                                        </div>
+                                                    <input type="text" class="form-control" id="numeroCuenta"
+                                                        placeholder="Ingrese el número de cuenta">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="montoTransferencia"><i class="fa fa-money mr-2"></i>
+                                                    Monto de
+                                                    Transferencia:</label>
+                                                <div class="input-group mb-3">
 
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input">Faltante(*)</label>
-                                        <div class="input-group">
-                                            <input type="number" disabled
-                                                :value="(faltante * parseFloat(monedaVenta[0])).toFixed(2)">
-                                        </div>
+                                                    <input type="number" class="form-control" id="montoTransferencia"
+                                                        placeholder="Ingrese el monto de transferencia">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="fechaTransferencia"><i class="fa fa-calendar mr-2"></i>
+                                                    Fecha de
+                                                    Transferencia:</label>
+                                                <div class="input-group mb-3">
+
+                                                    <input type="date" class="form-control" id="fechaTransferencia"
+                                                        placeholder="Ingrese la fecha de transferencia">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="numeroOperacion"><i class="fa fa-hashtag mr-2"></i> Número
+                                                    de
+                                                    Operación:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="text" class="form-control" id="numeroOperacion"
+                                                        placeholder="Ingrese el número de operación">
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-success btn-block"><i
+                                                    class="fa fa-check mr-2"></i> Confirmar Transferencia</button>
+                                        </form>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal2()">Volver</button>
-                            <button type="button" v-if="tipoAccion2 == 1" class="btn btn-primary"
-                                @click="registrar()">Cobrar</button>
-                            <!-- <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarSucursal()">Actualizar</button> -->
-                        </div>
+                            </b-tab>
+                            <b-tab>
+                                <template #title>
+                                    <span class="d-flex align-items-center">
+                                        <i class="fa fa-qrcode fa-2x icon-color mr-2" aria-hidden="true"></i>
+                                        <label>QR</label>
+                                    </span>
+                                </template>
+                                <div class="text-center">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Ejemplo"
+                                        alt="Código QR" class="img-fluid">
+                                    <p class="mt-3">Escanee el código QR para realizar el pago.</p>
+                                </div>
+                            </b-tab>
+                        </b-tabs>
                     </div>
+                    <!-- <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="cerrarModal2()">Volver</button>
+                        <button type="button" v-if="tipoAccion2 == 1" class="btn btn-primary"
+                            @click="registrar()">Cobrar</button>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -939,7 +1081,7 @@
                                     <label>
 
                                         {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                            monedaVenta[1] }}
+                        monedaVenta[1] }}
 
                                     </label>
                                     <button @click="generarCuotas" type="button" class="btn btn-success">GENERAR
@@ -963,8 +1105,6 @@
                                         @change="seleccionarTipoPago(tipo_pago)">
                                         <option v-for="(value, key) in tiposPago" :value="value">{{ key }}</option>
                                     </select>
-
-
                                 </div>
                             </div>
                         </div>
@@ -991,21 +1131,21 @@
 
                                             <td>
                                                 {{ (cuota.precio_cuota * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                    monedaVenta[1] }}
+                        monedaVenta[1] }}
 
                                             </td>
                                             <td>
                                                 {{ (cuota.totalCancelado * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                    monedaVenta[1] }}
+                        monedaVenta[1] }}
 
                                             </td>
                                             <td>
                                                 {{ (cuota.saldo_restante * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                    monedaVenta[1] }}
+                        monedaVenta[1] }}
 
                                             </td>
                                             <td>{{ cuota.fecha_cancelado ? new Date(cuota.fecha_cancelado
-                                            ).toLocaleDateString('es-ES') : "Sin fecha" }}</td>
+                                                ).toLocaleDateString('es-ES') : "Sin fecha" }}</td>
 
                                             <td>{{ cuota.estado }}</td>
                                         </tr>
@@ -1025,7 +1165,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @click="cerrarModal3()">Volver</button>
                         <button type="button" v-if="tipoAccion3 == 1" class="btn btn-primary"
-                            @click="registrar()">Registrar</button>
+                            @click="registrarVenta()">Registrar</button>
                     </div>
                 </div>
             </div>
@@ -1051,7 +1191,7 @@
                         <div class="col-md-5">
                             <label for="" class="font-weight-bold">Precio: </label>
                             {{ (datosFormularioKit.precio * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                monedaVenta[1]
+                            monedaVenta[1]
                             }}
                         </div>
                         <div class="col-md-5">
@@ -1111,6 +1251,8 @@
 
 <script>
 import vSelect from 'vue-select';
+import { TileSpinner } from 'vue-spinners';
+
 export default {
     data() {
         return {
@@ -1199,6 +1341,11 @@ export default {
             valorMaximoDescuento: '',
             mostrarDireccion: true,
             mostrarCUFD: true,
+            casosEspeciales: false,
+            numeroTarjeta: '',
+            leyendaAl: '',
+            codigoExcepcion: 0,
+            mostrarSpinner: false,
             primer_precio_cuota: 0,
 
             //almacenes
@@ -1237,17 +1384,17 @@ export default {
             faltante: 0,
             //-------DEStE AQUI 13-OCTUBRE--
             idtipo_pago: '',
-            idtipo_venta: '',
+            idtipo_venta: '1',
             tiempo_diaz: '',
             numero_cuotas: '',
             cuotas: [],//---para almacenar las fechas
             estadocrevent: 'activo',
             primera_cuota: '',
             habilitarPrimeraCuota: false,
-            tipoPago: '',
+            tipoPago: 'EFECTIVO',
             tiposPago: {
                 EFECTIVO: 1,
-                "TRANSFERENCIA BANCARIA": 2,
+                TARJETA: 2,
                 QR: 3
             },
 
@@ -1261,6 +1408,7 @@ export default {
         }
     },
     components: {
+        TileSpinner,
         vSelect
     },
     computed: {
@@ -1322,6 +1470,23 @@ export default {
 
     },
     methods: {
+        abrirTipoVenta() {
+            if (this.idtipo_venta == 1) {
+                this.modal2 = 1;
+                this.cliente = this.nombreCliente;
+                this.tipoAccion2 = 1;
+                this.scrollToTop()
+            } else {
+                this.modal3 = 1;
+                this.cliente = this.nombreCliente;
+                this.scrollToTop();
+                this.tituloModal3 = 'CREDITOS ' + this.cliente;
+                this.tipoAccion3 = 1;
+                this.idtipo_pago = this.tipo_pago;
+            }
+
+
+        },
         cerrarModalCuotas() {
             this.modalCuotas = 0;
             this.listarVenta(1, this.buscar, this.criterio);
@@ -1357,7 +1522,7 @@ export default {
                 })
                 .catch((error) => {
                     console.error(error);
-                    throw error; // Re-lanza el error para que pueda ser manejado en agregarKit
+                    throw error;
                 });
         },
         seleccionarTipoPago(tipo) {
@@ -1406,7 +1571,7 @@ export default {
                                 stock: articulo.stock,
                                 precioseleccionado: articulo.precio_costo_unid
                             });
-                            let actividadEconomica = 474110;
+                            let actividadEconomica = 461021;
 
                             this.arrayProductos.push({
 
@@ -1559,6 +1724,20 @@ export default {
             if (this.descuentoAdicional >= this.totalParcial) {
                 this.descuentoAdicional = 0;
                 alert("El descuento adicional no puede ser mayor o igual al total.");
+            }
+        },
+
+        habilitarNombreCliente() {
+            if (this.casosEspeciales) {
+                this.$refs.nombreRef.removeAttribute("readonly");
+                this.documento = "99001";
+                this.idcliente = "8";
+                this.tipo_documento = "1";
+            } else {
+                this.$refs.nombreRef.setAttribute("readonly", true);
+                this.documento = "";
+                this.idcliente = "";
+                this.tipo_documento = "";
             }
         },
         validarDescuentoGiftCard() {
@@ -1819,7 +1998,7 @@ export default {
         },
 
         agregarDetalle() {
-            let actividadEconomica = 474110;
+            let actividadEconomica = 461021;
             // let codigoProductoSin = document.getElementById("codigoProductoSin").value; si hay
             // let codigoProducto = document.getElementById("codigo").value; si 
             // let descripcion = document.getElementById("nombre_producto").value; nombre
@@ -1885,102 +2064,8 @@ export default {
                 this.unidadPaquete = 1;
                 this.codigo = '';
             }
-
-            // if (this.cantidad == 0 || this.precio == 0) {
-
-            // } else {
-            //     if (me.encuentra(me.idarticulo)) {
-            //         swal({
-            //             type: 'error',
-            //             title: 'Error...',
-            //             text: 'Este Artículo ya se encuentra agregado!',
-            //         })
-            //     } else {
-            //         console.log('saldo negativooo', me.saldosNegativos);
-            //         if (me.saldosNegativos === 0) {
-            //             if (this.selectedUnit > 1) {
-            //                 me.cantidad = me.cantidad * this.selectedUnit;
-            //                 console.log('cantidad agregado', me.cantidad);
-
-            //             }
-
-            //             if (me.stock < me.cantidad) {
-            //                 swal({
-            //                     type: 'error',
-            //                     title: 'Error...',
-            //                     text: 'No hay stock disponible!'
-            //                 });
-            //             } else {
-            //                 me.arrayDetalle.push({
-            //                     idarticulo: me.idarticulo,
-            //                     articulo: me.articulo,
-            //                     medida: me.medida,
-            //                     cantidad: me.cantidad,
-            //                     cantidad_paquetes: me.cantidad_paquetes,
-            //                     precio: me.precio,
-            //                     descuento: me.descuento,
-            //                     stock: me.saldo_stock,
-            //                     precioseleccionado: me.precioseleccionado//--aumenTe esTo
-
-            //                 });
-            //                 console.log("ARRAY_AGREGADO", me.arrayDetalle);
-
-
-
-            //                 me.codigo = '';
-            //                 me.idarticulo = 0;
-            //                 me.articulo = '';
-            //                 me.medida = '';
-            //                 me.cantidad = 0;
-            //                 me.precio = 0;
-            //                 me.descuento = 0;
-            //                 me.stock = 0;
-            //                 me.sTotal = 0;
-            //             }
-            //         } else if (me.saldosNegativos === 1) {
-            //             console.log('saldo negativo', me.saldosNegativos);
-            //             me.arrayDetalle.push({
-            //                 idarticulo: me.idarticulo,
-            //                 articulo: me.articulo,
-            //                 medida: me.medida,
-            //                 cantidad: me.cantidad,
-            //                 cantidad_paquetes: me.cantidad_paquetes,
-            //                 precio: me.precio,
-            //                 descuento: me.descuento,
-            //                 stock: me.saldo_stock,
-            //                 precioseleccionado: me.precioseleccionado
-            //             });
-            //             console.log("ARRAY_AGREGADO", me.arrayDetalle);
-
-            //             me.arrayProductos.push({
-            //                 actividadEconomica: actividadEconomica,
-            //                 codigoProductoSin: codigoProductoSin,
-            //                 codigoProducto: codigoProducto,
-            //                 descripcion: descripcion,
-            //                 cantidad: cantidad,
-            //                 unidadMedida: unidadMedida,
-            //                 precioUnitario: precioUnitario,
-            //                 montoDescuento: montoDescuento,
-            //                 subTotal: subTotal,
-            //                 numeroSerie: numeroSerie,
-            //                 numeroImei: numeroImei
-            //             });
-
-            //             me.codigo = '';
-            //             me.idarticulo = 0;
-            //             me.articulo = '';
-            //             me.medida = '';
-            //             me.cantidad = 0;
-            //             me.precio = 0;
-            //             me.descuento = 0;
-            //             me.stock = 0;
-            //             me.sTotal = 0;
-            //         }
-            //     }
-
-            // }
-
         },
+
         agregarDetalleModal(data) {
             this.scrollToSection();
             this.codigo = data.codigo;
@@ -2044,97 +2129,125 @@ export default {
                     console.error(error);
                 });
         },
-        registrar() {
-            this.registrarVenta();
-            this.emitirFactura();
-            //this.num_comprob;
+
+        verificarFactura(cuf, numeroFactura) {
+            var url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=5153610012&cuf=' + cuf + '&numero=' + numeroFactura + '&t=2';
+            window.open(url);
+
         },
-        //-------------REGISTRARAR VENTA ------
-        registrarVenta() {
-            if (this.validarVenta()) {
-                return;
-            }
 
-            let me = this;
-            console.log("hola");
-            console.log(this.primer_precio_cuota);
-            axios.post('/venta/registrar', {
-                'idcliente': this.idcliente,
-                'tipo_comprobante': this.tipo_comprobante,
-                'serie_comprobante': this.serie_comprobante,
-                'num_comprobante': this.num_comprob,
-                'impuesto': this.impuesto,
-                'total': this.calcularTotal,
-                'idAlmacen': this.idAlmacen,
-                'idtipo_pago': this.idtipo_pago ? this.idtipo_pago : 1,
-                'idtipo_venta': this.idtipo_venta,
-                'primer_precio_cuota': this.primer_precio_cuota,
-                // Datos para el crédito de venta
-                'idpersona': this.idcliente,
-                'numero_cuotasCredito': this.numero_cuotas, // Cambio de nombre
-                'tiempo_dias_cuotaCredito': this.tiempo_diaz, // Cambio de nombre
-                'totalCredito': this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal, // Asegúrate de tener esta variable
-                'estadoCredito': "Pendiente", // Asegúrate de tener esta variable
-                
-                // Cuotas del crédito
-                'cuotaspago': this.cuotas,
-                'data': this.arrayDetalle
-            }).then(function (response) {
-                console.log("Esto devolvio", response)
-                if (response.data.id > 0) {
-                    // Restablecer valores después de una venta exitosa
-                    me.listado = 1;
-                    me.listarVenta(1, '', 'num_comprob');
-                    me.cerrarModal2();
-                    me.cerrarModal3();
-                    me.idproveedor = 0;
-                    me.tipo_comprobante = 'FACTURA';
-                    me.nombreCliente = '';
-                    me.idcliente = 0;
-                    me.tipo_documento = 0;
-                    me.complemento_id = '';
-                    me.documento = '';
-                    me.email = '';
-                    me.imagen = '';
-                    me.serie_comprobante = '';
-                    me.num_comprob = '';
-                    me.impuesto = 0.18;
-                    me.total = 0.0;
-                    me.idarticulo = 0;
-                    me.articulo = '';
-                    me.cantidad = 0;
-                    me.precio = 0;
-                    me.stock = 0;
-                    me.codigo = '';
-                    me.descuento = 0;
-                    me.arrayDetalle = [];
-                    me.primer_precio_cuota = 0;
-                    
-                    //window.open('/factura/imprimir/' + response.data.id);
-                } else {
-                    console.log(response)
-                    if (response.data.valorMaximo) {
-                        //alert('El valor de descuento no puede exceder el '+ response.data.valorMaximo);
-                        swal(
-                            'Aviso',
-                            'El valor de descuento no puede exceder el ' + response.data.valorMaximo,
-                            'warning'
-                        )
-                        return;
-                    } else {
+        anularFactura(id, cuf) {
+            swal({
+                title: '¿Está seguro de anular la factura?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    let me = this;
+                    axios.get('/factura/obtenerDatosMotivoAnulacion')
+                        .then(function (response) {
+                            var respuesta = response.data;
+                            me.arrayMotivosAnulacion = respuesta.motivo_anulaciones;
 
-                        //alert(response.data.caja_validado); 
-                        swal(
-                            'Aviso',
-                            response.data.caja_validado,
-                            'warning'
-                        )
-                        return;
-                    }
-                    //console.log(response.data.valorMaximo)
+                            console.log('Motivos obtenidos:', me.arrayMotivosAnulacion);
+
+                            let options = {};
+                            me.arrayMotivosAnulacion.forEach(function (motivo) {
+                                options[motivo.codigo] = motivo.descripcion;
+                            });
+
+                            // Muestra un segundo modal para seleccionar el motivo
+                            swal({
+                                title: 'Seleccione un motivo de anulación',
+                                input: 'select',
+                                inputOptions: options,
+                                inputPlaceholder: 'Seleccione un motivo',
+                                showCancelButton: true,
+                                inputValidator: function (value) {
+                                    return new Promise(function (resolve, reject) {
+                                        if (value !== '') {
+                                            resolve();
+                                        } else {
+                                            reject('Debe seleccionar un motivo');
+                                        }
+                                    });
+                                }
+                            }).then((result) => {
+                                if (result.value) {
+                                    // Aquí obtienes el motivo seleccionado y puedes realizar la solicitud para anular la factura
+                                    const motivoSeleccionado = result.value;
+                                    axios.get('/factura/anular/' + cuf + "/" + motivoSeleccionado)
+                                        .then(function (response) {
+                                            const data = response.data;
+                                            if (data === 'ANULACION CONFIRMADA') {
+                                                swal(
+                                                    'FACTURA ANULADA',
+                                                    data,
+                                                    'success'
+                                                );
+                                            } else {
+                                                swal(
+                                                    'ANULACION RECHAZADA',
+                                                    data,
+                                                    'warning'
+                                                );
+                                            }
+                                        })
+                                        .catch(function (error) {
+                                            console.log(error);
+                                        });
+                                }
+                            });
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
                 }
-            }).catch(function (error) {
-                console.log(error);
+            });
+        },
+
+        imprimirFactura(id, email) {
+            swal({
+                title: 'Selecciona un tamaño de factura',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'CARTA',
+                cancelButtonText: 'ROLLO',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    console.log("El boton CARTA fue presionado");
+                    axios.get('/factura/imprimirCarta/' + id + '/' + email, { responseType: 'blob' })
+                        .then(function (response) {
+                            window.location.href = "docs/facturaCarta.pdf";
+                            console.log("Se generó el factura en Carta correctamente");
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                } else if (result.dismiss === swal.DismissReason.cancel) {
+                    console.log("El boton ROLLO fue presionado");
+                    axios.get('/factura/imprimirRollo/' + id + '/' + email, { responseType: 'blob' })
+                        .then(function (response) {
+                            window.location.href = "docs/facturaRollo.pdf";
+                            console.log("Se generó el la factura en Rollo correctamente");
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
+            }).catch((error) => {
+                console.error('Error al mostrar el diálogo:', error);
             });
         },
         //--------HASTA AQUI--------------------
@@ -2177,9 +2290,110 @@ export default {
             return me.errorVenta;
         },
 
-        emitirFactura() {
+
+        registrarVenta() {
+            if (this.validarVenta()) {
+                return;
+            }
+
+            let me = this;
+            this.mostrarSpinner = true;
+
+            for (let i = 0; i < me.cuotas.length; i++) {
+                console.log('LLEGA ARRAYDATA!', me.cuotas[i]);
+            }
+
+            console.log("hola");
+            console.log(this.primer_precio_cuota);
+            axios.post('/venta/registrar', {
+                'idcliente': this.idcliente,
+                'tipo_comprobante': this.tipo_comprobante,
+                'serie_comprobante': this.serie_comprobante,
+                'num_comprobante': this.num_comprob,
+                'impuesto': this.impuesto,
+                'total': this.calcularTotal,
+                'idAlmacen': this.idAlmacen,
+                'idtipo_pago': this.idtipo_pago ? this.idtipo_pago : 1,
+                'idtipo_venta': this.idtipo_venta,
+                'primer_precio_cuota': this.primer_precio_cuota,
+                // Datos para el crédito de venta
+                'idpersona': this.idcliente,
+                'numero_cuotasCredito': this.numero_cuotas, // Cambio de nombre
+                'tiempo_dias_cuotaCredito': this.tiempo_diaz, // Cambio de nombre
+                'totalCredito': this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal, // Asegúrate de tener esta variable
+                'estadoCredito': "Pendiente", // Asegúrate de tener esta variable
+
+                // Cuotas del crédito
+                'cuotaspago': this.cuotas,
+                'data': this.arrayDetalle
+
+            }).then((response) => {
+                let idVentaRecienRegistrada = response.data.id;
+                this.emitirFactura(idVentaRecienRegistrada);
+
+                if (response.data.id > 0) {
+                    // Restablecer valores después de una venta exitosa
+                    me.listado = 1;
+                    me.listarVenta(1, '', 'num_comprob');
+                    me.cerrarModal2();
+                    me.cerrarModal3();
+                    me.idproveedor = 0;
+                    me.tipo_comprobante = 'FACTURA';
+                    me.nombreCliente = '';
+                    me.idcliente = 0;
+                    me.tipo_documento = 0;
+                    me.complemento_id = '';
+                    me.documento = '';
+                    me.email = '';
+                    me.imagen = '';
+                    me.serie_comprobante = '';
+                    me.num_comprob = '';
+                    me.impuesto = 0.18;
+                    me.total = 0.0;
+                    me.idarticulo = 0;
+                    me.articulo = '';
+                    me.cantidad = 0;
+                    me.precio = 0;
+                    me.stock = 0;
+                    me.codigo = '';
+                    me.descuento = 0;
+                    me.arrayDetalle = [];
+                    me.primer_precio_cuota = 0;
+
+                    //window.open('/factura/imprimir/' + response.data.id);
+                } else {
+                    console.log(response)
+                    if (response.data.valorMaximo) {
+                        //alert('El valor de descuento no puede exceder el '+ response.data.valorMaximo);
+                        swal(
+                            'Aviso',
+                            'El valor de descuento no puede exceder el ' + response.data.valorMaximo,
+                            'warning'
+                        )
+                        return;
+                    } else {
+
+                        //alert(response.data.caja_validado); 
+                        swal(
+                            'Aviso',
+                            response.data.caja_validado,
+                            'warning'
+                        )
+                        return;
+                    }
+                    //console.log(response.data.valorMaximo)
+                }
+
+            }).catch((error) => {
+                console.log(error);
+            });
+        },
+
+        async emitirFactura(idVentaRecienRegistrada) {
+
             let me = this;
 
+            let idventa = idVentaRecienRegistrada;
             let numeroFactura = document.getElementById("num_comprobante").value;
             let cuf = "464646464";
             let cufdValor = document.getElementById("cufdValor");
@@ -2190,20 +2404,46 @@ export default {
             let fechaEmision = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
             let id_cliente = document.getElementById("idcliente").value;
             let nombreRazonSocial = document.getElementById("nombreCliente").value;
-            //let tipoDocumentoIdentidad = document.getElementById("tipo_documento").value;
-            let tipoDocumentoIdentidad = 1;
             let numeroDocumento = document.getElementById("documento").value;
             let complemento = document.getElementById("complemento_id").value;
+            let tipoDocumentoIdentidad = document.getElementById("tipo_documento").value;
             let montoTotal = (this.calcularTotal * parseFloat(this.monedaVenta[0])).toFixed(2);
             let descuentoAdicional = document.getElementById("descuentoAdicional").value;
-            let leyenda = "Ley N° 453: El proveedor de servicios debe habilitar medios e instrumentos para efectuar consultas y reclamaciones.";
             let usuario = document.getElementById("usuarioAutenticado").value;
             //let codigoPuntoVenta = this.puntoVentaAutenticado;
             let codigoPuntoVenta = 0;
             let montoGiftCard = document.getElementById("descuentoGiftCard").value;
+            let codigoMetodoPago = this.idtipo_pago;
 
-            console.log("El tipo de documento es: " + tipoDocumentoIdentidad);
             console.log("El monto de Descuento de Gift Card es: " + montoGiftCard);
+            console.log("El tipo de documento es: " + tipoDocumentoIdentidad);
+
+            try {
+                const response = await axios.get('/factura/obtenerLeyendaAleatoria');
+                this.leyendaAl = response.data.descripcionLeyenda;
+                console.log("El dato de leyenda llegado es: " + this.leyendaAl);
+            } catch (error) {
+                console.error(error);
+                return '"Ley N° 453: Los servicios deben suministrarse en condiciones de inocuidad, calidad y seguridad."';
+            }
+
+            try {
+                if (tipoDocumentoIdentidad === '5') {
+                    const response = await axios.post('/factura/verificarNit/' + numeroDocumento);
+                    if (response.data === 'NIT ACTIVO') {
+                        me.codigoExcepcion = 0;
+                        alert("NIT VÁLIDO.");
+                    } else {
+                        me.codigoExcepcion = 1;
+                        alert("NIT INVÁLIDO.");
+                    }
+                } else {
+                    me.codigoExcepcion = 0;
+                }
+            } catch (error) {
+                console.error(error);
+                return 'No se pudo verificar el NIT';
+            }
 
             var factura = [];
             factura.push({
@@ -2224,7 +2464,7 @@ export default {
                     numeroDocumento: numeroDocumento,
                     complemento: complemento,
                     codigoCliente: numeroDocumento,
-                    codigoMetodoPago: 1,
+                    codigoMetodoPago: codigoMetodoPago,
                     numeroTarjeta: null,
                     montoTotal: montoTotal,
                     montoTotalSujetoIva: montoTotal,
@@ -2233,9 +2473,9 @@ export default {
                     montoTotalMoneda: montoTotal,
                     montoGiftCard: montoGiftCard,
                     descuentoAdicional: descuentoAdicional,
-                    codigoExcepcion: 0,
+                    codigoExcepcion: this.codigoExcepcion,
                     cafc: null,
-                    leyenda: leyenda,
+                    leyenda: this.leyendaAl,
                     usuario: usuario,
                     codigoDocumentoSector: 1
                 }
@@ -2248,7 +2488,8 @@ export default {
 
             axios.post('/venta/emitirFactura', {
                 factura: datos,
-                id_cliente: id_cliente
+                id_cliente: id_cliente,
+                idventa: idventa
             })
                 .then(function (response) {
                     var data = response.data;
@@ -2260,11 +2501,14 @@ export default {
                             'success'
                         )
                         me.arrayProductos = [];
+                        me.codigoExcepcion = 0;
                         me.cerrarModal2();
                         me.cerrarModal3();
                         me.listarVenta(1, '', 'id');
+                        me.mostrarSpinner = false;
                     } else {
                         me.arrayProductos = [];
+                        me.codigoExcepcion = 0;
                         swal(
                             'FACTURA RECHAZADA',
                             data,
@@ -2278,6 +2522,7 @@ export default {
                         'INTENTE DE NUEVO',
                         'Comunicacion con SIAT fallida',
                         'error');
+                    me.mostrarSpinner = false;
                 });
         },
 
@@ -2436,32 +2681,7 @@ export default {
             console.log('Precio seleccionado:', this.precioseleccionado);
         },
         //--------------ABRIR MODAL------------------
-        registrarAbrilModal() {
-            this.modal2 = 1;
-            this.cliente = this.nombreCliente;
-            console.log('USUARIO LLEGA:', this.cliente);
-            this.tituloModal2 = 'VENTA  AL CONTADO ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
-            this.tipoAccion2 = 1;
-            this.scrollToTop()
-            //    this.idtipo_pago = 1;
-            this.idtipo_venta = 1;
-            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
-            console.log('idtipo_pago LLEGA:', this.idtipo_pago);
-        },
 
-        registrarAbrilModal2() {
-            this.modal3 = 1;
-            this.cliente = this.nombreCliente;
-            this.scrollToTop();
-            console.log('USUARIO LLEGA:', this.cliente);
-            this.tituloModal3 = 'CREDITOS ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
-            this.tipoAccion3 = 1;
-            this.idtipo_pago = this.tipo_pago;
-            // this.idtipo_pago = 1;
-            this.idtipo_venta = 2;
-            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
-            console.log('idtipo_pago LLEGA:', this.idtipo_pago);
-        },
         cerrarModal2() {
             this.modal2 = 0;
             this.tituloModal2 = '';
@@ -2550,12 +2770,12 @@ export default {
             const montoEntero = Math.floor(this.calcularTotal / this.numero_cuotas);
             const montoDecimal = (this.calcularTotal - montoEntero * (this.numero_cuotas - 1)).toFixed(2);
 
-            
+
             let fechaInicioPago;
             let saldos_total;
             let estadoCuota;
             if (this.primera_cuota) {
-                 this.primer_precio_cuota = montoEntero;
+                this.primer_precio_cuota = montoEntero;
                 console.log('primer_precio_cuota', this.primer_precio_cuota);
                 fechaInicioPago = fechaHoy;
                 saldos_total = (this.calcularTotal - this.primer_precio_cuota).toFixed(2);
@@ -2615,42 +2835,113 @@ export default {
     }
 }
 </script>
-<style>    .modal-content {
-        width: 100% !important;
-        position: absolute !important;
-    }
+<style>
+.custom-btn {
+    width: 100%;
+    text-align: center;
+    padding: 5px;
+    color: #939392;
+    border: 1px solid #939392;
+    background-color: white;
+    margin-left: 5px;
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 5%;
+    /* Agregando sombra */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
 
-    .mostrar {
-        display: list-item !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        background-color: #3c29297a !important;
-    }
 
-    .div-error {
-        display: flex;
-        justify-content: center;
-    }
+.selected {
+    background-color: rgba(5, 75, 122, 0.1);
+    /* Ajusta el último valor para cambiar la opacidad */
+    font-weight: 100;
+    color: #054b7a;
+    border: 1px solid #054b7a;
+    transition: all 0.5s ease;
 
-    .text-error {
-        color: red !important;
+
+}
+
+/* #054b7a; */
+.efectivo {
+    color: #054b7a;
+    transition: all 0.3s ease;
+
+}
+
+.qr {
+    transition: all 0.3s ease;
+
+    color: #054b7a;
+}
+
+.transferencia {
+    transition: all 0.3s ease;
+
+    color: #054b7a;
+}
+
+.modal-content {
+    width: 100% !important;
+    position: absolute !important;
+}
+
+.mostrar {
+    display: list-item !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    background-color: #3c29297a !important;
+}
+
+.div-error {
+    display: flex;
+    justify-content: center;
+}
+
+.text-error {
+    color: red !important;
+    font-weight: bold;
+}
+
+@media (min-width: 600px) {
+    .btnagregar {
+        margin-top: 2rem;
+    }
+}
+
+.card-img {
+    width: auto;
+    height: 200px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.spinner-container {
+    position: relative;
+}
+
+.spinner-container>* {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.spinner-message {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -170%);
+    z-index: 1;
+}
+
+
+
+/* .negrita-input {
         font-weight: bold;
-    }
-
-    @media (min-width: 600px) {
-        .btnagregar {
-            margin-top: 2rem;
-        }
-    }
-
-    .card-img {
-        width: auto;
-        height: 200px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-    }
-
-    /* .negrita-input {
-        font-weight: bold;
-    } */</style>
-  
+    } */
+</style>

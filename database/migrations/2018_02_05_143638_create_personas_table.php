@@ -26,7 +26,53 @@ class CreatePersonasTable extends Migration
             $table->string('email', 50)->nullable();
             $table->timestamps();
         });
-        DB::table('personas')->insert(array('id' => '1', 'nombre' => 'root','usuario' => '1', 'tipo_documento' => 'NA', 'num_documento' => '00000000', 'direccion' => 'NA', 'telefono' => '000000', 'email' => 'root@gmail.com'));
+        DB::table('personas')->insert([
+        ['id' => '1', 
+        'nombre' => 'root',
+        'usuario' => '1', 
+        'tipo_documento' => 'NA', 
+        'num_documento' => '00000000', 
+        'direccion' => 'NA', 
+        'telefono' => '000000', 
+        'email' => 'root@gmail.com'
+        ],
+        ['id' => '2', 
+        'nombre' => 'Casos Especiales',
+        'usuario' => null, 
+        'tipo_documento' => '1', 
+        'num_documento' => '99001', 
+        'direccion' => null, 
+        'telefono' => null, 
+        'email' => null
+        ],
+        ['id' => '3 ', 
+        'nombre' => 'Control Tributario',
+        'usuario' => null, 
+        'tipo_documento' => '4', 
+        'num_documento' => '99002', 
+        'direccion' => null, 
+        'telefono' => null, 
+        'email' => null
+        ],
+        ['id' => '4', 
+        'nombre' => 'VENTAS MENORES DEL DÍA',
+        'usuario' => null, 
+        'tipo_documento' => '4', 
+        'num_documento' => '99003', 
+        'direccion' => null, 
+        'telefono' => null, 
+        'email' => null
+        ],
+        ['id' => '5', 
+        'nombre' => 'S/N',
+        'usuario' => null, 
+        'tipo_documento' => '1', 
+        'num_documento' => '0', 
+        'direccion' => null, 
+        'telefono' => null, 
+        'email' => null
+        ],
+    ]);
 
     }
 

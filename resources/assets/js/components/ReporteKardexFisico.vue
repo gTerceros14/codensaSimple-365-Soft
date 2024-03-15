@@ -1444,7 +1444,7 @@ export default {
             const tableYPosition = 40;
 
             const columns = ['C.C.', 'Num Comprobante', 'Fecha', 'Detalle', 'Entrada', 'Salida', 'Saldo'];
-            const rows = this.arrayReporte.map(item => [item.tipo,
+            const rows = this.sortedResultados.map(item => [item.tipo,
                     item.num_comprobante,
                     item.fecha_hora,
                     item.tipo_comprobante,

@@ -92,31 +92,28 @@ export const esquemaArticulos = yup.object().shape({
     ),
 
   precio_costo_unid: yup
-  .number()
-  .required("La cantidad del costo por unidad es obligatoria")
-  .typeError("Debe ingresar un número válido")
-  .min(
-    0.01,
-    "El cantidad del costo por unidad no puede ser menor o igual a 0"
-  ),
+    .number()
+    .required("La cantidad del costo por unidad es obligatoria")
+    .typeError("Debe ingresar un número válido")
+    .min(
+      0.01,
+      "El cantidad del costo por unidad no puede ser menor o igual a 0"
+    ),
 
   precio_costo_paq: yup
-  .number()
-  .required("La cantidad del costo por paquete es obligatoria")
-  .typeError("Debe ingresar un número válido")
-  .min(
-    0.01,
-    "El cantidad de costo por paquete no puede ser menor o igual a 0"
-  ),
+    .number()
+    .required("La cantidad del costo por paquete es obligatoria")
+    .typeError("Debe ingresar un número válido")
+    .min(
+      0.01,
+      "El cantidad de costo por paquete no puede ser menor o igual a 0"
+    ),
 
   precio_venta: yup
-  .number()
-  .required("El precio de venta es obligatoria")
-  .typeError("Debe ingresar un número válido")
-  .min(
-    0.01,
-    "El precio de venta no puede ser menor o igual a 0"
-  ),
+    .number()
+    .required("El precio de venta es obligatoria")
+    .typeError("Debe ingresar un número válido")
+    .min(0.01, "El precio de venta no puede ser menor o igual a 0"),
   precio_uno: yup.number().typeError("Debe ingresar un número válido"),
   precio_dos: yup.number().typeError("Debe ingresar un número válido"),
   precio_tres: yup.number().typeError("Debe ingresar un número válido"),
@@ -159,4 +156,49 @@ export const esquemaAlmacen = yup.object().shape({
   observaciones: yup
     .string()
     .max(255, "Las observaciones no pueden tener más de 255 caracteres"),
+});
+
+export const esquemaCliente = yup.object().shape({
+  nombre: yup
+    .string()
+    .required("El nombre del cliente es obligatorio")
+    .max(80, "El nombre del cliente no puede tener más de 80 caracteres"),
+  direccion: yup.string().required("La dirección del cliente es obligatoria"),
+  tipo_documento: yup.string().required("El tipo de documento es obligatorio"),
+  num_documento: yup.string().required("El número de documento es obligatorio"),
+  telefono: yup.string().required("El teléfono es obligatorio"),
+  email: yup
+    .string()
+    .email("El correo electrónico debe tener un formato válido")
+    .required("El correo electrónico es obligatorio"),
+});
+
+export const esquemaPuntoDeVenta = yup.object().shape({
+  nombre: yup
+    .string()
+    .required("El nombre del punto de venta es obligatorio")
+    .max(
+      100,
+      "El nombre del punto de venta no puede tener más de 100 caracteres"
+    ),
+  nit: yup.string().required("El NIT del punto de venta es obligatorio"),
+  descripcion: yup
+    .string()
+    .required("La descripción del punto de venta es obligatoria"),
+  idtipopuntoventa: yup
+    .string()
+    .required("El tipo de punto de venta es obligatorio"),
+  idsucursal: yup.string().required("La sucursal es obligatoria"),
+});
+
+export const esquemaBanco = yup.object().shape({
+  nombre_cuenta: yup.string().required("El nombre de la cuenta es obligatorio"),
+
+  nombre_banco: yup.string().required("El nombre del banco es obligatorio"),
+  numero_cuenta: yup
+    .number()
+    .typeError("El número de cuenta debe ser un número")
+    .required("El número de cuenta es obligatorio")
+    .min(1, "El número de cuenta no puede ser igual o menor a cero"),
+  tipo_cuenta: yup.string().required("El tipo de cuenta es obligatorio"),
 });

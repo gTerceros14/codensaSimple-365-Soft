@@ -407,7 +407,7 @@ class SiatController extends Controller
         $params = array('SolicitudSincronizacion' => array(
             'codigoAmbiente' => $codigoAmbiente,
             'codigoPuntoVenta' => $codigoPuntoVenta,
-            'codigoSistema' => $codigoSistema,
+            'codigoSistema' => $codigoSistema,  
             'codigoSucursal' => $codigoSucursal,
             'cuis' => $cuis, 
             'nit' => $nit
@@ -428,6 +428,47 @@ class SiatController extends Controller
                 'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE
             ]);
             $result = $client->sincronizarParametricaUnidadMedida($params);
+        }catch (SoapFault $fault){
+            $result = "TOKEN NO VÁLIDO";
+        }
+        return $result;
+    }
+
+    public function verificarNit($codSucursal, $numeroDocumento){
+        $wsdl="https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos?wsdl";
+        $codigoAmbiente = 2;
+        $codigoModalidad = 2;
+        $codigoSistema = "77535546B712DD409D7A387";
+        $codigoSucursal = $codSucursal;
+        $cuis = $_SESSION['scuis'];
+        $nit = "5153610012";
+        $nitParaVerificacion = $numeroDocumento;
+
+        $params = array('SolicitudVerificarNit' => array(
+            'codigoAmbiente' => $codigoAmbiente,
+            'codigoModalidad' => $codigoModalidad,
+            'codigoSistema' => $codigoSistema,  
+            'codigoSucursal' => $codigoSucursal,
+            'cuis' => $cuis, 
+            'nit' => $nit,
+            'nitParaVerificacion' => $nitParaVerificacion
+        ));
+
+        $options = array(
+            'http' => array(
+                'header' => "apikey: TokenApi eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJHdWljaGkxLiIsImNvZGlnb1Npc3RlbWEiOiI3NzUzNTU0NkI3MTJERDQwOUQ3QTM4NyIsIm5pdCI6Ikg0c0lBQUFBQUFBQUFETTFORFUyTXpRd01EUUNBTWdwRkpRS0FBQUEiLCJpZCI6MzAxNTc4OCwiZXhwIjoxNzM1NjAzMjAwLCJpYXQiOjE3MDQyMTU0MTYsIm5pdERlbGVnYWRvIjo1MTUzNjEwMDEyLCJzdWJzaXN0ZW1hIjoiU0ZFIn0.9J0zThmiihbX0hVNRc2nWdO8G4HJEI33IGCneHl8f55THqJwuigDz2VaT06tAa8bO4XTNKz_LO0EbDgJFYFDsg",
+                'timeout' => 5
+            )
+        );
+
+        $context = stream_context_create($options);
+        try {
+            $client = new \SoapClient($wsdl, [
+                'stream_context' => $context,
+                'cache_wsdl' => WSDL_CACHE_NONE,
+                'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE
+            ]);
+            $result = $client->verificarNit($params);
         }catch (SoapFault $fault){
             $result = "TOKEN NO VÁLIDO";
         }

@@ -25,7 +25,7 @@ class CreateTipoPagosTable extends Migration
                 'updated_at' => now(),
             ],
             [
-                'nombre_tipo_pago' => 'Transacion Bancaria',
+                'nombre_tipo_pago' => 'Tarjeta',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

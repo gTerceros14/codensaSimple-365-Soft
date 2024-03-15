@@ -23,13 +23,28 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Puntos de
                             Venta</a>
                     </li>
-                    <li @click="menu=15" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Moneda</a>
-                    </li>
+               
+                </ul>
+            </li>
+            <li class="nav-item nav-dropdown">
+                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-usd" ></i>    
+                 Finanzas</a>
+                <ul class="nav-dropdown-items">
                     <li @click="menu=16" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Apertura/Cierre
                             Caja</a>
                     </li>
+                    <li @click="menu=65" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Transferencias</a>
+                    </li>
+                    <li @click="menu=65" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Bancos</a>
+                    </li>
+
+                    <li @click="menu=15" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Moneda</a>
+                    </li>
+                    
                 </ul>
             </li>
             <li class="nav-item nav-dropdown">
@@ -57,15 +72,12 @@
                     <li @click="menu=23" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Cotizaciones</a>
                     </li>
-                    <li @click="menu=29" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Facturas</a>
-                    </li>
                     <li @click="menu=38" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Eventos
                             Significativos</a>
                     </li>
                     <li @click="menu=39" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Factura Fuera de
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Fuera de
                             Línea</a>
                     </li>
                 </ul>
@@ -172,6 +184,12 @@
                     <li @click="menu=60" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Detallado Fisico de Movimientos</a>
                     </li>
+                    <li @click="menu=63" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventario Fisico Valorado</a>
+                    </li>
+                    <li @click="menu=64" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventario Fisico</a>
+                    </li>
 
                 </ul>
             </li>
@@ -182,6 +200,9 @@
 
                     <li @click="menu=45" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Diarias</a>
+                    </li>
+                    <li @click="menu=62" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Detallado</a>
                     </li>
                     <li @click="menu=55" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas x Documento</a>
@@ -215,9 +236,6 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Detalle - Recibo Cliente Por Documento</a>
                     </li>
 
-                    <li @click="menu=57" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas x Producto</a>
-                    </li>
                     
                 </ul>
             </li>

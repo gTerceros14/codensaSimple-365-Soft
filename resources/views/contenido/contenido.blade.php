@@ -204,8 +204,21 @@
     <reportefisicomovimientos></reportefisicomovimientos>
 </template>
 
-<template v-if="menu==61">
-    <reciboclientexdocumento></reciboclientexdocumento>
+<template v-if="menu==62">
+    <reporteventasdetallado></reporteventasdetallado>
+</template>
+
+<template v-if="menu==63">
+    <reporteinventariofisicovalorado></reporteinventariofisicovalorado>
+</template>
+
+<template v-if="menu==64">
+    <reporteinventariofisico></reporteinventariofisico>
+</template>
+
+
+<template v-if="menu==65">
+    <bancos></bancos>
 </template>
 
 @elseif (Auth::user()->idrol == 2)

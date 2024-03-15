@@ -147,6 +147,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/user/selectUser/rol', 'UserController@selectUsuariosPorRol');
 
         Route::get('/venta', 'VentaController@index');
+        Route::get('/venta/offline', 'VentaController@ventaOffline');
         Route::post('/venta/registrar', 'VentaController@store');
         Route::put('/venta/desactivar', 'VentaController@desactivar');
         Route::get('/venta/obtenerCabecera', 'VentaController@obtenerCabecera');
@@ -263,8 +264,10 @@ Route::group(['middleware' => ['auth']], function () {
         //FACTURAS
         Route::get('/factura', 'SiatController@index');
         Route::get('/factura/getFactura/{id}', 'SiatController@getFactura');
-        Route::get('/factura/imprimirRollo/{id}', 'VentaController@imprimirFacturaRollo');
-        Route::get('/factura/imprimirCarta/{id}', 'VentaController@imprimirFactura');
+        Route::get('/factura/imprimirRollo/{id}/{email}', 'VentaController@imprimirFacturaRollo');
+        Route::get('/factura/imprimirCarta/{id}/{email}', 'VentaController@imprimirFactura');
+        Route::get('/factura/imprimirRolloOffline/{id}', 'VentaController@imprimirFacturaRolloOffline');
+        Route::get('/factura/imprimirCartaOffline/{id}', 'VentaController@imprimirFacturaOffline');
         Route::get('/factura/anular/{cuf}/{motivoSeleccionado}', 'VentaController@anulacionFactura');
         Route::get('/factura/sincronizarActividades', 'VentaController@sincronizarActividades');
         Route::get('/factura/sincronizarParametricaTiposFactura', 'VentaController@sincronizarParametricaTiposFactura');
@@ -274,6 +277,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/factura/sincronizarParametricaEventosSignificativos', 'VentaController@sincronizarParametricaEventosSignificativos');
         Route::get('/factura/sincronizarParametricaUnidadMedida', 'VentaController@sincronizarParametricaUnidadMedida');
         Route::get('/factura/obtenerDatosMotivoAnulacion', 'FacturaController@obtenerDatosMotivoAnulacion');
+        Route::get('/factura/obtenerLeyendaAleatoria', 'FacturaController@obtenerLeyendaAleatoria');
+        Route::post('/factura/verificarNit/{numeroDocumento}', 'VentaController@verificarNit');
 
 
         //--INDUSTRIA--
@@ -307,6 +312,9 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/backup', 'BackupDbController@createBackup');
 
+        Route::get('/bancos', 'BancoController@index');
+        Route::post('/bancos/registrar', 'BancoController@store');
+        Route::put('/bancos/actualizar', 'BancoController@update');
 
         //grupo
         Route::get('/grupos', 'GrupoController@index');
@@ -396,14 +404,15 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/top-vendedores', 'VentaController@topVendedores');
         Route::get('/top-clientes', 'VentaController@topClientes');
         Route::get('/top-articulos', 'VentaController@topProductos');
-        Route::get('/resumen-ventas-documento','ReportesVentas@ResumenVentasPorDocumento');
+        Route::get('/resumen-ventas-documento', 'ReportesVentas@ResumenVentasPorDocumento');
         Route::get('/reporte-resumen-clientes', 'ReporteResumenClientesController@clientesPorVendedor');
         Route::get('/kardex-clientes-detallado-global', 'ReporteKardexClientesDetalladoGlobalController@articulosPorCliente');
         Route::get('/kardex-clientes-resumen-global', 'ReporteKardexClientesResumenGlobalController@ventasPorCliente');
         Route::get('/recibo-cliente-por-documento', 'ReporteReciboClientePorDocumentoController@clientesPorDocumento');
         Route::get('/reporte-ventas-producto', 'ReportesVentas@ventasPorProducto');
         Route::get('/reporte-resumen-fisico-movimientos', 'ReportesVentas@resumenFisicoMovimientos');
-        Route::get('/resumen-ventas-documento-detallado','ReportesVentas@ResumenVentasPorDocumentoDetallado');
+        Route::get('/resumen-ventas-documento-detallado', 'ReportesVentas@ResumenVentasPorDocumentoDetallado');
+        Route::get('/reporte-inventario-fisico-valorado/{tipo}', 'ReportesInventariosController@inventarioFisicoValorado');
 
 
 
