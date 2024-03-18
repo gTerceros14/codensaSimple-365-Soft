@@ -221,6 +221,11 @@
     <bancos></bancos>
 </template>
 
+<template v-if="menu==66">
+    <transferencias></transferencias>
+</template>
+
+
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
     <dashboard></dashboard>
