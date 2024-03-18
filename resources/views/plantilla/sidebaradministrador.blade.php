@@ -34,7 +34,7 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Apertura/Cierre
                             Caja</a>
                     </li>
-                    <li @click="menu=65" class="nav-item">
+                    <li @click="menu=66" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Transferencias</a>
                     </li>
                     <li @click="menu=65" class="nav-item">

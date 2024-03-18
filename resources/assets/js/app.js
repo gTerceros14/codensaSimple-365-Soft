@@ -51,6 +51,7 @@ Vue.component("ofertas", require("./components/Ofertas.vue"));
 Vue.component("kits", require("./components/Kits.vue"));
 
 Vue.component("bancos", require("./components/Bancos.vue"));
+Vue.component("transferencias", require("./components/Transferencias.vue"));
 
 Vue.component("ingreso", require("./components/Ingreso.vue"));
 Vue.component("cliente", require("./components/Cliente.vue"));
