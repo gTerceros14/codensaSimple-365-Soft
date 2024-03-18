@@ -2546,7 +2546,8 @@ class VentaController extends Controller
                 'personas.nombre as cliente',
                 'ventas.total',
                 'ventas.num_comprobante',
-                'users.usuario as usuario'
+                'users.usuario as usuario',
+                'personas.num_documento as nit'
             )
             ->whereDate('ventas.created_at', $request->input('fecha'))
             ->get();
