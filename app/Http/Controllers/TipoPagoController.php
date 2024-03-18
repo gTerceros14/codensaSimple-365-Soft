@@ -82,4 +82,12 @@ class TipoPagoController extends Controller
     {
         //
     }
+
+    public function selectTipoPago()
+    {
+        $tipoPagos = TipoPago::select('id', 'nombre_tipo_pago')
+            ->orderBy('nombre_tipo_pago', 'asc')->get();
+
+        return ['tipo_pagos' => $tipoPagos];
+    }
 }

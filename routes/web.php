@@ -223,6 +223,7 @@ Route::group(['middleware' => ['auth']], function () {
         // actualizar 
         Route::put('/sucursal/actualizar', 'SucursalController@update');
         Route::get('/sucursal/selectSucursal', 'SucursalController@selectSucursal');
+        Route::get('/tipoPago/selectTipoPago', 'TipoPagoController@selectTipoPago');
         Route::get('/sucursal/selectedSucursal/filter', 'SucursalController@selectedSucursal');
         //Puntos de Venta
         Route::get('/puntoVenta', 'PuntoVentaController@index');
@@ -407,6 +408,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/reporte-resumen-clientes', 'ReporteResumenClientesController@clientesPorVendedor');
         Route::get('/kardex-clientes-detallado-global', 'ReporteKardexClientesDetalladoGlobalController@articulosPorCliente');
         Route::get('/kardex-clientes-resumen-global', 'ReporteKardexClientesResumenGlobalController@ventasPorCliente');
+        Route::get('/recibo-cliente-por-documento', 'ReporteReciboClientePorDocumentoController@clientesPorDocumento');
         Route::get('/reporte-ventas-producto', 'ReportesVentas@ventasPorProducto');
         Route::get('/reporte-resumen-fisico-movimientos', 'ReportesVentas@resumenFisicoMovimientos');
         Route::get('/resumen-ventas-documento-detallado', 'ReportesVentas@ResumenVentasPorDocumentoDetallado');
