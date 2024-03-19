@@ -824,7 +824,7 @@ class VentaController extends Controller
         $sucursal = $user->sucursal;
         $codSucursal = $sucursal->codigoSucursal;
 
-        if (!isset($_SESSION['scufd'])) {
+        if (!isset ($_SESSION['scufd'])) {
             require "SiatController.php";
             $siat = new SiatController();
             $res = $siat->cufd($puntoVenta, $codSucursal);
@@ -1000,6 +1000,8 @@ class VentaController extends Controller
     {
 
         $user = Auth::user();
+        Log::info("Llego aqui 1");
+
         //$puntoVenta = $user->idpuntoventa;
         $puntoVenta = 0;
         $sucursal = $user->sucursal;
@@ -1025,6 +1027,7 @@ class VentaController extends Controller
         $numeroFactura = str_pad($valores['numeroFactura'], 10, "0", STR_PAD_LEFT);
         $puntoVentaCuf = str_pad($puntoVenta, 4, "0", STR_PAD_LEFT);
         $codigoControl = $_SESSION['scodigoControl'];
+
         $cadena = $nitEmisor . $fecha_formato . $sucursal . $modalidad . $tipoEmision . $tipoFactura . $tipoDocSector . $numeroFactura . $puntoVentaCuf;
         $numDig = 1;
         $limMult = 9;
@@ -1040,7 +1043,9 @@ class VentaController extends Controller
         $datos['factura'][0]['cabecera']['cuf'] = $cuf;
 
         $temporal = $datos['factura'];
-        dd($temporal);
+
+        // dd($temporal);
+
         $xml_temporal = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><facturaComputarizadaCompraVenta xsi:noNamespaceSchemaLocation=\"facturaComputarizadaCompraVenta.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"></facturaComputarizadaCompraVenta>");
 
         $this->formato_xml($temporal, $xml_temporal);
@@ -1053,25 +1058,29 @@ class VentaController extends Controller
         $hashArchivo = hash("sha256", file_get_contents(public_path("docs/facturaxml.xml")));
 
         $numeroFactura = $valores['numeroFactura'];
-        $codigoMetodoPago = $valores['codigoMetodoPago'];
+        // $codigoMetodoPago = $valores['codigoMetodoPago'];
+        $codigoMetodoPago = 1;
+
         $montoTotal = $valores['montoTotal'];
         $montoTotalSujetoIva = $valores['montoTotalSujetoIva'];
         $descuentoAdicional = $valores['descuentoAdicional'];
         $productos = file_get_contents(public_path("docs/facturaxml.xml"));
-
+        $mensaje = "";
 
         $data = $this->insertarFactura($request, $idventa, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
-
         if ($data) {
             // Registro exitoso
             require "SiatController.php";
             $siat = new SiatController();
             $resFactura = $siat->recepcionFactura($archivo, $fechaEmision, $hashArchivo, $puntoVenta, $codSucursal);
             //var_dump($resFactura);
+            Log::info(json_encode($resFactura));
+
             if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "VALIDADA") {
                 $mensaje = $resFactura->RespuestaServicioFacturacion->codigoDescripcion;
             } else if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA") {
                 $mensajes = $resFactura->RespuestaServicioFacturacion->mensajesList;
+                Log::info(json_encode($mensajes));
                 //dd($mensajes);
                 if (is_array($mensajes)) {
                     $descripciones = array_map(function ($mensaje) {
@@ -1142,7 +1151,9 @@ class VentaController extends Controller
         $hashArchivo = hash("sha256", file_get_contents(public_path("docs/facturaxml.xml")));
 
         $numeroFactura = $valores['numeroFactura'];
-        $codigoMetodoPago = $valores['codigoMetodoPago'];
+        // $codigoMetodoPago = $valores['codigoMetodoPago'];
+        $codigoMetodoPago = 1;
+
         $montoTotal = $valores['montoTotal'];
         $montoTotalSujetoIva = $valores['montoTotalSujetoIva'];
         $descuentoAdicional = $valores['descuentoAdicional'];
@@ -2546,7 +2557,8 @@ class VentaController extends Controller
                 'personas.nombre as cliente',
                 'ventas.total',
                 'ventas.num_comprobante',
-                'users.usuario as usuario'
+                'users.usuario as usuario',
+                'personas.num_documento as nit'
             )
             ->whereDate('ventas.created_at', $request->input('fecha'))
             ->get();

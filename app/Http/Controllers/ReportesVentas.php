@@ -278,6 +278,7 @@ class ReportesVentas extends Controller
             'marcas.nombre as nombre_marca',
             'industrias.nombre as nombre_industria',
             'medidas.descripcion_medida as medida',
+            'personas.num_documento as nit',
             
             DB::raw("ROUND((detalle_ventas.precio / detalle_ventas.cantidad), 2) AS precio_unitario"),
             DB::raw("'$moneda' as Tipo_cambio"),

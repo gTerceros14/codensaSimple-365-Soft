@@ -181,6 +181,17 @@
                                     Habilitar
                                     </label>
                                 </div>
+                            </div>
+
+
+                            <div v-if="clienteDeudas > 0" class="alert alert-danger text-center " role="alert"
+                                style="width: 100%;">
+                                Este cliente tiene <b>{{ clienteDeudas }}</b> pagos pendientes de crédito.
+                                <button type="button" class="close" @click="clienteDeudas = 0">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                                </div>
                             </div>    
                                 
                             <div v-if="clienteDeudas > 0" class="alert alert-danger text-center " role="alert"
@@ -198,12 +209,50 @@
                                 <v-select label="nombre_almacen" :options="arrayAlmacenes"
                                     placeholder="Seleccione un almacen" :onChange="getAlmacenProductos"></v-select>
                             </div>
+                            <div class="col-md-3">
+                                <label for="" class="font-weight-bold">Almacen
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <v-select label="nombre_almacen" :options="arrayAlmacenes"
+                                    placeholder="Seleccione un almacen" :onChange="getAlmacenProductos"></v-select>
+                            </div>
 
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Tipo de comprobante
                                     <span class="text-danger">*</span>
                                 </label>
+                            <div class="col-md-3">
+                                <label for="" class="font-weight-bold">Tipo de comprobante
+                                    <span class="text-danger">*</span>
+                                </label>
 
+                                <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
+                                    <option disabled value="0">Seleccione</option>
+                                    <option value="FACTURA">Factura</option>
+                                    <option value="BOLETA">Boleta</option>
+                                    <option value="TICKET">Ticket</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="" class="font-weight-bold">Numero de comprobante
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob"
+                                    disabled>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="" class="font-weight-bold">Aplicar impuesto:
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group mb-3" id="seccionObjetivo">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text" style="height: 100%;">
+                                            <input type="checkbox" aria-label="Checkbox for following text input">
+                                        </div>
+                                    </div>
+                                    <input disabled type="text" class="form-control" value="0.18">
+                                </div>
+                            </div>
                                 <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
                                     <option disabled value="0">Seleccione</option>
                                     <option value="FACTURA">Factura</option>
@@ -891,7 +940,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <button type="button" @click="registrar()"
+                                            <button type="button" @click="registrarVenta()"
                                                 class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i>
                                                 Registrar Pago</button>
                                         </div>
@@ -1836,7 +1885,7 @@ export default {
             var url = '/venta?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                console.log(respuesta)
+                console.log("Listando ventas: ", respuesta)
                 me.arrayVenta = respuesta.ventas.data;
                 me.pagination = respuesta.pagination;
             })
@@ -2304,6 +2353,7 @@ export default {
 
             }).then((response) => {
                 let idVentaRecienRegistrada = response.data.id;
+                console.log("LLego aca")
                 this.emitirFactura(idVentaRecienRegistrada);
 
                 if (response.data.id > 0) {
@@ -2467,6 +2517,7 @@ export default {
                 idventa: idventa
             })
                 .then(function (response) {
+                    console.log(response)
                     var data = response.data;
 
                     if (data === "VALIDADA") {
@@ -2492,6 +2543,7 @@ export default {
                     }
                 })
                 .catch(function (error) {
+                    console.log("Error:", error)
                     me.arrayProductos = [];
                     swal(
                         'INTENTE DE NUEVO',
