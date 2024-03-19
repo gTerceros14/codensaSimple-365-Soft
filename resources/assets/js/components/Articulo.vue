@@ -1894,8 +1894,17 @@ export default {
         },
         registrarArticulo(data) {
             let me = this;
-
-            axios.post('/articulo/registrar', data).then(function (response) {
+            var formulario = new FormData();
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    formulario.append(key, data[key]);
+                }
+            }
+            axios.post('/articulo/registrar', formulario, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data' 
+                    }
+                }).then(function (response) {
                 me.cerrarModal();
                 me.listarArticulo(1, '', 'nombre');
                 me.toastSuccess("Articulo registrado correctamente")
@@ -1909,14 +1918,25 @@ export default {
 
         //---actuslizar articulo
         actualizarArticulo(data) {
-
+            var formulario = new FormData();
             let me = this;
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    formulario.append(key, data[key]);
+                }
+            }
 
 
-
-            axios.post('/articulo/actualizar', data).then(function (response) {
+            axios.post('/articulo/actualizar', formulario, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data' 
+                    }
+                }).then(function (response) {
                 //alert("Datos actualizados con éxito");
                 //console.log("datos actuales",formData);
+                var respuesta = response.data;
+                console.log("respuesta = ",respuesta)
+                console.log("foto ",data)
                 me.cerrarModal();
                 me.listarArticulo(1, '', 'nombre');
                 me.toastSuccess("Articulo actualizado correctamente")

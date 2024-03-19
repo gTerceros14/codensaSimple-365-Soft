@@ -412,7 +412,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/kardex-clientes-resumen-global', 'ReporteKardexClientesResumenGlobalController@ventasPorCliente');
         Route::get('/recibo-cliente-por-documento', 'ReporteReciboClientePorDocumentoController@clientesPorDocumento');
         Route::get('/reporte-ventas-producto', 'ReportesVentas@ventasPorProducto');
-        Route::get('/reporte-resumen-fisico-movimientos', 'ReportesVentas@resumenFisicoMovimientos');
+        Route::get('/reporte-resumen-fisico-movimientos', 'ReportesInventariosController@resumenFisicoMovimientos');
         Route::get('/resumen-ventas-documento-detallado', 'ReportesVentas@ResumenVentasPorDocumentoDetallado');
         Route::get('/reporte-inventario-fisico-valorado/{tipo}', 'ReportesInventariosController@inventarioFisicoValorado');
 
