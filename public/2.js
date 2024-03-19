@@ -1,14 +1,6 @@
 webpackJsonp([2],{
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-/***/ 720:
-=======
-/***/ 757:
->>>>>>> 4bef4cdbb138837f33e541e966a0b55f86c02cb9
-=======
-/***/ 769:
->>>>>>> e3fe90dca697934336df322821dcfa94f19804a5
+/***/ 782:
 /***/ (function(module, exports, __webpack_require__) {
 
 /*! @license DOMPurify 2.4.7 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/2.4.7/LICENSE */
