@@ -1,6 +1,10 @@
 webpackJsonp([1],{
 
+<<<<<<< HEAD
 /***/ 788:
+=======
+/***/ 784:
+>>>>>>> 1e23c56f7e3eabf32055547ec896bfc17463c6dd
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!

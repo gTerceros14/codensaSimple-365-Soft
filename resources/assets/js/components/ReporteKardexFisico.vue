@@ -46,11 +46,14 @@
                                     <td v-text="articulo.tipo"></td>
                                     <td v-text="articulo.num_comprobante"></td>
                                     <td v-text="articulo.fecha_hora"></td>
-                                    <td v-text="articulo.tipo_comprobante"></td>
-                                    <td v-if="articulo.tipo === 'Ingreso'" v-text="articulo.cantidad"></td>
+                                    <td v-if="articulo.tipo === 'Traspaso'" v-text="articulo.almacen_destino"></td>
+                                        <td v-else v-text="articulo.tipo_comprobante"></td>
+
+                                    <td v-if="articulo.tipo === 'Ingreso' || articulo.tipo_traspaso === 'Entrada'" v-text="articulo.cantidad"></td>
                                     <td v-else>0</td>
-                                    <td v-if="articulo.tipo === 'Venta'" v-text="articulo.cantidad"></td>
+                                    <td v-if="articulo.tipo === 'Venta' || articulo.tipo_traspaso === 'Salida'" v-text="articulo.cantidad"></td>
                                     <td v-else>0</td>
+                                    
                                     <td v-text="articulo.resultado_operacionFisico"></td>
                                 </tr>
                             </tbody>
@@ -1781,7 +1784,7 @@ export default {
             // Merge de celdas para el título
             worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
             // Título del reporte
-            worksheet['A1'] = { t: 's', v: 'REPORTE KARDEX INVENTARIO FISICO VALORADO', s: { 
+            worksheet['A1'] = { t: 's', v: 'REPORTE KARDEX INVENTARIO FISICO', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
                 alignment: { horizontal: 'center', vertical: 'center' },
                 fill: { fgColor: { rgb: '3669a8' } } } };
@@ -1813,8 +1816,8 @@ export default {
                     item.num_comprobante,
                     item.fecha_hora,
                     item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
+                    item.tipo === 'Ingreso' || item.tipo_traspaso ==='Entrada' ? item.cantidad : '',
+                    item.tipo === 'Venta' || item.tipo_traspaso ==='Salida'? item.cantidad : '',
                     item.resultado_operacionFisico,
                 ];
 
