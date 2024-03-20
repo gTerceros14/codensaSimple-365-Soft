@@ -20,7 +20,7 @@ class ReporteKardexFisicoInventarioController extends Controller
             ->join('articulos','detalle_ingresos.idarticulo','=', 'articulos.id')
             ->join('almacens','almacens.encargado','=','ingresos.idusuario')
             ->join('sucursales','sucursales.id','=','almacens.sucursal')
-            ->select(DB::raw("'Ingreso' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ingresos.precio AS precio_ingreso')
+            ->select(DB::raw("'Ingreso' AS tipo"), 'ingresos.id','fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ingresos.precio AS precio_ingreso')
             ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59']);
             
     
@@ -29,7 +29,7 @@ class ReporteKardexFisicoInventarioController extends Controller
             ->join('articulos','detalle_ventas.idarticulo','=', 'articulos.id')
             ->join('users','ventas.idusuario','=','users.id')
             ->join('sucursales','users.idsucursal','=','sucursales.id')
-            ->select(DB::raw("'Venta' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ventas.precio  AS precio_venta')
+            ->select(DB::raw("'Venta' AS tipo"), 'ventas.id','fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante','detalle_ventas.precio  AS precio_venta')
             ->whereBetween('fecha_hora', [$fechainicio.' 00:00:00', $fechafin.' 23:59:59']);
             
     
@@ -106,7 +106,7 @@ public function generarReporteFisico(Request $request)
         ->join('articulos','detalle_ingresos.idarticulo','=','articulos.id')
         ->join('almacens','almacens.encargado','=','ingresos.idusuario')
         ->join('sucursales','sucursales.id','=','almacens.sucursal')
-        ->select(DB::raw("'Ingreso' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante')
+        ->select(DB::raw("'Ingreso' AS tipo"), 'ingresos.id','fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante')
         ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
         
     $ventas = DB::table('ventas')
@@ -114,7 +114,7 @@ public function generarReporteFisico(Request $request)
         ->join('articulos','detalle_ventas.idarticulo','=','articulos.id')
         ->join('users','ventas.idusuario','=','users.id')
         ->join('sucursales','users.idsucursal','=','sucursales.id')
-        ->select(DB::raw("'Venta' AS tipo"), 'fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante')
+        ->select(DB::raw("'Venta' AS tipo"), 'ventas.id','fecha_hora', 'cantidad', 'num_comprobante', 'tipo_comprobante')
         ->whereBetween('fecha_hora', [$fechaInicio, $fechaFin]);
         
         if ($request->has('articulo') && $request->articulo !== 'undefined') {

@@ -169,9 +169,9 @@
                 <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-line-chart"></i> Reportes Inventario</a>
                 <ul class="nav-dropdown-items">
 
-                    <li @click="menu=49" class="nav-item">
+                    <!--<li @click="menu=49" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventarios</a>
-                    </li>
+                    </li>-->
                     <li @click="menu=51" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Fisico Valorado</a>
                     </li>

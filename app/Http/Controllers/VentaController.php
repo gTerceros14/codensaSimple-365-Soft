@@ -1073,7 +1073,7 @@ class VentaController extends Controller
             require "SiatController.php";
             $siat = new SiatController();
             $resFactura = $siat->recepcionFactura($archivo, $fechaEmision, $hashArchivo, $puntoVenta, $codSucursal);
-            //var_dump($resFactura);
+            dd($resFactura);
             Log::info(json_encode($resFactura));
 
             if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "VALIDADA") {

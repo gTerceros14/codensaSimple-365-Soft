@@ -17,13 +17,15 @@
                         <i class="icon-doc"></i>&nbsp;Exportar a Excel
                     </button>
                     <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
-
                 </div>
+
+                <template v-if="listado == 1">
                 <div class="card-body"  style="max-height: 600px; overflow-y: auto;" >
                     <div class = "table-resposive" > 
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
+                                    <th>Opciones</th>
                                     <th>CODICO ITEM</th>
                                     <th>FECHA</th>
                                     <th>MARCA</th>
@@ -37,6 +39,11 @@
                             </thead>
                             <tbody>
                                 <tr v-for="articulo in sortedResultados" :key="articulo.id">
+                                    <td class="d-flex align-items-center">
+                                            <button type="button" @click="verVenta(articulo.idventa)"
+                                                class="btn btn-success btn-sm mr-1">
+                                                <i class="icon-eye"></i>
+                                            </button></td>
                                     <td v-text="articulo.codigo"></td>
                                     <td v-text="articulo.fecha_hora"></td>
                                     <td v-text="articulo.nombre_marca"></td>
@@ -46,34 +53,119 @@
                                     <td v-text="articulo.descripcion"></td>
                                     <td v-text="articulo.cantidad"></td>
                                     <td v-text="articulo.precio"></td>
-
-
-
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <!--<div class="text-right">
-                            <strong>Total Saldo Fisico: </strong> {{ total_saldofisico }} Unidades
-                        </div>
-                    <nav>
-                        <ul class="pagination">
-                            <li class="page-item" v-if="pagination.current_page > 1">
-                                <a class="page-link" href="#"
-                                    @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
-                            </li>
-                            <li class="page-item" v-for="page in pagesNumber" :key="page"
-                                :class="[page == isActived ? 'active' : '']">
-                                <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                    v-text="page"></a>
-                            </li>
-                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                <a class="page-link" href="#"
-                                    @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
-                            </li>
-                        </ul>
-                    </nav>-->
                 </div>
+            </template>
+
+            <template v-else-if="listado == 2">
+                    <div class="card-body">
+                        <div class="form-group row border">
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <label for="">Cliente</label>
+                                    <p v-text="cliente"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="">Impuesto</label>
+                                <p v-text="impuesto"></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Tipo Comprobante</label>
+                                    <p v-text="tipo_comprobante"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Serie Comprobante</label>
+                                    <p v-text="serie_comprobante"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Número Comprobante</label>
+                                    <p v-text="num_comprobante"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row border">
+                            <div class="table-responsive col-md-12">
+                                <table class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Artículo</th>
+                                            <th>Precio</th>
+                                            <th>Cantidad</th>
+                                            <th>Descuento</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="arrayDetalle.length">
+                                        <tr v-for="detalle in arrayDetalle" :key="detalle.id">
+                                            <td v-text="detalle.articulo">
+                                            </td>
+
+                                            <td>
+                                                {{ ((detalle.precio / detalle.cantidad) * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                                                    monedaPrincipal[1] }}
+
+                                            </td>
+                                            <td v-text="detalle.cantidad">
+                                            </td>
+                                            <td v-text="detalle.descuento">
+                                            </td>
+                                            <td>
+                                                {{ (((detalle.precio/detalle.cantidad) * detalle.cantidad - detalle.descuento)
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Parcial:</strong>
+                                            </td>
+                                            <td>
+                                                {{ ((totalParcial = (total - totalImpuesto))
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+                                            </td>
+
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
+                                            <td>
+                                                {{ ((totalImpuesto = (total * impuesto))
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Neto:</strong></td>
+                                            <td>
+                                                {{ ((total) * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-else>
+                                        <tr>
+                                            <td colspan="5">
+                                                No hay articulos agregados
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
             <!-- Fin ejemplo de tabla Listado -->
         </div>
@@ -192,7 +284,6 @@
                             <button type="submit" @click="listaReporte(); cerrarModal()" class="btn btn-primary">Visualizar Reporte</button>
                         </div>
                     </form>
-
                 </div>
                 <!-- /.modal-content -->
             </div>
@@ -748,6 +839,18 @@ export default {
             //fechas
             fechaInicio:'',
             fechaFin:'',
+
+            //Listados
+            listado: 1,
+            arrayDetalle: [],
+            cliente: '',
+            totalImpuesto: 0.0,
+            tipo_comprobante: 'BOLETA',
+            serie_comprobante: '',
+            num_comprobante: '',
+            impuesto: 0.18,
+
+
         }
     },
     components: {
@@ -1414,6 +1517,61 @@ export default {
                 .catch(function (error) {
                     console.log(error);
                 });
+        },
+
+        verVenta(idventa) {
+            let me = this;
+            me.listado = 2;
+
+            //Obtener datos del ingreso
+            var arrayVentaT = [];
+            var url = '/venta/obtenerCabecera?id=' + idventa;
+
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                arrayVentaT = respuesta.venta;
+                console.log("VIENDO ", respuesta)
+
+                me.cliente = arrayVentaT[0]['nombre'];
+                me.tipo_comprobante = arrayVentaT[0]['tipo_comprobante'];
+                me.serie_comprobante = arrayVentaT[0]['serie_comprobante'];
+                me.num_comprobante = arrayVentaT[0]['num_comprobante'];
+                me.impuesto = arrayVentaT[0]['impuesto'];
+                me.total = arrayVentaT[0]['total'];
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+            //obtener datos de los detalles
+            var url = '/venta/obtenerDetalles?id=' + idventa;
+
+            axios.get(url).then(function (response) {
+                //console.log(response);
+                var respuesta = response.data;
+                me.arrayDetalle = respuesta.detalles;
+                console.log(array)
+
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        ocultarDetalle() {
+            this.listado = 1;
+            this.codigo = null;
+            this.arrayArticulo.length = 0;
+            this.precioseleccionado = null;
+            this.medida = null;
+            this.nombreCliente = null;
+            this.documento = null;
+            this.email = null;
+            this.idAlmacen = null;
+            this.arrayProductos = [];
+            this.arrayDetalle = [];
+            this.precioBloqueado = false;
+
         },
 
        
