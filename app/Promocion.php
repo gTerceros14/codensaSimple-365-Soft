@@ -16,6 +16,15 @@ class Promocion extends Model
         'estado',
         'tipo_promocion',
         'nombre',
+        'precio_r1',
+        'rango_inicio_r1',
+        'rango_final_r1',
+        'precio_r2',
+        'rango_inicio_r2',
+        'rango_final_r2',
+        'precio_r3',
+        'rango_inicio_r3',
+        'rango_final_r3'
     ];
 
     // Relationships Muchos a Muchos agregado el 26 de 01 de 2024
