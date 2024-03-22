@@ -22,6 +22,15 @@ class CreatePromocionesTable extends Migration
             $table->string('estado', 50)->default("Activo");
             $table->tinyInteger('tipo_promocion')->nullable();
             $table->string('nombre', 250);
+            $table->integer('precio_r1')->nullable();
+            $table->integer('rango_inicio_r1')->nullable();
+            $table->integer('rango_final_r1')->nullable();
+            $table->integer('precio_r2')->nullable();
+            $table->integer('rango_inicio_r2')->nullable();
+            $table->integer('rango_final_r2')->nullable();
+            $table->integer('precio_r3')->nullable();
+            $table->integer('rango_inicio_r3')->nullable();
+            $table->integer('rango_final_r3')->nullable();
             $table->timestamps();
         });
     }
