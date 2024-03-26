@@ -225,6 +225,10 @@
     <transferencias></transferencias>
 </template>
 
+<template v-if="menu==67">
+    <mayoreo></mayoreo>
+</template>
+
 
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">

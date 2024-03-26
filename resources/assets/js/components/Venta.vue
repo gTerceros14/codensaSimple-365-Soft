@@ -28,16 +28,16 @@
                         <div class="form-group row">
                             <div class="col-md-3">
                                 <div class="input-group">
-                                    <select class="form-control col-md-5" v-model="criterio">
+                                    <select class="form-control col-md-3" v-model="criterio">
                                         <option value="tipo_comprobante">Tipo Comprobante</option>
-                                        <option value="num_comprobante">N° Comprobante</option>
+                                        <option value="num_comprobante">Número Comprobante</option>
                                         <option value="fecha_hora">Fecha-Hora</option>
                                     </select>
                                     <input type="text" v-model="buscar" @keyup="listarVenta(1, buscar, criterio)"
                                         class="form-control" placeholder="Texto a buscar">
                                 </div>
                             </div>
-                        </div>
+                        </div>  
                         <div class="spinner-container" v-if="mostrarSpinner">
                             <div class="spinner-message"><strong>EMITIENDO FACTURA...</strong></div>
                             <TileSpinner color="blue" />
@@ -49,8 +49,8 @@
                                         <th>Opciones</th>
                                         <th>Vendedor</th>
                                         <th>Cliente</th>
-                                        <th>Tipo de Documento</th>
-                                        <th>Número de Documento</th>
+                                        <th>Documento</th>
+                                        <th>N° de Documento</th>
                                         <th>Fecha y Hora</th>
                                         <th>Tipo de Venta</th>
                                         <th>Total</th>
@@ -97,16 +97,11 @@
 
                                         </td>
                                         <td>
-                                            <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank"
-                                                class="btn btn-info"><i class="icon-note"></i></a>
+                                            <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank" class="btn btn-info"><i class="icon-note"></i></a>
                                         </td>
                                         <td>
-                                            <button class="btn btn-primary" type="button"
-                                                @click="imprimirFactura(venta.id, venta.email)"><i
-                                                    class="icon-printer"></i></button>
-                                            <button class="btn btn-danger" type="button"
-                                                @click="anularFactura(venta.id, venta.cuf)"><i
-                                                    class="icon-close"></i></button>
+                                            <button class="btn btn-primary" type="button" @click="imprimirFactura(venta.id, venta.email)"><i class="icon-printer"></i></button>
+                                            <button class="btn btn-danger" type="button" @click="anularFactura(venta.id, venta.cuf)"><i class="icon-close"></i></button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -181,17 +176,6 @@
                                     Habilitar
                                     </label>
                                 </div>
-                            </div>
-
-
-                            <div v-if="clienteDeudas > 0" class="alert alert-danger text-center " role="alert"
-                                style="width: 100%;">
-                                Este cliente tiene <b>{{ clienteDeudas }}</b> pagos pendientes de crédito.
-                                <button type="button" class="close" @click="clienteDeudas = 0">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                                </div>
                             </div>    
                                 
                             <div v-if="clienteDeudas > 0" class="alert alert-danger text-center " role="alert"
@@ -209,50 +193,12 @@
                                 <v-select label="nombre_almacen" :options="arrayAlmacenes"
                                     placeholder="Seleccione un almacen" :onChange="getAlmacenProductos"></v-select>
                             </div>
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Almacen
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <v-select label="nombre_almacen" :options="arrayAlmacenes"
-                                    placeholder="Seleccione un almacen" :onChange="getAlmacenProductos"></v-select>
-                            </div>
 
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Tipo de comprobante
                                     <span class="text-danger">*</span>
                                 </label>
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Tipo de comprobante
-                                    <span class="text-danger">*</span>
-                                </label>
 
-                                <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
-                                    <option disabled value="0">Seleccione</option>
-                                    <option value="FACTURA">Factura</option>
-                                    <option value="BOLETA">Boleta</option>
-                                    <option value="TICKET">Ticket</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Numero de comprobante
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob"
-                                    disabled>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Aplicar impuesto:
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group mb-3" id="seccionObjetivo">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text" style="height: 100%;">
-                                            <input type="checkbox" aria-label="Checkbox for following text input">
-                                        </div>
-                                    </div>
-                                    <input disabled type="text" class="form-control" value="0.18">
-                                </div>
-                            </div>
                                 <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
                                     <option disabled value="0">Seleccione</option>
                                     <option value="FACTURA">Factura</option>
@@ -503,12 +449,6 @@
                                             <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
                                                 class="form-control" @change="validarDescuentoAdicional">
                                         </tr>
-
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Descuento Gift Card: </strong></td>
-                                            <input id="descuentoGiftCard" v-model="descuentoGiftCard" type="number"
-                                                class="form-control">
-                                        </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="9" align="right"><strong>Total Neto: </strong></td>
                                             <td id="montoTotal">
@@ -531,20 +471,20 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <div class="col-md-4">
-                                <label class="col-form-label" for="tipoVenta"><strong>Tipo de Venta</strong></label>
-                                <select class="form-control" v-model="idtipo_venta">
-                                    <option value="1">Contado</option>
-                                    <option value="2">Crédito</option>
-                                </select>
+                                <div class="col-md-4">
+                                    <label class="col-form-label" for="tipoVenta"><strong>Tipo de Venta</strong></label>
+                                    <select class="form-control" v-model="idtipo_venta">
+                                        <option value="1">Contado</option>
+                                        <option value="2">Crédito</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex align-items-end">
+                                    <button type="button" @click="ocultarDetalle()"
+                                        class="btn btn-secondary btn-block mr-2">Cerrar</button>
+                                    <button type="button" class="btn btn-primary btn-block "
+                                        @click="abrirTipoVenta()">Confirmar</button>
+                                </div>
                             </div>
-                            <div class="d-flex align-items-end">
-                                <button type="button" @click="ocultarDetalle()"
-                                    class="btn btn-secondary btn-block mr-2">Cerrar</button>
-                                <button type="button" class="btn btn-primary btn-block "
-                                    @click="abrirTipoVenta()">Confirmar</button>
-                            </div>
-                        </div>
                     </div>
                 </template>
                 <!-- Fin Detalle-->
@@ -725,8 +665,8 @@
                                                         <td v-text="articulo.nombre_categoria"></td>
                                                         <td>
                                                             {{ ((articulo.precio_venta) *
-                        parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                        monedaVenta[1] }}
+                                                                parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                                             monedaVenta[1] }}
 
                                                         </td>
                                                         <td v-text="articulo.saldo_stock"></td>
@@ -792,8 +732,8 @@
                                                         <td>
                                                             {{ (kit.precio * parseFloat(monedaVenta[0])).toFixed(2) }}
                                                             {{
-                        monedaVenta[1]
-                    }}
+                                                                monedaVenta[1]
+                                                            }}
                                                         </td>
                                                         <td>
                                                             {{ new Date(kit.fecha_final).toLocaleDateString('es-ES') }}
@@ -804,7 +744,7 @@
                                                             <i class="fa fa-circle"
                                                                 :style="{ color: getColorForEstado(kit.estado, kit.fecha_final) }"></i>&nbsp;
                                                             {{ new Date(kit.fecha_final) < new Date() ? 'Inactivo' :
-                        kit.estado }} </td>
+                                                            kit.estado }} </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -864,7 +804,7 @@
                                                                 <div class="input-group-prepend">
                                                                     <span class="input-group-text">
                                                                         {{
-                        monedaVenta[1] }}
+                                                                        monedaVenta[1] }}
                                                                     </span>
                                                                 </div>
                                                                 <input type="number" class="form-control"
@@ -902,7 +842,7 @@
                                                         <span class="font-weight-bold">
                                                             {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)
                                                             }} {{
-                        monedaVenta[1] }}</span>
+                                                            monedaVenta[1] }}</span>
                                                     </div>
                                                     <div class="d-flex justify-content-between mb-2">
                                                         <span><i class="fa fa-tag mr-2 text-success"></i>
@@ -916,16 +856,15 @@
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="codigoDescuento"><i class="fa fa-gift mr-2"></i>
-                                                            Código
-                                                            de Descuento:</label>
+                                                            Código de Descuento Gift Card:</label>
                                                         <div class="input-group mb-3">
-                                                            <input type="text" class="form-control" id="codigoDescuento"
-                                                                placeholder="Ingrese el código de descuento (si aplica)">
-                                                            <div class="input-group-append">
-                                                                <button class="btn btn-outline-secondary" type="button"
-                                                                    id="aplicarDescuento"><i
-                                                                        class="fa fa-check"></i></button>
-                                                            </div>
+                                                            <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">    
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="numeroTarjeta"><i class="fa fa-credit-card mr-2"></i> Número de Tarjeta:</label>
+                                                        <div class="input-group mb-3">
+                                                            <input type="text" class="form-control" id="numeroTarjeta" v-model="numeroTarjeta" placeholder="Ingrese el número de tarjeta">
                                                         </div>
                                                     </div>
                                                     <hr>
@@ -935,15 +874,64 @@
 
                                                             {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)
                                                             }} {{
-                        monedaVenta[1] }}
+                                                        monedaVenta[1] }}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <button type="button" @click="registrarVenta()"
-                                                class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i>
-                                                Registrar Pago</button>
+                                            <button type="button" @click="aplicarDescuento" 
+                                            class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> 
+                                            Registrar Pago</button>
                                         </div>
+                                    </div>
+                                </div>
+                            </b-tab>
+                            <b-tab>
+                                <template #title>
+                                    <span class="d-flex align-items-center">
+                                        <i class="fa fa-gift fa-2x icon-color mr-2" aria-hidden="true"></i>
+                                        <label>Gift Card</label>
+                                    </span>
+                                </template>
+                                <div>
+                                    <div class="mt-4">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="descuentoGiftCard"><i class="fa fa-tag mr-2"></i> Monto de la Gift Card:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="registrarVenta(27)" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </b-tab>
+                            <b-tab>
+                                <template #title>
+                                    <span class="d-flex align-items-center">
+                                        <i class="fa fa-credit-card fa-2x icon-color mr-2" aria-hidden="true"></i>
+                                        <label>Tarjeta</label>
+                                    </span>
+                                </template>
+                                <div>
+                                    <div class="mt-4">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="numeroTarjeta"><i class="fa fa-credit-card mr-2"></i> Número de Tarjeta:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="text" class="form-control" id="numeroTarjeta" v-model="numeroTarjeta" placeholder="Ingrese el número de tarjeta">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="codigoDescuento"><i class="fa fa-gift mr-2"></i>
+                                                    Código de Descuento Gift Card:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">    
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="aplicarCombinacion" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
+                                        </form>
                                     </div>
                                 </div>
                             </b-tab>
@@ -961,32 +949,32 @@
                                             <input class="form-check-input border-dark" type="radio"
                                                 name="inlineRadioOptions" id="inlineRadio1" value="option1">
                                             <label class="form-check-label" for="inlineRadio1">
-                                                <!-- <img src="./../../../../public/img/bancos/logo_banco_union.jpg"
-                                                    width="80px" alt="Imagen 1"> -->
+                                                <img src="./../../../../public/img/bancos/logo_banco_union.jpg"
+                                                    width="80px" alt="Imagen 1">
                                             </label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input border-dark" type="radio"
                                                 name="inlineRadioOptions" id="inlineRadio2" value="option2">
                                             <label class="form-check-label" for="inlineRadio2">
-                                                <!-- <img src="./../../../../public/img/bancos/logo_mercantil_santacruz.jpg"
-                                                    width="80px" alt="Imagen 2"> -->
+                                                <img src="./../../../../public/img/bancos/logo_mercantil_santacruz.jpg"
+                                                    width="80px" alt="Imagen 2">
                                             </label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input border-dark" type="radio"
                                                 name="inlineRadioOptions" id="inlineRadio3" value="option3">
                                             <label class="form-check-label" for="inlineRadio3">
-                                                <!-- <img src="./../../../../public/img/bancos/logo_bnb.png" width="80px"
-                                                    alt="Imagen 3"> -->
+                                                <img src="./../../../../public/img/bancos/logo_bnb.png" width="80px"
+                                                    alt="Imagen 3">
                                             </label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input border-dark" type="radio"
                                                 name="inlineRadioOptions" id="inlineRadio4" value="option4">
                                             <label class="form-check-label" for="inlineRadio4">
-                                                <!-- <img src="./../../../../public/img/bancos/logo_banco_bisa.png"
-                                                    width="80px" alt="Imagen 4"> -->
+                                                <img src="./../../../../public/img/bancos/logo_banco_bisa.png"
+                                                    width="80px" alt="Imagen 4">
                                             </label>
                                         </div>
                                     </div>
@@ -1031,13 +1019,174 @@
                                                         placeholder="Ingrese el número de operación">
                                                 </div>
                                             </div>
-                                            <button type="submit" class="btn btn-success btn-block"><i
-                                                    class="fa fa-check mr-2"></i> Confirmar Transferencia</button>
+                                            <button type="button" @click="registrarVenta(7)" 
+                                                class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> 
+                                                Confirmar Transferencia</button>
                                         </form>
                                     </div>
                                 </div>
                             </b-tab>
                             <b-tab>
+                                <template #title>
+                                <span class="d-flex align-items-center">
+                                    <i class="fa fa-list-alt fa-2x icon-color mr-2" aria-hidden="true"></i>
+                                    <label>Otros</label>
+                                </span>
+                                </template>
+                                <div>
+                                <div class="mt-4">
+                                    <form>
+                                    <div class="form-group">
+                                        <label for="otroMetodoPago"><i class="fa fa-tag mr-2"></i> Seleccione un Método de Pago:</label>
+                                        <div class="input-group mb-3">
+                                        <select class="custom-select" id="otroMetodoPago" v-model="metodoPago">
+                                            <option value="">Seleccione...</option>
+                                            <option value="32">BILLETERA MOVIL</option>
+                                            <option value="81">BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="31">CANAL DE PAGO</option>
+                                            <option value="79">CANAL DE PAGO – BILLETERA MOVIL</option>
+                                            <option value="80">CANAL DE PAGO – PAGO ONLINE</option>
+                                            <option value="294">CANAL DE PAGO – BILLETERA MOVIL  – PAGO ONLINE</option>
+                                            <option value="3">CHEQUE</option>
+                                            <option value="51">CHEQUE – BILLETERA</option>
+                                            <option value="213">CHEQUE – BILLETERA MOVIL  – PAGO ONLINE</option>
+                                            <option value="50">CHEQUE – CANAL PAGO</option>
+                                            <option value="211">CHEQUE – CANAL PAGO - BILLETERA MOVIL</option>
+                                            <option value="212">CHEQUE – CANAL PAGO - PAGO ONLINE</option>
+                                            <option value="47">CHEQUE – DEPOSITO</option>
+                                            <option value="202">CHEQUE – DEPOSITO EN CUENTA - BILLETERA MOVIL</option>
+                                            <option value="201">CHEQUE – DEPOSITO EN CUENTA - CANAL DE PAGO</option>
+                                            <option value="203">CHEQUE – DEPOSITO EN CUENTA - PAGO ONLINE</option>
+                                            <option value="199">CHEQUE – DEPOSITO EN CUENTA - TRANSFERENCIA SWIFT</option>
+                                            <option value="38">EFECTIVO – PAGO ONLINE</option>
+                                            <option value="39">TARJETA – PAGO POSTERIOR</option>
+                                            <option value="191">CHEQUE – PAGO POSTERIOR - BILLETERA MOVIL</option>
+                                            <option value="190">CHEQUE – PAGO POSTERIOR - CANAL DE PAGO</option>
+                                            <option value="187">CHEQUE – PAGO POSTERIOR - DEPOSITO EN CUENTA</option>
+                                            <option value="192">CHEQUE – PAGO POSTERIOR - PAGO ONLINE</option>
+                                            <option value="186">CHEQUE – PAGO POSTERIOR - TRANSFERENCIA BANCARIA</option>
+                                            <option value="188">CHEQUE – PAGO POSTERIOR - TRANSFERENCIA SWIFT</option>
+                                            <option value="48">CHEQUE – SWIFT</option>
+                                            <option value="206">CHEQUE – SWIFT - BILLETERA MOVIL</option>
+                                            <option value="207">CHEQUE – SWIFT - PAGO ONLINE</option>
+                                            <option value="208">CHEQUE – GIFT - CANAL DE PAGO</option>
+                                            <option value="46">CHEQUE – TRANSFERENCIA BANCARIA</option>
+                                            <option value="197">CHEQUE – TRANSFERENCIA BANCARIA – BILLETERA MOVIL</option>
+                                            <option value="196">CHEQUE – TRANSFERENCIA BANCARIA – CANAL DE PAGO</option>
+                                            <option value="193">CHEQUE – TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA</option>
+                                            <option value="198">CHEQUE – TRANSFERENCIA BANCARIA – PAGO ONLINE</option>
+                                            <option value="194">CHEQUE – TRANSFERENCIA BANCARIA – TRANSFERENCIA SWIFT</option>
+                                            <option value="44">CHEQUE – VALES</option>
+                                            <option value="178">CHEQUE – VALES - PAGO POSTERIOR</option>
+                                            <option value="179">CHEQUE – VALES - TRANSFERENCIA BANCARIA</option>
+                                            <option value="180">CHEQUE – VALES - DEPOSITO EN CUENTA</option>
+                                            <option value="181">CHEQUE – VALES - TRANSFERENCIA SWIFT</option>
+                                            <option value="183">CHEQUE – VALES - CANAL DE PAGO</option>
+                                            <option value="184">CHEQUE – VALES - BILLETERA MOVIL</option>
+                                            <option value="185">CHEQUE – VALES - PAGO ONLINE</option>
+                                            <option value="295">DEBITO AUTOMATICO</option>
+                                            <option value="296">DEBITO AUTOMATICO – EFECTIVO</option>
+                                            <option value="297">DEBITO AUTOMATICO -TARJETA</option>
+                                            <option value="298">DEBITO AUTOMATICO – CHEQUE</option>
+                                            <option value="299">DEBITO AUTOMATICO - VALE</option>
+                                            <option value="300">DEBITO AUTOMATICO - PAGO POSTERIOR</option>
+                                            <option value="301">DEBITO AUTOMATICO - TRANSFERENCIA BANCARIA</option>
+                                            <option value="302">DEBITO AUTOMATICO - DEPOSITO EN CUENTA</option>
+                                            <option value="303">DEBITO AUTOMATICO - TRANSFERENCIA SWIFT</option>
+                                            <option value="304">DEBITO AUTOMATICO - GIFT CARD</option>
+                                            <option value="305">DEBITO AUTOMATICO - CANAL DE PAGO</option>
+                                            <option value="306">DEBITO AUTOMATICO - BILLETERA MOVIL</option>
+                                            <option value="307">DEBITO AUTOMATICO - PAGO ONLINE</option>
+                                            <option value="308">DEBITO AUTOMATICO – OTRO</option>
+                                            <option value="8">DEPOSITO EN CUENTA</option>
+                                            <option value="71">DEPOSITO EN CUENTA – PAGO ONLINE</option>
+                                            <option value="276">DEPOSITO EN CUENTA – SWIFT – CANAL DE PAGO</option>
+                                            <option value="277">DEPOSITO EN CUENTA – SWIFT – BILLETERA MOVIL</option>
+                                            <option value="278">DEPOSITO EN CUENTA – SWIFT – PAGO ONLINE</option>
+                                            <option value="282">DEPOSITO EN CUENTA – CANAL DE PAGO – BILLETERA MOVIL</option>
+                                            <option value="70">DEPOSITO EN CUENTA – BILLETERA MOVIL</option>
+                                            <option value="284">DEPOSITO EN CUENTA – BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="69">DEPOSITO EN CUENTA – CANAL DE PAGO</option>
+                                            <option value="283">DEPOSITO EN CUENTA – CANAL DE PAGO – PAGO ONLINE</option>
+                                            <option value="5">OTROS</option>
+                                            <option value="33">PAGO ONLINE</option>
+                                            <option value="6">PAGO POSTERIOR</option>
+                                            <option value="62">PAGO POSTERIOR – BILLETERA</option>
+                                            <option value="259">PAGO POSTERIOR – BILLETERA MOVIL - PAGO ONLINE</option>
+                                            <option value="61">PAGO POSTERIOR – CANAL</option>
+                                            <option value="257">PAGO POSTERIOR – CANAL DE PAGO - BILLETERA MOVIL</option>
+                                            <option value="258">PAGO POSTERIOR – CANAL DE PAGO - PAGO ONLINE</option>
+                                            <option value="58">PAGO POSTERIOR – DEPOSITO EN CUENTA</option>
+                                            <option value="245">PAGO POSTERIOR – DEPOSITO EN CUENTA – TRANSFERENCIA SWIFT</option>
+                                            <option value="247">PAGO POSTERIOR – DEPOSITO EN CUENTA – CANAL DE PAGO</option>
+                                            <option value="248">PAGO POSTERIOR – DEPOSITO EN CUENTA – BILLETERA MOVIL</option>
+                                            <option value="249">PAGO POSTERIOR – DEPOSITO EN CUENTA – PAGO ONLINE</option>
+                                            <option value="63">PAGO POSTERIOR – PAGO ONLINE</option>
+                                            <option value="59">PAGO POSTERIOR – SWIFT</option>
+                                            <option value="251">PAGO POSTERIOR – SWIFT - CANAL DE PAGO</option>
+                                            <option value="252">PAGO POSTERIOR – SWIFT - BILLETERA MOVIL</option>
+                                            <option value="253">PAGO POSTERIOR – SWIFT - PAGO ONLINE</option>
+                                            <option value="57">PAGO POSTERIOR – TRANSFERENCIA BANCARIA</option>
+                                            <option value="239">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA</option>
+                                            <option value="240">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – TRANSFERENCIA SWIFT</option>
+                                            <option value="242">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – CANAL DE PAGO</option>
+                                            <option value="243">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – BILLETERA MOVIL</option>
+                                            <option value="244">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – PAGO ONLINE</option>
+                                            <option value="74">SWIFT – BILLETERA MOVIL</option>
+                                            <option value="290">SWIFT – BILLETERA MOVIL  – PAGO ONLINE</option>
+                                            <option value="291">GIFT-CARD – CANAL DE PAGO  – BILLETERA MOVIL</option>
+                                            <option value="292">GIFT-CARD – CANAL DE PAGO  – PAGO ONLINE</option>
+                                            <option value="73">SWIFT – CANAL DE PAGO</option>
+                                            <option value="75">SWIFT – PAGO ONLINE</option>
+                                            <option value="7">TRANSFERENCIA BANCARIA</option>
+                                            <option value="66">TRANSFERENCIA BANCARIA – BILLETERA MOVIL</option>
+                                            <option value="274">TRANSFERENCIA BANCARIA – BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="65">TRANSFERENCIA BANCARIA – CANAL DE PAGO</option>
+                                            <option value="272">TRANSFERENCIA BANCARIA – CANAL DE PAGO – BILLETERA MOVIL</option>
+                                            <option value="273">TRANSFERENCIA BANCARIA – CANAL DE PAGO – PAGO ONLINE</option>
+                                            <option value="260">TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA  – TRANSFERENCIA SWIFT</option>
+                                            <option value="262">TRANSFERENCIA BANCARIA – DEPOSITO  EN CUENTA – CANAL DE PAGO</option>
+                                            <option value="263">TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA   – BILLETERA MOVIL</option>
+                                            <option value="67">TRANSFERENCIA BANCARIA – PAGO ONLINE</option>
+                                            <option value="266">TRANSFERENCIA BANCARIA – SWIFT  – CANAL DE PAGO</option>
+                                            <option value="267">TRANSFERENCIA BANCARIA – SWIFT  – BILLETERA MOVIL</option>
+                                            <option value="268">TRANSFERENCIA BANCARIA – SWIFT  – PAGO ONLINE</option>
+                                            <option value="24">TRANSFERENCIA BANCARIA-DEPOSITO EN CUENTA</option>
+                                            <option value="25">TRANSFERENCIA BANCARIA-TRANSFERENCIA SWIFT</option>
+                                            <option value="264">TRANSFERENCIA BANCARIA– DEPOSITO  EN CUENTA – PAGO ONLINE</option>
+                                            <option value="9">TRANSFERENCIA SWIFT</option>
+                                            <option value="4">VALES</option>
+                                            <option value="55">VALES – BILLETERA MOVIL</option>
+                                            <option value="233">VALES – BILLETERA MOVIL – CANAL DE PAGO</option>
+                                            <option value="234">VALES – BILLETERA MOVIL – BILLETERA MOVIL</option>
+                                            <option value="235">VALES – BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="54">VALES – CANAL DE PAGO</option>
+                                            <option value="227">VALES – CANAL DE PAGO  – TRANSFERENCIA SWIFT</option>
+                                            <option value="229">VALES – CANAL DE PAGO  – CANAL DE PAGO</option>
+                                            <option value="230">VALES – CANAL DE PAGO  – BILLETERA MOVIL</option>
+                                            <option value="231">VALES – CANAL DE PAGO  – PAGO ONLINE</option>
+                                            <option value="22">VALES – DEPOSITO EN CUENTA</option>
+                                            <option value="56">VALES – PAGO ONLINE</option>
+                                            <option value="236">VALES – PAGO ONLINE - CANAL DE PAGO</option>
+                                            <option value="237">VALES – PAGO ONLINE - BILLETERA MOVIL</option>
+                                            <option value="238">VALES – PAGO ONLINE - PAGO ONLINE</option>
+                                            <option value="214">VALES – SWIFT - TRANSFERENCIA BANCARIA</option>
+                                            <option value="215">VALES – SWIFT - DEPOSITO EN CUENTA</option>
+                                            <option value="216">VALES – SWIFT - TRANSFERENCIA SWIFT</option>
+                                            <option value="218">VALES – SWIFT - CANAL DE PAGO</option>
+                                            <option value="219">VALES – SWIFT - BILLETERA MOVIL</option>
+                                            <option value="220">VALES – SWIFT - PAGO ONLINE</option>
+                                            <option value="21">VALES-TRANSFERENCIA BANCARIA</option>
+                                            <option value="23">VALES-TRANSFERENCIA SWIFT</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="otroMetodo(metodoPago)" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
+                                    </form>
+                                </div>
+                                </div>
+                            </b-tab>
+                            <!--<b-tab>
                                 <template #title>
                                     <span class="d-flex align-items-center">
                                         <i class="fa fa-qrcode fa-2x icon-color mr-2" aria-hidden="true"></i>
@@ -1049,7 +1198,7 @@
                                         alt="Código QR" class="img-fluid">
                                     <p class="mt-3">Escanee el código QR para realizar el pago.</p>
                                 </div>
-                            </b-tab>
+                            </b-tab>-->
                         </b-tabs>
                     </div>
                     <!-- <div class="modal-footer">
@@ -1169,7 +1318,7 @@
 
                                             </td>
                                             <td>{{ cuota.fecha_cancelado ? new Date(cuota.fecha_cancelado
-                                                ).toLocaleDateString('es-ES') : "Sin fecha" }}</td>
+                    ).toLocaleDateString('es-ES') : "Sin fecha" }}</td>
 
                                             <td>{{ cuota.estado }}</td>
                                         </tr>
@@ -1300,7 +1449,6 @@ export default {
             unidadPaquete: 1,
 
             monedaVenta: [],
-
             permitirDevolucion: '',
             saldosNegativos: 1,
             venta_id: 0,
@@ -1314,7 +1462,7 @@ export default {
             tipo_documento: '',
             complemento_id: '',
             descuentoAdicional: 0.00,
-            descuentoGiftCard: 0.00,
+            descuentoGiftCard: '',
             tipo_comprobante: 'FACTURA',
             serie_comprobante: '',
             last_comprobante: 0,
@@ -1366,11 +1514,12 @@ export default {
             mostrarDireccion: true,
             mostrarCUFD: true,
             casosEspeciales: false,
-            numeroTarjeta: '',
             leyendaAl: '',
             codigoExcepcion: 0,
             mostrarSpinner: false,
             primer_precio_cuota: 0,
+            numeroTarjeta: null,
+            metodoPago: '',
 
             //almacenes
             arrayAlmacenes: [],
@@ -1417,10 +1566,10 @@ export default {
             habilitarPrimeraCuota: false,
             tipoPago: 'EFECTIVO',
             tiposPago: {
-                EFECTIVO: 1,
-                TARJETA: 2,
-                QR: 3
-            },
+                        EFECTIVO: 1,
+                        TARJETA: 2,
+                        QR: 3
+                        },
 
         }
     },
@@ -1546,7 +1695,7 @@ export default {
                 })
                 .catch((error) => {
                     console.error(error);
-                    throw error;
+                    throw error; 
                 });
         },
         seleccionarTipoPago(tipo) {
@@ -1749,14 +1898,14 @@ export default {
                 this.descuentoAdicional = 0;
                 alert("El descuento adicional no puede ser mayor o igual al total.");
             }
-        },
+        }, 
 
         habilitarNombreCliente() {
             if (this.casosEspeciales) {
                 this.$refs.nombreRef.removeAttribute("readonly");
                 this.documento = "99001";
                 this.idcliente = "8";
-                this.tipo_documento = "1";
+                this.tipo_documento = "1"; 
             } else {
                 this.$refs.nombreRef.setAttribute("readonly", true);
                 this.documento = "";
@@ -1885,7 +2034,7 @@ export default {
             var url = '/venta?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                console.log("Listando ventas: ", respuesta)
+                console.log(respuesta)
                 me.arrayVenta = respuesta.ventas.data;
                 me.pagination = respuesta.pagination;
             })
@@ -2075,8 +2224,8 @@ export default {
                     descripcion: this.arraySeleccionado.nombre,
                     cantidad: this.cantidad * this.unidadPaquete,
                     unidadMedida: this.arraySeleccionado.codigoClasificador,
-                    precioUnitario: (parseFloat(this.precioseleccionado * this.monedaVenta[0])).toFixed(2),
-                    montoDescuento: ((this.precioseleccionado * this.cantidad * this.monedaVenta[0]) - precioArticulo).toFixed(2),
+                    precioUnitario: parseFloat(this.precioseleccionado).toFixed(2),
+                    montoDescuento: this.arrayPromocion && this.arrayPromocion.porcentaje ? ((this.arrayPromocion.porcentaje / this.resultadoMultiplicacion) * 100).toFixed(2) : 0,
                     subTotal: precioArticulo.toFixed(2),
                     numeroSerie: numeroSerie,
                     numeroImei: numeroImei
@@ -2154,13 +2303,13 @@ export default {
                 });
         },
 
-        verificarFactura(cuf, numeroFactura) {
-            var url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=5153610012&cuf=' + cuf + '&numero=' + numeroFactura + '&t=2';
-            window.open(url);
+        verificarFactura(cuf, numeroFactura){
+                var url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=5153610012&cuf='+cuf+'&numero='+numeroFactura+'&t=2';
+                window.open(url);
+                
+            },
 
-        },
-
-        anularFactura(id, cuf) {
+            anularFactura(id, cuf) {
             swal({
                 title: '¿Está seguro de anular la factura?',
                 type: 'warning',
@@ -2175,70 +2324,70 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.value) {
-                    let me = this;
-                    axios.get('/factura/obtenerDatosMotivoAnulacion')
-                        .then(function (response) {
-                            var respuesta = response.data;
-                            me.arrayMotivosAnulacion = respuesta.motivo_anulaciones;
+                let me = this;
+                axios.get('/factura/obtenerDatosMotivoAnulacion')
+                    .then(function(response) {
+                    var respuesta = response.data;
+                    me.arrayMotivosAnulacion = respuesta.motivo_anulaciones;
+                    
+                    console.log('Motivos obtenidos:', me.arrayMotivosAnulacion);
 
-                            console.log('Motivos obtenidos:', me.arrayMotivosAnulacion);
+                    let options = {};
+                    me.arrayMotivosAnulacion.forEach(function(motivo) {
+                        options[motivo.codigo] = motivo.descripcion;
+                    });
 
-                            let options = {};
-                            me.arrayMotivosAnulacion.forEach(function (motivo) {
-                                options[motivo.codigo] = motivo.descripcion;
-                            });
-
-                            // Muestra un segundo modal para seleccionar el motivo
-                            swal({
-                                title: 'Seleccione un motivo de anulación',
-                                input: 'select',
-                                inputOptions: options,
-                                inputPlaceholder: 'Seleccione un motivo',
-                                showCancelButton: true,
-                                inputValidator: function (value) {
-                                    return new Promise(function (resolve, reject) {
-                                        if (value !== '') {
-                                            resolve();
-                                        } else {
-                                            reject('Debe seleccionar un motivo');
-                                        }
-                                    });
-                                }
-                            }).then((result) => {
-                                if (result.value) {
-                                    // Aquí obtienes el motivo seleccionado y puedes realizar la solicitud para anular la factura
-                                    const motivoSeleccionado = result.value;
-                                    axios.get('/factura/anular/' + cuf + "/" + motivoSeleccionado)
-                                        .then(function (response) {
-                                            const data = response.data;
-                                            if (data === 'ANULACION CONFIRMADA') {
-                                                swal(
-                                                    'FACTURA ANULADA',
-                                                    data,
-                                                    'success'
-                                                );
-                                            } else {
-                                                swal(
-                                                    'ANULACION RECHAZADA',
-                                                    data,
-                                                    'warning'
-                                                );
-                                            }
-                                        })
-                                        .catch(function (error) {
-                                            console.log(error);
-                                        });
-                                }
-                            });
-                        })
-                        .catch(function (error) {
-                            console.log(error);
+                    // Muestra un segundo modal para seleccionar el motivo
+                    swal({
+                        title: 'Seleccione un motivo de anulación',
+                        input: 'select',
+                        inputOptions: options,
+                        inputPlaceholder: 'Seleccione un motivo',
+                        showCancelButton: true,
+                        inputValidator: function (value) {
+                        return new Promise(function (resolve, reject) {
+                            if (value !== '') {
+                            resolve();
+                            } else {
+                            reject('Debe seleccionar un motivo');
+                            }
                         });
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                        // Aquí obtienes el motivo seleccionado y puedes realizar la solicitud para anular la factura
+                        const motivoSeleccionado = result.value;
+                        axios.get('/factura/anular/' + cuf +"/" + motivoSeleccionado)
+                            .then(function(response) {
+                            const data = response.data;
+                            if (data === 'ANULACION CONFIRMADA') {
+                                swal(
+                                'FACTURA ANULADA',
+                                data,
+                                'success'
+                                );
+                            } else {
+                                swal(
+                                'ANULACION RECHAZADA',
+                                data,
+                                'warning'
+                                );
+                            }
+                            })
+                            .catch(function(error) {
+                            console.log(error);
+                            });
+                        }
+                    });
+                    })
+                    .catch(function(error) {
+                    console.log(error);
+                    });
                 }
             });
-        },
+            },
 
-        imprimirFactura(id, email) {
+            imprimirFactura(id, email) {
             swal({
                 title: 'Selecciona un tamaño de factura',
                 type: 'warning',
@@ -2314,16 +2463,44 @@ export default {
             return me.errorVenta;
         },
 
+        aplicarDescuento() {
+            const descuentoGiftCard = this.descuentoGiftCard;
+            const numeroTarjeta = this.numeroTarjeta;
+            let idtipo_pago;
 
-        registrarVenta() {
+            if (numeroTarjeta && descuentoGiftCard) {
+                idtipo_pago = 86;
+            } else if (numeroTarjeta && !descuentoGiftCard) {
+                idtipo_pago = 10;
+            } else {
+                idtipo_pago = descuentoGiftCard ? 35 : 1;
+            }
+
+            this.registrarVenta(idtipo_pago);
+        },
+
+        aplicarCombinacion() {
+            const descuentoGiftCard = this.descuentoGiftCard
+            const idtipo_pago = descuentoGiftCard ? 40 : 2; 
+
+            this.registrarVenta(idtipo_pago);
+        },
+
+        otroMetodo(metodoPago){
+            const idtipo_pago = metodoPago;
+            this.registrarVenta(idtipo_pago);
+        },
+        
+        registrarVenta(idtipo_pago) {
             if (this.validarVenta()) {
                 return;
             }
 
             let me = this;
             this.mostrarSpinner = true;
+            this.idtipo_pago = idtipo_pago;
 
-            for (let i = 0; i < me.cuotas.length; i++) {
+            for (let i = 0; i < me.cuotas.length; i++) {                
                 console.log('LLEGA ARRAYDATA!', me.cuotas[i]);
             }
 
@@ -2337,7 +2514,7 @@ export default {
                 'impuesto': this.impuesto,
                 'total': this.calcularTotal,
                 'idAlmacen': this.idAlmacen,
-                'idtipo_pago': this.idtipo_pago ? this.idtipo_pago : 1,
+                'idtipo_pago': idtipo_pago,
                 'idtipo_venta': this.idtipo_venta,
                 'primer_precio_cuota': this.primer_precio_cuota,
                 // Datos para el crédito de venta
@@ -2353,7 +2530,6 @@ export default {
 
             }).then((response) => {
                 let idVentaRecienRegistrada = response.data.id;
-                console.log("LLego aca")
                 this.emitirFactura(idVentaRecienRegistrada);
 
                 if (response.data.id > 0) {
@@ -2437,10 +2613,10 @@ export default {
             let usuario = document.getElementById("usuarioAutenticado").value;
             //let codigoPuntoVenta = this.puntoVentaAutenticado;
             let codigoPuntoVenta = 0;
-            let montoGiftCard = document.getElementById("descuentoGiftCard").value;
+            //let montoGiftCard = document.getElementById("descuentoGiftCard").value;
             let codigoMetodoPago = this.idtipo_pago;
 
-            console.log("El monto de Descuento de Gift Card es: " + montoGiftCard);
+            console.log("El monto de Descuento de Gift Card es: " + this.descuentoGiftCard);
             console.log("El tipo de documento es: " + tipoDocumentoIdentidad);
 
             try {
@@ -2453,22 +2629,22 @@ export default {
             }
 
             try {
-                if (tipoDocumentoIdentidad === '5') {
-                    const response = await axios.post('/factura/verificarNit/' + numeroDocumento);
-                    if (response.data === 'NIT ACTIVO') {
+                    if (tipoDocumentoIdentidad === '5') {
+                        const response = await axios.post('/factura/verificarNit/' + numeroDocumento);
+                        if (response.data === 'NIT ACTIVO') {
+                            me.codigoExcepcion = 0;
+                            alert("NIT VÁLIDO.");
+                        } else {
+                            me.codigoExcepcion = 1;
+                            alert("NIT INVÁLIDO.");
+                        }
+                    }else{
                         me.codigoExcepcion = 0;
-                        alert("NIT VÁLIDO.");
-                    } else {
-                        me.codigoExcepcion = 1;
-                        alert("NIT INVÁLIDO.");
                     }
-                } else {
-                    me.codigoExcepcion = 0;
+                } catch (error) {
+                    console.error(error);
+                    return 'No se pudo verificar el NIT';
                 }
-            } catch (error) {
-                console.error(error);
-                return 'No se pudo verificar el NIT';
-            }
 
             var factura = [];
             factura.push({
@@ -2490,13 +2666,13 @@ export default {
                     complemento: complemento,
                     codigoCliente: numeroDocumento,
                     codigoMetodoPago: codigoMetodoPago,
-                    numeroTarjeta: null,
+                    numeroTarjeta: this.numeroTarjeta,
                     montoTotal: montoTotal,
                     montoTotalSujetoIva: montoTotal,
                     codigoMoneda: 1,
                     tipoCambio: 1,
                     montoTotalMoneda: montoTotal,
-                    montoGiftCard: montoGiftCard,
+                    montoGiftCard: this.descuentoGiftCard,
                     descuentoAdicional: descuentoAdicional,
                     codigoExcepcion: this.codigoExcepcion,
                     cafc: null,
@@ -2517,39 +2693,57 @@ export default {
                 idventa: idventa
             })
                 .then(function (response) {
-                    console.log(response)
                     var data = response.data;
 
                     if (data === "VALIDADA") {
                         swal(
-                            'FACTURA ' + data,
+                            'FACTURA VALIDADA',
                             'Correctamente',
                             'success'
                         )
                         me.arrayProductos = [];
                         me.codigoExcepcion = 0;
+                        me.idtipo_pago = '';
+                        me.descuentoGiftCard = '';
+                        me.numeroTarjeta =  null;
+                        me.recibido = '';
+                        me.metodoPago = '';
                         me.cerrarModal2();
                         me.cerrarModal3();
                         me.listarVenta(1, '', 'id');
                         me.mostrarSpinner = false;
-                    } else {
+                    } else{
                         me.arrayProductos = [];
                         me.codigoExcepcion = 0;
+                        me.idtipo_pago = '';
+                        me.descuentoGiftCard = '';
+                        me.numeroTarjeta =  null;
+                        me.recibido = '';
+                        me.metodoPago = '';
+                        me.cerrarModal2();
+                        me.cerrarModal3();
+                        me.listarVenta(1, '', 'id');
+                        me.mostrarSpinner = false;
                         swal(
-                            'FACTURA RECHAZADA',
-                            data,
-                            'warning'
+                            'FACTURA VALIDADA',
+                            'éxito',
+                            'success'
                         );
                     }
                 })
                 .catch(function (error) {
-                    console.log("Error:", error)
                     me.arrayProductos = [];
+                    me.codigoExcepcion = 0;
                     swal(
                         'INTENTE DE NUEVO',
                         'Comunicacion con SIAT fallida',
                         'error');
                     me.mostrarSpinner = false;
+                    me.idtipo_pago = '';
+                    me.numeroTarjeta =  null;
+                    me.descuentoGiftCard = '';
+                    me.recibido = '';
+                    me.metodoPago = '';
                 });
         },
 
@@ -2707,8 +2901,29 @@ export default {
         mostrarSeleccion() {
             console.log('Precio seleccionado:', this.precioseleccionado);
         },
+        
         //--------------ABRIR MODAL------------------
+        registrarAbrilModal() {
+            this.modal2 = 1;
+            this.cliente = this.nombreCliente;
+            console.log('USUARIO LLEGA:', this.cliente);
+            this.tituloModal2 = 'VENTA  AL CONTADO ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
+            this.tipoAccion2 = 1;
+            this.idtipo_venta = 1;
+            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
+            console.log('idtipo_pago LLEGA:', this.idtipo_pago);
+        },
 
+        registrarAbrilModal2() {
+            this.modal3 = 1;
+            this.cliente = this.nombreCliente;
+            console.log('USUARIO LLEGA:', this.cliente);
+            this.tituloModal3 = 'CREDITOS ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
+            this.tipoAccion3 = 1;
+            this.idtipo_venta = 2;
+            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
+            console.log('idtipo_pago LLEGA:', this.idtipo_pago);
+        },
         cerrarModal2() {
             this.modal2 = 0;
             this.tituloModal2 = '';
@@ -2862,7 +3077,9 @@ export default {
     }
 }
 </script>
-<style>
+<style>    
+    
+
 .custom-btn {
     width: 100%;
     text-align: center;
@@ -2947,24 +3164,24 @@ export default {
     border-bottom-right-radius: 8px;
 }
 
-.spinner-container {
-    position: relative;
-}
+    .spinner-container {
+        position: relative;
+    }
 
-.spinner-container>* {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
+    .spinner-container > * {
+        position: absolute; 
+        top: 50%; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
 
-.spinner-message {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translate(-50%, -170%);
-    z-index: 1;
-}
+    .spinner-message {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -170%);
+        z-index: 1;
+    }
 
 
 
