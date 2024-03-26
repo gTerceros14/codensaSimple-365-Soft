@@ -229,6 +229,9 @@
     <mayoreo></mayoreo>
 </template>
 
+<template v-if="menu==61">
+    <reciboclientexdocumento></reciboclientexdocumento>
+</template>
 
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
