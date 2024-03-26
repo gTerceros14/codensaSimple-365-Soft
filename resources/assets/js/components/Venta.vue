@@ -660,12 +660,13 @@
                 <!--Fin ver ingreso-->
                 <!-- Vista Devoluciones -->
                 <template v-else-if="listado == 3">
-                    <devoluciones></devoluciones>
+                   <div>  <devoluciones></devoluciones>
                     <div class="form-group row">
                         <div class="col-md-12">
                             <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
                         </div>
                     </div>
+                  </div>
                 </template>
             </div>
             <!-- HASTA AQUI DEVOLUCIONES -->
