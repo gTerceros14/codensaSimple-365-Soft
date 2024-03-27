@@ -14,7 +14,8 @@ class CotizacionVenta extends Model
         'fecha_hora',
         'impuesto',
         'total',
-        'idcaja'
+        'idcaja',
+        'idalmacen'
     ];
 
     public function caja()

@@ -21,7 +21,9 @@ class CreateCotizacionventaTable extends Migration
 
             $table->integer('idusuario')->unsigned();
             $table->foreign('idusuario')->references('id')->on('users');
-
+            $table->integer('idalmacen')->unsigned();
+            
+            $table->foreign('idalmacen')->references('id')->on('almacens');
             $table->dateTime('fecha_hora')->default(DB::raw('CURRENT_TIMESTAMP'));
 
             $table->decimal('impuesto', 4, 2);
@@ -36,7 +38,7 @@ class CreateCotizacionventaTable extends Migration
             $table->string('lugar_entrega', 20)->nullable();
             $table->string('forma_pago', 20)->nullable();
             $table->string('nota', 50)->nullable();
-
+            
             $table->tinyInteger('condicion')->default(1);
 
             $table->timestamps();
