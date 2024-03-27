@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class PreciosEspeciales extends Controller
+class PreciosEspecialesController extends Controller
 {
     public function index(Request $request)
     {
@@ -25,7 +25,7 @@ class PreciosEspeciales extends Controller
             $query->where($criterio, 'like', '%' . $buscar . '%');
         }
 
-        $precioEspecial = $query->where('tipo_promocion', 2)
+        $precioEspecial = $query->where('tipo_promocion', 3)
             ->withCount('promocionArticulos as cantidad_articulos')
             ->orderBy('id', 'desc')
             ->paginate(6);
@@ -52,9 +52,6 @@ class PreciosEspeciales extends Controller
             DB::beginTransaction();
 
             $request->validate([
-                'codigo' => 'required',
-                'precio' => 'required',
-                'porcentaje' => 'required',
                 'fecha_final' => 'required',
                 'estado' => 'required',
                 'tipo_promocion' => 'required',
@@ -77,17 +74,15 @@ class PreciosEspeciales extends Controller
                 'porcentaje' => $request->porcentaje,
                 'fecha_final' => $request->fecha_final,
                 'estado' => $request->estado,
-                'tipo_promocion' => $request->tipo_promocion,
+                'tipo_promocion' => 3,
                 'nombre' => $request->nombre,
-                'precio_r1' =>$request->precioR1,
+                'precio_r1' =>$request->precio_r1,
                 'rango_inicio_r1'=>$request->rango_inicio_r1,
                 'rango_final_r1'=>$request->rango_final_r1,
-
-                'precio_r2' =>$request->precioR2,
+                'precio_r2' =>$request->precio_r2,
                 'rango_inicio_r2'=>$request->rango_inicio_r2,
                 'rango_final_r2'=>$request->rango_final_r2,
-
-                'precio_r3' =>$request->precioR3,
+                'precio_r3' =>$request->precio_r2,
                 'rango_inicio_r3'=>$request->rango_inicio_r3,
                 'rango_final_r3'=>$request->rango_final_r3
             ]);
@@ -100,6 +95,7 @@ class PreciosEspeciales extends Controller
                     'idpromociones' => $precioEspecial->id,
                     'idarticulos' => $articulo['id'],
                     'cantidad' => $cantidad,
+
                 ]);
             }
  

@@ -134,6 +134,10 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kits</a>
                     </li>
 
+                    <li @click="menu=67" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Mayoreo</a>
+                    </li>
+
                     <li @click="menu=18" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Marca</a>
                     </li>

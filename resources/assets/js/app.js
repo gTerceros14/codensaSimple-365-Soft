@@ -261,6 +261,11 @@ Vue.component(
   require("./components/Tables/TransaccionExtra.vue")
 );
 
+Vue.component(
+  "mayoreo",
+  require("./components/OfertasEspecialesMayoreo.vue")
+);
+
 Vue.use(BootstrapVue);
 Vue.use(Toasted);
 const app = new Vue({

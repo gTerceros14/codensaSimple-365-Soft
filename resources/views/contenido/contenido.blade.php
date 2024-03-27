@@ -224,6 +224,11 @@
 <template v-if="menu==66">
     <transferencias></transferencias>
 </template>
+
+<template v-if="menu==67">
+    <mayoreo></mayoreo>
+</template>
+
 <template v-if="menu==61">
     <reciboclientexdocumento></reciboclientexdocumento>
 </template>
