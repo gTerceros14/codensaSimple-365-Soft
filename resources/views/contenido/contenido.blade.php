@@ -158,12 +158,12 @@
 <template v-if="menu==43">
     <kits></kits>
 </template>
-            <template v-if="menu==45">
-                <reporteventas></reporteventas>
-            </template>
-            <template v-if="menu==48">
-                <ventasinstitucionales></ventasinstitucionales>
-            </template>
+<template v-if="menu==45">
+    <reporteventas></reporteventas>
+</template>
+<template v-if="menu==48">
+    <ventasinstitucionales></ventasinstitucionales>
+</template>
 <template v-if="menu==49">
     <reporteinventario></reporteinventario>
 </template>
@@ -227,6 +227,10 @@
 
 <template v-if="menu==67">
     <mayoreo></mayoreo>
+</template>
+
+<template v-if="menu==68">
+    <resumenventasycobranz></resumenventasycobranz>a
 </template>
 
 <template v-if="menu==61">

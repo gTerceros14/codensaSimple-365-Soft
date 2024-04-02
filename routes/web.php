@@ -54,7 +54,6 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/ingreso/desactivar', 'IngresoController@desactivar');
         Route::get('/ingreso/obtenerCabecera', 'IngresoController@obtenerCabecera');
         Route::get('/ingreso/obtenerDetalles', 'IngresoController@obtenerDetalles');
-
     });
 
     Route::group(['middleware' => ['Vendedor']], function () {
@@ -137,6 +136,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/cliente/registrar', 'ClienteController@store');
         Route::put('/cliente/actualizar', 'ClienteController@update');
         Route::get('/cliente/selectCliente', 'ClienteController@selectCliente');
+        Route::get('/cliente/selectClientePorNumero', 'ClienteController@seleccionarClientePorNumero');
         Route::get('/cliente/listarReporteClienteExcel', 'ClienteController@listarReporteClienteExcel');
 
         Route::get('/cliente/selectUusarioVend', 'ClienteController@selectUsuarioVendedor');
@@ -430,11 +430,6 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/variables/emitirFacturaInstitucional', 'VentaController@emitirFacturaInstitucional');
         Route::post('/variables/insertarFacturaInstitucional', 'VentaController@insertarFacturaInstitucional');
         Route::get('/variables/imprimirCarta/{id}/{idventainstitucional}', 'VentasInstitucionalesController@imprimirFactura');
-
-
-
-
-
     });
 
     //RUTA PARA RECUPERAR LA SESSION CON EL ID DE LA PERSONA LOGUEADA
