@@ -89,6 +89,14 @@
             };
         },
         methods: {
+            abrirVenta(){
+                const datos={
+                    cotizacion:this.arrayCotizacionSeleccionado,
+                    detalles:this.arrayCotizacionVentDet
+                }
+                this.$emit('abrirVenta',datos);
+
+            },
             cerrarModal(){
                 this.$emit('cerrar');
             },

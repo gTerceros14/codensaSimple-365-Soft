@@ -35,7 +35,8 @@ class CotizacionVentaController extends Controller
                 ->select(
                     'cotizacion_venta.id',
                     'cotizacion_venta.idcliente',
-                    'cotizacion_venta.fecha_hora',
+                    'cotizacion_venta.idusuario',
+                    'cotizacion_venta.idalmacen',                    'cotizacion_venta.fecha_hora',
                     'cotizacion_venta.impuesto',
                     'cotizacion_venta.total',
                     'cotizacion_venta.estado',
@@ -227,7 +228,7 @@ class CotizacionVentaController extends Controller
                 $cotizacionventa->impuesto = $request->impuesto;
                 $cotizacionventa->total = $request->total;
                 $cotizacionventa->estado = $request->estado;
-
+                $cotizacionventa->idalmacen = $request->idalmacen;
                 $cotizacionventa->validez = $nuevaFecha;
                 $cotizacionventa->plazo_entrega = $request->n_validez;
                 $cotizacionventa->tiempo_entrega = $request->tiempo_entrega;

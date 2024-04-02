@@ -519,6 +519,9 @@
             :arrayCotizacionSeleccionado="arrayCotizacionSeleccionado" 
             :arrayCotizacionVentDet = "arrayCotizacionVentDet">
         </detallecotizacionventa>
+        <registrarcompra v-if="showRegistrarVenta" :arrayDetallePedido="arrayDetallesAComprar" :arrayPedidoSeleccionado="arrayCotizacionSeleccionado">
+    </registrarcompra>
+        
         <!-- <div v-if="showRegistrarCompra" class="mx-3">
             <registrarcompra @editarEstadoPedido="editarPedidoComprado"  @cerrar="cerrarFormularioCompra" 
                 :arrayDetallePedido="arrayDetallesAComprar" :arrayPedidoSeleccionado="arrayPedidoSeleccionado" @listarArticuloProveedor="listarArticuloProveedor" @abrirModalArticulos="abrirModalArticulos" 
@@ -697,15 +700,19 @@ export default {
             console.log("CALCULADO",this.prectotal);
         },
         abrirFormularioCotizacion(dato){
-            //this.showModalDetalle=true;
-            //this.listado=10;
-            // let idalmacen = dato.pedido.idalmacen;
-            // let arrayConIdsAlmacen= dato.detalles.map(objeto => {
-            // return { ...objeto, idalmacen:idalmacen };
-            // });
-            // this.arrayDetallesAComprar=arrayConIdsAlmacen;
-            this.arrayCotizacionSeleccionado=dato;
-
+            this.showRegistrarVenta=true;
+            this.listado=10;
+            let idalmacen = dato.cotizacion.idalmacen;
+            let arrayConIdsAlmacen= dato.detalles.map(objeto => {
+             return { ...objeto, idalmacen:idalmacen };
+             });
+             this.arrayDetallesAComprar=arrayConIdsAlmacen;
+            this.arrayCotizacionSeleccionado=dato.cotizacion;
+            console.log("datos ", dato);
+            
+            console.log("vue ",this.showRegistrarVenta)
+            console.log("cotizACION ",this.arrayCotizacionSeleccionado)
+            console.log("detalles" , this.arrayDetallesAComprar)
             this.cerrarModalDetalles();
         },
         datosConfiguracion() {
@@ -1244,7 +1251,7 @@ export default {
                 'lugar_entrega':this.lugar_entrega,
                 'forma_pago':this.forma_pago,
                 'nota':this.nota,
-                
+                'idalmacen':this.idalmacen,
                 'data': this.arrayDetalle
 
             }).then(function (response) {

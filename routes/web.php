@@ -389,12 +389,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/kits/id', 'OfertaController@obtenerDatosKit');
         Route::get('/promocion/id', 'OfertaController@obtenerPromocionPorIdArticulo');
 
+        Route::post('/ofertasespeciales/registrar', 'PreciosEspecialesController@store');
 
         Route::get('/kits', 'OfertaController@indexKits');
-
-
-
-
+        Route::get('/ofertasespeciales', 'PreciosEspecialesController@index');
 
 
 
