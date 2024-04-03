@@ -137,8 +137,8 @@
                                         <span class="text-danger">*</span>
                                     </label>
 
-                                    <v-select :on-search="selectCliente" label="nombre" :options="arrayCliente"
-                                        placeholder="Buscar Clientes..." :onChange="getDatosCliente">
+                                    <v-select :on-search="selectCliente" label="num_documento" :options="arrayCliente"
+                                        placeholder="Num de documento..." :onChange="getDatosCliente">
                                     </v-select>
                                 </div>
                             </div>
@@ -2043,7 +2043,21 @@ export default {
                     console.log(error);
                 });
         },
-        selectCliente(search, loading) {
+
+        selectCliente(numero) {
+            let me = this;
+            var url = '/cliente/selectClientePorNumero?numero=' + numero;
+            axios.get(url).then(function (response) {
+                let respuesta  = response.data;
+                q: numero;
+                me.arrayCliente = respuesta.clientes;
+                console.log(me.arrayCliente);
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+
+        /*selectCliente2(search, loading) {
             let me = this;
             loading(true)
             var url = '/cliente/selectCliente?filtro=' + search;
@@ -2058,7 +2072,8 @@ export default {
                 .catch(function (error) {
                     console.log(error);
                 });
-        },
+        },*/
+
         getDatosCliente(val1) {
             let me = this;
             me.loading = true;

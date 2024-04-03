@@ -173,7 +173,18 @@ class ClienteController extends Controller
             ->take(5)
             ->get();
 
-        return ['clientes' => $clientes];
+        $clientesConCreditos = $clientes->map(function ($cliente) {
+            $cantidadCreditos = CreditoVenta::where('idcliente', $cliente->id)
+                ->where('estado', '!=', 'Completado')
+                ->count();
+
+            $cliente->cantidad_creditos = $cantidadCreditos;
+            return $cliente;
+        });
+
+        return ['clientes' => $clientesConCreditos];
+
+        //return ['clientes' => $clientes];
     }
 
     public function store(Request $request)

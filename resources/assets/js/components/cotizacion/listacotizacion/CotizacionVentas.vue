@@ -153,9 +153,9 @@
                                     <label for="" class="font-weight-bold">Cliente <span class="text-danger">*</span></label>
                                     <v-select 
                                         :on-search="selectCliente" 
-                                        label="nombre" 
+                                        label="num_documento" 
                                         :options="arrayCliente" 
-                                        placeholder="Buscar Clientes..." 
+                                        placeholder="Num de documento..." 
                                         :onChange="getDatosCliente"
                                         v-model="clienteSeleccionado"
                                         >
@@ -173,7 +173,7 @@
                             </div> -->
                             <div class="col-md-2">
                                 <label for="">NIT/CI</label>
-                                <input type="text" class="form-control" v-model="nitcliente" >
+                                <input type="text" class="form-control" v-model="nitcliente" readonly>
                             </div>
                             <div class="col-md-3">
                                 <label for="">Celular</label>
@@ -1012,7 +1012,21 @@ export default {
                     console.log(error);
                 });
         },
-        selectCliente(search, loading) {
+
+        selectCliente(numero) {
+            let me = this;
+            var url = '/cliente/selectClientePorNumero?numero=' + numero;
+            axios.get(url).then(function (response) {
+                let respuesta  = response.data;
+                q: numero;
+                me.arrayCliente = respuesta.clientes;
+                console.log(me.arrayCliente);
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+
+        selectCliente2(search, loading) {
             let me = this;
             loading(true)
             var url = '/cliente/selectCliente?filtro=' + search;
