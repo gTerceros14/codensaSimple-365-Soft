@@ -118,9 +118,6 @@ class PreciosEspecialesController extends Controller
             DB::beginTransaction();
 
             $request->validate([
-                'codigo' => 'required',
-                'precio' => 'required',
-                'porcentaje' => 'required',
                 'fecha_final' => 'required',
                 'estado' => 'required',
                 'tipo_promocion' => 'required',
@@ -144,17 +141,17 @@ class PreciosEspecialesController extends Controller
                 'porcentaje' => $request->porcentaje,
                 'fecha_final' => $request->fecha_final,
                 'estado' => $request->estado,
-                'tipo_promocion' => $request->tipo_promocion,
+                'tipo_promocion' => 3,
                 'nombre' => $request->nombre,
-                'precio_r1' =>$request->precioR1,
+                'precio_r1' =>$request->precio_r1,
                 'rango_inicio_r1'=>$request->rango_inicio_r1,
                 'rango_final_r1'=>$request->rango_final_r1,
 
-                'precio_r2' =>$request->precioR2,
+                'precio_r2' =>$request->precio_r2,
                 'rango_inicio_r2'=>$request->rango_inicio_r2,
                 'rango_final_r2'=>$request->rango_final_r2,
 
-                'precio_r3' =>$request->precioR3,
+                'precio_r3' =>$request->precio_r3,
                 'rango_inicio_r3'=>$request->rango_inicio_r3,
                 'rango_final_r3'=>$request->rango_final_r3
             ]);
@@ -183,6 +180,8 @@ class PreciosEspecialesController extends Controller
 
         }
     }
+
+    
     public function cambiarEstado (Request $request)
     {
         if (!$request->ajax()) {

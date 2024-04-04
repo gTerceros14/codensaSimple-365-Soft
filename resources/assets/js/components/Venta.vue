@@ -752,6 +752,63 @@
                                         </div>
                                     </template>
                                 </b-tab>
+
+                                <b-tab title="Precios Especiales">
+                                    <template>
+                                        <div class="form-group row">
+                                            <div class="col-md-6">
+                                                <div class="input-group">
+                                                    <select class="form-control col-md-3" v-model="criterioKit">
+                                                        <option value="nombre">Nombres</option>
+                                                    </select>
+                                                    <input type="text" v-model="buscarKit" class="form-control"
+                                                        placeholder="Texto a buscar"
+                                                        @keyup="listarOfertaEspecial(1, buscarKit, criterioKit)">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Acciones</th>
+                                                        <th>Nombre kit</th>
+                                                        <th>Fecha limite</th>
+                                                        <th>Articulos Incluidos</th>
+                                                        <th>Estado</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="kit in arrayPreciosEspeciales" :key="kit.id">
+                                                        <td>
+                                                            <!--<icon-button icon="icon-check" size="small" color="success"
+                                                                @click="agregarKit(kit)" />-->
+                                                            <icon-button icon="icon-eye" size="small" color="primary"
+                                                                @click="abrirModalDetalles(kit)" />
+
+
+                                                        </td>
+                                                        <td v-text="kit.nombre"></td>
+                                                    
+                                                        <td>
+                                                            {{ new Date(kit.fecha_final).toLocaleDateString('es-ES') }}
+                                                        </td>
+                                                        <td>{{ kit.cantidad_articulos }} articulos</td>
+                                                        <td>
+
+                                                            <i class="fa fa-circle"
+                                                                :style="{ color: getColorForEstado(kit.estado, kit.fecha_final) }"></i>&nbsp;
+                                                            {{ new Date(kit.fecha_final) < new Date() ? 'Inactivo' :
+                                                            kit.estado }} </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </template>
+                                </b-tab>
                             </b-tabs>
                         </div>
 
@@ -1410,12 +1467,132 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" @click="() => modalDetalleKit = 0">Cerrar</button>
-
                     </div>
                 </div>
             </div>
         </div>
 
+        <div class="modal " tabindex="-1" :class="{ 'mostrar': modalDetalle }" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-primary modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        Detalle del kit Precio Especial
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-md-8">
+                            <label for="" class="font-weight-bold">Nombre del kit: </label>
+                            {{ datosFormularioPE.nombre }}
+                        </div>
+                        <div class="col-md-5">
+                            <label for="" class="font-weight-bold">Fecha final: </label>
+                            {{ datosFormularioPE.fecha_final }}
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-4">
+                                <div>
+                                    <label for="" class="font-weight-bold">Rango Inicio 1: </label>{{ datosFormularioPE.rango_inicio_r1 }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div>
+                                    <label for="" class="font-weight-bold">Rango Final 1: </label>{{ datosFormularioPE.rango_final_r1 }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div>
+                                    <label for="" class="font-weight-bold">Precio Rango 1: </label>{{ datosFormularioPE.precio_r1 }}
+                                    <span v-if="totalCantidades >= datosFormularioPE.rango_inicio_r1 && totalCantidades <= datosFormularioPE.rango_final_r1">
+                                        <i class="fas fa-check-circle text-success"></i> <!-- Cambia esto por el icono de tu elección -->
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-4">
+                                <div>
+                                    <label for="" class="font-weight-bold">Rango Inicio 2: </label>{{ datosFormularioPE.rango_inicio_r2 }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div>
+                                    <label for="" class="font-weight-bold">Rango Final 2: </label>{{ datosFormularioPE.rango_final_r2 }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div>
+                                    <label for="" class="font-weight-bold">Precio Rango 2: </label>{{ datosFormularioPE.precio_r2 }}
+                                    <span v-if="totalCantidades >= datosFormularioPE.rango_inicio_r2 && totalCantidades <= datosFormularioPE.rango_final_r2">
+                                        <i class="fas fa-check-circle text-success"></i> <!-- Cambia esto por el icono de tu elección -->
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-4">
+                                <div>
+                                    <label for="" class="font-weight-bold">Rango Inicio 3: </label>{{ datosFormularioPE.rango_inicio_r3 }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div>
+                                    <label for="" class="font-weight-bold">Rango Final 3: </label>{{ datosFormularioPE.rango_final_r3 }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div>
+                                    <label for="" class="font-weight-bold">Precio Rango 3: </label>{{ datosFormularioPE.precio_r3 }}
+                                    <span v-if="totalCantidades >= datosFormularioPE.rango_inicio_r3 && totalCantidades <= datosFormularioPE.rango_final_r3">
+                                        <i class="fas fa-check-circle text-success"></i> <!-- Cambia esto por el icono de tu elección -->
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p>Total de cantidades: {{ totalCantidades }}</p>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Nombre comercial</th>
+                                        <th>Costo unidad</th>
+                                        <th>Costo paquete</th>
+                                        <th>Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(articulo, index) in arrayArticulosKit" :key="articulo.id">
+                                        <td v-text="articulo.codigo"></td>
+                                        <td v-text="articulo.nombre"></td>
+                                        <td>
+                                            <p>{{ calcularPrecioUnitario(articulo) }} {{ monedaVenta[1] }}</p>
+                                        </td>
+                                        <td>
+                                            <p>{{ (articulo.precio_costo_paq) * parseFloat(monedaVenta[0]) }} {{ monedaVenta[1] }}</p>
+                                        </td>
+                                        <td>
+                                            <input type="text" v-model="articulo.cantidad">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" @click="agregarPE(datosFormularioPE)">Agregar</button>
+
+                        <button type="button" class="btn btn-danger" @click="() => modalDetalle = 0">Cerrar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        
         <div>
             <AbonarCuota v-if="cuotaSeleccionada" :cuota="cuotaSeleccionada" :modal="modalCuotas" :moneda="monedaVenta"
                 :ventaCredito="arraySeleccionado" :arrayCuotas="arrayCuotas" @cerrar-modal="cerrarModalCuotas" />
@@ -1445,6 +1622,12 @@ export default {
             datosFormularioKit: [],
             modalDetalleKit: 0,
             arrayKit: [],
+
+            arrayPreciosEspeciales: [],
+            modalDetalle: 0,
+            datosFormularioPE: [],
+            arrayArticulosPE: [],
+
 
             arrayPromocion: [],
             unidadPaquete: 1,
@@ -1593,6 +1776,12 @@ export default {
             }
         },
 
+        totalCantidades() {
+            return this.arrayArticulosKit.reduce((total, articulo) => {
+                return total + parseInt(articulo.cantidad);
+            }, 0);
+        },
+
 
         isActived: function () {
             return this.pagination.current_page;
@@ -1644,6 +1833,30 @@ export default {
 
     },
     methods: {
+        calcularPrecioUnitario(articulo) {
+            // Lógica para calcular el precio unitario según el rango total de cantidades
+            if (this.totalCantidades >= this.datosFormularioPE.rango_inicio_r1 && this.totalCantidades <= this.datosFormularioPE.rango_final_r1) {
+                return this.datosFormularioPE.precio_r1;
+            } else if (this.totalCantidades >= this.datosFormularioPE.rango_inicio_r2 && this.totalCantidades <= this.datosFormularioPE.rango_final_r2) {
+                return this.datosFormularioPE.precio_r2;
+            } else if (this.totalCantidades >= this.datosFormularioPE.rango_inicio_r3 && this.totalCantidades <= this.datosFormularioPE.rango_final_r3) {
+                return this.datosFormularioPE.precio_r3;
+            } else {
+                // Precio predeterminado si no está en ningún rango
+                return articulo.precio_costo_unid;
+            }
+        },
+        getClassByCantidad(total) {
+        if (total >= this.datosFormularioPE.rango_inicio_r1 && total <= this.datosFormularioPE.rango_final_r1) {
+            return 'rango-1'; // clase para el rango 1
+        } else if (total >= this.datosFormularioPE.rango_inicio_r2 && total <= this.datosFormularioPE.rango_final_r2) {
+            return 'rango-2'; // clase para el rango 2
+        } else if (total >= this.datosFormularioPE.rango_inicio_r3 && total <= this.datosFormularioPE.rango_final_r3) {
+            return 'rango-3'; // clase para el rango 3
+        } else {
+            return ''; // clase por defecto si no se cumple ningún rango
+        }
+    },
         abrirTipoVenta() {
             if (this.idtipo_venta == 1) {
                 this.modal2 = 1;
@@ -1741,7 +1954,7 @@ export default {
                                 cantidad: articulo.cantidad,
                                 cantidad_paquetes: articulo.unidad_envase * articulo.cantidad,
                                 precio: articulo.nuevo_precio,
-                                descuento: (((articulo.precio_costo_unid * articulo.cantidad) - (articulo.nuevo_precio)) / (articulo.precio_costo_unid * articulo.cantidad)) * 100,
+                                descuento: 0,
                                 stock: articulo.stock,
                                 precioseleccionado: articulo.precio_costo_unid
                             });
@@ -1793,6 +2006,88 @@ export default {
                     console.error(error);
                 });
         },
+
+        agregarPE(kit) {
+            console.log('esto:', kit);
+            kit['articulos'] = this.arrayArticulosKit;
+            kit['precio'] = kit['precio'] / parseFloat(this.monedaVenta[0])
+            axios.put('/ofertasespeciales/actualizar', kit);
+            
+            this.modalDetalle = 0;
+            if (new Date(kit.fecha_final) < new Date()) {
+                swal({
+                    type: 'error',
+                    title: 'Error...',
+                    text: 'Este kit ha expirado!',
+                });
+                return;
+            }
+            console.log("datos formulario agregar PE", kit)
+            //   this.GetValidateKit(kit['id'])
+            this.GetValidateKit(kit['id'])
+                .then(() => {
+
+                    if (this.mensajesKit.length == 0) {
+                        
+                        const totalKit = this.arrayArticulosKit.reduce((total, producto) => {
+                            return total + (producto.cantidad * producto.precio_costo_unid);
+                        }, 0);
+                        this.arrayArticulosKit.forEach(producto => {
+                            producto.porcentaje = ((producto.cantidad * producto.precio_costo_unid) / totalKit) * 100;
+                        });
+                        console.log("precio especial ", this.arrayArticulosKit);
+                        this.arrayArticulosKit.forEach(producto => {
+                            producto.nuevo_precio = (this.calcularPrecioUnitario(kit) * producto.porcentaje) / 100;
+                        });
+                        console.log("Estos son los articulos: ", this.arrayArticulosKit);
+                        this.arrayArticulosKit.forEach(articulo => {
+                            this.arrayDetalle.push({
+                                idkit: kit['id'],
+                                idarticulo: articulo.id,
+                                articulo: articulo.nombre,
+                                medida: "KIT",
+                                unidad_envase: articulo.unidad_envase,
+                                cantidad: articulo.cantidad,
+                                cantidad_paquetes: articulo.unidad_envase * articulo.cantidad,
+                                precio: articulo.nuevo_precio,
+                                descuento: 0,
+                                stock: articulo.stock,
+                                precioseleccionado: this.calcularPrecioUnitario(articulo)
+                            });
+                            let actividadEconomica = 461021;
+
+                            this.arrayProductos.push({
+
+                                actividadEconomica: actividadEconomica,
+                                codigoProductoSin: articulo.id,
+                                codigoProducto: articulo.codigo,
+                                descripcion: articulo.nombre,
+                                cantidad: articulo.cantidad,
+                                unidadMedida: 25,
+                                precioUnitario: parseFloat(this.calcularPrecioUnitario(articulo) * this.monedaVenta[0]).toFixed(2),
+                                montoDescuento: ((articulo.precio_costo_unid * articulo.cantidad) * this.monedaVenta[0] - articulo.nuevo_precio * this.monedaVenta[0]).toFixed(2),
+                                subTotal: (parseFloat(articulo.nuevo_precio * this.monedaVenta[0])).toFixed(2),
+                                numeroSerie: null,
+                                numeroImei: null
+                            });
+                            this.cerrarModal()
+                        });
+                    } else {
+
+                        swal({
+                            type: 'error',
+                            title: 'Stock insuficiente',
+                            text: this.mensajesKit.join("\n\n"),
+                        })
+                    }
+                })
+                .catch((error) => {
+                    // Maneja el error aquí
+                    console.error(error);
+                });
+        },
+        
+
         abrirModalDetallesKit(data) {
             this.arrayArticulosSeleccionados = [];
 
@@ -1811,6 +2106,34 @@ export default {
             };
             this.obtenerDatosKit(data['id'])
         },
+
+        abrirModalDetalles(data) {
+            this.arrayArticulosSeleccionados = [];
+
+            this.modalDetalle = 1;
+            this.datosFormularioPE = {
+                id: data['id'],
+                nombre: data['nombre'],
+                precio_r1: data['precio_r1'],
+                rango_inicio_r1: data['rango_inicio_r1'],
+                rango_final_r1: data['rango_final_r1'],
+                precio_r2: data['precio_r2'],
+                rango_inicio_r2: data['rango_inicio_r2'],
+                rango_final_r2: data['rango_final_r2'],
+                precio_r3: data['precio_r3'],
+                rango_inicio_r3: data['rango_inicio_r3'],
+                rango_final_r3: data['rango_final_r3'],
+
+                fecha_final: (new Date(data['fecha_final'])).toISOString().split('T')[0],
+                tipo_promocion: data['tipo_promocion'],
+                estado: data['estado'],
+
+            };
+            this.obtenerDatosKit(data['id']),
+            console.log(this.datosFormularioPE);
+        },
+        
+
         obtenerDatosKit(idPromocion) {
             return axios.get('/ofertas/id', {
                 params: {
@@ -1829,6 +2152,7 @@ export default {
                     throw error; // Re-lanza el error para que pueda ser manejado en agregarKit
                 });
         },
+
 
         getColorForEstado(estado, fecha_final) {
             const fechaFinal = new Date(fecha_final) < new Date();
@@ -1866,6 +2190,26 @@ export default {
                 console.log(error);
             });
         },
+
+        listarOfertaEspecial(page, buscar, criterio) {
+        let me = this;
+        let url = '/ofertasespeciales';
+
+        axios.get(url, {
+            params: {
+            page: page,
+            buscar: buscar,
+            criterio: criterio
+            }
+        }).then(function (response) {
+            let respuesta = response.data;
+            me.arrayPreciosEspeciales = response.data.ofertas.data;
+            me.pagination = respuesta.pagination;
+        }).catch(function (error) {
+            console.log(error);
+        });
+        },
+
         scrollToSection() {
             $('html, body').animate({
                 scrollTop: $('#seccionObjetivo').offset().top
@@ -2828,6 +3172,7 @@ export default {
             this.scrollToTop()
             this.listarArticulo('', 'nombre');
             this.listarKits(1, '', 'nombre');
+            this.listarOfertaEspecial(1, '', 'nombre');
 
             this.arrayArticulo = [];
             this.modal = 1;
@@ -3078,8 +3423,12 @@ export default {
     }
 }
 </script>
-<style>    
+<style scoped>    
     
+/* Estilos para los iconos (ajusta según tus necesidades) */
+.fa-check-circle {
+    margin-left: 5px; /* Espacio entre el precio y el icono */
+}
 
 .custom-btn {
     width: 100%;

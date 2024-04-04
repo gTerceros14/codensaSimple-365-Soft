@@ -393,6 +393,8 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/kits', 'OfertaController@indexKits');
         Route::get('/ofertasespeciales', 'PreciosEspecialesController@index');
+        Route::put('/ofertasespeciales/actualizar', 'PreciosEspecialesController@update');
+
 
 
 

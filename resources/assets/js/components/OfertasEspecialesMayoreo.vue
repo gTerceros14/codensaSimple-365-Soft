@@ -116,7 +116,6 @@
                 </div>
               </div>
 
-    
               <div class="form-group row">
                 <div class="col-md-4">
                   <div>
@@ -131,7 +130,7 @@
                   <div>
                     <label for="" class="font-weight-bold">R1-F:</label> 
                     <input type="number" v-model="datosFormulario.rango_final_r1" class="form-control"
-                    :class="{ 'is-invalid': errores.rango_final_r1 }" @input="validarCampo('rango_final_r1')"/>
+                    :class="{ 'is-invalid': errores.rango_final_r1 }" @input="validarCampo('rango_final_r1')"/>  
                     <p class="text-danger" v-if="errores.rango_final_r1">{{ errores.rango_final_r1 }}</p>
                   </div>
                 </div>
@@ -436,8 +435,6 @@
                     <td>
                       <p>{{ (articulo.precio_costo_paq) * parseFloat(monedaPrincipal[0])  }} {{ monedaPrincipal[1] }} </p>
                     </td>
-
-
                   </tr>
                 </tbody>
               </table>
@@ -677,7 +674,6 @@ export default {
             return
           }
        
-     
           if (this.tipoAccion == 2) {
             this.actualizarKit(this.datosFormulario);
           } else {
@@ -729,7 +725,7 @@ export default {
     actualizarKit(datos) {
       datos['articulos'] = this.arrayArticulosSeleccionados;
       datos['precio'] = datos['precio'] / parseFloat(this.monedaPrincipal[0])
-      axios.put('/ofertas/actualizar', datos)
+      axios.put('/ofertasespeciales/actualizar', datos)
         .then((response) => {
           swal(
             'KIT ACTUALIZADO',
@@ -912,6 +908,15 @@ export default {
                     nombre: data['nombre'],
                     porcentaje: data['porcentaje'],
                     codigo: data['codigo'],
+                    rango_inicio_r1: data['rango_inicio_r1'],
+                    rango_final_r1: data['rango_final_r1'],
+                    precio_r1: data['precio_r1'],
+                    rango_inicio_r2: data['rango_inicio_r2'],
+                    rango_final_r2: data['rango_final_r2'],
+                    precio_r2: data['precio_r2'],
+                    rango_inicio_r3: data['rango_inicio_r3'],
+                    rango_final_r3: data['rango_final_r3'],
+                    precio_r3: data['precio_r3'],
 
                     fecha_final: (new Date(data['fecha_final'])).toISOString().split('T')[0],
                     tipo_promocion: data['tipo_promocion'],
