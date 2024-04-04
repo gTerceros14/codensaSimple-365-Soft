@@ -194,6 +194,11 @@ Vue.component(
 );
 
 Vue.component(
+  "resumenventasycobranzas",
+  require("./components/ReporteResumenVentasYCobranzas.vue")
+)
+
+Vue.component(
   "resumenventaxdocumento",
   require("./components/ReporteResumenVentasXDocumento.vue")
 );
@@ -274,7 +279,7 @@ const app = new Vue({
     menu: 0,
     notifications: [],
   },
-  mounted() {},
+  mounted() { },
   created() {
     let me = this;
     axios

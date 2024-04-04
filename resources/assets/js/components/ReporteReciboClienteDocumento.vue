@@ -97,8 +97,9 @@
                                     <label for="" class="font-weight-bold">Cliente
                                         <span class="text-danger">*</span>
                                     </label>
-                                    <v-select :on-search="selectCliente" label="nombre" :options="arrayCliente" placeholder="Buscar Clientes..." :onChange="getDatosCliente" @input="validarCliente">
+                                    <v-select :on-search="selectCliente" label="num_documento" :options="arrayCliente" placeholder="Num de documento ..." :onChange="getDatosCliente" @input="validarCliente">
                                     </v-select>
+                                    <small v-if="clienteId">{{ nombre_cliente }}</small>
                                     <small v-if="!clienteId" class="text-danger">Selecciona un cliente.</small>
                                 </div>
                             </div>
@@ -217,6 +218,7 @@ export default {
 
             modal: 0,
 
+            nombre_cliente: '',
             vendedorId: 'todos',
             sucursalId: 'todos',
             tipoPagoId: 'todos',
@@ -283,7 +285,7 @@ export default {
                 var respuesta = response.data;
 
                 me.valor_moneda_principal = respuesta.configuracionTrabajo.valor_moneda_principal;
-                me.simbolo_moneda_principal = respuesta.configuracionTrabajo.simbolo_moneda_principal;                
+                me.simbolo_moneda_principal = respuesta.configuracionTrabajo.simbolo_moneda_principal;
             })
             .catch(function (error) {
                 console.log(error);
@@ -357,25 +359,38 @@ export default {
             });
         },
 
-        selectCliente(search) {
+        selectCliente(numero) {
             let me = this;
-            var url = '/cliente/selectCliente?filtro=' + search;
+            var url = '/cliente/selectClientePorNumero?numero=' + numero;
             axios.get(url).then(function (response) {
-                let respuesta = response.data;
-                q: search
+                let respuesta  = response.data;
+                q: numero
                 me.arrayCliente = respuesta.clientes;
                 console.log(me.arrayCliente);
-            })
-            .catch(function (error) {
-                console.log(error);
             });
         },
+
+        //selectCliente2(search) {
+        //    let me = this;
+        //    var url = '/cliente/selectCliente?filtro=' + search;
+        //    axios.get(url).then(function (response) {
+        //        let respuesta = response.data;
+        //        q: search
+        //        me.arrayCliente = respuesta.clientes;
+        //        console.log(me.arrayCliente);
+        //    })
+        //    .catch(function (error) {
+        //        console.log(error);
+        //    });
+        //},
 
         getDatosCliente(val1) {
             let me = this;
             me.loading = true;
             me.clienteId = val1.id;
+            me.nombre_cliente = val1.nombre;
             console.log(this.clienteId);
+            console.log(this.nombre_cliente);
         },
 
         selectVendedor(search) {

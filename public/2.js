@@ -1,9 +1,9 @@
 webpackJsonp([2],{
 
-/***/ 792:
+/***/ 795:
 /***/ (function(module, exports, __webpack_require__) {
 
-/*! @license DOMPurify 2.4.7 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/2.4.7/LICENSE */
+/*! @license DOMPurify 2.4.9 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/2.4.9/LICENSE */
 
 (function (global, factory) {
    true ? module.exports = factory() :
@@ -274,6 +274,7 @@ webpackJsonp([2],{
   var ATTR_WHITESPACE = seal(/[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205F\u3000]/g // eslint-disable-line no-control-regex
   );
   var DOCTYPE_NAME = seal(/^html$/i);
+  var CUSTOM_ELEMENT = seal(/^[a-z][.\w]*(-[.\w]+)+$/i);
 
   var getGlobal = function getGlobal() {
     return typeof window === 'undefined' ? null : window;
@@ -335,7 +336,7 @@ webpackJsonp([2],{
      */
 
 
-    DOMPurify.version = '2.4.7';
+    DOMPurify.version = '2.4.9';
     /**
      * Array of elements that DOMPurify removed during sanitation.
      * Empty if nothing was removed.
@@ -408,7 +409,8 @@ webpackJsonp([2],{
         DATA_ATTR$1 = DATA_ATTR,
         ARIA_ATTR$1 = ARIA_ATTR,
         IS_SCRIPT_OR_DATA$1 = IS_SCRIPT_OR_DATA,
-        ATTR_WHITESPACE$1 = ATTR_WHITESPACE;
+        ATTR_WHITESPACE$1 = ATTR_WHITESPACE,
+        CUSTOM_ELEMENT$1 = CUSTOM_ELEMENT;
     var IS_ALLOWED_URI$1 = IS_ALLOWED_URI;
     /**
      * We consider the elements and attributes below to be safe. Ideally
@@ -996,7 +998,7 @@ webpackJsonp([2],{
 
     var _createIterator = function _createIterator(root) {
       return createNodeIterator.call(root.ownerDocument || root, root, // eslint-disable-next-line no-bitwise
-      NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT | NodeFilter.SHOW_TEXT, null, false);
+      NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT | NodeFilter.SHOW_TEXT | NodeFilter.SHOW_PROCESSING_INSTRUCTION | NodeFilter.SHOW_CDATA_SECTION, null, false);
     };
     /**
      * _isClobbered
@@ -1094,6 +1096,14 @@ webpackJsonp([2],{
 
 
       if (tagName === 'select' && regExpTest(/<template/i, currentNode.innerHTML)) {
+        _forceRemove(currentNode);
+
+        return true;
+      }
+      /* Remove any ocurrence of processing instructions */
+
+
+      if (currentNode.nodeType === 7) {
         _forceRemove(currentNode);
 
         return true;
@@ -1215,7 +1225,7 @@ webpackJsonp([2],{
 
 
     var _basicCustomElementTest = function _basicCustomElementTest(tagName) {
-      return tagName.indexOf('-') > 0;
+      return tagName !== 'annotation-xml' && stringMatch(tagName, CUSTOM_ELEMENT$1);
     };
     /**
      * _sanitizeAttributes
