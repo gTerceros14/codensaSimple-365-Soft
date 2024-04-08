@@ -32,7 +32,7 @@
 
                         </div>
                         <div v-if="rolUsuario == 1" class="col-md-3">
-                            <label for="selectUsuarioFiltro" class="form-label">Buscar Cliente por Usuario</label>
+                            <label for="selectUsuarioFiltro" class="form-label"><strong>Buscar Cliente por Usuario</strong></label>
                             <v-select id="selectUsuarioFiltro" :on-search="selectUsuarioFiltro" label="nombre"
                                 :options="arrayUsuarioFiltro" placeholder="Buscar Usuario..."
                                 :onChange="getDatosUsuarioFiltro" v-model="usuarioSeleccionadodos">
@@ -167,23 +167,29 @@
                                     <p class="text-danger" v-if="errores.tipo_documento">{{ errores.tipo_documento }}
                                     </p>
                                 </div>
-                                <div class="col-md-6">
-                                    <label for="num_documento" class="font-weight-bold">N°
-                                        {{ datosFormulario.tipo_documento == "" ? "Documento" : "" }}
+                                    <div class="col-md-3">
+                                        <label for="num_documento" class="font-weight-bold">N°
+                                            {{ datosFormulario.tipo_documento == "" ? "Documento" : "" }}
 
-                                        {{ datosFormulario.tipo_documento == 1 ? "Cedula de identidad" : "" }}
-                                        {{ datosFormulario.tipo_documento == 2 ? "Cedula de identidad de extranjero" :
-                        "" }}
-                                        {{ datosFormulario.tipo_documento == 3 ? "Pasaporte" : "" }}
-                                        {{ datosFormulario.tipo_documento == 4 ? "NIT" : "" }}
-                                        <span class="text-danger">*</span></label>
-                                    <input type="text" v-model="datosFormulario.num_documento" class="form-control"
-                                        id="num_documento" placeholder="Ej. 12345678"
-                                        :class="{ 'is-invalid': errores.num_documento }"
-                                        @input="validarCampo('num_documento')">
-                                    <p class="text-danger" v-if="errores.num_documento">{{ errores.num_documento }}</p>
-                                </div>
+                                            {{ datosFormulario.tipo_documento == 1 ? "CI" : "" }}
+                                            {{ datosFormulario.tipo_documento == 2 ? "CEX" :
+                            "" }}
+                                            {{ datosFormulario.tipo_documento == 3 ? "Pasaporte" : "" }}
+                                            {{ datosFormulario.tipo_documento == 5 ? "NIT" : "" }}
+                                            <span class="text-danger">*</span></label>
+                                        <input type="text" v-model="datosFormulario.num_documento" class="form-control"
+                                            id="num_documento" placeholder="Ej. 12345678"
+                                            :class="{ 'is-invalid': errores.num_documento }"
+                                            @input="validarCampo('num_documento')">
+                                        <p class="text-danger" v-if="errores.num_documento">{{ errores.num_documento }}</p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="font-weight-bold" for="complemento">Complemento</label>
+                                        <input class="form-check-input ml-2" type="checkbox" id="complemento" v-model="mostrarComplemento">
+                                        <input type="text" v-show="mostrarComplemento" v-model="datosFormulario.complemento" class="form-control" id="complemento" placeholder="Ingrese el complemento">
+                                    </div>
                             </div>
+                            
                             <div class="form-group row">
                                 <div class="col-md-6">
                                     <label for="telefono" class="font-weight-bold">Teléfono <span
@@ -242,6 +248,7 @@ export default {
                 nombre: '',
                 tipo_documento: '',
                 num_documento: '',
+                complemento: '',
                 direccion: '',
                 telefono: '',
                 email: ''
@@ -258,6 +265,7 @@ export default {
             usuarioSeleccionadodos: '',
             usuariodos_id: '',
             role_id: '',
+            mostrarComplemento: false,
 
             arrayPersona: [],
             modal: 0,
@@ -327,6 +335,7 @@ export default {
                         this.datosFormulario.usuariodos_id = this.idusuario
                         this.actualizarPersona(this.datosFormulario);
                     }
+                    this.mostrarComplemento = false;
                 })
                 .catch((error) => {
                     const erroresValidacion = {};
@@ -428,6 +437,7 @@ export default {
                                         nombre: '',
                                         tipo_documento: '',
                                         num_documento: '',
+                                        complemento: '',
                                         direccion: '',
                                         telefono: '',
                                         email: ''
@@ -442,6 +452,7 @@ export default {
                                         nombre: data['nombre'],
                                         tipo_documento: data['tipo_documento'],
                                         num_documento: data['num_documento'],
+                                        complemento: data['complemento_id'],
                                         direccion: data['direccion'],
                                         telefono: data['telefono'],
                                         email: data['email'],

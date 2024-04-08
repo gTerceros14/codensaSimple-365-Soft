@@ -144,7 +144,7 @@ class ClienteController extends Controller
         $filtro = $request->filtro;
         $clientes = Persona::where('nombre', 'like', '%' . $filtro . '%')
             ->orWhere('num_documento', 'like', '%' . $filtro . '%')
-            ->select('id', 'nombre', 'tipo_documento',  'num_documento', 'email', 'telefono')
+            ->select('id', 'nombre', 'tipo_documento',  'num_documento','complemento_id', 'email', 'telefono')
             ->orderBy('nombre', 'asc')
             ->take(5)
             ->get();
@@ -157,7 +157,7 @@ class ClienteController extends Controller
             return $cliente;
         });
 
-        return ['clientes' => $clientesConCreditos];
+        return ['clientes' => $clientes];
     }
 
 
@@ -173,6 +173,7 @@ class ClienteController extends Controller
         //$persona->usuario = Auth::user()->id;
         $persona->tipo_documento = $request->tipo_documento;
         $persona->num_documento = $request->num_documento;
+        $persona->complemento_id = $request->complemento;
         $persona->direccion = $request->direccion;
         $persona->telefono = $request->telefono;
         $persona->email = $request->email;
@@ -191,6 +192,7 @@ class ClienteController extends Controller
         $persona->usuario = $request->usuariodos_id;
         $persona->tipo_documento = $request->tipo_documento;
         $persona->num_documento = $request->num_documento;
+        $persona->complemento_id = $request->complemento;
         $persona->direccion = $request->direccion;
         $persona->telefono = $request->telefono;
         $persona->email = $request->email;

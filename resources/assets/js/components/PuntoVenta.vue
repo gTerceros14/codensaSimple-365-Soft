@@ -43,7 +43,7 @@
                             </thead>
                             <tbody>
                                 <tr v-for="puntoVenta in arrayPuntoVenta" :key="puntoVenta.id">
-                                    <td v-text="puntoVenta.id"></td>
+                                    <td v-text="puntoVenta.codigoPuntoVenta"></td>
                                     <td v-text="puntoVenta.nombre"></td>
                                     <td v-text="puntoVenta.descripcion"></td>
                                     <td v-text="puntoVenta.descripcionTipo"></td>

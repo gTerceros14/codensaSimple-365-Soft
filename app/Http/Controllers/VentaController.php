@@ -66,6 +66,7 @@ class VentaController extends Controller
                 ->join('users', 'ventas.idusuario', '=', 'users.id')
                 ->select(
                     'facturas.*',
+                    'facturas.correo as correo',
                     'ventas.tipo_comprobante as tipo_comprobante',
                     'ventas.serie_comprobante',
                     'ventas.num_comprobante as num_comprobante',
@@ -134,6 +135,7 @@ class VentaController extends Controller
                 ->join('users', 'ventas.idusuario', '=', 'users.id')
                 ->select(
                     'factura_fuera_lineas.*',
+                    'factura_fuera_lineas.correo as correo',
                     'ventas.tipo_comprobante as tipo_comprobante',
                     'ventas.serie_comprobante',
                     'ventas.num_comprobante as num_comprobante',
@@ -817,6 +819,34 @@ class VentaController extends Controller
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
     }
 
+    public function nuevoCufd()
+    {
+        $user = Auth::user();
+        $puntoVenta = $user->idpuntoventa;
+        $sucursal = $user->sucursal;
+        $codSucursal = $sucursal->codigoSucursal;
+
+        require "SiatController.php";
+        $siat = new SiatController();
+        $res = $siat->cufd($puntoVenta, $codSucursal);
+        
+        if ($res->RespuestaCufd->transaccion == true) {
+            $cufd = $res->RespuestaCufd->codigo;
+            $codigoControl = $res->RespuestaCufd->codigoControl;
+            $direccion = $res->RespuestaCufd->direccion;
+            $fechaVigencia = $res->RespuestaCufd->fechaVigencia;
+            
+            $_SESSION['scufd'] = $cufd;
+            $_SESSION['scodigoControl'] = $codigoControl;
+            $_SESSION['sdireccion'] = $direccion;
+            $_SESSION['sfechaVigenciaCufd'] = $fechaVigencia;
+        } else {
+            $res = false;
+        }
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    }
+
     public function cufd()
     {
         $user = Auth::user();
@@ -1008,6 +1038,7 @@ class VentaController extends Controller
         $datos = $request->input('factura');
         $id_cliente = $request->input('id_cliente');
         $idventa = $request->input('idventa');
+        $correo = $request->input('correo');
 
         $valores = $datos['factura'][0]['cabecera'];
         $nitEmisor = str_pad($valores['nitEmisor'], 13, "0", STR_PAD_LEFT);
@@ -1040,7 +1071,7 @@ class VentaController extends Controller
         $datos['factura'][0]['cabecera']['cuf'] = $cuf;
 
         $temporal = $datos['factura'];
-        dd($temporal);
+        //dd($temporal);
         $xml_temporal = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><facturaComputarizadaCompraVenta xsi:noNamespaceSchemaLocation=\"facturaComputarizadaCompraVenta.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"></facturaComputarizadaCompraVenta>");
 
         $this->formato_xml($temporal, $xml_temporal);
@@ -1060,25 +1091,26 @@ class VentaController extends Controller
         $productos = file_get_contents(public_path("docs/facturaxml.xml"));
 
             
-        $data = $this->insertarFactura($request, $idventa, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
+        $data = $this->insertarFactura($request, $idventa, $id_cliente, $numeroFactura, $cuf, $correo, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
 
         if ($data) {
             // Registro exitoso
             require "SiatController.php";
             $siat = new SiatController();
             $resFactura = $siat->recepcionFactura($archivo, $fechaEmision, $hashArchivo, $puntoVenta, $codSucursal);
-            //var_dump($resFactura);
+            //dd($resFactura);
             if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "VALIDADA") {
                 $mensaje = $resFactura->RespuestaServicioFacturacion->codigoDescripcion;
             } else if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA") {
-                $mensajes = $resFactura->RespuestaServicioFacturacion->mensajesList;
+                $mensaje = $resFactura->RespuestaServicioFacturacion->mensajesList->descripcion;
+                /*$mensajes = $resFactura->RespuestaServicioFacturacion->mensajesList;
                 //dd($mensajes);
                 if (is_array($mensajes)) {
                     $descripciones = array_map(function ($mensaje) {
                         return $mensaje->descripcion;
                     }, $mensajes);
                     $mensaje = $descripciones;
-                }
+                }*/
             }
             echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
 
@@ -1186,6 +1218,7 @@ class VentaController extends Controller
         $id_cliente = $request->input('id_cliente');
         $cafc = $request->input('cafc');
         $idventa = $request->input('idventa');
+        $correo = $request->input('correo');
         $_SESSION['scafc'] = $cafc;
 
         $valores = $datos['factura'][0]['cabecera'];
@@ -1241,13 +1274,11 @@ class VentaController extends Controller
         $descuentoAdicional = $valores['descuentoAdicional'];
         $productos = file_get_contents(public_path("docs/temporal/" . $nombreArchivo));
 
-        $data = $this->insertarFacturaOffline($request, $idventa, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
+        $data = $this->insertarFacturaOffline($request, $idventa, $id_cliente, $numeroFactura, $correo, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
         if ($data === true) {
-            // Si la inserción fue exitosa, devolver una respuesta JSON
             return response()->json(['message' => 'Factura registrada correctamente']);
         } else {
-            // Si la inserción no fue exitosa, devolver una respuesta JSON con un mensaje de error
-            return response()->json(['message' => 'Error al registrar la factura'], 500); // 500 indica un error interno del servidor
+            return response()->json(['message' => 'Error al registrar la factura'], 500); 
         }
     }
 
@@ -1405,6 +1436,7 @@ class VentaController extends Controller
             $siat = new SiatController();
             $res = $siat->recepcionPaqueteFactura($archivo, $request->fechaEmision, $hashArchivo, $numeroFacturas, $puntoVenta, $codSucursal);
             // Verificar el valor de transacción y asignar el mensaje correspondiente
+            //dd($res);
             if ($res->RespuestaServicioFacturacion->codigoDescripcion === "PENDIENTE") {
                 $mensaje = $res->RespuestaServicioFacturacion->codigoDescripcion;
                 $_SESSION['scodigorecepcion'] = $res->RespuestaServicioFacturacion->codigoRecepcion;
@@ -1423,14 +1455,14 @@ class VentaController extends Controller
                 }
 
             } else if ($res->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA") {
-                $mensajes = $res->RespuestaServicioFacturacion->mensajesList;
+                $mensaje = $res->RespuestaServicioFacturacion->mensajesList->descripcion;
 
-                if (is_array($mensajes)) {
+                /*if (is_array($mensajes)) {
                     $descripciones = array_map(function ($mensaje) {
                         return $mensaje->descripcion;
                     }, $mensajes);
                     $mensaje = $descripciones;
-                }
+                }*/
             }
             echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
             //var_dump($res);
@@ -1481,7 +1513,7 @@ class VentaController extends Controller
         rmdir($directorio);
     }
 
-    public function insertarFactura(Request $request, $idventa, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
+    public function insertarFactura(Request $request, $idventa, $id_cliente, $numeroFactura, $cuf, $correo, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
     {
         if (!$request->ajax()) {
             return response()->json(['error' => 'Acceso no autorizado'], 401);
@@ -1492,6 +1524,7 @@ class VentaController extends Controller
         $factura->idcliente = $id_cliente;
         $factura->numeroFactura = $numeroFactura;
         $factura->cuf = $cuf;
+        $factura->correo = $correo;
         $factura->fechaEmision = $fechaEmision;
         $factura->codigoMetodoPago = $codigoMetodoPago;
         $factura->montoTotal = $montoTotal;
@@ -1505,7 +1538,7 @@ class VentaController extends Controller
         return $success;
     }
 
-    public function insertarFacturaOffline(Request $request, $idventa, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
+    public function insertarFacturaOffline(Request $request, $idventa, $id_cliente, $numeroFactura, $correo, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
     {
         if (!$request->ajax()) {
             return response()->json(['error' => 'Acceso no autorizado'], 401);
@@ -1516,6 +1549,7 @@ class VentaController extends Controller
         $facturaOff->idcliente = $id_cliente;
         $facturaOff->numeroFactura = $numeroFactura;
         $facturaOff->cuf = $cuf;
+        $facturaOff->correo = $correo;
         $facturaOff->fechaEmision = $fechaEmision;
         $facturaOff->codigoMetodoPago = $codigoMetodoPago;
         $facturaOff->montoTotal = $montoTotal;
@@ -1529,29 +1563,6 @@ class VentaController extends Controller
         return $success;
     }
 
-    public function insertarFacturaOffline(Request $request, $idventa, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
-    {
-        if (!$request->ajax()) {
-            return response()->json(['error' => 'Acceso no autorizado'], 401);
-        }
-
-        $facturaOff = new FacturaFueraLinea();
-        $facturaOff->idventa = $idventa;
-        $facturaOff->idcliente = $id_cliente;
-        $facturaOff->numeroFactura = $numeroFactura;
-        $facturaOff->cuf = $cuf;
-        $facturaOff->fechaEmision = $fechaEmision;
-        $facturaOff->codigoMetodoPago = $codigoMetodoPago;
-        $facturaOff->montoTotal = $montoTotal;
-        $facturaOff->montoTotalSujetoIva = $montoTotalSujetoIva;
-        $facturaOff->descuentoAdicional = $descuentoAdicional;
-        $facturaOff->productos = $productos;
-        $facturaOff->estado = 1;
-
-        $success = $facturaOff->save();
-
-        return $success;
-    }
 
     public function insertarFacturaInstitucional(Request $request, $id_cliente, $idventainstitucional, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
     {
@@ -1698,7 +1709,7 @@ class VentaController extends Controller
         //var_dump($res);
     }
 
-    public function imprimirFactura($id, $email)
+    public function imprimirFactura($id, $correo)
     {
 
         $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
@@ -1724,6 +1735,7 @@ class VentaController extends Controller
         $razonSocial = $archivoXML->cabecera[0]->nombreRazonSocial;
         $codigoCliente = $archivoXML->cabecera[0]->codigoCliente;
         $montoTotal = $archivoXML->cabecera[0]->montoTotal;
+        $montoGiftCard = $archivoXML->cabecera[0]->montoGiftCard;
         $descuentoAdicional = $archivoXML->cabecera[0]->descuentoAdicional;
         $leyenda = $archivoXML->cabecera[0]->leyenda;
         $complementoid = $archivoXML->cabecera[0]->complemento;
@@ -1796,7 +1808,12 @@ class VentaController extends Controller
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell(38, 5, 'NIT/CI/CEX:    ', 0, 0, 'R');
         $pdf->SetFont('Arial', '', 8);
-        $pdf->Cell(32, 5, $documentoid . $complementoid, 0, 1, 'L');
+        if (isset($complementoid) && $complementoid !== '') {
+            //$pdf->Cell(32, 5, $documentoid, 0, 1, 'L');
+            $pdf->Cell(32, 5, $documentoid . "-" . $complementoid, 0, 1, 'L');
+        } else {
+            $pdf->Cell(32, 5, $documentoid, 0, 1, 'L');
+        }
 
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell(40, 5, utf8_decode('Nombre/Razón Social:'), 0, 0, 'L');
@@ -1838,7 +1855,7 @@ class VentaController extends Controller
         foreach ($detalle as $p) {
             $pdf->Cell(25, 5, $p->codigoProducto, 1, 0, 'L');
             $pdf->Cell(25, 5, $p->cantidad, 1, 0, 'R');
-            $pdf->Cell(20, 5, $p->unidadMedida, 1, 0, 'L');
+            $pdf->Cell(20, 5, "UNIDAD", 1, 0, 'L');
             $pdf->Cell(50, 5, $p->descripcion, 1, 0, 'L');
             $pdf->Cell(25, 5, number_format(floatval($p->precioUnitario), 2), 1, 0, 'R');
             $pdf->Cell(25, 5, number_format(floatval($p->montoDescuento), 2), 1, 0, 'R');
@@ -1864,7 +1881,7 @@ class VentaController extends Controller
 
         $pdf->Cell(120, 5, '', 0, 0, 'L');
         $pdf->Cell(50, 5, 'MONTO GIFT CARD Bs.', 1, 0, 'R');
-        $pdf->Cell(27, 5, '0.00', 1, 1, 'R');
+        $pdf->Cell(27, 5, number_format(floatval(($montoGiftCard)), 2), 1, 1, 'R');
 
         $pdf->Cell(120, 5, '', 0, 0, 'L');
         $pdf->SetFont('Arial', 'B', 8);
@@ -1892,13 +1909,13 @@ class VentaController extends Controller
         $pdfPath = public_path('docs/facturaCarta.pdf');
         $xmlPath = public_path("docs/facturaxml.xml");
 
-        \Mail::to($email)->send(new \App\Mail\MailPrueba($xmlPath, $pdfPath));
+        \Mail::to($correo)->send(new \App\Mail\MailPrueba($xmlPath, $pdfPath));
 
         return response()->download(public_path('docs/facturaCarta.pdf'));
 
     }
 
-    public function imprimirFacturaRollo($id, $email)
+    public function imprimirFacturaRollo($id, $correo)
     {
 
         $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
@@ -1925,6 +1942,7 @@ class VentaController extends Controller
         $razonSocial = $archivoXML->cabecera[0]->nombreRazonSocial;
         $codigoCliente = $archivoXML->cabecera[0]->codigoCliente;
         $montoTotal = $archivoXML->cabecera[0]->montoTotal;
+        $montoGiftCard = $archivoXML->cabecera[0]->montoGiftCard;
         $descuentoAdicional = $archivoXML->cabecera[0]->descuentoAdicional;
         $leyenda = $archivoXML->cabecera[0]->leyenda;
         $complementoid = $archivoXML->cabecera[0]->complemento;
@@ -1978,6 +1996,7 @@ class VentaController extends Controller
         $pdf->SetFont('Arial', 'B', 6);
         $pdf->Cell(0, 3, 'NIT', 0, 1, 'C');
         $pdf->SetFont('Arial', '', 6);
+        //$pdf->Cell(0, 3, utf8_decode($documentoid."-".$complementoid), 0, 1, 'C');
         $pdf->Cell(0, 3, utf8_decode($documentoid), 0, 1, 'C');
         $pdf->SetFont('Arial', 'B', 6);
         $pdf->Cell(0, 3, utf8_decode('FACTURA N°'), 0, 1, 'C');
@@ -2067,7 +2086,7 @@ class VentaController extends Controller
         $pdf->Cell(0, 3, 'TOTAL Bs', 0, 0, 'C');
         $pdf->Cell(0, 3, number_format(floatval($montoTotal), 2), 0, 1, 'R');
         $pdf->Cell(0, 3, 'MONTO GIFT CARD Bs', 0, 0, 'C');
-        $pdf->Cell(0, 3, '0.00', 0, 1, 'R');
+        $pdf->Cell(0, 3, number_format(floatval($montoGiftCard), 2), 0, 1, 'R');
         $pdf->SetFont('Arial', 'B', 6);
         $pdf->Cell(0, 3, 'MONTO A PAGAR Bs', 0, 0, 'C');
         $pdf->Cell(0, 3, number_format(floatval($montoTotal), 2), 0, 1, 'R');
@@ -2112,18 +2131,18 @@ class VentaController extends Controller
         $pdfPath = public_path('docs/facturaRollo.pdf');
         $xmlPath = public_path("docs/facturaxml.xml");
 
-        \Mail::to($email)->send(new \App\Mail\MailPrueba($xmlPath, $pdfPath));
+        \Mail::to($correo)->send(new \App\Mail\MailPrueba($xmlPath, $pdfPath));
 
         return response()->download(public_path('docs/facturaRollo.pdf'));
     }
 
-    public function imprimirFacturaOffline($id) 
+    public function imprimirFacturaOffline($id, $correo) 
     {
 
-        $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
-            ->select('facturas.*', 'personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
-            ->where('facturas.id', '=', $id)
-            ->orderBy('facturas.id', 'desc')->paginate(3);
+        $facturas = FacturaFueraLinea::join('personas', 'factura_fuera_lineas.idcliente', '=', 'personas.id')
+            ->select('factura_fuera_lineas.*', 'personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
+            ->where('factura_fuera_lineas.id', '=', $id)
+            ->orderBy('factura_fuera_lineas.id', 'desc')->paginate(3);
 
         Log::info('Resultado', [
             //'facturas' => $facturas,
@@ -2143,6 +2162,7 @@ class VentaController extends Controller
         $razonSocial = $archivoXML->cabecera[0]->nombreRazonSocial;
         $codigoCliente = $archivoXML->cabecera[0]->codigoCliente;
         $montoTotal = $archivoXML->cabecera[0]->montoTotal;
+        $montoGiftCard = $archivoXML->cabecera[0]->montoGiftCard;
         $descuentoAdicional = $archivoXML->cabecera[0]->descuentoAdicional;
         $leyenda = $archivoXML->cabecera[0]->leyenda;
         $complementoid = $archivoXML->cabecera[0]->complemento;
@@ -2215,7 +2235,12 @@ class VentaController extends Controller
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell(38, 5, 'NIT/CI/CEX:    ', 0, 0, 'R');
         $pdf->SetFont('Arial', '', 8);
-        $pdf->Cell(32, 5, $documentoid . $complementoid, 0, 1, 'L');
+        if (isset($complementoid) && $complementoid !== '') {
+            //$pdf->Cell(32, 5, $documentoid, 0, 1, 'L');
+            $pdf->Cell(32, 5, $documentoid . "-" . $complementoid, 0, 1, 'L');
+        } else {
+            $pdf->Cell(32, 5, $documentoid, 0, 1, 'L');
+        }
 
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell(40, 5, utf8_decode('Nombre/Razón Social:'), 0, 0, 'L');
@@ -2283,7 +2308,7 @@ class VentaController extends Controller
 
         $pdf->Cell(120, 5, '', 0, 0, 'L');
         $pdf->Cell(50, 5, 'MONTO GIFT CARD Bs.', 1, 0, 'R');
-        $pdf->Cell(27, 5, '0.00', 1, 1, 'R');
+        $pdf->Cell(27, 5, number_format(floatval(($montoGiftCard)), 2), 1, 1, 'R');
 
         $pdf->Cell(120, 5, '', 0, 0, 'L');
         $pdf->SetFont('Arial', 'B', 8);
@@ -2304,19 +2329,25 @@ class VentaController extends Controller
         $pdf->Cell(170, 5, utf8_decode($leyenda), 0, 1, 'C');
 
         $pdf->Ln(2);
-        $pdf->Cell(170, 5, utf8_decode('"Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación fuera de línea"'), 0, 1, 'C');
+        $pdf->Cell(170, 5, utf8_decode('"Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido fuera de línea, verifique su envío con su proveedor o en la página web www.impuestos.gob.bo"'), 0, 1, 'C');
 
         $pdf->Output(public_path('docs/facturaCarta.pdf'), 'F');
+
+        $pdfPath = public_path('docs/facturaCarta.pdf');
+        $xmlPath = public_path("docs/facturaxml.xml");
+
+        \Mail::to($correo)->send(new \App\Mail\MailPrueba($xmlPath, $pdfPath));
+
         return response()->download(public_path('docs/facturaCarta.pdf'));
     }
 
-    public function imprimirFacturaRolloOffline($id)
+    public function imprimirFacturaRolloOffline($id, $correo)
     {
 
-        $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
-            ->select('facturas.*', 'personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
-            ->where('facturas.id', '=', $id)
-            ->orderBy('facturas.id', 'desc')->paginate(3);
+        $facturas = FacturaFueraLinea::join('personas', 'factura_fuera_lineas.idcliente', '=', 'personas.id')
+            ->select('factura_fuera_lineas.*', 'personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
+            ->where('factura_fuera_lineas.id', '=', $id)
+            ->orderBy('factura_fuera_lineas.id', 'desc')->paginate(3);
 
         Log::info('Resultado', [
             //'facturas' => $facturas,
@@ -2337,6 +2368,7 @@ class VentaController extends Controller
         $razonSocial = $archivoXML->cabecera[0]->nombreRazonSocial;
         $codigoCliente = $archivoXML->cabecera[0]->codigoCliente;
         $montoTotal = $archivoXML->cabecera[0]->montoTotal;
+        $montoGiftCard = $archivoXML->cabecera[0]->montoGiftCard;
         $descuentoAdicional = $archivoXML->cabecera[0]->descuentoAdicional;
         $leyenda = $archivoXML->cabecera[0]->leyenda;
         $complementoid = $archivoXML->cabecera[0]->complemento;
@@ -2390,6 +2422,7 @@ class VentaController extends Controller
         $pdf->SetFont('Arial', 'B', 6);
         $pdf->Cell(0, 3, 'NIT', 0, 1, 'C');
         $pdf->SetFont('Arial', '', 6);
+        //$pdf->Cell(0, 3, utf8_decode($documentoid."-".$complementoid), 0, 1, 'C');
         $pdf->Cell(0, 3, utf8_decode($documentoid), 0, 1, 'C');
         $pdf->SetFont('Arial', 'B', 6);
         $pdf->Cell(0, 3, utf8_decode('FACTURA N°'), 0, 1, 'C');
@@ -2479,7 +2512,7 @@ class VentaController extends Controller
         $pdf->Cell(0, 3, 'TOTAL Bs', 0, 0, 'C');
         $pdf->Cell(0, 3, number_format(floatval($montoTotal), 2), 0, 1, 'R');
         $pdf->Cell(0, 3, 'MONTO GIFT CARD Bs', 0, 0, 'C');
-        $pdf->Cell(0, 3, '0.00', 0, 1, 'R');
+        $pdf->Cell(0, 3, number_format(floatval($montoGiftCard), 2), 0, 1, 'R');
         $pdf->SetFont('Arial', 'B', 6);
         $pdf->Cell(0, 3, 'MONTO A PAGAR Bs', 0, 0, 'C');
         $pdf->Cell(0, 3, number_format(floatval($montoTotal), 2), 0, 1, 'R');
@@ -2506,8 +2539,8 @@ class VentaController extends Controller
         $pdf->MultiCell(0, 3, utf8_decode($leyenda), 0, 'C');
         $pdf->Ln(3);
         $pdf->Cell(0, 3, utf8_decode('Este documento es la Representación Gráfica de un'), 0, 1, 'C');
-        $pdf->Cell(0, 3, utf8_decode('Documento Fiscal Digital emitido en una modalidad de'), 0, 1, 'C');
-        $pdf->Cell(0, 3, utf8_decode('facturación fuera de línea'), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode('Documento Fiscal Digital emitido fuera de línea,'), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode('verifique su envío con su proveedor o en la página web www.impuestos.gob.bo'), 0, 1, 'C');
         $pdf->Ln(3);
 
         $textY = $pdf->GetY();
@@ -2517,9 +2550,13 @@ class VentaController extends Controller
         $imageX = ($pageWidth - $imageWidth) / 2;
         $pdf->Image(public_path('qr/qrcode.png'), $imageX, $textY + 3, $imageWidth, 0, 'PNG');
 
-
-
         $pdf->Output(public_path('docs/facturaRollo.pdf'), 'F');
+
+        $pdfPath = public_path('docs/facturaRollo.pdf');
+        $xmlPath = public_path("docs/facturaxml.xml");
+
+        \Mail::to($correo)->send(new \App\Mail\MailPrueba($xmlPath, $pdfPath));
+
         return response()->download(public_path('docs/facturaRollo.pdf'));
     }
 

@@ -8,8 +8,10 @@ class Factura extends Model
 {
     protected $fillable =[
         'idcliente',
+        'idventa',
         'numeroFactura',
         'cuf',
+        'correo',
         'fechaEmision',
         'codigoMetodoPago',
         'montoTotal',
@@ -21,5 +23,9 @@ class Factura extends Model
 
     public function persona(){
         return $this->belongsTo('App\Persona');
+    }
+
+    public function venta(){
+        return $this->belongsTo('App\Venta');
     }
 }

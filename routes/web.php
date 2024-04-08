@@ -158,6 +158,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/venta/verificarComunicacion', 'VentaController@verificarComunicacion');
         Route::post('/venta/cuis', 'VentaController@cuis');
         Route::post('/venta/cufd', 'VentaController@cufd');
+        Route::post('/venta/nuevoCufd', 'VentaController@nuevoCufd');
         Route::post('/venta/emitirFactura', 'VentaController@emitirFactura');
         Route::post('/venta/insertarFactura', 'VentaController@insertarFactura');
         Route::post('/venta/paqueteFactura', 'VentaController@paqueteFactura');
@@ -263,10 +264,10 @@ Route::group(['middleware' => ['auth']], function () {
         //FACTURAS
         Route::get('/factura', 'SiatController@index');
         Route::get('/factura/getFactura/{id}', 'SiatController@getFactura');
-        Route::get('/factura/imprimirRollo/{id}/{email}', 'VentaController@imprimirFacturaRollo');
-        Route::get('/factura/imprimirCarta/{id}/{email}', 'VentaController@imprimirFactura');
-        Route::get('/factura/imprimirRolloOffline/{id}', 'VentaController@imprimirFacturaRolloOffline');
-        Route::get('/factura/imprimirCartaOffline/{id}', 'VentaController@imprimirFacturaOffline');
+        Route::get('/factura/imprimirRollo/{id}/{correo}', 'VentaController@imprimirFacturaRollo');
+        Route::get('/factura/imprimirCarta/{id}/{correo}', 'VentaController@imprimirFactura');
+        Route::get('/factura/imprimirRolloOffline/{id}/{correo}', 'VentaController@imprimirFacturaRolloOffline');
+        Route::get('/factura/imprimirCartaOffline/{id}/{correo}', 'VentaController@imprimirFacturaOffline');
         Route::get('/factura/anular/{cuf}/{motivoSeleccionado}', 'VentaController@anulacionFactura');
         Route::get('/factura/sincronizarActividades', 'VentaController@sincronizarActividades');
         Route::get('/factura/sincronizarParametricaTiposFactura', 'VentaController@sincronizarParametricaTiposFactura');

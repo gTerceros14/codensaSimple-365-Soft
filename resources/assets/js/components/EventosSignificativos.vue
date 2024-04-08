@@ -16,6 +16,17 @@
                 <span class="badge bg-secondary" id="cuis">CUIS: Inexistente</span>
                 <span class="badge bg-primary" id="cufdValor" v-show="mostrarCUFD">No hay CUFD</span>
             </div>
+            <div class="card-body"></div>
+            <div class="form-group row">
+                            <div class="col-md-3">
+                                <div class="input-group">
+                                    <button type="button" class="btn btn-info" @click="obtenerNuevoCUFD">
+                                        <i class="icon-reload"></i>
+                                    </button>
+                                    <input type="text" class="form-control" placeholder="Obtener Nuevo CUFD" readonly>
+                                </div>
+                            </div>
+                        </div> 
             <div class="table-responsive">
                         
                         <table class="table table-bordered table-striped table-sm">
@@ -50,6 +61,7 @@
                                 </tr>                                                              
                             </tbody>
                         </table>
+                    </div>
                         <nav>
                             <ul class="pagination">
                                 <li class="page-item" v-if="pagination.current_page > 1">
@@ -260,6 +272,23 @@
                         console.log(error);
                     });
             },
+
+            obtenerNuevoCUFD() {
+            axios.post('/venta/nuevoCufd')
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.RespuestaCufd.transaccion != false) {
+                        document.getElementById("cufdValor").innerHTML = response.data.RespuestaCufd.codigo;
+                        this.cufdEvento = response.data.RespuestaCufd.codigo;
+                    } else {
+                        document.getElementById("cufd").innerHTML = "No existe CUFD vigente";
+                        document.getElementById("cufd").className = "badge bg-secondary";
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
 
             obtenerDatosMotivo (){
                 let me = this;

@@ -11,6 +11,7 @@ class FacturaFueraLinea extends Model
         'idventa',
         'numeroFactura',
         'cuf',
+        'correo',
         'fechaEmision',
         'codigoMetodoPago',
         'montoTotal',

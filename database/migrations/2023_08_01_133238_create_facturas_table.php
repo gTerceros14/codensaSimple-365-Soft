@@ -20,6 +20,7 @@ class CreateFacturasTable extends Migration
 
             $table->integer('numeroFactura');
             $table->string('cuf', 255);
+            $table->string('correo', 255);
             $table->dateTime('fechaEmision');
             $table->integer('codigoMetodoPago');
             $table->decimal('montoTotal', 10, 2);

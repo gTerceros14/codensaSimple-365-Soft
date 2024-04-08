@@ -28,9 +28,9 @@
                         <div class="form-group row">
                             <div class="col-md-3">
                                 <div class="input-group">
-                                    <select class="form-control col-md-5" v-model="criterio">
+                                    <select class="form-control col-md-3" v-model="criterio">
                                         <option value="tipo_comprobante">Tipo Comprobante</option>
-                                        <option value="num_comprobante">N° Comprobante</option>
+                                        <option value="num_comprobante">Número Comprobante</option>
                                         <option value="fecha_hora">Fecha-Hora</option>
                                     </select>
                                     <input type="text" v-model="buscar" @keyup="listarVenta(1, buscar, criterio)"
@@ -49,10 +49,9 @@
                                         <th>Opciones</th>
                                         <th>Vendedor</th>
                                         <th>Cliente</th>
-                                        <th>Tipo de Documento</th>
-                                        <th>Número de Documento</th>
+                                        <th>Documento</th>
+                                        <th>N° de Documento</th>
                                         <th>Fecha y Hora</th>
-                                        <th>Tipo de Venta</th>
                                         <th>Total</th>
                                         <th>Estado</th>
                                         <th> </th>
@@ -88,9 +87,6 @@
                                         <td v-text="venta.num_comprobante"></td>
                                         <td v-text="venta.fecha_hora"></td>
                                         <td>
-                                            {{ venta.idtipo_venta == 1 ? "Contado" : "Credito" }}
-                                        </td>
-                                        <td>
                                             {{ ((venta.total) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
                         monedaVenta[1]
                     }}
@@ -100,7 +96,7 @@
                                             <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank" class="btn btn-info"><i class="icon-note"></i></a>
                                         </td>
                                         <td>
-                                            <button class="btn btn-primary" type="button" @click="imprimirFactura(venta.id, venta.email)"><i class="icon-printer"></i></button>
+                                            <button class="btn btn-primary" type="button" @click="imprimirFactura(venta.id, venta.correo)"><i class="icon-printer"></i></button>
                                             <button class="btn btn-danger" type="button" @click="anularFactura(venta.id, venta.cuf)"><i class="icon-close"></i></button>
                                         </td>
                                     </tr>
@@ -158,7 +154,7 @@
                                 ref="complementoIdRef" readonly>
                             <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado"
                                 readonly>
-                            <input type="hidden" id="email" class="form-control" v-model="email" ref="emailRef" readonly>
+                            <input type="hidden" id="email" class="form-control" v-model="email" readonly>
 
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Documento
@@ -176,6 +172,7 @@
                                     Habilitar
                                     </label>
                                 </div>
+                            </div>    
                                 
                             <div v-if="clienteDeudas > 0" class="alert alert-danger text-center " role="alert"
                                 style="width: 100%;">
@@ -225,6 +222,10 @@
                                     <input disabled type="text" class="form-control" value="0.18">
                                 </div>
                             </div>
+                            <div class="col-md-3" v-if="casosEspeciales">
+                                <label for="email" class="font-weight-bold">Correo electrónico</label>
+                                <input type="email" id="email" class="form-control" v-model="email" ref="emailRef">
+                            </div>
                         </div>
 
                         <div class="form-group row border">
@@ -238,12 +239,7 @@
                                     <button :disabled="!idAlmacen" class="btn btn-primary" type="button"
                                         @click="abrirModal()">...</button>
                                 </div>
-
-
-
-
                             </div>
-
 
                             <!-- Desde aca comienza el seleccionado -->
                             <template v-if="arraySeleccionado && arraySeleccionado.id">
@@ -264,18 +260,18 @@
                                             style="display:flex;align-items:center;margin:0px;">
                                             <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
                                             <b v-else>{{ (calcularPrecioConDescuento(resultadoMultiplicacion,
-                        arrayPromocion.porcentaje) * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                                arrayPromocion.porcentaje) * parseFloat(monedaVenta[0])).toFixed(2) }}
                                                 {{
-                        monedaVenta[1] }}</b>
+                                                    monedaVenta[1] }}</b>
                                             <s style="font-size:15px" class="lead">{{
-                        (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                        monedaVenta[1] }}</s>
+                                            calcularPrecioConDescuento(resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                            monedaVenta[1] }}</s>
                                         </h3>
 
                                         <h3 v-else style="display:flex;align-items:center;margin:0px;">
-                                            <b>{{ (resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                            <b>{{ calcularPrecioConDescuento(resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }}
                                                 {{
-                        monedaVenta[1] }}</b>
+                                            monedaVenta[1] }}</b>
                                         </h3>
                                         <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id" class="lead">
                                             {{ arrayPromocion.porcentaje }} % de descuento
@@ -283,7 +279,7 @@
                                         <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id"
                                             class="text-danger">
                                             <i class="fa fa-clock-o" aria-hidden="true"></i> Esta oferta termina en {{
-                        calcularDiasRestantes(arrayPromocion.fecha_final) }} días
+                                            calcularDiasRestantes(arrayPromocion.fecha_final) }} días
                                         </p>
                                     </div>
                                 </div>
@@ -295,14 +291,14 @@
 
 
                                     <div :class="{
-                        'alert': true,
-                        'alert-success': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) > arraySeleccionado.stock / unidadPaquete,
-                        'alert-warning': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= arraySeleccionado.stock / unidadPaquete,
-                        'alert-danger': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= 0
-                    }" role="alert">
+                                        'alert': true,
+                                        'alert-success': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) > arraySeleccionado.stock / unidadPaquete,
+                                        'alert-warning': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= arraySeleccionado.stock / unidadPaquete,
+                                        'alert-danger': (arraySeleccionado.saldo_stock / unidadPaquete - cantidad) <= 0
+                                    }" role="alert">
                                         <p style="margin:0px">Stock disponible</p>
                                         <b>{{ arraySeleccionado.saldo_stock / unidadPaquete - cantidad }} {{
-                        unidadPaquete == 1 ? "Unidades" : "Paquetes" }}</b>
+                                        unidadPaquete == 1 ? "Unidades" : "Paquetes" }}</b>
                                     </div>
 
                                 </div>
@@ -330,11 +326,11 @@
                                             :disabled="precioBloqueado">
                                             <option>Selecciona un precio: </option>
                                             <option :value="arraySeleccionado.precio_uno" v-if="arrayPrecios[0]">{{
-                        arrayPrecios[0].nombre_precio
-                    }}</option>
+                                                arrayPrecios[0].nombre_precio
+                                            }}</option>
                                             <option :value="arraySeleccionado.precio_dos" v-if="arrayPrecios[1]">{{
-                        arrayPrecios[1].nombre_precio
-                    }}
+                                                arrayPrecios[1].nombre_precio
+                                            }}
                                             </option>
                                             <option :value="arraySeleccionado.precio_tres" v-if="arrayPrecios[2]">
                                                 {{ arrayPrecios[2].nombre_precio }}</option>
@@ -351,6 +347,16 @@
                                         </label>
                                         <input type="number" id="cantidad" value="1" class="form-control"
                                             v-model="cantidad">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="" class="font-weight-bold">Descuento %
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="number" id="descuentoProducto" value="0" class="form-control"
+                                            v-model="descuentoProducto" max="99">
                                     </div>
                                 </div>
 
@@ -409,7 +415,7 @@
                                                 {{ (detalle.precioseleccionado * parseFloat(monedaVenta[0])).toFixed(2)
                                                 }}
                                                 {{
-                        monedaVenta[1] }}
+                                                monedaVenta[1] }}
 
                                             </td>
                                             <td>
@@ -424,30 +430,23 @@
                                             <td>
 
                                                 {{ ((detalle.precioseleccionado * detalle.cantidad)
-                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                                                * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
 
 
                                             </td>
-
-
-                                            <td>
-                                                <input type="number" v-model="detalle.descuento" max="99"
-                                                    style="border: none; outline: none; width: 50px;" />
-                                            </td>
+                                            <td v-text="detalle.descuento"></td>
                                             <td>
                                                 {{ (((detalle.precioseleccionado * detalle.cantidad) -
-                        (detalle.precioseleccionado * detalle.cantidad * detalle.descuento /
-                            100))
-                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
-
+                                                (detalle.precioseleccionado * detalle.cantidad * detalle.descuento /
+                                                    100))
+                                                * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="9" align="right"><strong>Sub Total: </strong></td>
                                             <td id="subTotal">
                                                 {{ ((totalParcial = (calcularSubTotal))
-                        * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
-
+                                                    * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
@@ -455,18 +454,11 @@
                                             <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
                                                 class="form-control" @change="validarDescuentoAdicional">
                                         </tr>
-
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="9" align="right"><strong>Descuento Gift Card: </strong></td>
-                                            <input id="descuentoGiftCard" v-model="descuentoGiftCard" type="number"
-                                                class="form-control">
-                                        </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="9" align="right"><strong>Total Neto: </strong></td>
                                             <td id="montoTotal">
                                                 {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                        monedaVenta[1] }}
-
+                                                    monedaVenta[1] }}
                                             </td>
                                         </tr>
                                     </tbody>
@@ -483,22 +475,20 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <div class="col-md-4">
-                                <label class="col-form-label" for="tipoVenta"><strong>Tipo de Venta</strong></label>
-                                <select class="form-control" v-model="idtipo_venta">
-                                    <option value="1">Contado</option>
-                                    <option value="2">Crédito</option>
-                                </select>
+                                <div class="col-md-4">
+                                    <label class="col-form-label" for="tipoVenta"><strong>Tipo de Venta</strong></label>
+                                    <select class="form-control" v-model="idtipo_venta">
+                                        <option value="1">Contado</option>
+                                        <option value="2">Crédito</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex align-items-end">
+                                    <button type="button" @click="ocultarDetalle()"
+                                        class="btn btn-secondary btn-block mr-2">Cerrar</button>
+                                    <button type="button" class="btn btn-primary btn-block "
+                                        @click="abrirTipoVenta()">Confirmar</button>
+                                </div>
                             </div>
-                            <div class="d-flex align-items-end">
-                                <button type="button" @click="ocultarDetalle()"
-                                    class="btn btn-secondary btn-block mr-2">Cerrar</button>
-                                <button type="button" class="btn btn-primary btn-block "
-                                    @click="abrirTipoVenta()">Confirmar</button>
-                            </div>
-                        </div>
-
-
                     </div>
                 </template>
                 <!-- Fin Detalle-->
@@ -680,7 +670,7 @@
                                                         <td>
                                                             {{ ((articulo.precio_venta) *
                                                                 parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                                monedaVenta[1] }}
+                                                             monedaVenta[1] }}
 
                                                         </td>
                                                         <td v-text="articulo.saldo_stock"></td>
@@ -746,8 +736,8 @@
                                                         <td>
                                                             {{ (kit.precio * parseFloat(monedaVenta[0])).toFixed(2) }}
                                                             {{
-                        monedaVenta[1]
-                    }}
+                                                                monedaVenta[1]
+                                                            }}
                                                         </td>
                                                         <td>
                                                             {{ new Date(kit.fecha_final).toLocaleDateString('es-ES') }}
@@ -758,7 +748,7 @@
                                                             <i class="fa fa-circle"
                                                                 :style="{ color: getColorForEstado(kit.estado, kit.fecha_final) }"></i>&nbsp;
                                                             {{ new Date(kit.fecha_final) < new Date() ? 'Inactivo' :
-                        kit.estado }} </td>
+                                                            kit.estado }} </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -818,7 +808,7 @@
                                                                 <div class="input-group-prepend">
                                                                     <span class="input-group-text">
                                                                         {{
-                        monedaVenta[1] }}
+                                                                        monedaVenta[1] }}
                                                                     </span>
                                                                 </div>
                                                                 <input type="number" class="form-control"
@@ -856,7 +846,7 @@
                                                         <span class="font-weight-bold">
                                                             {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)
                                                             }} {{
-                        monedaVenta[1] }}</span>
+                                                            monedaVenta[1] }}</span>
                                                     </div>
                                                     <div class="d-flex justify-content-between mb-2">
                                                         <span><i class="fa fa-tag mr-2 text-success"></i>
@@ -870,16 +860,15 @@
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="codigoDescuento"><i class="fa fa-gift mr-2"></i>
-                                                            Código
-                                                            de Descuento:</label>
+                                                            Código de Descuento Gift Card:</label>
                                                         <div class="input-group mb-3">
-                                                            <input type="text" class="form-control" id="codigoDescuento"
-                                                                placeholder="Ingrese el código de descuento (si aplica)">
-                                                            <div class="input-group-append">
-                                                                <button class="btn btn-outline-secondary" type="button"
-                                                                    id="aplicarDescuento"><i
-                                                                        class="fa fa-check"></i></button>
-                                                            </div>
+                                                            <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">    
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="numeroTarjeta"><i class="fa fa-credit-card mr-2"></i> Número de Tarjeta:</label>
+                                                        <div class="input-group mb-3">
+                                                            <input type="text" class="form-control" id="numeroTarjeta" v-model="numeroTarjeta" placeholder="Ingrese el número de tarjeta">
                                                         </div>
                                                     </div>
                                                     <hr>
@@ -889,15 +878,64 @@
 
                                                             {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)
                                                             }} {{
-                        monedaVenta[1] }}
+                                                        monedaVenta[1] }}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <button type="button" @click="registrar()"
-                                                class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i>
-                                                Registrar Pago</button>
+                                            <button type="button" @click="aplicarDescuento" 
+                                            class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> 
+                                            Registrar Pago</button>
                                         </div>
+                                    </div>
+                                </div>
+                            </b-tab>
+                            <b-tab>
+                                <template #title>
+                                    <span class="d-flex align-items-center">
+                                        <i class="fa fa-gift fa-2x icon-color mr-2" aria-hidden="true"></i>
+                                        <label>Gift Card</label>
+                                    </span>
+                                </template>
+                                <div>
+                                    <div class="mt-4">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="descuentoGiftCard"><i class="fa fa-tag mr-2"></i> Monto de la Gift Card:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="registrarVenta(27)" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </b-tab>
+                            <b-tab>
+                                <template #title>
+                                    <span class="d-flex align-items-center">
+                                        <i class="fa fa-credit-card fa-2x icon-color mr-2" aria-hidden="true"></i>
+                                        <label>Tarjeta</label>
+                                    </span>
+                                </template>
+                                <div>
+                                    <div class="mt-4">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="numeroTarjeta"><i class="fa fa-credit-card mr-2"></i> Número de Tarjeta:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="text" class="form-control" id="numeroTarjeta" v-model="numeroTarjeta" placeholder="Ingrese el número de tarjeta">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="codigoDescuento"><i class="fa fa-gift mr-2"></i>
+                                                    Código de Descuento Gift Card:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">    
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="aplicarCombinacion" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
+                                        </form>
                                     </div>
                                 </div>
                             </b-tab>
@@ -985,13 +1023,174 @@
                                                         placeholder="Ingrese el número de operación">
                                                 </div>
                                             </div>
-                                            <button type="submit" class="btn btn-success btn-block"><i
-                                                    class="fa fa-check mr-2"></i> Confirmar Transferencia</button>
+                                            <button type="button" @click="registrarVenta(7)" 
+                                                class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> 
+                                                Confirmar Transferencia</button>
                                         </form>
                                     </div>
                                 </div>
                             </b-tab>
                             <b-tab>
+                                <template #title>
+                                <span class="d-flex align-items-center">
+                                    <i class="fa fa-list-alt fa-2x icon-color mr-2" aria-hidden="true"></i>
+                                    <label>Otros</label>
+                                </span>
+                                </template>
+                                <div>
+                                <div class="mt-4">
+                                    <form>
+                                    <div class="form-group">
+                                        <label for="otroMetodoPago"><i class="fa fa-tag mr-2"></i> Seleccione un Método de Pago:</label>
+                                        <div class="input-group mb-3">
+                                        <select class="custom-select" id="otroMetodoPago" v-model="metodoPago">
+                                            <option value="">Seleccione...</option>
+                                            <option value="32">BILLETERA MOVIL</option>
+                                            <option value="81">BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="31">CANAL DE PAGO</option>
+                                            <option value="79">CANAL DE PAGO – BILLETERA MOVIL</option>
+                                            <option value="80">CANAL DE PAGO – PAGO ONLINE</option>
+                                            <option value="294">CANAL DE PAGO – BILLETERA MOVIL  – PAGO ONLINE</option>
+                                            <option value="3">CHEQUE</option>
+                                            <option value="51">CHEQUE – BILLETERA</option>
+                                            <option value="213">CHEQUE – BILLETERA MOVIL  – PAGO ONLINE</option>
+                                            <option value="50">CHEQUE – CANAL PAGO</option>
+                                            <option value="211">CHEQUE – CANAL PAGO - BILLETERA MOVIL</option>
+                                            <option value="212">CHEQUE – CANAL PAGO - PAGO ONLINE</option>
+                                            <option value="47">CHEQUE – DEPOSITO</option>
+                                            <option value="202">CHEQUE – DEPOSITO EN CUENTA - BILLETERA MOVIL</option>
+                                            <option value="201">CHEQUE – DEPOSITO EN CUENTA - CANAL DE PAGO</option>
+                                            <option value="203">CHEQUE – DEPOSITO EN CUENTA - PAGO ONLINE</option>
+                                            <option value="199">CHEQUE – DEPOSITO EN CUENTA - TRANSFERENCIA SWIFT</option>
+                                            <option value="38">EFECTIVO – PAGO ONLINE</option>
+                                            <option value="39">TARJETA – PAGO POSTERIOR</option>
+                                            <option value="191">CHEQUE – PAGO POSTERIOR - BILLETERA MOVIL</option>
+                                            <option value="190">CHEQUE – PAGO POSTERIOR - CANAL DE PAGO</option>
+                                            <option value="187">CHEQUE – PAGO POSTERIOR - DEPOSITO EN CUENTA</option>
+                                            <option value="192">CHEQUE – PAGO POSTERIOR - PAGO ONLINE</option>
+                                            <option value="186">CHEQUE – PAGO POSTERIOR - TRANSFERENCIA BANCARIA</option>
+                                            <option value="188">CHEQUE – PAGO POSTERIOR - TRANSFERENCIA SWIFT</option>
+                                            <option value="48">CHEQUE – SWIFT</option>
+                                            <option value="206">CHEQUE – SWIFT - BILLETERA MOVIL</option>
+                                            <option value="207">CHEQUE – SWIFT - PAGO ONLINE</option>
+                                            <option value="208">CHEQUE – GIFT - CANAL DE PAGO</option>
+                                            <option value="46">CHEQUE – TRANSFERENCIA BANCARIA</option>
+                                            <option value="197">CHEQUE – TRANSFERENCIA BANCARIA – BILLETERA MOVIL</option>
+                                            <option value="196">CHEQUE – TRANSFERENCIA BANCARIA – CANAL DE PAGO</option>
+                                            <option value="193">CHEQUE – TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA</option>
+                                            <option value="198">CHEQUE – TRANSFERENCIA BANCARIA – PAGO ONLINE</option>
+                                            <option value="194">CHEQUE – TRANSFERENCIA BANCARIA – TRANSFERENCIA SWIFT</option>
+                                            <option value="44">CHEQUE – VALES</option>
+                                            <option value="178">CHEQUE – VALES - PAGO POSTERIOR</option>
+                                            <option value="179">CHEQUE – VALES - TRANSFERENCIA BANCARIA</option>
+                                            <option value="180">CHEQUE – VALES - DEPOSITO EN CUENTA</option>
+                                            <option value="181">CHEQUE – VALES - TRANSFERENCIA SWIFT</option>
+                                            <option value="183">CHEQUE – VALES - CANAL DE PAGO</option>
+                                            <option value="184">CHEQUE – VALES - BILLETERA MOVIL</option>
+                                            <option value="185">CHEQUE – VALES - PAGO ONLINE</option>
+                                            <option value="295">DEBITO AUTOMATICO</option>
+                                            <option value="296">DEBITO AUTOMATICO – EFECTIVO</option>
+                                            <option value="297">DEBITO AUTOMATICO -TARJETA</option>
+                                            <option value="298">DEBITO AUTOMATICO – CHEQUE</option>
+                                            <option value="299">DEBITO AUTOMATICO - VALE</option>
+                                            <option value="300">DEBITO AUTOMATICO - PAGO POSTERIOR</option>
+                                            <option value="301">DEBITO AUTOMATICO - TRANSFERENCIA BANCARIA</option>
+                                            <option value="302">DEBITO AUTOMATICO - DEPOSITO EN CUENTA</option>
+                                            <option value="303">DEBITO AUTOMATICO - TRANSFERENCIA SWIFT</option>
+                                            <option value="304">DEBITO AUTOMATICO - GIFT CARD</option>
+                                            <option value="305">DEBITO AUTOMATICO - CANAL DE PAGO</option>
+                                            <option value="306">DEBITO AUTOMATICO - BILLETERA MOVIL</option>
+                                            <option value="307">DEBITO AUTOMATICO - PAGO ONLINE</option>
+                                            <option value="308">DEBITO AUTOMATICO – OTRO</option>
+                                            <option value="8">DEPOSITO EN CUENTA</option>
+                                            <option value="71">DEPOSITO EN CUENTA – PAGO ONLINE</option>
+                                            <option value="276">DEPOSITO EN CUENTA – SWIFT – CANAL DE PAGO</option>
+                                            <option value="277">DEPOSITO EN CUENTA – SWIFT – BILLETERA MOVIL</option>
+                                            <option value="278">DEPOSITO EN CUENTA – SWIFT – PAGO ONLINE</option>
+                                            <option value="282">DEPOSITO EN CUENTA – CANAL DE PAGO – BILLETERA MOVIL</option>
+                                            <option value="70">DEPOSITO EN CUENTA – BILLETERA MOVIL</option>
+                                            <option value="284">DEPOSITO EN CUENTA – BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="69">DEPOSITO EN CUENTA – CANAL DE PAGO</option>
+                                            <option value="283">DEPOSITO EN CUENTA – CANAL DE PAGO – PAGO ONLINE</option>
+                                            <option value="5">OTROS</option>
+                                            <option value="33">PAGO ONLINE</option>
+                                            <option value="6">PAGO POSTERIOR</option>
+                                            <option value="62">PAGO POSTERIOR – BILLETERA</option>
+                                            <option value="259">PAGO POSTERIOR – BILLETERA MOVIL - PAGO ONLINE</option>
+                                            <option value="61">PAGO POSTERIOR – CANAL</option>
+                                            <option value="257">PAGO POSTERIOR – CANAL DE PAGO - BILLETERA MOVIL</option>
+                                            <option value="258">PAGO POSTERIOR – CANAL DE PAGO - PAGO ONLINE</option>
+                                            <option value="58">PAGO POSTERIOR – DEPOSITO EN CUENTA</option>
+                                            <option value="245">PAGO POSTERIOR – DEPOSITO EN CUENTA – TRANSFERENCIA SWIFT</option>
+                                            <option value="247">PAGO POSTERIOR – DEPOSITO EN CUENTA – CANAL DE PAGO</option>
+                                            <option value="248">PAGO POSTERIOR – DEPOSITO EN CUENTA – BILLETERA MOVIL</option>
+                                            <option value="249">PAGO POSTERIOR – DEPOSITO EN CUENTA – PAGO ONLINE</option>
+                                            <option value="63">PAGO POSTERIOR – PAGO ONLINE</option>
+                                            <option value="59">PAGO POSTERIOR – SWIFT</option>
+                                            <option value="251">PAGO POSTERIOR – SWIFT - CANAL DE PAGO</option>
+                                            <option value="252">PAGO POSTERIOR – SWIFT - BILLETERA MOVIL</option>
+                                            <option value="253">PAGO POSTERIOR – SWIFT - PAGO ONLINE</option>
+                                            <option value="57">PAGO POSTERIOR – TRANSFERENCIA BANCARIA</option>
+                                            <option value="239">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA</option>
+                                            <option value="240">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – TRANSFERENCIA SWIFT</option>
+                                            <option value="242">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – CANAL DE PAGO</option>
+                                            <option value="243">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – BILLETERA MOVIL</option>
+                                            <option value="244">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – PAGO ONLINE</option>
+                                            <option value="74">SWIFT – BILLETERA MOVIL</option>
+                                            <option value="290">SWIFT – BILLETERA MOVIL  – PAGO ONLINE</option>
+                                            <option value="291">GIFT-CARD – CANAL DE PAGO  – BILLETERA MOVIL</option>
+                                            <option value="292">GIFT-CARD – CANAL DE PAGO  – PAGO ONLINE</option>
+                                            <option value="73">SWIFT – CANAL DE PAGO</option>
+                                            <option value="75">SWIFT – PAGO ONLINE</option>
+                                            <option value="7">TRANSFERENCIA BANCARIA</option>
+                                            <option value="66">TRANSFERENCIA BANCARIA – BILLETERA MOVIL</option>
+                                            <option value="274">TRANSFERENCIA BANCARIA – BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="65">TRANSFERENCIA BANCARIA – CANAL DE PAGO</option>
+                                            <option value="272">TRANSFERENCIA BANCARIA – CANAL DE PAGO – BILLETERA MOVIL</option>
+                                            <option value="273">TRANSFERENCIA BANCARIA – CANAL DE PAGO – PAGO ONLINE</option>
+                                            <option value="260">TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA  – TRANSFERENCIA SWIFT</option>
+                                            <option value="262">TRANSFERENCIA BANCARIA – DEPOSITO  EN CUENTA – CANAL DE PAGO</option>
+                                            <option value="263">TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA   – BILLETERA MOVIL</option>
+                                            <option value="67">TRANSFERENCIA BANCARIA – PAGO ONLINE</option>
+                                            <option value="266">TRANSFERENCIA BANCARIA – SWIFT  – CANAL DE PAGO</option>
+                                            <option value="267">TRANSFERENCIA BANCARIA – SWIFT  – BILLETERA MOVIL</option>
+                                            <option value="268">TRANSFERENCIA BANCARIA – SWIFT  – PAGO ONLINE</option>
+                                            <option value="24">TRANSFERENCIA BANCARIA-DEPOSITO EN CUENTA</option>
+                                            <option value="25">TRANSFERENCIA BANCARIA-TRANSFERENCIA SWIFT</option>
+                                            <option value="264">TRANSFERENCIA BANCARIA– DEPOSITO  EN CUENTA – PAGO ONLINE</option>
+                                            <option value="9">TRANSFERENCIA SWIFT</option>
+                                            <option value="4">VALES</option>
+                                            <option value="55">VALES – BILLETERA MOVIL</option>
+                                            <option value="233">VALES – BILLETERA MOVIL – CANAL DE PAGO</option>
+                                            <option value="234">VALES – BILLETERA MOVIL – BILLETERA MOVIL</option>
+                                            <option value="235">VALES – BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="54">VALES – CANAL DE PAGO</option>
+                                            <option value="227">VALES – CANAL DE PAGO  – TRANSFERENCIA SWIFT</option>
+                                            <option value="229">VALES – CANAL DE PAGO  – CANAL DE PAGO</option>
+                                            <option value="230">VALES – CANAL DE PAGO  – BILLETERA MOVIL</option>
+                                            <option value="231">VALES – CANAL DE PAGO  – PAGO ONLINE</option>
+                                            <option value="22">VALES – DEPOSITO EN CUENTA</option>
+                                            <option value="56">VALES – PAGO ONLINE</option>
+                                            <option value="236">VALES – PAGO ONLINE - CANAL DE PAGO</option>
+                                            <option value="237">VALES – PAGO ONLINE - BILLETERA MOVIL</option>
+                                            <option value="238">VALES – PAGO ONLINE - PAGO ONLINE</option>
+                                            <option value="214">VALES – SWIFT - TRANSFERENCIA BANCARIA</option>
+                                            <option value="215">VALES – SWIFT - DEPOSITO EN CUENTA</option>
+                                            <option value="216">VALES – SWIFT - TRANSFERENCIA SWIFT</option>
+                                            <option value="218">VALES – SWIFT - CANAL DE PAGO</option>
+                                            <option value="219">VALES – SWIFT - BILLETERA MOVIL</option>
+                                            <option value="220">VALES – SWIFT - PAGO ONLINE</option>
+                                            <option value="21">VALES-TRANSFERENCIA BANCARIA</option>
+                                            <option value="23">VALES-TRANSFERENCIA SWIFT</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="otroMetodo(metodoPago)" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
+                                    </form>
+                                </div>
+                                </div>
+                            </b-tab>
+                            <!--<b-tab>
                                 <template #title>
                                     <span class="d-flex align-items-center">
                                         <i class="fa fa-qrcode fa-2x icon-color mr-2" aria-hidden="true"></i>
@@ -1003,7 +1202,7 @@
                                         alt="Código QR" class="img-fluid">
                                     <p class="mt-3">Escanee el código QR para realizar el pago.</p>
                                 </div>
-                            </b-tab>
+                            </b-tab>-->
                         </b-tabs>
                     </div>
                     <!-- <div class="modal-footer">
@@ -1254,7 +1453,6 @@ export default {
             unidadPaquete: 1,
 
             monedaVenta: [],
-
             permitirDevolucion: '',
             saldosNegativos: 1,
             venta_id: 0,
@@ -1268,7 +1466,7 @@ export default {
             tipo_documento: '',
             complemento_id: '',
             descuentoAdicional: 0.00,
-            descuentoGiftCard: 0.00,
+            descuentoGiftCard: '',
             tipo_comprobante: 'FACTURA',
             serie_comprobante: '',
             last_comprobante: 0,
@@ -1314,17 +1512,19 @@ export default {
             paquni: '',
             precioBloqueado: false,
             descuento: 0,
+            descuentoProducto: 0,
             sTotal: 0,
             stock: 0,
             valorMaximoDescuento: '',
             mostrarDireccion: true,
             mostrarCUFD: true,
             casosEspeciales: false,
-            numeroTarjeta: '',
             leyendaAl: '',
             codigoExcepcion: 0,
             mostrarSpinner: false,
             primer_precio_cuota: 0,
+            numeroTarjeta: null,
+            metodoPago: '',
 
             //almacenes
             arrayAlmacenes: [],
@@ -1430,11 +1630,11 @@ export default {
         calcularTotal: function () {
             var resultado = 0.0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
-                resultado += ((this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad) - (this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad * this.arrayDetalle[i].descuento / 100))
+                resultado += ((this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad) - ((this.arrayDetalle[i].precioseleccionado * this.arrayDetalle[i].cantidad) * this.arrayDetalle[i].descuento / 100))
 
             }
             resultado -= this.descuentoAdicional;
-            resultado -= this.descuentoGiftCard;
+            //resultado -= this.descuentoGiftCard;
             return resultado;
         },
 
@@ -1681,9 +1881,13 @@ export default {
             }, 50);
         },
         calcularPrecioConDescuento(precioOriginal, porcentajeDescuento) {
-            const descuento = precioOriginal * (porcentajeDescuento / 100);
+            /*const descuento = precioOriginal * (porcentajeDescuento / 100);
             const precioConDescuento = precioOriginal - descuento;
-            return precioConDescuento; // Ajusta a la cantidad de decimales que desees
+            return precioConDescuento;*/
+            const descuento = this.precioseleccionado * (this.descuentoProducto / 100);
+            const precioConDescuento = this.precioseleccionado - descuento;
+            const precioFinal = precioConDescuento * this.unidadPaquete * this.cantidad;
+            return precioFinal;
         },
         calcularDiasRestantes(fechaFinal) {
             const fechaActual = new Date();
@@ -1709,15 +1913,15 @@ export default {
             if (this.casosEspeciales) {
                 this.$refs.nombreRef.removeAttribute("readonly");
                 this.documento = "99001";
-                this.idcliente = "8";
-                this.tipo_documento = "1";
+                this.idcliente = "2";
+                this.tipo_documento = "5"; 
             } else {
                 this.$refs.nombreRef.setAttribute("readonly", true);
                 this.documento = "";
                 this.idcliente = "";
                 this.tipo_documento = "";
             }
-            },
+        },
         validarDescuentoGiftCard() {
 
             if (this.descuentoGiftCard >= this.calcularTotal) {
@@ -1988,6 +2192,7 @@ export default {
             // let subTotal = subTotalValor.textContent;
             let numeroSerie = null;
             let numeroImei = null;
+            let descuento = ((this.precioseleccionado * this.cantidad) * (this.descuentoProducto / 100)).toFixed(2);
 
             if (this.encuentra(this.arraySeleccionado.id)) {
                 swal({
@@ -2016,7 +2221,8 @@ export default {
                     cantidad: this.cantidad * this.unidadPaquete,
                     cantidad_paquetes: this.arraySeleccionado.unidad_envase,
                     precio: precioArticulo,
-                    descuento: this.arrayPromocion && this.arrayPromocion.porcentaje !== undefined ? this.arrayPromocion.porcentaje : 0,
+                    //descuento: this.arrayPromocion && this.arrayPromocion.porcentaje !== undefined ? this.arrayPromocion.porcentaje : 0,
+                    descuento: this.descuentoProducto,
                     stock: this.arraySeleccionado.saldo_stock,
                     precioseleccionado: this.precioseleccionado
 
@@ -2029,8 +2235,9 @@ export default {
                     descripcion: this.arraySeleccionado.nombre,
                     cantidad: this.cantidad * this.unidadPaquete,
                     unidadMedida: this.arraySeleccionado.codigoClasificador,
-                    precioUnitario: (parseFloat(this.precioseleccionado * this.monedaVenta[0])).toFixed(2),
-                    montoDescuento: ((this.precioseleccionado * this.cantidad * this.monedaVenta[0]) - precioArticulo).toFixed(2),
+                    precioUnitario: parseFloat(this.precioseleccionado).toFixed(2),
+                    //montoDescuento: this.arrayPromocion && this.arrayPromocion.porcentaje ? ((this.arrayPromocion.porcentaje / this.resultadoMultiplicacion) * 100).toFixed(2) : 0,
+                    montoDescuento: descuento,   
                     subTotal: precioArticulo.toFixed(2),
                     numeroSerie: numeroSerie,
                     numeroImei: numeroImei
@@ -2041,8 +2248,82 @@ export default {
                 this.cantidad = 1;
                 this.unidadPaquete = 1;
                 this.codigo = '';
+                this.descuentoProducto = 0;
             }
         },
+
+        /*agregarDetalle() {
+            let actividadEconomica = 461021;
+            // let codigoProductoSin = document.getElementById("codigoProductoSin").value; si hay
+            // let codigoProducto = document.getElementById("codigo").value; si 
+            // let descripcion = document.getElementById("nombre_producto").value; nombre
+            // let cantidad = document.getElementById("cantidad").value; cantidad
+            // let unidadMedida = document.getElementById("codigoClasificador").value;
+            // let precioUnitario = document.getElementById("precio").value; precio  sin descuento
+            // let montoDescuento = document.getElementById("descuento").value; descuento
+            // let subTotalValor = document.getElementById("sTotal");  total con descuento
+            // let subTotal = subTotalValor.textContent;
+            let numeroSerie = null;
+            let numeroImei = null;
+            let descuento = ((this.precioseleccionado * this.cantidad) * (this.descuentoProducto / 100)).toFixed(2);
+
+            if (this.encuentra(this.arraySeleccionado.id)) {
+                swal({
+                    type: 'error',
+                    title: 'Error...',
+                    text: 'Este Artículo ya se encuentra agregado!',
+                })
+            } else {
+                if (this.saldosNegativos === 0 && this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete) {
+                    swal({
+                        type: 'error',
+                        title: 'Error...',
+                        text: 'No hay stock disponible!'
+                    });
+                    return
+                }
+
+                const precioArticulo = (this.calcularPrecioConDescuento(this.resultadoMultiplicacion, this.arrayPromocion ? this.arrayPromocion.porcentaje : 0)) * this.monedaVenta[0]
+                console.log("Este es el precio del articulo: ", precioArticulo);
+                this.arrayDetalle.push({
+                    idkit: -1,
+                    idarticulo: this.arraySeleccionado.id,
+                    articulo: this.arraySeleccionado.nombre,
+                    medida: this.arraySeleccionado.medida,
+                    unidad_envase: this.arraySeleccionado.unidad_envase,
+                    cantidad: this.cantidad * this.unidadPaquete,
+                    cantidad_paquetes: this.arraySeleccionado.unidad_envase,
+                    precio: precioArticulo,
+                    //descuento: this.arrayPromocion && this.arrayPromocion.porcentaje !== undefined ? this.arrayPromocion.porcentaje : 0,
+                    descuento: this.descuentoProducto,
+                    stock: this.arraySeleccionado.saldo_stock,
+                    precioseleccionado: parseFloat(this.precioseleccionado).toFixed(2)
+
+                });
+                console.log(this.arrayDetalle)
+                this.arrayProductos.push({
+                    actividadEconomica: actividadEconomica,
+                    codigoProductoSin: this.arraySeleccionado.codigoProductoSin,
+                    codigoProducto: this.arraySeleccionado.codigo,
+                    descripcion: this.arraySeleccionado.nombre,
+                    cantidad: this.cantidad * this.unidadPaquete,
+                    unidadMedida: this.arraySeleccionado.codigoClasificador,
+                    precioUnitario: parseFloat(this.precioseleccionado).toFixed(2),
+                    //montoDescuento: this.arrayPromocion && this.arrayPromocion.porcentaje ? ((this.arrayPromocion.porcentaje / this.resultadoMultiplicacion) * 100).toFixed(2) : 0,
+                    montoDescuento: descuento,   
+                    subTotal: precioArticulo.toFixed(2),
+                    numeroSerie: numeroSerie,
+                    numeroImei: numeroImei
+                });
+                console.log("pa la factura: ", this.arrayProductos)
+                this.precioBloqueado = true;
+                this.arraySeleccionado = [];
+                this.cantidad = 1;
+                this.unidadPaquete = 1;
+                this.codigo = '';
+                this.descuentoProducto = 0;
+            }
+        },*/
 
         agregarDetalleModal(data) {
             this.scrollToSection();
@@ -2192,7 +2473,7 @@ export default {
             });
             },
 
-            imprimirFactura(id, email) {
+            imprimirFactura(id, correo) {
             swal({
                 title: 'Selecciona un tamaño de factura',
                 type: 'warning',
@@ -2205,7 +2486,7 @@ export default {
             }).then((result) => {
                 if (result.value) {
                     console.log("El boton CARTA fue presionado");
-                    axios.get('/factura/imprimirCarta/' + id + '/' + email, { responseType: 'blob' })
+                    axios.get('/factura/imprimirCarta/' + id + '/' + correo, { responseType: 'blob' })
                         .then(function (response) {
                             window.location.href = "docs/facturaCarta.pdf";
                             console.log("Se generó el factura en Carta correctamente");
@@ -2215,7 +2496,7 @@ export default {
                         });
                 } else if (result.dismiss === swal.DismissReason.cancel) {
                     console.log("El boton ROLLO fue presionado");
-                    axios.get('/factura/imprimirRollo/' + id + '/' + email, { responseType: 'blob' })
+                    axios.get('/factura/imprimirRollo/' + id + '/' + correo, { responseType: 'blob' })
                         .then(function (response) {
                             window.location.href = "docs/facturaRollo.pdf";
                             console.log("Se generó el la factura en Rollo correctamente");
@@ -2268,14 +2549,42 @@ export default {
             return me.errorVenta;
         },
 
+        aplicarDescuento() {
+            const descuentoGiftCard = this.descuentoGiftCard;
+            const numeroTarjeta = this.numeroTarjeta;
+            let idtipo_pago;
+
+            if (numeroTarjeta && descuentoGiftCard) {
+                idtipo_pago = 86;
+            } else if (numeroTarjeta && !descuentoGiftCard) {
+                idtipo_pago = 10;
+            } else {
+                idtipo_pago = descuentoGiftCard ? 35 : 1;
+            }
+
+            this.registrarVenta(idtipo_pago);
+        },
+
+        aplicarCombinacion() {
+            const descuentoGiftCard = this.descuentoGiftCard
+            const idtipo_pago = descuentoGiftCard ? 40 : 2; 
+
+            this.registrarVenta(idtipo_pago);
+        },
+
+        otroMetodo(metodoPago){
+            const idtipo_pago = metodoPago;
+            this.registrarVenta(idtipo_pago);
+        },
         
-        registrarVenta() {
+        registrarVenta(idtipo_pago) {
             if (this.validarVenta()) {
                 return;
             }
 
             let me = this;
             this.mostrarSpinner = true;
+            this.idtipo_pago = idtipo_pago;
 
             for (let i = 0; i < me.cuotas.length; i++) {                
                 console.log('LLEGA ARRAYDATA!', me.cuotas[i]);
@@ -2291,7 +2600,7 @@ export default {
                 'impuesto': this.impuesto,
                 'total': this.calcularTotal,
                 'idAlmacen': this.idAlmacen,
-                'idtipo_pago': this.idtipo_pago ? this.idtipo_pago : 1,
+                'idtipo_pago': idtipo_pago,
                 'idtipo_venta': this.idtipo_venta,
                 'primer_precio_cuota': this.primer_precio_cuota,
                 // Datos para el crédito de venta
@@ -2322,7 +2631,6 @@ export default {
                     me.tipo_documento = 0;
                     me.complemento_id = '';
                     me.documento = '';
-                    me.email = '';
                     me.imagen = '';
                     me.serie_comprobante = '';
                     me.num_comprob = '';
@@ -2390,11 +2698,13 @@ export default {
             let usuario = document.getElementById("usuarioAutenticado").value;
             //let codigoPuntoVenta = this.puntoVentaAutenticado;
             let codigoPuntoVenta = 0;
-            let montoGiftCard = document.getElementById("descuentoGiftCard").value;
             let codigoMetodoPago = this.idtipo_pago;
+            let montoTotalSujetoIva = montoTotal - this.descuentoGiftCard;
+            let correo = document.getElementById("email").value;
 
-            console.log("El monto de Descuento de Gift Card es: " + montoGiftCard);
+            console.log("El monto de Descuento de Gift Card es: " + this.descuentoGiftCard);
             console.log("El tipo de documento es: " + tipoDocumentoIdentidad);
+            console.log("El complemento de documento es: " + complemento);
 
             try {
                 const response = await axios.get('/factura/obtenerLeyendaAleatoria');
@@ -2443,13 +2753,13 @@ export default {
                     complemento: complemento,
                     codigoCliente: numeroDocumento,
                     codigoMetodoPago: codigoMetodoPago,
-                    numeroTarjeta: null,
+                    numeroTarjeta: this.numeroTarjeta,
                     montoTotal: montoTotal,
-                    montoTotalSujetoIva: montoTotal,
+                    montoTotalSujetoIva: montoTotalSujetoIva,
                     codigoMoneda: 1,
                     tipoCambio: 1,
                     montoTotalMoneda: montoTotal,
-                    montoGiftCard: montoGiftCard,
+                    montoGiftCard: this.descuentoGiftCard,
                     descuentoAdicional: descuentoAdicional,
                     codigoExcepcion: this.codigoExcepcion,
                     cafc: null,
@@ -2467,19 +2777,27 @@ export default {
             axios.post('/venta/emitirFactura', {
                 factura: datos,
                 id_cliente: id_cliente,
-                idventa: idventa
+                idventa: idventa,
+                correo: correo
             })
                 .then(function (response) {
                     var data = response.data;
+                    console.log(response);
 
                     if (data === "VALIDADA") {
                         swal(
-                            'FACTURA ' + data,
+                            'FACTURA VALIDADA',
                             'Correctamente',
                             'success'
                         )
                         me.arrayProductos = [];
                         me.codigoExcepcion = 0;
+                        me.idtipo_pago = '';
+                        me.email = '';
+                        me.descuentoGiftCard = '';
+                        me.numeroTarjeta =  null;
+                        me.recibido = '';
+                        me.metodoPago = '';
                         me.cerrarModal2();
                         me.cerrarModal3();
                         me.listarVenta(1, '', 'id');
@@ -2487,6 +2805,15 @@ export default {
                     } else{
                         me.arrayProductos = [];
                         me.codigoExcepcion = 0;
+                        me.idtipo_pago = '';
+                        me.descuentoGiftCard = '';
+                        me.numeroTarjeta =  null;
+                        me.recibido = '';
+                        me.metodoPago = '';
+                        me.cerrarModal2();
+                        me.cerrarModal3();
+                        me.listarVenta(1, '', 'id');
+                        me.mostrarSpinner = false;
                         swal(
                             'FACTURA RECHAZADA',
                             data,
@@ -2496,11 +2823,17 @@ export default {
                 })
                 .catch(function (error) {
                     me.arrayProductos = [];
+                    me.codigoExcepcion = 0;
                     swal(
                         'INTENTE DE NUEVO',
                         'Comunicacion con SIAT fallida',
                         'error');
                     me.mostrarSpinner = false;
+                    me.idtipo_pago = '';
+                    me.numeroTarjeta =  null;
+                    me.descuentoGiftCard = '';
+                    me.recibido = '';
+                    me.metodoPago = '';
                 });
         },
 
@@ -2658,8 +2991,29 @@ export default {
         mostrarSeleccion() {
             console.log('Precio seleccionado:', this.precioseleccionado);
         },
+        
         //--------------ABRIR MODAL------------------
+        registrarAbrilModal() {
+            this.modal2 = 1;
+            this.cliente = this.nombreCliente;
+            console.log('USUARIO LLEGA:', this.cliente);
+            this.tituloModal2 = 'VENTA  AL CONTADO ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
+            this.tipoAccion2 = 1;
+            this.idtipo_venta = 1;
+            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
+            console.log('idtipo_pago LLEGA:', this.idtipo_pago);
+        },
 
+        registrarAbrilModal2() {
+            this.modal3 = 1;
+            this.cliente = this.nombreCliente;
+            console.log('USUARIO LLEGA:', this.cliente);
+            this.tituloModal3 = 'CREDITOS ' + this.cliente; // Usamos '+' para concatenar el nombre del cliente
+            this.tipoAccion3 = 1;
+            this.idtipo_venta = 2;
+            console.log('idtipo_venta LLEGA:', this.idtipo_venta);
+            console.log('idtipo_pago LLEGA:', this.idtipo_pago);
+        },
         cerrarModal2() {
             this.modal2 = 0;
             this.tituloModal2 = '';
