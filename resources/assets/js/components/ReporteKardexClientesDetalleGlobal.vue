@@ -1,7 +1,7 @@
 <template>
     <main class="main">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a> </li>
+            <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
         </ol>
         <div class="container-fluid">
         
@@ -9,19 +9,17 @@
                 <div class="card-header">
                     <i class="fa fa-align-justify"></i> Kardex Clientes Detallado Global
 
-                    <button @click="" class="btn btn-primary" data-toggle="modal" data-target="#modalFiltros">
+                    <button type="button" @click="abrirModal()" class="btn btn-primary">
                         <i class="fa fa-search"></i>&nbsp;Filtros
                     </button>
-                    <button @click="exportarExcel()" class="btn btn-success">
+                    <button type="button" @click="exportarExcel()" class="btn btn-success">
                         <i class="icon-doc"></i>&nbsp;Exportar a EXCEL
                     </button>
-                    <button @click="exportarPDF()" class="btn btn-danger">
+                    <button type="button" @click="exportarPDF()" class="btn btn-danger">
                         <i class="icon-doc"></i>&nbsp;Exportar a PDF
                     </button>
                 </div>
 
-                <br>
-                
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped table-sm">
@@ -49,68 +47,67 @@
                                         <td>{{ detalle.impuesto }}</td>
                                         <td>{{ detalle.total }}</td>
                                         <td>{{ 0 }}</td>
-
-
-
-                                        
                                     </tr>
                                 </tbody>
                         </table>
-
-                        <hr>
-                        
-                    </div>   
+                    </div>
                 </div>
             </div>
         </div>
-
-
-        <div class="modal fade" id="modalFiltros" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+        
+        <!-- contenido del modal -->
+        <div class="modal" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title font-weight-bold">Filtros de reportes</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <h4 class="modal-title">Filtros</h4>
+                        <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
+                            <span aria-hidden="true">×</span>
                         </button>
                     </div>
+
                     <div class="modal-body">
-                        <form>
-                            <div class="form-row">
+                            <div class="row">
+
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="font-weight-bold">VENDEDORES: <span class="text-danger">*</span></label>
-                                        <select class="form-control" v-model="vendedorId" @change="">
+                                        <label class="font-weight-bold">Vendedor
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <v-select :on-search="selectVendedor" label="nombre" :options="arrayEjecutivos" placeholder="Buscar encargado..." :onChange="getDatosVendedor">
+                                        </v-select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="" class="font-weight-bold">Cliente
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <v-select :on-search="selectCliente" label="num_documento" :options="arrayClientes" placeholder="Num de documento ..." :onChange="getDatosCliente" @input="validarCliente">
+                                        </v-select>
+                                        <small v-if="clienteId">{{ nombre_cliente }}</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Sucursal
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <select v-model="sucursalId" class="form-control">
                                             <option value="0" disabled>Seleccione</option>
-                                            <option value="todos">TODOS</option>
-                                            <option v-for="opcion in arrayEjecutivos" :key="opcion.id" :value="opcion.id">{{ opcion.nombre }}</option>
+                                            <option value="todos">*TODOS*</option>
+                                            <option v-for="sucursal in arraySucursales" :key="sucursal.id" :value="sucursal.id" v-text="sucursal.nombre">
+                                            </option>
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="font-weight-bold">SUCURSAL: <span class="text-danger">*</span></label>
-                                        <select class="form-control" v-model="sucursalId" @change="">
-                                            <option value="0" disabled>Seleccione</option>
-                                            <option value="todos">TODOS</option>
-                                            <option v-for="opcion in arraySucursales" :key="opcion.id" :value="opcion.id">{{ opcion.nombre }}</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="font-weight-bold">CLIENTES: <span class="text-danger">*</span></label>
-                                        <select class="form-control" v-model="clienteId" @change="">
-                                            <option value="0" disabled>Seleccione</option>
-                                            <option value="todos">TODOS</option>
-                                            <option v-for="opcion in clientes" :key="opcion.id" :value="opcion.id">{{ opcion.nombre }}</option>
-                                        </select>
-                                    </div>
-                                </div>
+
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="font-weight-bold">TIPO COMPROBANTE: <span class="text-danger">*</span></label>
-                                        <select class="form-control" v-model="tipo_comprobante" @change="">
+                                        <select class="form-control" v-model="tipo_comprobante">
                                             <option value="0" disabled>Seleccione</option>
                                             <option value="todos">TODOS</option>
                                             <option value="FACTURA">Factura</option>
@@ -129,20 +126,22 @@
                                     <input type="date" id="fechaFin" v-model="fechaFin" @change="" class="form-control">
                                 </div>
                             </div>
-                            
-                        </form>
                     </div>
+
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                        <button type="button" class="btn btn-primary" @click="generarReporte()" data-dismiss="modal"    >Generar Reporte</button>
+                        <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
+                        <button type="button" class="btn btn-primary" @click="generarReporte()">Generar Reporte</button>
                     </div>
                 </div>
             </div>
         </div>
+
     </main>
 </template>
 
 <script>
+import vSelect from 'vue-select';
+
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx-js-style';
@@ -160,19 +159,25 @@ data() {
         },
         offset: 3,
         currentPage: 1,
-        
+
         arraySucursales : [],
         arrayEjecutivos : [],
         arrayDetalles: [],
+        arrayClientes: [],
 
-        clientes: [],
-        vendedorId: null,
-        sucursalId: null,
-        clienteId: null,
-        tipo_comprobante: null,
+        modal: 0,
+
+        nombre_cliente: '',
+        vendedorId: 'todos',
+        sucursalId: 'todos',
+        tipo_comprobante: 'todos',
+        clienteId: false,
         fechaInicio: '2024-01-01',
-        fechaFin: '2024-12-30',
+        fechaFin: '2024-06-30',
     }
+},
+components: {
+    vSelect
 },
 computed: {
     isActived: function () {
@@ -201,7 +206,24 @@ computed: {
         return pagesArray;
     },
 },
-methods: {        
+methods: {
+    validarCliente() {
+        this.clienteId = this.arrayCliente && this.arrayCliente.length > 0;
+    },
+
+    abrirModal() {
+        this.modal = 1;
+    },
+
+    cerrarModal() {
+        this.modal = 0;
+        this.sucursalId = 'todos',
+        this.tipo_comprobante = 'todos';
+        this.fechaInicio = '2024-01-01';
+        this.fechaFin = '2024-06-30';
+        console.log('cerrando modal');
+    },
+
     selectSucursal() {
         let me = this;
         var url = '/sucursal/selectSucursal';
@@ -214,30 +236,51 @@ methods: {
             console.log(error);
         });
     },
-    selectEjecutivos() {
+
+    selectVendedor(search) {
         let me = this;
-        var url = '/user/selectUser/rol?filtro=' + 2;
+        let url = '/user/selectUser/filter?filtro=' + search;
         axios.get(url).then(function (response) {
-            var respuesta = response.data;
+            let respuesta = response.data;
             me.arrayEjecutivos = respuesta.usuarios;
-            console.log('Ejecutivos',me.arrayEjecutivos);
+            console.log(me.arrayEjecutivos)
         })
         .catch(function (error) {
             console.log(error);
         });
     },
-    selectCliente() {
+
+    selectCliente(numero) {
         let me = this;
-        var url = '/cliente/selectCliente';
+        var url = '/cliente/selectClientePorNumero?numero=' + numero;
         axios.get(url).then(function (response) {
-            var respuesta = response.data;
-            me.clientes = respuesta.clientes;
-            console.log('CLIENTES',me.clientes);
+            let respuesta  = response.data;
+            q: numero
+            me.arrayClientes = respuesta.clientes;
+            console.log(me.arrayCliente);
         })
         .catch(function (error) {
             console.log(error);
         });
     },
+
+
+    getDatosVendedor(val1) {
+        let me = this;
+        me.loading = true;
+        me.vendedorId = val1.id;
+        console.log(this.vendedorId);
+    },
+
+    getDatosCliente(val1) {
+        let me = this;
+        me.loading = true;
+        me.clienteId = val1.id;
+        me.nombre_cliente = val1.nombre;
+        console.log(this.clienteId);
+        console.log(this.nombre_cliente);
+    },
+
     generarReporte() {
         let me = this;
         
@@ -273,6 +316,8 @@ methods: {
         .catch(function (error) {
             console.log(error);
         });
+
+        this.cerrarModal();
     },
 
 
@@ -350,8 +395,6 @@ methods: {
 },
 mounted() {
         this.selectSucursal();
-        this.selectEjecutivos();
-        this.selectCliente();
     }
 }
 </script>

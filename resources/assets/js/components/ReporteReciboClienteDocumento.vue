@@ -270,10 +270,11 @@ export default {
 
         cerrarModal() {
             this.modal = 0;
-            this.vendedorId = 'todos';
             this.sucursalId = 'todos';
             this.tipoPagoId = 'todos',
             this.ventaEstado = 'todos',
+            this.fechaInicio = '2024-01-01';
+            this.fechaFin = '2024-06-30';
             console.log('cerrarndo el modal');
         },
 
@@ -367,6 +368,9 @@ export default {
                 q: numero
                 me.arrayCliente = respuesta.clientes;
                 console.log(me.arrayCliente);
+            })
+            .catch(function (error) {
+                console.log(error);
             });
         },
 

@@ -246,7 +246,6 @@ export default {
 
         cerrarModal() {
             this.modal = 0;
-            this.vendedorId = 'todos';
             this.sucursalId = 'todos';
             console.log('cerrarndo el modal');
         },
