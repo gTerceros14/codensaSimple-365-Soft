@@ -33,6 +33,10 @@ Vue.component(
 );
 
 Vue.component("AbonarCuota", require("./components/creditos/AbonarCuota.vue"));
+Vue.component(
+  "ImportarExcel",
+  require("./components/productos/ImportarExcel.vue")
+);
 
 Vue.component("icon-button", require("./components/buttons/IconButton.vue"));
 
@@ -45,6 +49,9 @@ Vue.component("articulo", require("./components/Articulo.vue"));
 
 Vue.component("ofertas", require("./components/Ofertas.vue"));
 Vue.component("kits", require("./components/Kits.vue"));
+
+Vue.component("bancos", require("./components/Bancos.vue"));
+Vue.component("transferencias", require("./components/Transferencias.vue"));
 
 Vue.component("ingreso", require("./components/Ingreso.vue"));
 Vue.component("cliente", require("./components/Cliente.vue"));
@@ -168,6 +175,7 @@ Vue.component(
   "reportekardexfisico",
   require("./components/ReporteKardexFisico.vue")
 );
+
 Vue.component(
   "resumenclientes",
   require("./components/ReporteResumenClientes.vue")
@@ -180,6 +188,16 @@ Vue.component(
   "kardexclientesresumenglobal",
   require("./components/ReporteKardexClientesResumenGlobal.vue")
 );
+Vue.component(
+  "reciboclientexdocumento",
+  require("./components/ReporteReciboClienteDocumento.vue")
+);
+
+Vue.component(
+  "resumenventasycobranzas",
+  require("./components/ReporteResumenVentasYCobranzas.vue")
+)
+
 Vue.component(
   "resumenventaxdocumento",
   require("./components/ReporteResumenVentasXDocumento.vue")
@@ -199,7 +217,6 @@ Vue.component(
   "reportefisicomovimientos",
   require("./components/ReporteDetalladoFisicoMovimientos.vue")
 );
-
 
 Vue.component(
   "ventasinstitucionales",
@@ -249,6 +266,11 @@ Vue.component(
   require("./components/Tables/TransaccionExtra.vue")
 );
 
+Vue.component(
+  "mayoreo",
+  require("./components/OfertasEspecialesMayoreo.vue")
+);
+
 Vue.use(BootstrapVue);
 Vue.use(Toasted);
 const app = new Vue({
@@ -257,7 +279,7 @@ const app = new Vue({
     menu: 0,
     notifications: [],
   },
-  mounted() {},
+  mounted() { },
   created() {
     let me = this;
     axios

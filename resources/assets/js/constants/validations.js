@@ -60,6 +60,64 @@ export const esquemaKits = yup.object().shape({
     .min(1, "El precio no puede ser menor o igual que 0")
     .typeError("Debe ser un número"),
   fecha_final: yup.string().required("La fecha final es obligatoria"),
+  
+});
+
+export const esquemaOfertasEspeciales = yup.object().shape({
+  nombre: yup
+    .string()
+    .required("El nombre es obligatorio")
+    .max(80, "El nombre no puede tener más de 80 caracteres"),
+  fecha_final: yup.string().required("La fecha final es obligatoria"),
+
+  precio_r1: yup
+  .number()
+  .required("El precio del rango 1 es obligatorio")
+  .min(1, "El precio no puede ser menor o igual que 0")
+  .typeError("Debe ser un número"),
+  rango_inicio_r1: yup
+  .number()
+  .required("El rango inicio 1 es obligatorio")
+  .min(1, "El rango no puede ser menor o igual que 0")
+  .typeError("Debe ser un número"),
+  rango_final_r1: yup
+    .number()
+    .required("El precio es obligatorio")
+    .min(yup.ref('rango_inicio_r1'), "El rango final debe ser mayor que el rango inicial")
+    .typeError("Debe ser un número"),
+  
+    precio_r2: yup
+    .number()
+    .required("El precio del rango 2 es obligatorio")
+    .min(1, "El precio no puede ser menor o igual que 0")
+    .typeError("Debe ser un número"),
+    rango_inicio_r2: yup
+    .number()
+    .required("El precio es obligatorio")
+    .min(yup.ref('rango_final_r1'), "El rango inicio 2 debe ser mayor al rango final 1")
+    .typeError("Debe ser un número"),
+    rango_final_r2: yup
+    .number()
+    .required("El precio es obligatorio")
+    .min(yup.ref('rango_inicio_r2'), "El rango final 2 debe ser mayor al rango inicio 2")
+    .typeError("Debe ser un número"),
+  
+    precio_r3: yup
+    .number()
+    .required("El precio es obligatorio")
+    .min(1, "El precio no puede ser menor o igual que 0")
+    .typeError("Debe ser un número"),
+    rango_inicio_r3: yup
+    .number()
+    .required("El precio es obligatorio")
+    .min(yup.ref('rango_final_r2'), "El rango inicio 3 debe ser mayor al rango final 2")
+    .typeError("Debe ser un número"),
+    rango_final_r3: yup
+    .number()
+    .required("El precio es obligatorio")
+    .min(yup.ref('rango_inicio_r3'), "El rango final 3 debe ser mayor al rango inicio 3")
+    .typeError("Debe ser un número"),
+  
 });
 
 export const esquemaOfertas = yup.object().shape({
@@ -171,4 +229,34 @@ export const esquemaCliente = yup.object().shape({
     .string()
     .email("El correo electrónico debe tener un formato válido")
     .required("El correo electrónico es obligatorio"),
+});
+
+export const esquemaPuntoDeVenta = yup.object().shape({
+  nombre: yup
+    .string()
+    .required("El nombre del punto de venta es obligatorio")
+    .max(
+      100,
+      "El nombre del punto de venta no puede tener más de 100 caracteres"
+    ),
+  nit: yup.string().required("El NIT del punto de venta es obligatorio"),
+  descripcion: yup
+    .string()
+    .required("La descripción del punto de venta es obligatoria"),
+  idtipopuntoventa: yup
+    .string()
+    .required("El tipo de punto de venta es obligatorio"),
+  idsucursal: yup.string().required("La sucursal es obligatoria"),
+});
+
+export const esquemaBanco = yup.object().shape({
+  nombre_cuenta: yup.string().required("El nombre de la cuenta es obligatorio"),
+
+  nombre_banco: yup.string().required("El nombre del banco es obligatorio"),
+  numero_cuenta: yup
+    .number()
+    .typeError("El número de cuenta debe ser un número")
+    .required("El número de cuenta es obligatorio")
+    .min(1, "El número de cuenta no puede ser igual o menor a cero"),
+  tipo_cuenta: yup.string().required("El tipo de cuenta es obligatorio"),
 });

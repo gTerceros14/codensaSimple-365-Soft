@@ -23,13 +23,28 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Puntos de
                             Venta</a>
                     </li>
-                    <li @click="menu=15" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Moneda</a>
-                    </li>
+
+                </ul>
+            </li>
+            <li class="nav-item nav-dropdown">
+                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-usd"></i>
+                    Finanzas</a>
+                <ul class="nav-dropdown-items">
                     <li @click="menu=16" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Apertura/Cierre
                             Caja</a>
                     </li>
+                    <li @click="menu=66" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Transferencias</a>
+                    </li>
+                    <li @click="menu=65" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Bancos</a>
+                    </li>
+
+                    <li @click="menu=15" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Moneda</a>
+                    </li>
+
                 </ul>
             </li>
             <li class="nav-item nav-dropdown">
@@ -119,6 +134,10 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kits</a>
                     </li>
 
+                    <li @click="menu=67" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Mayoreo</a>
+                    </li>
+
                     <li @click="menu=18" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Marca</a>
                     </li>
@@ -154,9 +173,9 @@
                 <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-line-chart"></i> Reportes Inventario</a>
                 <ul class="nav-dropdown-items">
 
-                    <li @click="menu=49" class="nav-item">
+                    <!--<li @click="menu=49" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventarios</a>
-                    </li>
+                    </li>-->
                     <li @click="menu=51" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Fisico Valorado</a>
                     </li>
@@ -217,10 +236,17 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Clientes Resumen Global</a>
                     </li>
 
-                    
+                    <li @click="menu=61" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Detalle - Recibo Cliente Por Documento</a>
+                    </li>
+
+                    <li @click="menu=68" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas Y Cobranzas</a>
+                    </li>
+
                 </ul>
             </li>
-               
+
             <li class="nav-item nav-dropdown">
                 <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-info"></i>SIAT</a>
                 <ul class="nav-dropdown-items">
@@ -255,12 +281,10 @@
             </li>
 
             <li @click="menu=11" class="nav-item">
-                <a class="nav-link" href="#"><i class="fa fa-question-circle"></i> Ayuda <span
-                        class="badge badge-danger">PDF</span></a>
+                <a class="nav-link" href="#"><i class="fa fa-question-circle"></i> Ayuda <span class="badge badge-danger">PDF</span></a>
             </li>
             <li @click="menu=12" class="nav-item">
-                <a class="nav-link" href="#"><i class="fa fa-info-circle"></i> Acerca de...<span
-                        class="badge badge-info">IT</span></a>
+                <a class="nav-link" href="#"><i class="fa fa-info-circle"></i> Acerca de...<span class="badge badge-info">IT</span></a>
             </li>
 
 

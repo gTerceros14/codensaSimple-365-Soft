@@ -19,11 +19,14 @@
                     <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
 
                 </div>
+
+                <template v-if="listado == 1">
                 <div class="card-body"  style="max-height: 600px; overflow-y: auto;" >
                     <div class = "table-resposive" > 
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
+                                    <th>Opciones</th>
                                     <th>C.C</th>
                                     <th>NUM COMPROBANTE</th>
                                     <th>FECHA</th>
@@ -35,50 +38,240 @@
                             </thead>
                             <tbody>
                                 <tr v-for="articulo in sortedResultados" :key="articulo.id">
+                                    <td class="d-flex align-items-center">
+                                            <button type="button" @click="verDetalle(articulo)"
+                                                class="btn btn-success btn-sm mr-1">
+                                                <i class="icon-eye"></i>
+                                            </button></td>
                                     <td v-text="articulo.tipo"></td>
                                     <td v-text="articulo.num_comprobante"></td>
                                     <td v-text="articulo.fecha_hora"></td>
-                                    <td v-text="articulo.tipo_comprobante"></td>
-                                    <td v-if="articulo.tipo === 'Ingreso'" v-text="articulo.cantidad"></td>
+                                    <td v-if="articulo.tipo === 'Traspaso'" v-text="articulo.almacen_destino"></td>
+                                        <td v-else v-text="articulo.tipo_comprobante"></td>
+
+                                    <td v-if="articulo.tipo === 'Ingreso' || articulo.tipo_traspaso === 'Entrada'" v-text="articulo.cantidad"></td>
                                     <td v-else>0</td>
-                                    <td v-if="articulo.tipo === 'Venta'" v-text="articulo.cantidad"></td>
+                                    <td v-if="articulo.tipo === 'Venta' || articulo.tipo_traspaso === 'Salida'" v-text="articulo.cantidad"></td>
                                     <td v-else>0</td>
+                                    
                                     <td v-text="articulo.resultado_operacionFisico"></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    
-                    <!--<nav>
-                        <ul class="pagination">
-                            <li class="page-item" v-if="pagination.current_page > 1">
-                                <a class="page-link" href="#"
-                                    @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
-                            </li>
-                            <li class="page-item" v-for="page in pagesNumber" :key="page"
-                                :class="[page == isActived ? 'active' : '']">
-                                <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                    v-text="page"></a>
-                            </li>
-                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                <a class="page-link" href="#"
-                                    @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
-                            </li>
-                        </ul>
-                    </nav>-->
-
                 </div>
-                <div class="text-right">
-                            <strong>Total Saldo Fisico: </strong> {{ total_saldofisico }} Unidades
+                    <div class="text-right">
+                        <strong>Total Saldo Fisico: </strong> {{ total_saldofisico }} Unidades
                     </div>
+                </template>
+
+                <template v-else-if="listado == 2">
+                    <div class="card-body">
+                        <div class="form-group row border">
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <p v-text="cliente"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="">Impuesto</label>
+                                <p v-text="impuesto"></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Tipo Comprobante</label>
+                                    <p v-text="tipo_comprobante"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Serie Comprobante</label>
+                                    <p v-text="serie_comprobante"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Número Comprobante</label>
+                                    <p v-text="num_comprobante"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row border">
+                            <div class="table-responsive col-md-12">
+                                <table class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Artículo</th>
+                                            <th>Precio</th>
+                                            <th>Cantidad</th>
+                                            <th>Descuento</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="arrayDetalle.length">
+                                        <tr v-for="detalle in arrayDetalle" :key="detalle.id">
+                                            <td v-text="detalle.articulo">
+                                            </td>
+
+                                            <td>
+                                                {{ ((detalle.precio / detalle.cantidad) * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                                                    monedaPrincipal[1] }}
+
+                                            </td>
+                                            <td v-text="detalle.cantidad">
+                                            </td>
+                                            <td v-text="detalle.descuento">
+                                            </td>
+                                            <td>
+                                                {{ (((detalle.precio/detalle.cantidad) * detalle.cantidad - detalle.descuento)
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Parcial:</strong>
+                                            </td>
+                                            <td>
+                                                {{ ((totalParcial = (total - totalImpuesto))
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+                                            </td>
+
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
+                                            <td>
+                                                {{ ((totalImpuesto = (total * impuesto))
+                                                    * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Neto:</strong></td>
+                                            <td>
+                                                {{ ((total) * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-else>
+                                        <tr>
+                                            <td colspan="5">
+                                                No hay articulos agregados
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template v-else-if="listado == 3">
+                    <div class="card-body">
+                        <div class="form-group row border">
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <label for="">Proveedor</label>
+                                    <p v-text="proveedor"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="">Impuesto</label>
+                                <p v-text="impuesto"></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Tipo Comprobante</label>
+                                    <p v-text="tipo_comprobante"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Serie Comprobante</label>
+                                    <p v-text="serie_comprobante"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Número Comprobante</label>
+                                    <p v-text="num_comprobante"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row border">
+                            <div class="table-responsive col-md-12">
+                                <table class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Artículo</th>
+                                            <th>Precio</th>
+                                            <th>Cantidad</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="arrayDetalle.length">
+                                        <tr v-for="detalle in arrayDetalle" :key="detalle.id">
+                                            <td v-text="detalle.articulo">
+                                            </td>
+                                            <td >
+                            {{( detalle.precio *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+
+                                            </td>
+                                            <td v-text="detalle.cantidad">
+                                            </td>
+                                            <td>
+                            {{( ( detalle.precio * detalle.cantidad ) *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="3" align="right"><strong>Total Parcial:</strong></td>
+                                            <td>
+                            {{( (totalParcial=(total - totalImpuesto)) *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+                                            
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="3" align="right"><strong>Total Impuesto:</strong></td>
+                                            <td>
+                            {{( (totalImpuesto=(total * impuesto)) *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+                                            
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="3" align="right"><strong>Total Neto:</strong></td>
+                                            <td>
+                            {{(total *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+                                            
+                                                </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-else>
+                                        <tr>
+                                            <td colspan="4">
+                                                No hay articulos agregados
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
-            <!-- Fin ejemplo de tabla Listado -->
         </div>
-        <!-- MODAL LISTADO DE MARCAS -->
 
-        <!-- contenido del modal -->
 
-        <!--Inicio del modal agregar/actualizar-->
         <div class="modal" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
@@ -540,7 +733,8 @@ export default {
                 idindustria: null,
                 idgrupo: null,
                 idproveedor: null,
-                idmedida: null
+                idmedida: null,
+                tipo: '',
             },
             errores: {},
 
@@ -727,6 +921,7 @@ export default {
             descripcion_corta: '',
             medidaseleccionada: [],
 
+
             //Sucursal
             arraySucursal:[],
             sucursalseleccionada:[],
@@ -739,6 +934,21 @@ export default {
             //fechas
             fechaInicio:'',
             fechaFin:'',
+
+            //Listados
+            listado: 1,
+            arrayDetalle: [],
+            cliente: '',
+            totalImpuesto: 0.0,
+            tipo_comprobante: 'BOLETA',
+            serie_comprobante: '',
+            num_comprobante: '',
+            impuesto: 0.18,
+            proveedor: '',
+            monedaCompra:[],
+
+
+            
         }
     },
     components: {
@@ -1143,6 +1353,115 @@ export default {
             return precioP.toFixed(2);
         },
         //-------------hasta qui calcular -----------
+
+        verDetalle(articulo) {
+            if (articulo.tipo === 'Ingreso') {
+                this.verIngreso(articulo.id);
+            } else if (articulo.tipo === 'Venta') {
+                this.verVenta(articulo.id);
+            }
+        },
+
+        verVenta(id) {
+            let me = this;
+            me.listado = 2;
+
+            //Obtener datos del ingreso
+            var arrayVentaT = [];
+            var url = '/venta/obtenerCabecera?id=' + id;
+
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                arrayVentaT = respuesta.venta;
+                console.log("VIENDO ", respuesta)
+
+                me.cliente = arrayVentaT[0]['nombre'];
+                me.tipo_comprobante = arrayVentaT[0]['tipo_comprobante'];
+                me.serie_comprobante = arrayVentaT[0]['serie_comprobante'];
+                me.num_comprobante = arrayVentaT[0]['num_comprobante'];
+                me.impuesto = arrayVentaT[0]['impuesto'];
+                me.total = arrayVentaT[0]['total'];
+                console.log("cabeza venta")
+
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+            //obtener datos de los detalles
+            var url = '/venta/obtenerDetalles?id=' + id;
+
+            axios.get(url).then(function (response) {
+                //console.log(response);
+                var respuesta = response.data;
+                me.arrayDetalle = respuesta.detalles;
+                console.log("detalle venta")
+
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        verIngreso(id) {
+            let me = this;
+            me.listado = 3;
+
+            //Obtener datos del ingreso
+            var arrayIngresoT = [];
+            var url = '/ingreso/obtenerCabecera?id=' + id;
+
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                arrayIngresoT = respuesta.ingreso;
+
+                me.proveedor = arrayIngresoT[0]['nombre'];
+                me.tipo_comprobante = arrayIngresoT[0]['tipo_comprobante'];
+                me.serie_comprobante = arrayIngresoT[0]['serie_comprobante'];
+                me.num_comprobante = arrayIngresoT[0]['num_comprobante'];
+                me.impuesto = arrayIngresoT[0]['impuesto'];
+                me.total = arrayIngresoT[0]['total'];
+                console.log("cabeza ingreso")
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+            //obtener datos de los detalles
+            var url = '/ingreso/obtenerDetalles?id=' + id;
+
+            axios.get(url).then(function (response) {
+                console.log(response);
+                var respuesta = response.data;
+                me.arrayDetalle = respuesta.detalles;
+                console.log("detalle ingreso:",me.arrayDetalle)
+
+
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        ocultarDetalle() {
+            this.listado = 1;
+            this.codigo = null;
+            this.arrayArticulo.length = 0;
+            this.precioseleccionado = null;
+            this.medida = null;
+            this.nombreCliente = null;
+            this.documento = null;
+            this.email = null;
+            this.idAlmacen = null;
+            this.arrayProductos = [];
+            this.arrayDetalle = [];
+            this.precioBloqueado = false;
+
+        },
+
+
+
+
         seleccionar(selected) {
             if (this.tituloModal2 == "Marcas") {
                 this.marcaseleccionadaVacio = false;
@@ -1465,7 +1784,7 @@ export default {
             // Merge de celdas para el título
             worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
             // Título del reporte
-            worksheet['A1'] = { t: 's', v: 'REPORTE KARDEX INVENTARIO FISICO VALORADO', s: { 
+            worksheet['A1'] = { t: 's', v: 'REPORTE KARDEX INVENTARIO FISICO', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
                 alignment: { horizontal: 'center', vertical: 'center' },
                 fill: { fgColor: { rgb: '3669a8' } } } };
@@ -1497,8 +1816,8 @@ export default {
                     item.num_comprobante,
                     item.fecha_hora,
                     item.tipo_comprobante,
-                    item.tipo === 'Ingreso' ? item.cantidad : '',
-                    item.tipo === 'Venta' ? item.cantidad : '',
+                    item.tipo === 'Ingreso' || item.tipo_traspaso ==='Entrada' ? item.cantidad : '',
+                    item.tipo === 'Venta' || item.tipo_traspaso ==='Salida'? item.cantidad : '',
                     item.resultado_operacionFisico,
                 ];
 
@@ -2227,6 +2546,8 @@ export default {
                 me.mostrarCostos = respuesta.configuracionTrabajo.mostrarCostos;
                 me.mostrarProveedores = respuesta.configuracionTrabajo.mostrarProveedores;
 
+                
+                me.monedaCompra=[respuesta.configuracionTrabajo.valor_moneda_compra,respuesta.configuracionTrabajo.simbolo_moneda_compra]
                 me.monedaPrincipal = [respuesta.configuracionTrabajo.valor_moneda_principal, respuesta.configuracionTrabajo.simbolo_moneda_principal]
                 console.log("MostrarCostos: " + me.mostrarCostos);
                 console.log("ProveedorEstado: " + me.mostrarProveedores);

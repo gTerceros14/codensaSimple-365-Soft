@@ -75,33 +75,33 @@ class VentaController extends Controller
                     'ventas.total as total',
                     'ventas.idtipo_venta',
                     'ventas.estado as estado',
-                    'personas.nombre as razonSocial', 
-                    'personas.email as email', 
-                    'personas.num_documento as documentoid', 
+                    'personas.nombre as razonSocial',
+                    'personas.email as email',
+                    'personas.num_documento as documentoid',
                     'personas.complemento_id as complementoid',
                     'users.usuario as usuario'
                 )
                 ->orderBy('facturas.id', 'desc')->paginate(3);
         } else {
             $ventas = Factura::join('ventas', 'facturas.idventa', '=', 'ventas.id')
-            ->join('personas', 'facturas.idcliente', '=', 'personas.id')
-            ->join('users', 'ventas.idusuario', '=', 'users.id')
-            ->select(
-                'facturas.*',
-                'ventas.tipo_comprobante as tipo_comprobante',
-                'ventas.serie_comprobante',
-                'ventas.num_comprobante as num_comprobante',
-                'ventas.fecha_hora as fecha_hora',
-                'ventas.impuesto as impuesto',
-                'ventas.total as total',
+                ->join('personas', 'facturas.idcliente', '=', 'personas.id')
+                ->join('users', 'ventas.idusuario', '=', 'users.id')
+                ->select(
+                    'facturas.*',
+                    'ventas.tipo_comprobante as tipo_comprobante',
+                    'ventas.serie_comprobante',
+                    'ventas.num_comprobante as num_comprobante',
+                    'ventas.fecha_hora as fecha_hora',
+                    'ventas.impuesto as impuesto',
+                    'ventas.total as total',
                     'ventas.idtipo_venta',
-                'ventas.estado as estado',
-                'personas.nombre as razonSocial', 
-                'personas.email as email', 
-                'personas.num_documento as documentoid', 
-                'personas.complemento_id as complementoid',
-                'users.usuario as usuario'
-            )
+                    'ventas.estado as estado',
+                    'personas.nombre as razonSocial',
+                    'personas.email as email',
+                    'personas.num_documento as documentoid',
+                    'personas.complemento_id as complementoid',
+                    'users.usuario as usuario'
+                )
                 ->where('facturas.' . $criterio, 'like', '%' . $buscar . '%')
                 ->orderBy('facturas.id', 'desc')->paginate(6);
         }
@@ -143,9 +143,9 @@ class VentaController extends Controller
                     'ventas.impuesto as impuesto',
                     'ventas.total as total',
                     'ventas.estado as estado',
-                    'personas.nombre as razonSocial', 
-                    'personas.email as email', 
-                    'personas.num_documento as documentoid', 
+                    'personas.nombre as razonSocial',
+                    'personas.email as email',
+                    'personas.num_documento as documentoid',
                     'personas.complemento_id as complementoid',
                     'users.usuario as usuario'
                 )
@@ -163,9 +163,9 @@ class VentaController extends Controller
                     'ventas.impuesto as impuesto',
                     'ventas.total as total',
                     'ventas.estado as estado',
-                    'personas.nombre as razonSocial', 
-                    'personas.email as email', 
-                    'personas.num_documento as documentoid', 
+                    'personas.nombre as razonSocial',
+                    'personas.email as email',
+                    'personas.num_documento as documentoid',
                     'personas.complemento_id as complementoid',
                     'users.usuario as usuario'
                 )
@@ -419,8 +419,8 @@ class VentaController extends Controller
             }
             $venta = $this->crearVenta($request);
 
-           $this->actualizarCaja($request);
-            
+            $this->actualizarCaja($request);
+
 
             $this->registrarDetallesVenta($venta, $request->data, $request->idAlmacen);
 
@@ -470,7 +470,7 @@ class VentaController extends Controller
         } else {
             $venta->estado = 'Registrado';
         }
-        
+
         $venta->idcaja = Caja::latest()->first()->id;
         $venta->save();
 
@@ -535,41 +535,41 @@ class VentaController extends Controller
 
 
     private function actualizarCaja($request)
-{
+    {
 
-    $ultimaCaja = Caja::latest()->first();
+        $ultimaCaja = Caja::latest()->first();
 
-    if ($request->idtipo_pago == 1) {
-        // Actualizar caja en ventas y ventas efectivo
-        // Código para ventas en efectivo
+        if ($request->idtipo_pago == 1) {
+            // Actualizar caja en ventas y ventas efectivo
+            // Código para ventas en efectivo
 
-        if ($request->idtipo_venta == 2) {
-            // Sumar a ventas crédito
-            // Código para ventas a crédito
-            $ultimaCaja->ventas += $request->primer_precio_cuota;
-           $ultimaCaja->pagosEfectivoVentas += $request->primer_precio_cuota;
-           $ultimaCaja->ventasCredito += $request->primer_precio_cuota;
-           $ultimaCaja->saldoCaja += $request->primer_precio_cuota;
-        } else {
-            // Sumar a ventas contado
-            // Código para ventas a contado
-            $ultimaCaja->ventasContado += $request->total;
+            if ($request->idtipo_venta == 2) {
+                // Sumar a ventas crédito
+                // Código para ventas a crédito
+                $ultimaCaja->ventas += $request->primer_precio_cuota;
+                $ultimaCaja->pagosEfectivoVentas += $request->primer_precio_cuota;
+                $ultimaCaja->ventasCredito += $request->primer_precio_cuota;
+                $ultimaCaja->saldoCaja += $request->primer_precio_cuota;
+            } else {
+                // Sumar a ventas contado
+                // Código para ventas a contado
+                $ultimaCaja->ventasContado += $request->total;
+                $ultimaCaja->ventas += $request->total;
+                $ultimaCaja->pagosEfectivoVentas += $request->total;
+                $ultimaCaja->saldoCaja += $request->total;
+            }
+        } elseif ($request->idtipo_venta == 1) {
+            // Actualizar caja en ventas y ventas cotado no efectivo
+            // Código para ventas cotado no efectivo
+
             $ultimaCaja->ventas += $request->total;
-            $ultimaCaja->pagosEfectivoVentas += $request->total;
-            $ultimaCaja->saldoCaja += $request->total;
-       }
-    } elseif ($request->idtipo_venta == 1) {
-        // Actualizar caja en ventas y ventas cotado no efectivo
-        // Código para ventas cotado no efectivo
-      
-      $ultimaCaja->ventas += $request->total;
-   } else {
-       $ultimaCaja->ventas += $request->primer_precio_cuota;
-   }
-   
+        } else {
+            $ultimaCaja->ventas += $request->primer_precio_cuota;
+        }
 
-    $ultimaCaja->save();
-}
+
+        $ultimaCaja->save();
+    }
 
 
     private function registrarDetallesVenta($venta, $detalles, $idAlmacen)
@@ -854,7 +854,7 @@ class VentaController extends Controller
         $sucursal = $user->sucursal;
         $codSucursal = $sucursal->codigoSucursal;
 
-        if (!isset($_SESSION['scufd'])) {
+        if (!isset ($_SESSION['scufd'])) {
             require "SiatController.php";
             $siat = new SiatController();
             $res = $siat->cufd($puntoVenta, $codSucursal);
@@ -1003,7 +1003,7 @@ class VentaController extends Controller
         $res = $siat->verificarNit($codSucursal, $numeroDocumento);
         if ($res->RespuestaVerificarNit->transaccion === true) {
             $mensaje = $res->RespuestaVerificarNit->mensajesList->descripcion;
-        }else if($res->RespuestaVerificarNit->transaccion === false){
+        } else if ($res->RespuestaVerificarNit->transaccion === false) {
             $mensaje = $res->RespuestaVerificarNit->transaccion;
         }
 
@@ -1030,6 +1030,8 @@ class VentaController extends Controller
     {
 
         $user = Auth::user();
+        Log::info("Llego aqui 1");
+
         //$puntoVenta = $user->idpuntoventa;
         $puntoVenta = 0;
         $sucursal = $user->sucursal;
@@ -1056,6 +1058,7 @@ class VentaController extends Controller
         $numeroFactura = str_pad($valores['numeroFactura'], 10, "0", STR_PAD_LEFT);
         $puntoVentaCuf = str_pad($puntoVenta, 4, "0", STR_PAD_LEFT);
         $codigoControl = $_SESSION['scodigoControl'];
+
         $cadena = $nitEmisor . $fecha_formato . $sucursal . $modalidad . $tipoEmision . $tipoFactura . $tipoDocSector . $numeroFactura . $puntoVentaCuf;
         $numDig = 1;
         $limMult = 9;
@@ -1071,7 +1074,9 @@ class VentaController extends Controller
         $datos['factura'][0]['cabecera']['cuf'] = $cuf;
 
         $temporal = $datos['factura'];
+        
         //dd($temporal);
+
         $xml_temporal = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><facturaComputarizadaCompraVenta xsi:noNamespaceSchemaLocation=\"facturaComputarizadaCompraVenta.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"></facturaComputarizadaCompraVenta>");
 
         $this->formato_xml($temporal, $xml_temporal);
@@ -1084,7 +1089,9 @@ class VentaController extends Controller
         $hashArchivo = hash("sha256", file_get_contents(public_path("docs/facturaxml.xml")));
 
         $numeroFactura = $valores['numeroFactura'];
-        $codigoMetodoPago = $valores['codigoMetodoPago'];
+        // $codigoMetodoPago = $valores['codigoMetodoPago'];
+        $codigoMetodoPago = 1;
+
         $montoTotal = $valores['montoTotal'];
         $montoTotalSujetoIva = $valores['montoTotalSujetoIva'];
         $descuentoAdicional = $valores['descuentoAdicional'];
@@ -1175,6 +1182,7 @@ class VentaController extends Controller
 
         $numeroFactura = $valores['numeroFactura'];
         $codigoMetodoPago = $valores['codigoMetodoPago'];
+
         $montoTotal = $valores['montoTotal'];
         $montoTotalSujetoIva = $valores['montoTotalSujetoIva'];
         $descuentoAdicional = $valores['descuentoAdicional'];
@@ -1558,10 +1566,10 @@ class VentaController extends Controller
         $facturaOff->productos = $productos;
         $facturaOff->estado = 1;
 
-        $success = $facturaOff->save();
+         $success = $facturaOff->save();
 
-        return $success;
-    }
+         return $success;
+     }
 
 
     public function insertarFacturaInstitucional(Request $request, $id_cliente, $idventainstitucional, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
@@ -2583,7 +2591,8 @@ class VentaController extends Controller
                 'personas.nombre as cliente',
                 'ventas.total',
                 'ventas.num_comprobante',
-                'users.usuario as usuario'
+                'users.usuario as usuario',
+                'personas.num_documento as nit'
             )
             ->whereDate('ventas.created_at', $request->input('fecha'))
             ->get();
