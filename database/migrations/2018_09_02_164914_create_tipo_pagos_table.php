@@ -16,7 +16,7 @@ class CreateTipoPagosTable extends Migration
         Schema::create('tipo_pagos', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('codigoClasificador');
-            $table->string('nombre_tipo_pago', 50)->nullable();
+            $table->string('nombre_tipo_pago', 250)->nullable();
             $table->timestamps();
         });
         DB::table('tipo_pagos')->insert([
