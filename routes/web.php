@@ -337,6 +337,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/almacen', 'AlmacenController@index');
         Route::post('/almacen/registrar', 'AlmacenController@store');
         Route::put('/almacen/editar', 'AlmacenController@update');
+        
 
         Route::get('/almacen/selectAlmacen', 'AlmacenController@selectAlmacen');
         Route::get('/almacen/selectAlmacenDest', 'AlmacenController@selectAlmacenDestino');
@@ -356,6 +357,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/inventarios/itemLote/{tipo}', 'InventarioController@indexItemLote'); //listato por filtro
         //saldostosk
         Route::get('/inventarios/saldostock', 'InventarioController@indexsaldostock'); //listar el saldo_stock
+        Route::post('/inventarios/importar', 'InventarioController@importar')->name('inventario.importar');
 
         //traspaso
         Route::get('/list/traspasos', 'TraspasoController@index');

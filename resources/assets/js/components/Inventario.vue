@@ -1,4 +1,7 @@
 <template>
+
+
+
     <main class="main">
         <ol class="breadcrumb">
              <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
@@ -7,6 +10,12 @@
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">
+                 <div>
+                    <i class="fa fa-align-justify"></i> Inventario
+                    <button type="button" @click="abrirModalImportar()" class="btn btn-success">
+                        <i class="icon-plus"></i>&nbsp;Importar
+                    </button>
+                </div>
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -120,32 +129,30 @@
         <!--Inicio del modal agregar/actualizar-->
         
         <!--Fin del modal-->
+
+        <div v-if="modalImportar">
+         <ImportarExcelInventario @cerrar="cerrarModalImportar" />
+       </div>
+
     </main>
+     
+
+ 
+
+  
 </template>
+
 <script>
     export default {
         data (){
             return {
                 arrayInventario: [],
-                //---------------------
+                
                 arrayAlmacenes: [],
                 AlmacenSeleccionado: 1,
                 idalmacen: 0,
                 tipoSeleccionado: 'item',
-                //---------------------
-                // almacen_id:0,
-                // nombre_almacen: '',
-                // ubicacion: '',
-                // encargado: '',
-                // telefono: '',
-                // lugar: '',
-                // observacion: '',
-
-                // modal : 0,
-                // tituloModal : '',
-                // tipoAccion : 0,
-                // errorMostrarMsjIndustria: [],
-                // errorIndustria : 0,
+                modalImportar: 0,
                 pagination : {
                     'total' : 0,
                     'current_page' : 0,
@@ -189,6 +196,14 @@
             }
         },
         methods : {
+            
+        abrirModalImportar() {
+            this.modalImportar = 1;
+        },
+         cerrarModalImportar() {
+            this.modalImportar = 0;
+            this.listarInventario(1, '', 'nombre');
+        },
             cambiarPagina(page,buscar,criterio){
                 let me = this;
                 //Actualiza la página actual

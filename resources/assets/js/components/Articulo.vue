@@ -2202,14 +2202,6 @@ export default {
         validarArticulo() {
             this.errorArticulo = 0;
             this.errorMostrarMsjArticulo = [];
-
-            // if (this.lineaseleccionada.length == 0) this.errorMostrarMsjArticulo.push("");
-            // if (this.industriaseleccionada.length == 0) this.errorMostrarMsjArticulo.push("");
-            // if (this.marcaseleccionada.length == 0) this.errorMostrarMsjArticulo.push("");
-            // if (this.proveedorseleccionada.length == 0) this.errorMostrarMsjArticulo.push("");
-            // if (this.medidaseleccionada.length == 0) this.errorMostrarMsjArticulo.push("");
-            // if (this.gruposeleccionada.length == 0) this.errorMostrarMsjArticulo.push("");
-
             if (!this.unidad_envase) this.errorMostrarMsjArticulo.push("");
             if (!this.codigo) this.errorMostrarMsjArticulo.push("");
             if (!this.nombre_producto) this.errorMostrarMsjArticulo.push("");
@@ -2229,8 +2221,7 @@ export default {
         cerrarModal() {
             this.modal = 0;
             this.tituloModal = '';
-            //this.idcategoria = 0;
-            //this.nombre_categoria = '';
+           
             //validacion para quitar borde rojo en los inputs
             this.codigoVacio = false;
             this.nombreProductoVacio = false;

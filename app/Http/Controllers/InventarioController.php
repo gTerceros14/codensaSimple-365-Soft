@@ -11,6 +11,8 @@ use App\Exports\ProductosBajoStockExport;
 use App\Exports\ProductosPorVencerseExport;
 use App\Exports\ProductosVencidosExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\InventarioImport;
+use Exception;
 
 class InventarioController extends Controller
 {
@@ -584,4 +586,31 @@ class InventarioController extends Controller
     //     }
     // }
 
+
+
+    public function importar(Request $request)
+    {
+        try {
+            $request->validate([
+                'archivo' => 'required|mimes:csv,txt',
+            ]);
+
+            $archivo = $request->file('archivo');
+
+            $import = new InventarioImport();
+            Excel::import($import, $archivo);
+
+            $errors = $import->getErrors();
+
+            if (!empty($errors)) {
+                return response()->json(['errors' => $errors], 422);
+            } else {
+                return response()->json(['mensaje' => 'Importación exitosa'], 200);
+            }
+        } catch (Exception $e) {
+            Log::error('Error en la importación: ' . $e->getMessage());
+
+            return response()->json(['error' => 'Error en la importación', 'mensaje' => $e->getMessage()], 500);
+        }
+    }
 }
