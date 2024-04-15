@@ -37,7 +37,7 @@
                                         class="form-control" placeholder="Texto a buscar">
                                 </div>
                             </div>
-                        </div>  
+                        </div>
                         <div class="spinner-container" v-if="mostrarSpinner">
                             <div class="spinner-message"><strong>EMITIENDO FACTURA...</strong></div>
                             <TileSpinner color="blue" />
@@ -88,20 +88,25 @@
                                         <td v-text="venta.fecha_hora"></td>
                                         <td>
                                             {{ ((venta.total) * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                        monedaVenta[1]
-                    }}
+                                                monedaVenta[1]
+                                            }}
 
                                         </td>
                                         <td>
                                             <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank"
+                                               
                                                 class="btn btn-info"><i class="icon-note"></i></a>
                                         </td>
                                         <td>
                                             <button class="btn btn-primary" type="button"
+                                               
                                                 @click="imprimirFactura(venta.id, venta.correo)"><i
+                                                   
                                                     class="icon-printer"></i></button>
                                             <button class="btn btn-danger" type="button"
+                                               
                                                 @click="anularFactura(venta.id, venta.cuf)"><i
+                                                   
                                                     class="icon-close"></i></button>
                                         </td>
                                     </tr>
@@ -151,6 +156,11 @@ import { TileSpinner } from 'vue-spinners';
 export default {
     data() {
         return {
+            cuentaSeleccionada: '',
+            arrayCuentas: [],
+            bancos: bancos,
+            bancoSeleccionado: '',
+            arrayBancos: [],
             clienteDeudas: 0,
             arrayCuotas: [],
             arraySeleccionado: [],
@@ -295,10 +305,10 @@ export default {
             habilitarPrimeraCuota: false,
             tipoPago: 'EFECTIVO',
             tiposPago: {
-                        EFECTIVO: 1,
-                        TARJETA: 2,
-                        QR: 3
-                        },
+                EFECTIVO: 1,
+                TARJETA: 2,
+                QR: 3
+            },
 
         }
     },
@@ -307,6 +317,14 @@ export default {
             if (newValue) {
                 this.buscarArticulo();
             }
+        },
+        bancoSeleccionado: function (nuevoValor, viejoValor) {
+            this.obtenerCuentasPorBanco(nuevoValor);
+            if (this.arrayCuentas.length > 0) {
+                this.cuentaSeleccionada = this.arrayCuentas[0].numero_cuenta;
+            } else {
+                this.cuentaSeleccionada = '';
+            }
         }
     },
     components: {
@@ -314,6 +332,16 @@ export default {
         vSelect
     },
     computed: {
+        bancosUnicos() {
+            const nombresUnicos = {};
+            return this.arrayBancos.filter(banco => {
+                if (!nombresUnicos[banco.nombre_banco]) {
+                    nombresUnicos[banco.nombre_banco] = true;
+                    return true;
+                }
+                return false;
+            });
+        },
 
         resultadoMultiplicacion() {
             if (this.arraySeleccionado) {
@@ -332,7 +360,6 @@ export default {
             return this.pagination.current_page;
         },
 
-        //Calcula los elementos de la paginación
         pagesNumber: function () {
             if (!this.pagination.to) {
                 return [];
@@ -378,6 +405,36 @@ export default {
 
     },
     methods: {
+        obtenerCuentasPorBanco(banco) {
+            const cuentas = this.arrayBancos
+                .filter(item => item.nombre_banco === banco)
+                .map(item => ({ nombre_cuenta: item.nombre_cuenta, numero_cuenta: item.numero_cuenta }));
+            this.arrayCuentas = cuentas
+        },
+        getBankUrl(bankName) {
+            const code = this.getBankCodeByName(bankName);
+            return code ? `img/bancos/${code.toUpperCase()}.png` : null;
+        },
+        getBankCodeByName(bankName) {
+            const lowerCaseName = bankName.toLowerCase();
+            for (const [code, name] of Object.entries(this.bancos)) {
+                if (name.toLowerCase() === lowerCaseName) {
+                    return code;
+                }
+            }
+            return null;
+        },
+        obtenerBancos() {
+            axios.get('/bancos/select')
+                .then(response => {
+                    this.arrayBancos = response.data;
+
+                })
+                .catch(error => {
+                    console.error('Error al cargar las transferencias:', error);
+                });
+        },
+
         calcularPrecioUnitario(articulo) {
             // Lógica para calcular el precio unitario según el rango total de cantidades
             if (this.totalCantidades >= this.datosFormularioPE.rango_inicio_r1 && this.totalCantidades <= this.datosFormularioPE.rango_final_r1) {
@@ -392,21 +449,22 @@ export default {
             }
         },
         getClassByCantidad(total) {
-        if (total >= this.datosFormularioPE.rango_inicio_r1 && total <= this.datosFormularioPE.rango_final_r1) {
-            return 'rango-1'; // clase para el rango 1
-        } else if (total >= this.datosFormularioPE.rango_inicio_r2 && total <= this.datosFormularioPE.rango_final_r2) {
-            return 'rango-2'; // clase para el rango 2
-        } else if (total >= this.datosFormularioPE.rango_inicio_r3 && total <= this.datosFormularioPE.rango_final_r3) {
-            return 'rango-3'; // clase para el rango 3
-        } else {
-            return ''; // clase por defecto si no se cumple ningún rango
-        }
-    },
+            if (total >= this.datosFormularioPE.rango_inicio_r1 && total <= this.datosFormularioPE.rango_final_r1) {
+                return 'rango-1'; // clase para el rango 1
+            } else if (total >= this.datosFormularioPE.rango_inicio_r2 && total <= this.datosFormularioPE.rango_final_r2) {
+                return 'rango-2'; // clase para el rango 2
+            } else if (total >= this.datosFormularioPE.rango_inicio_r3 && total <= this.datosFormularioPE.rango_final_r3) {
+                return 'rango-3'; // clase para el rango 3
+            } else {
+                return ''; // clase por defecto si no se cumple ningún rango
+            }
+        },
         abrirTipoVenta() {
             if (this.idtipo_venta == 1) {
                 this.modal2 = 1;
                 this.cliente = this.nombreCliente;
                 this.tipoAccion2 = 1;
+                this.obtenerBancos();
                 this.scrollToTop()
             } else {
                 this.modal3 = 1;
@@ -454,7 +512,7 @@ export default {
                 })
                 .catch((error) => {
                     console.error(error);
-                    throw error; 
+                    throw error;
                 });
         },
         seleccionarTipoPago(tipo) {
@@ -488,7 +546,6 @@ export default {
                         this.arrayArticulosKit.forEach(producto => {
                             producto.nuevo_precio = (kit.precio * producto.porcentaje) / 100;
                         });
-                        console.log("Estos son los articulos: ", this.arrayArticulosKit);
                         this.arrayArticulosKit.forEach(articulo => {
                             this.arrayDetalle.push({
                                 idkit: kit['id'],
@@ -553,11 +610,10 @@ export default {
         },
 
         agregarPE(kit) {
-            console.log('esto:', kit);
             kit['articulos'] = this.arrayArticulosKit;
             kit['precio'] = kit['precio'] / parseFloat(this.monedaVenta[0])
             axios.put('/ofertasespeciales/actualizar', kit);
-            
+
             this.modalDetalle = 0;
             if (new Date(kit.fecha_final) < new Date()) {
                 swal({
@@ -567,24 +623,21 @@ export default {
                 });
                 return;
             }
-            console.log("datos formulario agregar PE", kit)
             //   this.GetValidateKit(kit['id'])
             this.GetValidateKit(kit['id'])
                 .then(() => {
 
                     if (this.mensajesKit.length == 0) {
-                        
+
                         const totalKit = this.arrayArticulosKit.reduce((total, producto) => {
                             return total + (producto.cantidad * producto.precio_costo_unid);
                         }, 0);
                         this.arrayArticulosKit.forEach(producto => {
                             producto.porcentaje = ((producto.cantidad * producto.precio_costo_unid) / totalKit) * 100;
                         });
-                        console.log("precio especial ", this.arrayArticulosKit);
                         this.arrayArticulosKit.forEach(producto => {
                             producto.nuevo_precio = (this.calcularPrecioUnitario(kit) * producto.porcentaje) / 100;
                         });
-                        console.log("Estos son los articulos: ", this.arrayArticulosKit);
                         this.arrayArticulosKit.forEach(articulo => {
                             this.arrayDetalle.push({
                                 idkit: kit['id'],
@@ -631,7 +684,7 @@ export default {
                     console.error(error);
                 });
         },
-        
+
 
         abrirModalDetallesKit(data) {
             this.arrayArticulosSeleccionados = [];
@@ -675,9 +728,9 @@ export default {
 
             };
             this.obtenerDatosKit(data['id']),
-            console.log(this.datosFormularioPE);
+                console.log(this.datosFormularioPE);
         },
-        
+
 
         obtenerDatosKit(idPromocion) {
             return axios.get('/ofertas/id', {
@@ -737,22 +790,22 @@ export default {
         },
 
         listarOfertaEspecial(page, buscar, criterio) {
-        let me = this;
-        let url = '/ofertasespeciales';
+            let me = this;
+            let url = '/ofertasespeciales';
 
-        axios.get(url, {
-            params: {
-            page: page,
-            buscar: buscar,
-            criterio: criterio
-            }
-        }).then(function (response) {
-            let respuesta = response.data;
-            me.arrayPreciosEspeciales = response.data.ofertas.data;
-            me.pagination = respuesta.pagination;
-        }).catch(function (error) {
-            console.log(error);
-        });
+            axios.get(url, {
+                params: {
+                    page: page,
+                    buscar: buscar,
+                    criterio: criterio
+                }
+            }).then(function (response) {
+                let respuesta = response.data;
+                me.arrayPreciosEspeciales = response.data.ofertas.data;
+                me.pagination = respuesta.pagination;
+            }).catch(function (error) {
+                console.log(error);
+            });
         },
 
         scrollToSection() {
@@ -792,14 +845,14 @@ export default {
                 this.descuentoAdicional = 0;
                 alert("El descuento adicional no puede ser mayor o igual al total.");
             }
-        }, 
+        },
 
         habilitarNombreCliente() {
             if (this.casosEspeciales) {
                 this.$refs.nombreRef.removeAttribute("readonly");
                 this.documento = "99001";
                 this.idcliente = "2";
-                this.tipo_documento = "5"; 
+                this.tipo_documento = "5";
             } else {
                 this.$refs.nombreRef.setAttribute("readonly", true);
                 this.documento = "";
@@ -928,7 +981,6 @@ export default {
             var url = '/venta?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                console.log(respuesta)
                 me.arrayVenta = respuesta.ventas.data;
                 me.pagination = respuesta.pagination;
             })
@@ -941,10 +993,9 @@ export default {
             let me = this;
             var url = '/cliente/selectClientePorNumero?numero=' + numero;
             axios.get(url).then(function (response) {
-                let respuesta  = response.data;
+                let respuesta = response.data;
                 q: numero;
                 me.arrayCliente = respuesta.clientes;
-                console.log(me.arrayCliente);
             }).catch(function (error) {
                 console.log(error);
             });
@@ -989,7 +1040,6 @@ export default {
                 axios.get(url).then(function (response) {
                     let respuesta = response.data;
                     me.arraySeleccionado = respuesta.articulos[0];
-                    console.log(me.arraySeleccionado)
                     // if (me.arraySeleccionado.length > 0) {
                     //     me.fecha_vencimiento = me.arraySeleccionado[0]['fecha_vencimiento'];
                     // }
@@ -1127,7 +1177,6 @@ export default {
                     precioseleccionado: this.precioseleccionado
 
                 });
-                console.log(this.arrayDetalle)
                 this.arrayProductos.push({
                     actividadEconomica: actividadEconomica,
                     codigoProductoSin: this.arraySeleccionado.codigoProductoSin,
@@ -1137,12 +1186,11 @@ export default {
                     unidadMedida: this.arraySeleccionado.codigoClasificador,
                     precioUnitario: parseFloat(this.precioseleccionado).toFixed(2),
                     //montoDescuento: this.arrayPromocion && this.arrayPromocion.porcentaje ? ((this.arrayPromocion.porcentaje / this.resultadoMultiplicacion) * 100).toFixed(2) : 0,
-                    montoDescuento: descuento,   
+                    montoDescuento: descuento,
                     subTotal: precioArticulo.toFixed(2),
                     numeroSerie: numeroSerie,
                     numeroImei: numeroImei
                 });
-                console.log("pa la factura: ", this.arrayProductos)
                 this.precioBloqueado = true;
                 this.arraySeleccionado = [];
                 this.cantidad = 1;
@@ -1228,7 +1276,6 @@ export default {
         agregarDetalleModal(data) {
             this.scrollToSection();
             this.codigo = data.codigo;
-            console.log('SLECCIONE ESTO:', data);
 
             this.buscarPromocion(data.id);
             this.precioseleccionado = data.precio_uno;
@@ -1245,7 +1292,6 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.arrayArticulo = respuesta.articulos;
-                console.log('listar articulo', respuesta);
             })
                 .catch(function (error) {
                     console.log(error);
@@ -1268,7 +1314,6 @@ export default {
 
             axios.get(url).then(function (response) {
                 let respuesta = response.data;
-                console.log(respuesta)
                 me.saldosNegativos = respuesta.configuracionTrabajo.saldosNegativos;
                 me.permitirDevolucion = respuesta.configuracionTrabajo.permitirDevolucion;
                 me.monedaVenta = [respuesta.configuracionTrabajo.valor_moneda_venta, respuesta.configuracionTrabajo.simbolo_moneda_venta]
@@ -1289,13 +1334,13 @@ export default {
                 });
         },
 
-        verificarFactura(cuf, numeroFactura){
-                var url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=5153610012&cuf='+cuf+'&numero='+numeroFactura+'&t=2';
-                window.open(url);
-                
-            },
+        verificarFactura(cuf, numeroFactura) {
+            var url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=5153610012&cuf=' + cuf + '&numero=' + numeroFactura + '&t=2';
+            window.open(url);
 
-            anularFactura(id, cuf) {
+        },
+
+        anularFactura(id, cuf) {
             swal({
                 title: '¿Está seguro de anular la factura?',
                 type: 'warning',
@@ -1310,70 +1355,70 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.value) {
-                let me = this;
-                axios.get('/factura/obtenerDatosMotivoAnulacion')
-                    .then(function(response) {
-                    var respuesta = response.data;
-                    me.arrayMotivosAnulacion = respuesta.motivo_anulaciones;
-                    
-                    console.log('Motivos obtenidos:', me.arrayMotivosAnulacion);
+                    let me = this;
+                    axios.get('/factura/obtenerDatosMotivoAnulacion')
+                        .then(function (response) {
+                            var respuesta = response.data;
+                            me.arrayMotivosAnulacion = respuesta.motivo_anulaciones;
 
-                    let options = {};
-                    me.arrayMotivosAnulacion.forEach(function(motivo) {
-                        options[motivo.codigo] = motivo.descripcion;
-                    });
+                            console.log('Motivos obtenidos:', me.arrayMotivosAnulacion);
 
-                    // Muestra un segundo modal para seleccionar el motivo
-                    swal({
-                        title: 'Seleccione un motivo de anulación',
-                        input: 'select',
-                        inputOptions: options,
-                        inputPlaceholder: 'Seleccione un motivo',
-                        showCancelButton: true,
-                        inputValidator: function (value) {
-                        return new Promise(function (resolve, reject) {
-                            if (value !== '') {
-                            resolve();
-                            } else {
-                            reject('Debe seleccionar un motivo');
-                            }
-                        });
-                        }
-                    }).then((result) => {
-                        if (result.value) {
-                        // Aquí obtienes el motivo seleccionado y puedes realizar la solicitud para anular la factura
-                        const motivoSeleccionado = result.value;
-                        axios.get('/factura/anular/' + cuf +"/" + motivoSeleccionado)
-                            .then(function(response) {
-                            const data = response.data;
-                            if (data === 'ANULACION CONFIRMADA') {
-                                swal(
-                                'FACTURA ANULADA',
-                                data,
-                                'success'
-                                );
-                            } else {
-                                swal(
-                                'ANULACION RECHAZADA',
-                                data,
-                                'warning'
-                                );
-                            }
-                            })
-                            .catch(function(error) {
-                            console.log(error);
+                            let options = {};
+                            me.arrayMotivosAnulacion.forEach(function (motivo) {
+                                options[motivo.codigo] = motivo.descripcion;
                             });
-                        }
-                    });
-                    })
-                    .catch(function(error) {
-                    console.log(error);
-                    });
+
+                            // Muestra un segundo modal para seleccionar el motivo
+                            swal({
+                                title: 'Seleccione un motivo de anulación',
+                                input: 'select',
+                                inputOptions: options,
+                                inputPlaceholder: 'Seleccione un motivo',
+                                showCancelButton: true,
+                                inputValidator: function (value) {
+                                    return new Promise(function (resolve, reject) {
+                                        if (value !== '') {
+                                            resolve();
+                                        } else {
+                                            reject('Debe seleccionar un motivo');
+                                        }
+                                    });
+                                }
+                            }).then((result) => {
+                                if (result.value) {
+                                    // Aquí obtienes el motivo seleccionado y puedes realizar la solicitud para anular la factura
+                                    const motivoSeleccionado = result.value;
+                                    axios.get('/factura/anular/' + cuf + "/" + motivoSeleccionado)
+                                        .then(function (response) {
+                                            const data = response.data;
+                                            if (data === 'ANULACION CONFIRMADA') {
+                                                swal(
+                                                    'FACTURA ANULADA',
+                                                    data,
+                                                    'success'
+                                                );
+                                            } else {
+                                                swal(
+                                                    'ANULACION RECHAZADA',
+                                                    data,
+                                                    'warning'
+                                                );
+                                            }
+                                        })
+                                        .catch(function (error) {
+                                            console.log(error);
+                                        });
+                                }
+                            });
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
                 }
             });
-            },
+        },
 
-            imprimirFactura(id, correo) {
+        imprimirFactura(id, correo) {
             swal({
                 title: 'Selecciona un tamaño de factura',
                 type: 'warning',
@@ -1467,16 +1512,16 @@ export default {
 
         aplicarCombinacion() {
             const descuentoGiftCard = this.descuentoGiftCard
-            const idtipo_pago = descuentoGiftCard ? 40 : 2; 
+            const idtipo_pago = descuentoGiftCard ? 40 : 2;
 
             this.registrarVenta(idtipo_pago);
         },
 
-        otroMetodo(metodoPago){
+        otroMetodo(metodoPago) {
             const idtipo_pago = metodoPago;
             this.registrarVenta(idtipo_pago);
         },
-        
+
         registrarVenta(idtipo_pago) {
             if (this.validarVenta()) {
                 return;
@@ -1486,7 +1531,7 @@ export default {
             this.mostrarSpinner = true;
             this.idtipo_pago = idtipo_pago;
 
-            for (let i = 0; i < me.cuotas.length; i++) {                
+            for (let i = 0; i < me.cuotas.length; i++) {
                 console.log('LLEGA ARRAYDATA!', me.cuotas[i]);
             }
 
@@ -1617,22 +1662,22 @@ export default {
             }
 
             try {
-                    if (tipoDocumentoIdentidad === '5') {
-                        const response = await axios.post('/factura/verificarNit/' + numeroDocumento);
-                        if (response.data === 'NIT ACTIVO') {
-                            me.codigoExcepcion = 0;
-                            alert("NIT VÁLIDO.");
-                        } else {
-                            me.codigoExcepcion = 1;
-                            alert("NIT INVÁLIDO.");
-                        }
-                    }else{
+                if (tipoDocumentoIdentidad === '5') {
+                    const response = await axios.post('/factura/verificarNit/' + numeroDocumento);
+                    if (response.data === 'NIT ACTIVO') {
                         me.codigoExcepcion = 0;
+                        alert("NIT VÁLIDO.");
+                    } else {
+                        me.codigoExcepcion = 1;
+                        alert("NIT INVÁLIDO.");
                     }
-                } catch (error) {
-                    console.error(error);
-                    return 'No se pudo verificar el NIT';
+                } else {
+                    me.codigoExcepcion = 0;
                 }
+            } catch (error) {
+                console.error(error);
+                return 'No se pudo verificar el NIT';
+            }
 
             var factura = [];
             factura.push({
@@ -1696,19 +1741,19 @@ export default {
                         me.idtipo_pago = '';
                         me.email = '';
                         me.descuentoGiftCard = '';
-                        me.numeroTarjeta =  null;
+                        me.numeroTarjeta = null;
                         me.recibido = '';
                         me.metodoPago = '';
                         me.cerrarModal2();
                         me.cerrarModal3();
                         me.listarVenta(1, '', 'id');
                         me.mostrarSpinner = false;
-                    } else{
+                    } else {
                         me.arrayProductos = [];
                         me.codigoExcepcion = 0;
                         me.idtipo_pago = '';
                         me.descuentoGiftCard = '';
-                        me.numeroTarjeta =  null;
+                        me.numeroTarjeta = null;
                         me.recibido = '';
                         me.metodoPago = '';
                         me.cerrarModal2();
@@ -1731,7 +1776,7 @@ export default {
                         'error');
                     me.mostrarSpinner = false;
                     me.idtipo_pago = '';
-                    me.numeroTarjeta =  null;
+                    me.numeroTarjeta = null;
                     me.descuentoGiftCard = '';
                     me.recibido = '';
                     me.metodoPago = '';
@@ -1894,7 +1939,7 @@ export default {
         mostrarSeleccion() {
             console.log('Precio seleccionado:', this.precioseleccionado);
         },
-        
+
         //--------------ABRIR MODAL------------------
         registrarAbrilModal() {
             this.modal2 = 1;
@@ -2070,11 +2115,11 @@ export default {
     }
 }
 </script>
-<style scoped>    
-    
+<style scoped>
 /* Estilos para los iconos (ajusta según tus necesidades) */
 .fa-check-circle {
-    margin-left: 5px; /* Espacio entre el precio y el icono */
+    margin-left: 5px;
+    /* Espacio entre el precio y el icono */
 }
 
 .custom-btn {
@@ -2161,24 +2206,24 @@ export default {
     border-bottom-right-radius: 8px;
 }
 
-    .spinner-container {
-        position: relative;
-    }
+.spinner-container {
+    position: relative;
+}
 
-    .spinner-container > * {
-        position: absolute; 
-        top: 50%; 
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
+.spinner-container>* {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 
-    .spinner-message {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translate(-50%, -170%);
-        z-index: 1;
-    }
+.spinner-message {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -170%);
+    z-index: 1;
+}
 
 
 

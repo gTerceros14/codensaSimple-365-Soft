@@ -67,4 +67,14 @@ class BancoController extends Controller
         return response()->json($banco, 200);
     }
 
+    public function getAllData(Request $request)
+    {
+        if (!$request->ajax()) {
+            return redirect('/');
+        }
+
+        $bancos = Banco::select('nombre_cuenta', 'nombre_banco', 'numero_cuenta')->get();
+
+        return response()->json($bancos, 200);
+    }
 }

@@ -316,6 +316,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/bancos', 'BancoController@index');
         Route::post('/bancos/registrar', 'BancoController@store');
         Route::put('/bancos/actualizar', 'BancoController@update');
+        Route::get('/bancos/select', 'BancoController@getAllData');
+
 
         Route::get('/transferencias', 'TransferenciaController@index');
         Route::post('/transferencias/registrar', 'TransferenciaController@store');
@@ -337,7 +339,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/almacen', 'AlmacenController@index');
         Route::post('/almacen/registrar', 'AlmacenController@store');
         Route::put('/almacen/editar', 'AlmacenController@update');
-        
+
 
         Route::get('/almacen/selectAlmacen', 'AlmacenController@selectAlmacen');
         Route::get('/almacen/selectAlmacenDest', 'AlmacenController@selectAlmacenDestino');
@@ -414,6 +416,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/kardex-clientes-detallado-global', 'ReporteKardexClientesDetalladoGlobalController@articulosPorCliente');
         Route::get('/kardex-clientes-resumen-global', 'ReporteKardexClientesResumenGlobalController@ventasPorCliente');
         Route::get('/recibo-cliente-por-documento', 'ReporteReciboClientePorDocumentoController@clientesPorDocumento');
+        Route::get('/resumen-ventas-y-cobranzas', 'ReporteResumenVentasYCobranzas@ventasYcobranzas');
         Route::get('/reporte-ventas-producto', 'ReportesVentas@ventasPorProducto');
         Route::get('/reporte-resumen-fisico-movimientos', 'ReportesInventariosController@resumenFisicoMovimientos');
         Route::get('/resumen-ventas-documento-detallado', 'ReportesVentas@ResumenVentasPorDocumentoDetallado');

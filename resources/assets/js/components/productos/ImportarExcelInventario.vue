@@ -130,8 +130,8 @@
                                                 <tr v-for="(row, rowIndex) in previewCsv" :key="rowIndex">
                                                     <td v-for="(cell, cellIndex) in row" :key="cellIndex">
                                                         {{ [5, 6, 7, 8, 9, 10, 11, 12, 13].includes(cellIndex) ?
-            cell + " " + monedaSeleccionada.simbolo : cell
-    }}
+                                                            cell + " " + monedaSeleccionada.simbolo : cell
+                                                        }}
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -231,11 +231,11 @@ export default {
             registrosSuccess: [],
 
             headersOrigin: [
-                   
-                    "Almacen",
-                    "Articulo",
-                    "Fecha vencimiento",
-                    "Saldo stock",
+
+                "Almacen",
+                "Articulo",
+                "Fecha vencimiento",
+                "Saldo stock",
             ],
 
             modalImportar: true,
@@ -289,7 +289,7 @@ export default {
                 const palabras = elemento.split(' ');
                 const primeraPalabra = palabras.shift();
                 const restoDelString = palabras.join(' ');
-                
+
             }
 
             this.submitForm();
@@ -523,12 +523,10 @@ export default {
             if (!this.previewCsv) {
                 return;
             }
-            let contentCsv = this.dividirElementos(this.previewCsv)
-
-
+            let contentCsv = this.dividirElementos(this.previewCsv);
             this.pageImportar = 3;
-
-            const blob = new Blob([contentCsv], { type: 'text/csv' });
+            const csvContent = this.arrayToCsv(contentCsv);
+            const blob = new Blob([csvContent], { type: 'text/csv' });
             const newCsvFile = new File([blob], 'nuevo_csv.csv', { type: 'text/csv' });
             const formData = new FormData();
             formData.append('archivo', newCsvFile);
@@ -551,6 +549,13 @@ export default {
                         console.error(error);
                     }
                 });
+        },
+        arrayToCsv(contentCsv) {
+            let csvContent = '';
+            contentCsv.forEach(row => {
+                csvContent += row.join(',') + '\n';
+            });
+            return csvContent;
         },
         downloadCSVTemplate() {
             const csvContent = this.headersOrigin.join(',') + '\n';
@@ -592,7 +597,6 @@ function s2ab(s) {
 </script>
 
 <style>
-
 .success-checkmark {
     width: 80px;
     height: 115px;

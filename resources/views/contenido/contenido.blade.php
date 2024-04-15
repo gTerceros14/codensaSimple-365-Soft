@@ -230,7 +230,7 @@
 </template>
 
 <template v-if="menu==68">
-    <resumenventasycobranz></resumenventasycobranz>a
+    <resumenventasycobranzas></resumenventasycobranzas>
 </template>
 
 <template v-if="menu==61">

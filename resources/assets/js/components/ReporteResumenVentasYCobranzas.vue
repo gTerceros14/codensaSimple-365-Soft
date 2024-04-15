@@ -3,6 +3,60 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
         </ol>
+
+        <div class="container-fluid">
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-align-justify"></i> Resumen de Ventas y Cobranzas
+                    <button type="button" @click="" class="btn btn-primary" >
+                        <i class="fa fa-search"></i>&nbsp;Filtros</button>
+                    <button type="button" @click="" class="btn btn-success">
+                        <i class="icon-doc"></i>&nbsp;Exportar a Excel
+                    </button>
+                    <button type="button" @click="" class="btn btn-danger">
+                        <i class="icon-doc"></i>&nbsp;Exportar a PDF
+                    </button>
+                </div>
+
+                <div class="card-body">
+                
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <div>
+                                        <p>Vendedor</p>
+                                    <div>
+                                        <p>Ventas y Facturacion</p>
+                                        <th>Efectivo</th>
+                                        <th>Tarjeta</th>
+                                        <th>Transaccion QR</th>
+                                        <th>Total</th>
+                                    </div>
+                                    <div>
+                                        <p>Cobranzas y Creditos</p>
+                                        <th>Efectivo</th>
+                                        <th>Tarjeta</th>
+                                        <th>Transaccion QR</th>
+                                        <th>Total</th>
+                                    </div>
+
+                                    </div>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                
+                </div>
+
+            </div>
+        </div>
+
     </main>
 </template>
 
@@ -28,7 +82,7 @@ export default {
             offset: 3,
 
             arrayDetalles: [],
-            vendedorId: 7,
+            vendedorId: 'todos',
         }
 
     },

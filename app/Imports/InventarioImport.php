@@ -14,14 +14,14 @@ class InventarioImport implements ToCollection
 {
     private $almacenMapping;
     private $articuloMapping;
-    
+
     private $errors = [];
 
     public function __construct()
     {
         $this->almacenMapping = $this->createAlmacenMapping();
         $this->articuloMapping = $this->createArticuloMapping();
-       
+
     }
 
     private function createAlmacenMapping()
@@ -32,52 +32,52 @@ class InventarioImport implements ToCollection
     {
         return Articulo::pluck('nombre', 'id')->toArray();
     }
-   
+
     public function collection(Collection $rows)
     {
         $rowNumber = 1;
         $importacionExitosa = true;
         try {
-                    \DB::beginTransaction();
-        
-                    foreach ($rows as $row) {
-                        $idAlmacen = $this->getAlmacenId($row[0]);
-                        $idArticulo = $this->getArticuloId($row[1]);
-                        try {
-                            Inventario::create([ 
-                                'idalmacen' => $idAlmacen,
-                                'idarticulo' => $idArticulo,
-                                'fecha_vencimiento'=>$row[2],
-                                'saldo_stock'=>$row[3],
-                            ]);
-                        } catch (Exception $e) {
-                            if (!$idAlmacen) {
-                                $this->errors[] = "Error fila $rowNumber: No existe 'El almacen $row[0]' ";
-                            } else if (!$idArticulo) {
-                                $this->errors[] = "Error fila $rowNumber: No existe 'Articulo $row[1]'";
-                            }  else {
-                                $this->errors[] = "Error al procesar fila: " . $e->getMessage();
-                            }
-        
-                            $importacionExitosa = false;
-                        }
-        
-                        $rowNumber++;
-                    }
-        
-                    if ($importacionExitosa) {
-                        \DB::commit(); // Confirmar la transacción si no hay errores
-                    } else {
-                        \DB::rollBack(); // Revertir la transacción en caso de error
-                    }
+            \DB::beginTransaction();
+
+            foreach ($rows as $row) {
+                $idAlmacen = $this->getAlmacenId($row[0]);
+                $idArticulo = $this->getArticuloId($row[1]);
+                try {
+                    Inventario::create([
+                        'idalmacen' => $idAlmacen,
+                        'idarticulo' => $idArticulo,
+                        'fecha_vencimiento' => $row[2],
+                        'saldo_stock' => $row[3],
+                    ]);
                 } catch (Exception $e) {
-                    \DB::rollBack(); // Revertir la transacción en caso de error
+                    if (!$idAlmacen) {
+                        $this->errors[] = "Error fila $rowNumber: No existe 'El almacen $row[0]' ";
+                    } else if (!$idArticulo) {
+                        $this->errors[] = "Error fila $rowNumber: No se encontro 'Articulo $row[1]' en la base de datos";
+                    } else {
+                        $this->errors[] = "Error al procesar fila: " . $e->getMessage();
+                    }
+
                     $importacionExitosa = false;
-                    $this->errors[] = "Error al procesar fila: " . $e->getMessage();
                 }
-                return $this->getErrorsResponse($importacionExitosa);
-   }
-   private function getArticuloId($nombreArticulo)
+
+                $rowNumber++;
+            }
+
+            if ($importacionExitosa) {
+                \DB::commit(); // Confirmar la transacción si no hay errores
+            } else {
+                \DB::rollBack(); // Revertir la transacción en caso de error
+            }
+        } catch (Exception $e) {
+            \DB::rollBack(); // Revertir la transacción en caso de error
+            $importacionExitosa = false;
+            $this->errors[] = "Error al procesar fila: " . $e->getMessage();
+        }
+        return $this->getErrorsResponse($importacionExitosa);
+    }
+    private function getArticuloId($nombreArticulo)
     {
         $idArticulo = array_search($nombreArticulo, $this->articuloMapping);
 
