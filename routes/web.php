@@ -316,6 +316,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/bancos', 'BancoController@index');
         Route::post('/bancos/registrar', 'BancoController@store');
         Route::put('/bancos/actualizar', 'BancoController@update');
+        Route::get('/bancos/select', 'BancoController@getAllData');
+
 
         Route::get('/transferencias', 'TransferenciaController@index');
         Route::post('/transferencias/registrar', 'TransferenciaController@store');
