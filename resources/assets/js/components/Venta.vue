@@ -156,11 +156,7 @@ import { TileSpinner } from 'vue-spinners';
 export default {
     data() {
         return {
-            cuentaSeleccionada: '',
-            arrayCuentas: [],
-            bancos: bancos,
-            bancoSeleccionado: '',
-            arrayBancos: [],
+            
             clienteDeudas: 0,
             arrayCuotas: [],
             arraySeleccionado: [],
@@ -318,30 +314,14 @@ export default {
                 this.buscarArticulo();
             }
         },
-        bancoSeleccionado: function (nuevoValor, viejoValor) {
-            this.obtenerCuentasPorBanco(nuevoValor);
-            if (this.arrayCuentas.length > 0) {
-                this.cuentaSeleccionada = this.arrayCuentas[0].numero_cuenta;
-            } else {
-                this.cuentaSeleccionada = '';
-            }
-        }
+        
     },
     components: {
         TileSpinner,
         vSelect
     },
     computed: {
-        bancosUnicos() {
-            const nombresUnicos = {};
-            return this.arrayBancos.filter(banco => {
-                if (!nombresUnicos[banco.nombre_banco]) {
-                    nombresUnicos[banco.nombre_banco] = true;
-                    return true;
-                }
-                return false;
-            });
-        },
+        
 
         resultadoMultiplicacion() {
             if (this.arraySeleccionado) {
@@ -405,35 +385,7 @@ export default {
 
     },
     methods: {
-        obtenerCuentasPorBanco(banco) {
-            const cuentas = this.arrayBancos
-                .filter(item => item.nombre_banco === banco)
-                .map(item => ({ nombre_cuenta: item.nombre_cuenta, numero_cuenta: item.numero_cuenta }));
-            this.arrayCuentas = cuentas
-        },
-        getBankUrl(bankName) {
-            const code = this.getBankCodeByName(bankName);
-            return code ? `img/bancos/${code.toUpperCase()}.png` : null;
-        },
-        getBankCodeByName(bankName) {
-            const lowerCaseName = bankName.toLowerCase();
-            for (const [code, name] of Object.entries(this.bancos)) {
-                if (name.toLowerCase() === lowerCaseName) {
-                    return code;
-                }
-            }
-            return null;
-        },
-        obtenerBancos() {
-            axios.get('/bancos/select')
-                .then(response => {
-                    this.arrayBancos = response.data;
-
-                })
-                .catch(error => {
-                    console.error('Error al cargar las transferencias:', error);
-                });
-        },
+        
 
         calcularPrecioUnitario(articulo) {
             // Lógica para calcular el precio unitario según el rango total de cantidades
@@ -464,7 +416,6 @@ export default {
                 this.modal2 = 1;
                 this.cliente = this.nombreCliente;
                 this.tipoAccion2 = 1;
-                this.obtenerBancos();
                 this.scrollToTop()
             } else {
                 this.modal3 = 1;
