@@ -519,8 +519,8 @@
             :arrayCotizacionSeleccionado="arrayCotizacionSeleccionado" 
             :arrayCotizacionVentDet = "arrayCotizacionVentDet">
         </detallecotizacionventa>
-        <registrarcompra v-if="showRegistrarVenta" :arrayDetallePedido="arrayDetallesAComprar" :arrayPedidoSeleccionado="arrayCotizacionSeleccionado">
-    </registrarcompra>
+        <registrarventa v-if="showRegistrarVenta" :arrayDetalleCotizacion="arrayDetallesAComprar" :arrayCotizacionSeleccionado="arrayCotizacionSeleccionado" @cerrar="cerrarFormularioVenta">
+        </registrarventa>
         
         <!-- <div v-if="showRegistrarCompra" class="mx-3">
             <registrarcompra @editarEstadoPedido="editarPedidoComprado"  @cerrar="cerrarFormularioCompra" 
@@ -873,7 +873,7 @@ export default {
                 });
 
             //obtener datos de los detalles
-            var url = '/cotizacionventa/obtenerDetalles?id=' + id;
+            var url = '/cotizacionventa/obtenerDetalles?idcotizacion=' + id;
 
             axios.get(url).then(function (response) {
                 //console.log(response);
@@ -1474,6 +1474,10 @@ export default {
         abrirModalDetalles(venta){
             this.showModalDetalle=true;
             this.verCotizacionDet(venta);
+        },
+        cerrarFormularioVenta(){
+            this.showRegistrarVenta=false;
+            this.listado=1;
         },
         cerrarModalDetalles(){
             this.showModalDetalle=false;

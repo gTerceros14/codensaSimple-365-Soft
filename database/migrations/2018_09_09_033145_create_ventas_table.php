@@ -21,7 +21,7 @@ class CreateVentasTable extends Migration
             $table->foreign('idusuario')->references('id')->on('users');
             $table->integer('idtipo_venta')->unsigned();
             $table->foreign('idtipo_venta')->references('id')->on('tipo_ventas');
-            $table->integer('idtipo_pago')->unsigned();
+            $table->integer('idtipo_pago')->unsigned()->nullable();
             $table->foreign('idtipo_pago')->references('id')->on('tipo_pagos');
             $table->string('tipo_comprobante', 20);
             $table->string('serie_comprobante', 7)->nullable();

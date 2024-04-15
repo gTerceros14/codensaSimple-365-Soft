@@ -32,11 +32,14 @@ class CotizacionVentaController extends Controller
         if ($buscar == '') {
             $cotizacion_venta = CotizacionVenta::join('personas', 'cotizacion_venta.idcliente', '=', 'personas.id')
                 ->join('users', 'cotizacion_venta.idusuario', '=', 'users.id')
+                ->join('almacens','cotizacion_venta.idalmacen','=','almacens.id')
                 ->select(
                     'cotizacion_venta.id',
                     'cotizacion_venta.idcliente',
                     'cotizacion_venta.idusuario',
-                    'cotizacion_venta.idalmacen',                    'cotizacion_venta.fecha_hora',
+                    'cotizacion_venta.idalmacen',                    
+                    'almacens.nombre_almacen', 
+                    'cotizacion_venta.fecha_hora',
                     'cotizacion_venta.impuesto',
                     'cotizacion_venta.total',
                     'cotizacion_venta.estado',
@@ -134,6 +137,7 @@ class CotizacionVentaController extends Controller
         $IDcotizacion = $request->idcotizacion;
         $detalles = DetalleCotizacionVenta::join('articulos', 'detalle_cotizacion.idarticulo', '=', 'articulos.id')
             ->join('cotizacion_venta', 'detalle_cotizacion.idcotizacion', '=', 'cotizacion_venta.id')
+            ->join('medidas','articulos.idmedida','=','medidas.id')
             ->select(
 
                 'detalle_cotizacion.cantidad',
@@ -141,10 +145,11 @@ class CotizacionVentaController extends Controller
                 'detalle_cotizacion.descuento',
                 'detalle_cotizacion.idarticulo',
 
-                'articulos.nombre as nombre_articulo',
+                'articulos.nombre as articulo',
                 'articulos.codigo',
                 'articulos.unidad_envase',
 
+                'medidas.descripcion_medida as medida',
                 'cotizacion_venta.total as prectotal',
                 // 'cotizacion_venta.idcliente'	
 

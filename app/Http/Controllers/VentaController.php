@@ -462,7 +462,13 @@ class VentaController extends Controller
             'impuesto',
             'total'
         ]));
-        $venta->idusuario = \Auth::user()->id;
+        if($request->usuarioCotizacion == null){
+            $venta->idusuario = \Auth::user()->id;
+        }
+        else{
+            $venta->idusuario = $request->usuarioCotizacion;
+        }
+       
         $venta->fecha_hora = now()->setTimezone('America/La_Paz');
         if ($request->idtipo_venta == 2) {
             $venta->estado = 'Pendiente';
