@@ -134,7 +134,7 @@
                         <div class="form-group row border">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="" class="font-weight-bold">Cliente
+                                    <label for="" class="font-weight-bold">Nit / CI
                                         <span class="text-danger">*</span>
                                     </label>
 
@@ -145,7 +145,7 @@
                             </div>
 
                             <div class="col-md-3">
-                                <label for="" class="font-weight-bold">Razon social
+                                <label for="" class="font-weight-bold">Razon social (Cliente)
                                     <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" id="nombreCliente" class="form-control" v-model="nombreCliente"
