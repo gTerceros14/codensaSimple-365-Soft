@@ -93,11 +93,16 @@
 
                                         </td>
                                         <td>
-                                            <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank" class="btn btn-info"><i class="icon-note"></i></a>
+                                            <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank"
+                                                class="btn btn-info"><i class="icon-note"></i></a>
                                         </td>
                                         <td>
-                                            <button class="btn btn-primary" type="button" @click="imprimirFactura(venta.id, venta.correo)"><i class="icon-printer"></i></button>
-                                            <button class="btn btn-danger" type="button" @click="anularFactura(venta.id, venta.cuf)"><i class="icon-close"></i></button>
+                                            <button class="btn btn-primary" type="button"
+                                                @click="imprimirFactura(venta.id, venta.correo)"><i
+                                                    class="icon-printer"></i></button>
+                                            <button class="btn btn-danger" type="button"
+                                                @click="anularFactura(venta.id, venta.cuf)"><i
+                                                    class="icon-close"></i></button>
                                         </td>
                                     </tr>
                                 </tbody>

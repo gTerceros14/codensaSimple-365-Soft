@@ -34,7 +34,8 @@
                                 <label for="" class="font-weight-bold">Razon social (Cliente)
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" id="nombreCliente" class="form-control" v-model="nombreCliente" ref="nombreRef" readonly>
+                                <input type="text" id="nombreCliente" class="form-control" v-model="nombreCliente"
+                                    ref="nombreRef" readonly>
                             </div>
 
                             <input type="hidden" id="idcliente" class="form-control" v-model="idcliente" ref="idRef"
@@ -43,16 +44,16 @@
                                 ref="tipoDocumentoRef" readonly>
                             <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id"
                                 ref="complementoIdRef" readonly>
-                            <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado"
-                                readonly>
+                            <input type="hidden" id="usuarioAutenticado" class="form-control"
+                                v-model="usuarioAutenticado" readonly>
                             <input type="hidden" id="email" class="form-control" v-model="email" readonly>
 
                             <div class="col-md-3">
                                 <label for="" class="font-weight-bold">Documento
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" id="documento" class="form-control" v-model="documento" ref="documentoRef"
-                                    readonly>
+                                <input type="text" id="documento" class="form-control" v-model="documento"
+                                    ref="documentoRef" readonly>
                             </div>
 
                             <div class="col-md-3">
