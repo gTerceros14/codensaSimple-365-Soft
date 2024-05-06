@@ -11,22 +11,21 @@ class CreateAlmacensTable extends Migration
      *
      * @return void
      */
-    public function up()
-    {
-        Schema::create('almacens', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('nombre_almacen', 100)->unique();
-            $table->string('ubicacion')->nullable();
-            $table->integer('encargado')->unsigned();
-            $table->foreign('encargado')->references('id')->on('users');
-            $table->integer('sucursal')->unsigned();
-            $table->foreign('sucursal')->references('id')->on('sucursales');
-            $table->string('telefono')->nullable();
-            $table->string('observacion')->nullable();
-            $table->boolean('condicion')->default(1);
-            $table->timestamps();
-        });
-    }
+  public function up()
+{
+    Schema::create('almacens', function (Blueprint $table) {
+        $table->increments('id');
+        $table->string('nombre_almacen', 100)->unique();
+        $table->string('ubicacion')->nullable();
+        $table->string('encargado')->nullable(); // Cambio a string
+        $table->integer('sucursal')->unsigned();
+        $table->foreign('sucursal')->references('id')->on('sucursales');
+        $table->string('telefono')->nullable();
+        $table->string('observacion')->nullable();
+        $table->boolean('condicion')->default(1);
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.

@@ -15,7 +15,6 @@ Route::group(['middleware' => ['guest']], function () {
     Route::get('/', 'Auth\LoginController@showLoginForm');
     Route::post('/', 'Auth\LoginController@login')->name('login');
 });
-
 Route::group(['middleware' => ['auth']], function () {
 
     Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
@@ -55,7 +54,6 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/ingreso/desactivar', 'IngresoController@desactivar');
         Route::get('/ingreso/obtenerCabecera', 'IngresoController@obtenerCabecera');
         Route::get('/ingreso/obtenerDetalles', 'IngresoController@obtenerDetalles');
-
     });
 
     Route::group(['middleware' => ['Vendedor']], function () {
@@ -63,6 +61,11 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/cliente/registrar', 'ClienteController@store');
         Route::put('/cliente/actualizar', 'ClienteController@update');
         Route::get('/cliente/selectCliente', 'ClienteController@selectCliente');
+
+        Route::get('/cliente/usuario', 'ClienteController@indexUsuario');
+        Route::get('/cliente/selectUusarioVend', 'ClienteController@selectUsuarioVendedor');
+        Route::get('/cliente/usuario/filtro', 'ClienteController@indexUsuarioFiltro');
+        Route::get('/user-info', 'ClienteController@getUserInfo');
 
         Route::get('/articulo/buscarArticuloVenta', 'ArticuloController@buscarArticuloVenta');
         Route::get('/articulo/listarArticuloVenta', 'ArticuloController@listarArticuloVenta');
@@ -86,10 +89,12 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/empresa/selectEmpresa', 'EmpresaController@selectEmpresa');
 
         //Rutas de configuracion de trabajo
-        Route::get('/configuracion/saldos-negativos', 'ConfiguracionTrabajoController@obtenerSaldosNegativos');
+        // Route::get('/configuracion/saldos-negativos', 'ConfiguracionTrabajoController@obtenerSaldosNegativos');
         Route::get('/configuracion/iva', 'ConfiguracionTrabajoController@obtenerIva');
         Route::get('/configuracion/editar', 'ConfiguracionTrabajoController@edit');
         Route::put('/configuracion/actualizar', 'ConfiguracionTrabajoController@update');
+        Route::get('/configuracion', 'ConfiguracionTrabajoController@index');
+
         Route::get('/backup', 'BackupDbController@createBackup');
         Route::get('/categoria', 'CategoriaController@index');
         Route::post('/categoria/registrar', 'CategoriaController@store');
@@ -131,9 +136,18 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/cliente/registrar', 'ClienteController@store');
         Route::put('/cliente/actualizar', 'ClienteController@update');
         Route::get('/cliente/selectCliente', 'ClienteController@selectCliente');
+        Route::get('/cliente/selectClientePorNumero', 'ClienteController@seleccionarClientePorNumero');
         Route::get('/cliente/listarReporteClienteExcel', 'ClienteController@listarReporteClienteExcel');
 
+        Route::get('/cliente/selectUusarioVend', 'ClienteController@selectUsuarioVendedor');
+        Route::get('/cliente/usuario', 'ClienteController@indexUsuario');
+        Route::get('/cliente/usuario/filtro', 'ClienteController@indexUsuarioFiltro');
+        Route::get('/user-info', 'ClienteController@getUserInfo');
+        Route::get('/user/selectUser/filter', 'UserController@selectUsuarios');
+        Route::get('/user/selectUser/rol', 'UserController@selectUsuariosPorRol');
+
         Route::get('/venta', 'VentaController@index');
+        Route::get('/venta/offline', 'VentaController@ventaOffline');
         Route::post('/venta/registrar', 'VentaController@store');
         Route::put('/venta/desactivar', 'VentaController@desactivar');
         Route::get('/venta/obtenerCabecera', 'VentaController@obtenerCabecera');
@@ -155,6 +169,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/credito/registrar', 'CreditoVentaController@store');
         Route::put('/credito/actualizar', 'CreditoVentaController@update');
         Route::get('/credito/eliminar', 'CreditoVentaController@destroy');
+        Route::post('/credito/cuotas', 'CreditoVentaController@obtenerCuotasCredito');
+        Route::post('/credito/cuotas/registrar', 'CreditoVentaController@registrarPagoCuota');
+        Route::get('/credito/cuotas/venta/{idventa}', 'CreditoVentaController@obtenerCreditoYCuotas');
         // cuota_credito
         Route::get('/cuota', 'CuotasCreditoController@index');
         Route::post('/cuota/registrar', 'CuotasCreditoController@store');
@@ -173,6 +190,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/cotizacionventa/eliminar', 'CotizacionVentaController@delete');
         Route::get('/cotizacionventa/obtenerDetalles', 'CotizacionVentaController@obtenerDetalles');
         Route::put('cotizacionventa/editar', 'CotizacionVentaController@editar');
+        Route::get('/cotizacionventa/imprimir/{id}', 'CotizacionVentaController@imprimirTicket');
+
 
         Route::get('/rol', 'RolController@index');
         Route::get('/rol/selectRol', 'RolController@selectRol');
@@ -205,7 +224,8 @@ Route::group(['middleware' => ['auth']], function () {
         // actualizar 
         Route::put('/sucursal/actualizar', 'SucursalController@update');
         Route::get('/sucursal/selectSucursal', 'SucursalController@selectSucursal');
-
+        Route::get('/tipoPago/selectTipoPago', 'TipoPagoController@selectTipoPago');
+        Route::get('/sucursal/selectedSucursal/filter', 'SucursalController@selectedSucursal');
         //Puntos de Venta
         Route::get('/puntoVenta', 'PuntoVentaController@index');
         Route::get('/puntoVenta/obtenerDatosTipoPuntoVenta', 'PuntoVentaController@obtenerDatosTipoPuntoVenta');
@@ -221,6 +241,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/moneda/activar', 'MonedaController@activar');
         Route::put('/moneda/desactivar', 'MonedaController@desactivar');
         Route::put('/moneda/actualizar', 'MonedaController@update');
+        Route::get('/moneda/selectMoneda', 'MonedaController@selectMoneda');
+        Route::get('/moneda/selectMoneda', 'MonedaController@selectMoneda');
+
+        Route::get('/moneda/{id}', 'MonedaController@getMonedaById');
 
         //APERTURA/CIERRE CAJA
         //Listar
@@ -241,15 +265,10 @@ Route::group(['middleware' => ['auth']], function () {
         //FACTURAS
         Route::get('/factura', 'SiatController@index');
         Route::get('/factura/getFactura/{id}', 'SiatController@getFactura');
-<<<<<<< HEAD
         Route::get('/factura/imprimirRollo/{id}/{correo}', 'VentaController@imprimirFacturaRollo');
         Route::get('/factura/imprimirCarta/{id}/{correo}', 'VentaController@imprimirFactura');
         Route::get('/factura/imprimirRolloOffline/{id}/{correo}', 'VentaController@imprimirFacturaRolloOffline');
         Route::get('/factura/imprimirCartaOffline/{id}/{correo}', 'VentaController@imprimirFacturaOffline');
-=======
-        Route::get('/factura/imprimirRollo/{id}', 'VentaController@imprimirFacturaRollo');
-        Route::get('/factura/imprimirCarta/{id}', 'VentaController@imprimirFactura');
->>>>>>> d0b3de9 (Mensaje de confirmación)
         Route::get('/factura/anular/{cuf}/{motivoSeleccionado}', 'VentaController@anulacionFactura');
         Route::get('/factura/sincronizarActividades', 'VentaController@sincronizarActividades');
         Route::get('/factura/sincronizarParametricaTiposFactura', 'VentaController@sincronizarParametricaTiposFactura');
@@ -259,6 +278,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/factura/sincronizarParametricaEventosSignificativos', 'VentaController@sincronizarParametricaEventosSignificativos');
         Route::get('/factura/sincronizarParametricaUnidadMedida', 'VentaController@sincronizarParametricaUnidadMedida');
         Route::get('/factura/obtenerDatosMotivoAnulacion', 'FacturaController@obtenerDatosMotivoAnulacion');
+        Route::get('/factura/obtenerLeyendaAleatoria', 'FacturaController@obtenerLeyendaAleatoria');
+        Route::post('/factura/verificarNit/{numeroDocumento}', 'VentaController@verificarNit');
 
 
         //--INDUSTRIA--
@@ -292,15 +313,14 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/backup', 'BackupDbController@createBackup');
 
-<<<<<<< HEAD
         Route::get('/bancos', 'BancoController@index');
         Route::post('/bancos/registrar', 'BancoController@store');
         Route::put('/bancos/actualizar', 'BancoController@update');
         Route::get('/bancos/select', 'BancoController@getAllData');
 
-=======
->>>>>>> d0b3de9 (Mensaje de confirmación)
 
+        Route::get('/transferencias', 'TransferenciaController@index');
+        Route::post('/transferencias/registrar', 'TransferenciaController@store');
         //grupo
         Route::get('/grupos', 'GrupoController@index');
         Route::post('/grupos/registrar', 'GrupoController@store');
@@ -364,9 +384,27 @@ Route::group(['middleware' => ['auth']], function () {
         //-----seleccionar usuario , roles REGISTROS DE VENTAS
         Route::get('/roles/selectRoles', 'VentaController@selectRoles');
 
+        // OFERTAS
+        Route::get('/ofertas', 'OfertaController@index');
+        Route::post('/ofertas/registrar', 'OfertaController@store');
+        Route::put('/ofertas/actualizar', 'OfertaController@update');
+        Route::get('/ofertas/id', 'OfertaController@obtenerDatosPromocion');
+        Route::put('/ofertas/estado', 'OfertaController@modificarEstado');
+
+        Route::get('/kits/id', 'OfertaController@obtenerDatosKit');
+        Route::get('/promocion/id', 'OfertaController@obtenerPromocionPorIdArticulo');
+
+        Route::post('/ofertasespeciales/registrar', 'PreciosEspecialesController@store');
+
+        Route::get('/kits', 'OfertaController@indexKits');
+        Route::get('/ofertasespeciales', 'PreciosEspecialesController@index');
+        Route::put('/ofertasespeciales/actualizar', 'PreciosEspecialesController@update');
+
+
+
+
         //REPORTES
         Route::get('/ventas-diarias', 'VentaController@reporteVentasDiarias');
-<<<<<<< HEAD
         Route::get('/reporte-almacen', 'InventarioController@reporteAlmacenes');
         Route::get('/reporte-kardex-fisico-valorado', 'ReporteKardexFisicoInventarioController@generarReporte');
         Route::get('/reporte-kardex-fisico', 'ReporteKardexFisicoInventarioController@generarReporteFisico');
@@ -383,12 +421,21 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/reporte-resumen-fisico-movimientos', 'ReportesInventariosController@resumenFisicoMovimientos');
         Route::get('/resumen-ventas-documento-detallado', 'ReportesVentas@ResumenVentasPorDocumentoDetallado');
         Route::get('/reporte-inventario-fisico-valorado/{tipo}', 'ReportesInventariosController@inventarioFisicoValorado');
-=======
-        Route::get('/exportar-ventas', 'ReportesController@exportarVentas');
->>>>>>> d0b3de9 (Mensaje de confirmación)
 
 
 
+        //VARIABLES TEMPORALES
+        Route::post('/variables/registrarVariable', 'VentasInstitucionalesController@registrarVariable');
+        Route::post('/variables/registrarArticuloVariable', 'VentasInstitucionalesController@registrarArticuloVariable');
+        Route::post('/variables/registrarArticuloVariable2', 'VentasInstitucionalesController@registrarArticuloVariable2');
+        Route::get('/variables/listarArticulosVariable', 'VentasInstitucionalesController@obtenerArticulosPorVariableTemporal');
+        Route::delete('/variables/excluirArticulo', 'VentasInstitucionalesController@excluirArticulo');
+        Route::post('/variables/registrar-venta-institucional', 'VentasInstitucionalesController@registrarVentaInstitucional');
+        Route::post('/variables/ventas_institucionales', 'VentasInstitucionalesController@registrarModificacionVentasInstitucionales');
+        Route::get('/variables/facturaInstitucional', 'VentasInstitucionalesController@listarFacturas');
+        Route::post('/variables/emitirFacturaInstitucional', 'VentaController@emitirFacturaInstitucional');
+        Route::post('/variables/insertarFacturaInstitucional', 'VentaController@insertarFacturaInstitucional');
+        Route::get('/variables/imprimirCarta/{id}/{idventainstitucional}', 'VentasInstitucionalesController@imprimirFactura');
     });
 
     //RUTA PARA RECUPERAR LA SESSION CON EL ID DE LA PERSONA LOGUEADA

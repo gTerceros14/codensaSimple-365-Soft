@@ -5,27 +5,35 @@ namespace App\Http\Controllers;
 use App\Almacen;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use App\User;
 
 class AlmacenController extends Controller
 {
     //listas almacen
-    public function index(Request $request)
+   public function index(Request $request)
     {
-        if (!$request->ajax())
+        if (!$request->ajax()) {
             return redirect('/');
+        }
 
         $buscar = $request->buscar;
         $criterio = $request->criterio;
 
-        $almacenes = Almacen::join('users', 'almacens.encargado', '=', 'users.id')
-            ->join('personas', 'users.id', '=', 'personas.id')
-            ->join('sucursales', 'almacens.sucursal', '=', 'sucursales.id')
-            ->select('almacens.*', 'personas.nombre as nombre_encargado', 'sucursales.nombre as nombre_sucursal')
+        $almacenes = Almacen::join('sucursales', 'almacens.sucursal', '=', 'sucursales.id')
+            ->select('almacens.*', 'sucursales.nombre as nombre_sucursal')
             ->when($buscar, function ($query) use ($buscar, $criterio) {
-                return $query->where('personas.nombre', 'like', '%' . $buscar . '%');
+                return $query->where('almacens.nombre_almacen', 'like', '%' . $buscar . '%')
+                    ->orWhere('sucursales.nombre', 'like', '%' . $buscar . '%');
             })
             ->orderBy('almacens.id', 'desc')
             ->paginate(6);
+
+      foreach ($almacenes as $almacen) {
+    $encargadosIds = explode(',', $almacen->encargado);
+    // Cambia 'name' a 'usuario' en la siguiente línea
+    $encargadosNombres = User::whereIn('id', $encargadosIds)->pluck('usuario')->implode(', ');
+    $almacen->encargados_nombres = $encargadosNombres;
+}
 
         return [
             'pagination' => [
@@ -39,6 +47,7 @@ class AlmacenController extends Controller
             'almacenes' => $almacenes
         ];
     }
+
     public function store(Request $request)
     {
         if (!$request->ajax())
@@ -59,6 +68,8 @@ class AlmacenController extends Controller
             'observacion' => $request->observacion,
         ]);
         $almacenes->save();
+         $encargados = explode(',', $request->encargado);
+    $almacenes->encargado = json_encode($encargados);
     }
     public function update(Request $request)
     {
@@ -82,6 +93,8 @@ class AlmacenController extends Controller
             'observacion' => $request->observacion,
         ]);
         $almacenes->save();
+  $encargados = explode(',', $request->encargado);
+    $almacenes->encargado = json_encode($encargados);
     }
     public function selectAlmacen(Request $request)
     {
