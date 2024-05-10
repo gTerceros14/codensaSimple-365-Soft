@@ -245,7 +245,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-2">
+                             <!--   <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="" class="font-weight-bold">Descuento %
                                             <span class="text-danger">*</span>
@@ -253,7 +253,7 @@
                                         <input type="number" id="descuentoProducto" value="0" class="form-control"
                                             v-model="descuentoProducto" max="99">
                                     </div>
-                                </div>
+                                </div> -->
 
                                 <div class="col-md-3">
                                     <div class="form-group d-flex">
