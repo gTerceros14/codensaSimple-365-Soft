@@ -22,7 +22,7 @@ class CreateArticulosTable extends Migration
             $table->integer('idmedida')->unsigned(); //new
 
             $table->string('codigo', 50)->nullable();
-            $table->string('nombre', 100)->unique(); //Nombre comercial
+            $table->string('nombre', 100); //Nombre comercial
             $table->string('nombre_generico', 100); //aumente 5_julio
             $table->integer('unidad_envase'); //aumente
             $table->decimal('precio_list_unid', 15, 4)->nullable(); //aumente
