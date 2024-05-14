@@ -11,11 +11,14 @@ use App\Articulo;
 use App\Inventario;
 use App\DetalleVenta;
 use App\User;
+use App\Ingreso;
 use App\CreditoVenta;
 use App\CuotasCredito;
 use App\Empresa;
 use App\Caja;
 use App\Factura;
+use App\FacturaFueraLinea;
+use App\FacturaInstitucional;
 use App\Http\Controllers\CifrasEnLetrasController;
 use Illuminate\Support\Facades\Log;
 use App\Notifications\NotifyAdmin;
@@ -58,44 +61,49 @@ class VentaController extends Controller
         $usuario = \Auth::user();
 
         if ($buscar == '') {
-            $ventas = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
+            $ventas = Factura::join('ventas', 'facturas.idventa', '=', 'ventas.id')
+                ->join('personas', 'facturas.idcliente', '=', 'personas.id')
                 ->join('users', 'ventas.idusuario', '=', 'users.id')
                 ->select(
-<<<<<<< HEAD
                     'facturas.*',
                     'facturas.correo as correo',
                     'ventas.tipo_comprobante as tipo_comprobante',
-=======
-                    'ventas.id',
-                    'ventas.tipo_comprobante',
->>>>>>> d0b3de9 (Mensaje de confirmación)
                     'ventas.serie_comprobante',
-                    'ventas.num_comprobante',
-                    'ventas.fecha_hora',
-                    'ventas.impuesto',
-                    'ventas.total',
-                    'ventas.estado',
-                    'personas.nombre',
-                    'users.usuario'
+                    'ventas.num_comprobante as num_comprobante',
+                    'ventas.fecha_hora as fecha_hora',
+                    'ventas.impuesto as impuesto',
+                    'ventas.total as total',
+                    'ventas.idtipo_venta',
+                    'ventas.estado as estado',
+                    'personas.nombre as razonSocial',
+                    'personas.email as email',
+                    'personas.num_documento as documentoid',
+                    'personas.complemento_id as complementoid',
+                    'users.usuario as usuario'
                 )
-                ->orderBy('ventas.id', 'desc')->paginate(3);
+                ->orderBy('facturas.id', 'desc')->paginate(3);
         } else {
-            $ventas = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
+            $ventas = Factura::join('ventas', 'facturas.idventa', '=', 'ventas.id')
+                ->join('personas', 'facturas.idcliente', '=', 'personas.id')
                 ->join('users', 'ventas.idusuario', '=', 'users.id')
                 ->select(
-                    'ventas.id',
-                    'ventas.tipo_comprobante',
+                    'facturas.*',
+                    'ventas.tipo_comprobante as tipo_comprobante',
                     'ventas.serie_comprobante',
-                    'ventas.num_comprobante',
-                    'ventas.fecha_hora',
-                    'ventas.impuesto',
-                    'ventas.total',
-                    'ventas.estado',
-                    'personas.nombre',
-                    'users.usuario'
+                    'ventas.num_comprobante as num_comprobante',
+                    'ventas.fecha_hora as fecha_hora',
+                    'ventas.impuesto as impuesto',
+                    'ventas.total as total',
+                    'ventas.idtipo_venta',
+                    'ventas.estado as estado',
+                    'personas.nombre as razonSocial',
+                    'personas.email as email',
+                    'personas.num_documento as documentoid',
+                    'personas.complemento_id as complementoid',
+                    'users.usuario as usuario'
                 )
-                ->where('ventas.' . $criterio, 'like', '%' . $buscar . '%')
-                ->orderBy('ventas.id', 'desc')->paginate(3);
+                ->where('facturas.' . $criterio, 'like', '%' . $buscar . '%')
+                ->orderBy('facturas.id', 'desc')->paginate(6);
         }
 
         return [
@@ -111,7 +119,6 @@ class VentaController extends Controller
             'usuario' => $usuario
         ];
     }
-<<<<<<< HEAD
 
     public function ventaOffline(Request $request)
     {
@@ -180,8 +187,6 @@ class VentaController extends Controller
         ];
     }
 
-=======
->>>>>>> d0b3de9 (Mensaje de confirmación)
     public function indexBuscar(Request $request)
     {
         if (!$request->ajax()) {
@@ -202,7 +207,7 @@ class VentaController extends Controller
             $ventas = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
                 ->join('users', 'ventas.idusuario', '=', 'users.id')
                 ->join('detalle_ventas', 'ventas.id', '=', 'detalle_ventas.idventa')
-                ->join('articulos', 'detalle_ventas.idarticulo', '=', 'articulos.id') 
+                ->join('articulos', 'detalle_ventas.idarticulo', '=', 'articulos.id')
                 ->join('inventarios', 'articulos.id', '=', 'inventarios.idarticulo')
                 ->select(
                     'ventas.id',
@@ -219,28 +224,28 @@ class VentaController extends Controller
                     'detalle_ventas.idarticulo'
                 )
                 ->distinct()
-                ->where(function($query) use ($idRoles) {
+                ->where(function ($query) use ($idRoles) {
                     if ($idRoles !== null) {
                         $query->where('users.idrol', $idRoles);
                     }
                 })
-                ->where(function($query) use ($idAlmacen) {
+                ->where(function ($query) use ($idAlmacen) {
                     if ($idAlmacen !== null) {
                         $query->where('inventarios.idalmacen', $idAlmacen);
                     }
                 });
 
-                // Filtrar por fechas solo si se proporcionan fechas distintas de la actual
-                if ($fechaInicio !== now()->toDateString() || $fechaFin !== now()->addDay()->toDateString()) {
-                    $ventas->whereBetween('ventas.fecha_hora', [$fechaInicio, $fechaFin]);
-                }
+            // Filtrar por fechas solo si se proporcionan fechas distintas de la actual
+            if ($fechaInicio !== now()->toDateString() || $fechaFin !== now()->addDay()->toDateString()) {
+                $ventas->whereBetween('ventas.fecha_hora', [$fechaInicio, $fechaFin]);
+            }
 
-            $ventas = $ventas->orderBy('ventas.id', 'desc')->paginate(3);
+            $ventas = $ventas->orderBy('ventas.id', 'desc')->paginate(6);
         } else {
             $ventas = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
                 ->join('users', 'ventas.idusuario', '=', 'users.id')
                 ->join('detalle_ventas', 'ventas.id', '=', 'detalle_ventas.idventa')
-                ->join('articulos', 'detalle_ventas.idarticulo', '=', 'articulos.id') 
+                ->join('articulos', 'detalle_ventas.idarticulo', '=', 'articulos.id')
                 ->join('inventarios', 'articulos.id', '=', 'inventarios.idarticulo')
                 ->select(
                     'ventas.id',
@@ -257,12 +262,12 @@ class VentaController extends Controller
                     'detalle_ventas.idarticulo'
                 )
                 ->distinct()
-                ->where(function($query) use ($idRoles) {
+                ->where(function ($query) use ($idRoles) {
                     if ($idRoles !== null) {
                         $query->where('users.idrol', $idRoles);
                     }
                 })
-                ->where(function($query) use ($idAlmacen) {
+                ->where(function ($query) use ($idAlmacen) {
                     if ($idAlmacen !== null) {
                         $query->where('inventarios.idalmacen', $idAlmacen);
                     }
@@ -274,7 +279,7 @@ class VentaController extends Controller
                 $ventas->whereBetween('ventas.fecha_hora', [$fechaInicio, $fechaFin]);
             }
 
-            $ventas = $ventas->orderBy('ventas.id', 'desc')->paginate(3);
+            $ventas = $ventas->orderBy('ventas.id', 'desc')->paginate(6);
         }
         return [
             'pagination' => [
@@ -292,20 +297,27 @@ class VentaController extends Controller
 
     public function obtenerUltimoComprobante(Request $request)
     {
-        $ultimoComprobante = DB::table('Facturas')
+        $ultimoComprobanteFacturas = DB::table('Facturas')
             ->select('numeroFactura')
             ->orderBy('numeroFactura', 'desc')
             ->limit(1)
             ->first();
 
-        if ($ultimoComprobante) {
-            $lastComprobante = $ultimoComprobante->numeroFactura;
-        } else {
-            $lastComprobante = 1;
-        }
+        $ultimoComprobanteFueraLineas = DB::table('factura_fuera_lineas')
+            ->select('numeroFactura')
+            ->orderBy('numeroFactura', 'desc')
+            ->limit(1)
+            ->first();
+
+        $lastComprobanteFacturas = $ultimoComprobanteFacturas ? $ultimoComprobanteFacturas->numeroFactura : 0;
+        $lastComprobanteFueraLineas = $ultimoComprobanteFueraLineas ? $ultimoComprobanteFueraLineas->numeroFactura : 0;
+
+        // Obtener el número mayor entre las dos tablas
+        $lastComprobante = max($lastComprobanteFacturas, $lastComprobanteFueraLineas);
 
         return response()->json(['last_comprobante' => $lastComprobante]);
     }
+
 
     public function obtenerCabecera(Request $request)
     {
@@ -391,167 +403,37 @@ class VentaController extends Controller
         return $pdf->setPaper('a4', 'landscape')->download('venta-' . $numventa[0]->num_comprobante . '.pdf');
 
     }
+
     public function store(Request $request)
     {
         if (!$request->ajax())
             return redirect('/');
 
+        $idtipoventa = $request->idtipo_venta;
+
         try {
             DB::beginTransaction();
 
-            $descu = '';
-            $valorMaximoDescuentoEmpresa = Empresa::first();
-            $valorMaximo = $valorMaximoDescuentoEmpresa->valorMaximoDescuento;
-            $detalles = $request->data; //Array de detalles
-            $idAlmacen = $request->idAlmacen;
-
-            foreach ($detalles as $ep => $det) {
-                $descu = $det['descuento'];
+            if (!$this->validarCajaAbierta()) {
+                return ['id' => -1, 'caja_validado' => 'Debe tener una caja abierta'];
             }
+            $venta = $this->crearVenta($request);
 
-            if ($descu > $valorMaximoDescuentoEmpresa->valorMaximoDescuento) {
-                return [
-                    'id' => -1,
-                    'valorMaximo' => $valorMaximo
-                ];
-            } else {
+            $this->actualizarCaja($request);
 
-                $ultimaCaja = Caja::latest()->first();
 
-                if ($ultimaCaja) {
-                    if ($ultimaCaja->estado == '1') {
-                        $venta = new Venta();
-                        $venta->idcliente = $request->idcliente;
-                        $venta->idusuario = \Auth::user()->id;
-                        $venta->idtipo_pago = $request->idtipo_pago;
-                        $venta->tipo_comprobante = $request->tipo_comprobante;
-                        $venta->serie_comprobante = $request->serie_comprobante;
-                        $venta->num_comprobante = $request->num_comprobante;
-                        $venta->fecha_hora = now()->setTimezone('America/La_Paz');
-                        $venta->impuesto = $request->impuesto;
-                        $venta->total = $request->total;
-                        $venta->estado = 'Registrado';
-                        $venta->idcaja = $ultimaCaja->id;
-                        //---------registro credito_Ventas---
-                        Log::info('DATOS REGISTRO ARTICULO VENTA:', [
-                            'idcliente' => $request->idcliente,
-                            'idusuario' => $request->id,
-                            'idtipo_pago' => $request->idtipo_pago,
-                            'tipo_comprobante' => $request->tipo_comprobante,
-                            'serie_comprobante' => $request->serie_comprobante,
-                            'num_comprobante' => $request->num_comprobante,
-                            'fecha_hora' => $request->fecha_hora,
-                            'impuesto' => $request->impuesto,
-                            'total' => $request->total,
-                            //'estado' => $request->precio_venta,
-                            'idcaja' => $request->id,
-                        ]);
-                        $venta->save();
-                        //-----hasta aqui----
+            $this->registrarDetallesVenta($venta, $request->data, $request->idAlmacen);
 
-                        if($request->idtipo_pago == 2){
-                            //----REGIStRADO DE CREDITOS_VENTAAS--
-                            $creditoventa = new CreditoVenta();
-                            $creditoventa->idventa = $venta->id;
-                            $creditoventa->idpersona = $request->idpersona;
-                            $creditoventa->numero_cuotas = $request->numero_cuotas;
-                            $creditoventa->tiempo_dias_cuota = $request->tiempo_dias_cuota;
-                            $creditoventa->estado = $request->estadocrevent;//--OJO CON ESTO REPIDE EN VARIOS
-                            Log::info('LLEGA_2 CREDITOS_VENTAS:', [
-                                'DATOS' => $creditoventa,
-                            ]);
-                            $creditoventa->save();
-                            //----HASTA AQUI REGIStRADO DE CREDITOS_VENTAS--
+            $this->notificarAdministradores();
 
-                            //------para Ver que daTos llega
-                            $detallescuota = $request->cuotaspago;//Array de detalles
-                            //Recorro todos los elementos
-                            Log::info('LLEGA_3 CUOTAS_CREDITO:', [
-                                'DATOS' => $detallescuota,
-                            ]);
-                             //----REGIStRADO DE CUOTAS_CREDITO--
-                            foreach ($detallescuota as $detalle) {
-                                $cuotascredito = new CuotasCredito();
-                                $cuotascredito->idcredito = $creditoventa->id;
-                                $cuotascredito->fecha_pago = $detalle['fechaPago'];
-                                $cuotascredito->fecha_cancelado = $detalle['fechaCancelado'];
-                                $cuotascredito->precio_cuota = $detalle['precioCuota'];
-                                $cuotascredito->total_cancelado = $detalle['totalCancelado'];
-                                $cuotascredito->saldo = $detalle['saldo'];
-                                $cuotascredito->estado = $detalle['estadocuocre'];
-                                $cuotascredito->save();
-                            }
-                            //---hastaa qui REGIStRADO DE CUOTAS_CREDITO--
+            DB::commit();
 
-                        }
-
-                        $ultimaCaja->ventasContado = ($request->total) + ($ultimaCaja->ventasContado);
-                        $ultimaCaja->save();
-
-                        Log::info('venta', [
-                            'data' => $ultimaCaja,
-                            'idalmacen' => $idAlmacen,
-                        ]);
-
-                        foreach ($detalles as $ep => $det) {
-
-                            $disminuirStock = Inventario::where('idalmacen', $idAlmacen)
-                                                        ->where('idarticulo', $det['idarticulo'])
-                                                        ->firstOrFail();
-                            $disminuirStock->saldo_stock -= $det['cantidad'];
-                            $disminuirStock->save();
-
-                            $detalle = new DetalleVenta();
-                            $detalle->idventa = $venta->id;
-                            $detalle->idarticulo = $det['idarticulo'];
-                            $detalle->cantidad = $det['cantidad'];
-                            $detalle->precio = $det['precioseleccionado'];
-                            $detalle->descuento = $det['descuento'];
-                            $detalle->save();
-                        }
-                        $fechaActual = date('Y-m-d');
-                        $numVentas = DB::table('ventas')->whereDate('created_at', $fechaActual)->count();
-                        $numIngresos = DB::table('ingresos')->whereDate('created_at', $fechaActual)->count();
-
-                        $arreglosDatos = [
-                            'ventas' => [
-                                'numero' => $numVentas,
-                                'msj' => 'Ventas'
-                            ],
-                            'ingresos' => [
-                                'numero' => $numIngresos,
-                                'msj' => 'Ingresos'
-                            ]
-                        ];
-                        $allUsers = User::all();
-
-                        foreach ($allUsers as $notificar) {
-                            User::findOrFail($notificar->id)->notify(new NotifyAdmin($arreglosDatos));
-                        }
-                        DB::commit();
-                        return [
-                            'id' => $venta->id
-                        ];
-                    } else {
-                        return [
-                            'id' => -1,
-                            'caja_validado' => 'Debe tener una caja abierta'
-                        ];
-                    }
-                } else {
-                    return [
-                        'id' => -1,
-                        'caja_validado' => 'Debe crear primero una apertura de caja'
-                    ];
-                }
-
-            }
+            return ['id' => $venta->id];
         } catch (Exception $e) {
             DB::rollBack();
         }
     }
 
-<<<<<<< HEAD
     private function validarCajaAbierta()
     {
         $ultimaCaja = Caja::latest()->first();
@@ -580,13 +462,7 @@ class VentaController extends Controller
             'impuesto',
             'total'
         ]));
-        if($request->usuarioCotizacion == null){
-            $venta->idusuario = \Auth::user()->id;
-        }
-        else{
-            $venta->idusuario = $request->usuarioCotizacion;
-        }
-       
+        $venta->idusuario = \Auth::user()->id;
         $venta->fecha_hora = now()->setTimezone('America/La_Paz');
         if ($request->idtipo_venta == 2) {
             $venta->estado = 'Pendiente';
@@ -905,8 +781,6 @@ class VentaController extends Controller
     //     }
     // }
 
-=======
->>>>>>> d0b3de9 (Mensaje de confirmación)
     public function desactivar(Request $request)
     {
         if (!$request->ajax())
@@ -916,19 +790,21 @@ class VentaController extends Controller
         $venta->save();
     }
 
-    public function verificarComunicacion(){
+    public function verificarComunicacion()
+    {
         require "SiatController.php";
-            $siat = new SiatController();
-            $res = $siat->verificarComunicacion();
-            if($res->RespuestaComunicacion->transaccion==true){
-                echo json_encode($res, JSON_UNESCAPED_UNICODE);
-            }else{
-                $msg="Falló la comunicación";
-                echo json_encode($msg, JSON_UNESCAPED_UNICODE);
-            }
+        $siat = new SiatController();
+        $res = $siat->verificarComunicacion();
+        if ($res->RespuestaComunicacion->transaccion == true) {
+            echo json_encode($res, JSON_UNESCAPED_UNICODE);
+        } else {
+            $msg = "Falló la comunicación";
+            echo json_encode($msg, JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    public function cuis(){
+    public function cuis()
+    {
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
@@ -943,7 +819,6 @@ class VentaController extends Controller
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
     }
 
-<<<<<<< HEAD
     public function nuevoCufd()
     {
         $user = Auth::user();
@@ -974,19 +849,16 @@ class VentaController extends Controller
 
     public function cufd()
     {
-=======
-    public function cufd(){
->>>>>>> d0b3de9 (Mensaje de confirmación)
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
         $codSucursal = $sucursal->codigoSucursal;
 
-        if(!isset($_SESSION['scufd'])){
+        if (!isset ($_SESSION['scufd'])) {
             require "SiatController.php";
             $siat = new SiatController();
             $res = $siat->cufd($puntoVenta, $codSucursal);
-            if($res->RespuestaCufd->transaccion==true){
+            if ($res->RespuestaCufd->transaccion == true) {
                 $cufd = $res->RespuestaCufd->codigo;
                 $codigoControl = $res->RespuestaCufd->codigoControl;
                 $direccion = $res->RespuestaCufd->direccion;
@@ -995,17 +867,17 @@ class VentaController extends Controller
                 $_SESSION['scodigoControl'] = $codigoControl;
                 $_SESSION['sdireccion'] = $direccion;
                 $_SESSION['sfechaVigenciaCufd'] = $fechaVigencia;
-            }else{
-                $res=false;
+            } else {
+                $res = false;
             }
-        }else{
-            $fechaVigencia = substr($_SESSION['sfechaVigenciaCufd'],0,16);
+        } else {
+            $fechaVigencia = substr($_SESSION['sfechaVigenciaCufd'], 0, 16);
             $fechaVigencia = str_replace("T", " ", $fechaVigencia);
-            if($fechaVigencia<date('Y-m-d H:i')){
+            if ($fechaVigencia < date('Y-m-d H:i')) {
                 require "SiatController.php";
                 $siat = new SiatController();
                 $res = $siat->cufd($puntoVenta, $codSucursal);
-                if($res->RespuestaCufd->transaccion==true){
+                if ($res->RespuestaCufd->transaccion == true) {
                     $cufd = $res->RespuestaCufd->codigo;
                     $codigoControl = $res->RespuestaCufd->codigoControl;
                     $direccion = $res->RespuestaCufd->direccion;
@@ -1014,20 +886,21 @@ class VentaController extends Controller
                     $_SESSION['scodigoControl'] = $codigoControl;
                     $_SESSION['sdireccion'] = $direccion;
                     $_SESSION['sfechaVigenciaCufd'] = $fechaVigencia;
-                }else{
-                    $res=false;
+                } else {
+                    $res = false;
                 }
-                }else{
-                    $res['transaccion'] = true;
-                    $res['codigo'] = $_SESSION['scufd'];
-                    $res['fechaVigencia'] = $_SESSION['sfechaVigenciaCufd'];
-                    $res['direccion'] = $_SESSION['sdireccion'];
-                }
-                }
-            echo json_encode($res, JSON_UNESCAPED_UNICODE);
+            } else {
+                $res['transaccion'] = true;
+                $res['codigo'] = $_SESSION['scufd'];
+                $res['fechaVigencia'] = $_SESSION['sfechaVigenciaCufd'];
+                $res['direccion'] = $_SESSION['sdireccion'];
+            }
+        }
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
     }
 
-    public function sincronizarActividades(){
+    public function sincronizarActividades()
+    {
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
@@ -1040,7 +913,8 @@ class VentaController extends Controller
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
     }
 
-    public function sincronizarParametricaTiposFactura(){
+    public function sincronizarParametricaTiposFactura()
+    {
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
@@ -1049,10 +923,11 @@ class VentaController extends Controller
         require "SiatController.php";
         $siat = new SiatController();
         $res = $siat->sincronizarParametricaTiposFactura($puntoVenta, $codSucursal);
-        echo json_encode($res, JSON_UNESCAPED_UNICODE);   
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
     }
 
-    public function sincronizarListaProductosServicios(){
+    public function sincronizarListaProductosServicios()
+    {
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
@@ -1064,7 +939,8 @@ class VentaController extends Controller
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
     }
 
-    public function sincronizarParametricaMotivoAnulacion(){
+    public function sincronizarParametricaMotivoAnulacion()
+    {
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
@@ -1076,7 +952,8 @@ class VentaController extends Controller
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
     }
 
-    public function sincronizarParametricaEventosSignificativos(){
+    public function sincronizarParametricaEventosSignificativos()
+    {
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
@@ -1088,7 +965,8 @@ class VentaController extends Controller
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
     }
 
-    public function sincronizarListaLeyendasFactura(){
+    public function sincronizarListaLeyendasFactura()
+    {
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
@@ -1100,7 +978,8 @@ class VentaController extends Controller
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
     }
 
-    public function sincronizarParametricaUnidadMedida(){
+    public function sincronizarParametricaUnidadMedida()
+    {
         $user = Auth::user();
         //$puntoVenta = $user->idpuntoventa;
         $puntoVenta = 0;
@@ -1113,7 +992,26 @@ class VentaController extends Controller
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
     }
 
-    public function verificacionEstadoFactura($cuf){
+    public function verificarNit($numeroDocumento)
+    {
+        $user = Auth::user();
+        $sucursal = $user->sucursal;
+        $codSucursal = $sucursal->codigoSucursal;
+
+        require "SiatController.php";
+        $siat = new SiatController();
+        $res = $siat->verificarNit($codSucursal, $numeroDocumento);
+        if ($res->RespuestaVerificarNit->transaccion === true) {
+            $mensaje = $res->RespuestaVerificarNit->mensajesList->descripcion;
+        } else if ($res->RespuestaVerificarNit->transaccion === false) {
+            $mensaje = $res->RespuestaVerificarNit->transaccion;
+        }
+
+        echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function verificacionEstadoFactura($cuf)
+    {
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
@@ -1123,12 +1021,11 @@ class VentaController extends Controller
         $siat = new SiatController();
         $res = $siat->verificacionEstadoFactura($cuf, $puntoVenta, $codSucursal);
         $mensaje = $res->RespuestaServicioFacturacion->codigoDescripcion;
-        
+
         echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
         //var_dump($res);
     }
 
-<<<<<<< HEAD
     public function emitirFactura(Request $request)
     {
 
@@ -1229,9 +1126,6 @@ class VentaController extends Controller
 
     public function emitirFacturaInstitucional(Request $request)
     {
-=======
-    public function emitirFactura(Request $request){    
->>>>>>> d0b3de9 (Mensaje de confirmación)
 
         $user = Auth::user();
         //$puntoVenta = $user->idpuntoventa;
@@ -1241,10 +1135,11 @@ class VentaController extends Controller
 
         $datos = $request->input('factura');
         $id_cliente = $request->input('id_cliente');
-            
+        $idventainstitucional = $request->input('idventainstitucional');
+
         $valores = $datos['factura'][0]['cabecera'];
         $nitEmisor = str_pad($valores['nitEmisor'], 13, "0", STR_PAD_LEFT);
-            
+
         $fechaEmision = $valores['fechaEmision'];
         $fecha_formato = str_replace("T", "", $fechaEmision);
         $fecha_formato = str_replace("-", "", $fecha_formato);
@@ -1264,15 +1159,16 @@ class VentaController extends Controller
         $x10 = false;
         $mod11 = CustomHelpers::calculaDigitoMod11($cadena, $numDig, $limMult, $x10);
         $cadena2 = $cadena . $mod11;
-        
+
         $pString = $cadena2;
         $bas16 = CustomHelpers::base16($pString);
-        
+
         $cuf = strtoupper($bas16) . $codigoControl;
-            
+
         $datos['factura'][0]['cabecera']['cuf'] = $cuf;
-            
+
         $temporal = $datos['factura'];
+        //dd($temporal);
         $xml_temporal = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><facturaComputarizadaCompraVenta xsi:noNamespaceSchemaLocation=\"facturaComputarizadaCompraVenta.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"></facturaComputarizadaCompraVenta>");
 
         $this->formato_xml($temporal, $xml_temporal);
@@ -1283,19 +1179,17 @@ class VentaController extends Controller
         fclose($fp);
         $archivo = $gzdata;
         $hashArchivo = hash("sha256", file_get_contents(public_path("docs/facturaxml.xml")));
-            
+
         $numeroFactura = $valores['numeroFactura'];
         $codigoMetodoPago = $valores['codigoMetodoPago'];
-<<<<<<< HEAD
 
-=======
->>>>>>> d0b3de9 (Mensaje de confirmación)
         $montoTotal = $valores['montoTotal'];
         $montoTotalSujetoIva = $valores['montoTotalSujetoIva'];
         $descuentoAdicional = $valores['descuentoAdicional'];
         $productos = file_get_contents(public_path("docs/facturaxml.xml"));
-            
-        $data = $this->insertarFactura($request, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
+
+
+        $data = $this->insertarFacturaInstitucional($request, $id_cliente, $idventainstitucional, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
 
         if ($data) {
             // Registro exitoso
@@ -1303,90 +1197,64 @@ class VentaController extends Controller
             $siat = new SiatController();
             $resFactura = $siat->recepcionFactura($archivo, $fechaEmision, $hashArchivo, $puntoVenta, $codSucursal);
             //var_dump($resFactura);
-            if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "VALIDADA"){
+            if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "VALIDADA") {
                 $mensaje = $resFactura->RespuestaServicioFacturacion->codigoDescripcion;
-            }else if($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA"){
-                $mensaje = $resFactura->RespuestaServicioFacturacion->mensajesList->descripcion;
+            } else if ($resFactura->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA") {
+                $mensajes = $resFactura->RespuestaServicioFacturacion->mensajesList;
+                //dd($mensajes);
+                if (is_array($mensajes)) {
+                    $descripciones = array_map(function ($mensaje) {
+                        return $mensaje->descripcion;
+                    }, $mensajes);
+                    $mensaje = $descripciones;
+                }
             }
             echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
-            
-        } 
+
+        }
     }
 
     public function paqueteFactura(Request $request)
     {
-            $user = Auth::user();
-            $puntoVenta = $user->idpuntoventa;
-            $sucursal = $user->sucursal;
-            $codSucursal = $sucursal->codigoSucursal;
+        $user = Auth::user();
+        //$puntoVenta = $user->idpuntoventa;
+        $puntoVenta = 0;
+        $sucursal = $user->sucursal;
+        $codSucursal = $sucursal->codigoSucursal;
 
-<<<<<<< HEAD
         $datos = $request->input('factura');
         $id_cliente = $request->input('id_cliente');
         $cafc = $request->input('cafc');
         $idventa = $request->input('idventa');
         $correo = $request->input('correo');
         $_SESSION['scafc'] = $cafc;
-=======
-            $datos = $request->input('factura');
-            $id_cliente = $request->input('id_cliente');
-            $cafc = $request->input('cafc');
-            $_SESSION['scafc'] = $cafc;
-                
-            $valores = $datos['factura'][0]['cabecera'];
-            $nitEmisor = str_pad($valores['nitEmisor'], 13, "0", STR_PAD_LEFT);
-                
-            $fechaEmision = $valores['fechaEmision'];
-            $fecha_formato = str_replace("T", "", $fechaEmision);
-            $fecha_formato = str_replace("-", "", $fecha_formato);
-            $fecha_formato = str_replace(":", "", $fecha_formato);
-            $fecha_formato = str_replace(".", "", $fecha_formato);
-            $sucursal = str_pad($codSucursal, 4, "0", STR_PAD_LEFT);
-            $modalidad = 2;
-            $tipoEmision = 2;
-            $tipoFactura = 1;
-            $tipoDocSector = str_pad(1, 2, "0", STR_PAD_LEFT);
-            $numeroFactura = str_pad($valores['numeroFactura'], 10, "0", STR_PAD_LEFT);
-            $puntoVentaCuf = str_pad($puntoVenta, 4, "0", STR_PAD_LEFT);
-            $codigoControl = $_SESSION['scodigoControl'];
-            $cadena = $nitEmisor . $fecha_formato . $sucursal . $modalidad . $tipoEmision . $tipoFactura . $tipoDocSector . $numeroFactura . $puntoVentaCuf;
-            $numDig = 1;
-            $limMult = 9;
-            $x10 = false;
-            $mod11 = CustomHelpers::calculaDigitoMod11($cadena, $numDig, $limMult, $x10);
-            $cadena2 = $cadena . $mod11;
-            
-            $pString = $cadena2;
-            $bas16 = CustomHelpers::base16($pString);
-            
-            $cuf = strtoupper($bas16) . $codigoControl;
-                
-            $datos['factura'][0]['cabecera']['cuf'] = $cuf;
-                
->>>>>>> d0b3de9 (Mensaje de confirmación)
 
-            // Crear una carpeta temporal
-            $carpetaTemporal = public_path("docs/temporal/");
-            if (!file_exists($carpetaTemporal)) {
-                mkdir($carpetaTemporal, 0777, true);
-                chmod($carpetaTemporal, 0777);
-            }
+        $valores = $datos['factura'][0]['cabecera'];
+        $nitEmisor = str_pad($valores['nitEmisor'], 13, "0", STR_PAD_LEFT);
 
-            // Guardar el archivo XML en la carpeta temporal
-            $temporal = $datos['factura'];
-            $xml_temporal = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><facturaComputarizadaCompraVenta xsi:noNamespaceSchemaLocation=\"facturaComputarizadaCompraVenta.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"></facturaComputarizadaCompraVenta>");
-            $this->formato_xml($temporal, $xml_temporal);
-            $nombreArchivo = "facturaxml" . $fecha_formato . ".xml";
-            $xml_temporal->asXML(public_path("docs/temporal/" . $nombreArchivo));
+        $fechaEmision = $valores['fechaEmision'];
+        $fecha_formato = str_replace("T", "", $fechaEmision);
+        $fecha_formato = str_replace("-", "", $fecha_formato);
+        $fecha_formato = str_replace(":", "", $fecha_formato);
+        $fecha_formato = str_replace(".", "", $fecha_formato);
+        $sucursal = str_pad($codSucursal, 4, "0", STR_PAD_LEFT);
+        $modalidad = 2;
+        $tipoEmision = 2;
+        $tipoFactura = 1;
+        $tipoDocSector = str_pad(1, 2, "0", STR_PAD_LEFT);
+        $numeroFactura = str_pad($valores['numeroFactura'], 10, "0", STR_PAD_LEFT);
+        $puntoVentaCuf = str_pad($puntoVenta, 4, "0", STR_PAD_LEFT);
+        $codigoControl = $_SESSION['scodigoControl'];
+        $cadena = $nitEmisor . $fecha_formato . $sucursal . $modalidad . $tipoEmision . $tipoFactura . $tipoDocSector . $numeroFactura . $puntoVentaCuf;
+        $numDig = 1;
+        $limMult = 9;
+        $x10 = false;
+        $mod11 = CustomHelpers::calculaDigitoMod11($cadena, $numDig, $limMult, $x10);
+        $cadena2 = $cadena . $mod11;
 
-            $numeroFactura = $valores['numeroFactura'];
-            $codigoMetodoPago = $valores['codigoMetodoPago'];
-            $montoTotal = $valores['montoTotal'];
-            $montoTotalSujetoIva = $valores['montoTotalSujetoIva'];
-            $descuentoAdicional = $valores['descuentoAdicional'];
-            $productos = file_get_contents(public_path("docs/temporal/" . $nombreArchivo));
+        $pString = $cadena2;
+        $bas16 = CustomHelpers::base16($pString);
 
-<<<<<<< HEAD
         $cuf = strtoupper($bas16) . $codigoControl;
 
         $datos['factura'][0]['cabecera']['cuf'] = $cuf;
@@ -1420,16 +1288,6 @@ class VentaController extends Controller
         } else {
             return response()->json(['message' => 'Error al registrar la factura'], 500); 
         }
-=======
-            $data = $this->insertarFactura($request, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos);
-            if ($data === true) {
-                // Si la inserción fue exitosa, devolver una respuesta JSON
-                return response()->json(['message' => 'Factura registrada correctamente']);
-            } else {
-                // Si la inserción no fue exitosa, devolver una respuesta JSON con un mensaje de error
-                return response()->json(['message' => 'Error al registrar la factura'], 500); // 500 indica un error interno del servidor
-            }
->>>>>>> d0b3de9 (Mensaje de confirmación)
     }
 
     /*public function paqueteFactura(Request $request)
@@ -1554,7 +1412,7 @@ class VentaController extends Controller
         try {
             // Obtener la lista de archivos en el directorio
             $archivosEnDirectorio = scandir($carpetaFuente);
-            
+
             $archivos = array_diff($archivosEnDirectorio, array('.', '..'));
 
             // Obtener el número de archivos en la carpeta
@@ -1572,7 +1430,7 @@ class VentaController extends Controller
 
             // Agregar el contenido del directorio al archivo TAR
             $tar->buildFromDirectory($carpetaFuente);
-            
+
             // Comprimir el archivo TAR utilizando Gzip
             $gzdata = gzencode(file_get_contents(public_path($nombreArchivoTAR)), 9);
             $fp = fopen(public_path("docs/temporal.tar.zip"), "w");
@@ -1585,19 +1443,15 @@ class VentaController extends Controller
             require "SiatController.php";
             $siat = new SiatController();
             $res = $siat->recepcionPaqueteFactura($archivo, $request->fechaEmision, $hashArchivo, $numeroFacturas, $puntoVenta, $codSucursal);
-<<<<<<< HEAD
             // Verificar el valor de transacción y asignar el mensaje correspondiente
             //dd($res);
-=======
-             // Verificar el valor de transacción y asignar el mensaje correspondiente
->>>>>>> d0b3de9 (Mensaje de confirmación)
             if ($res->RespuestaServicioFacturacion->codigoDescripcion === "PENDIENTE") {
                 $mensaje = $res->RespuestaServicioFacturacion->codigoDescripcion;
                 $_SESSION['scodigorecepcion'] = $res->RespuestaServicioFacturacion->codigoRecepcion;
 
                 // Eliminar el archivo TAR si existe
                 if (file_exists($nombreArchivoTAR)) {
-                unlink($nombreArchivoTAR);
+                    unlink($nombreArchivoTAR);
                 }
                 // Eliminar el archivo ZIP si existe
                 if (file_exists($nombreArchivoZIP)) {
@@ -1606,21 +1460,13 @@ class VentaController extends Controller
                 // Eliminar la carpeta temporal si existe y está vacía
                 if (is_dir($carpetaFuente)) {
                     $this->eliminarDirectorio($carpetaFuente);
-                } 
+                }
 
-<<<<<<< HEAD
             } else if ($res->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA") {
                 $mensaje = $res->RespuestaServicioFacturacion->mensajesList->descripcion;
 
                 /*if (is_array($mensajes)) {
                     $descripciones = array_map(function ($mensaje) {
-=======
-            } else if($res->RespuestaServicioFacturacion->codigoDescripcion === "RECHAZADA"){
-                $mensajes = $res->RespuestaServicioFacturacion->mensajesList;
-
-                if (is_array($mensajes)) {
-                    $descripciones = array_map(function($mensaje) {
->>>>>>> d0b3de9 (Mensaje de confirmación)
                         return $mensaje->descripcion;
                     }, $mensajes);
                     $mensaje = $descripciones;
@@ -1628,13 +1474,14 @@ class VentaController extends Controller
             }
             echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
             //var_dump($res);
- 
+
         } catch (Exception $e) {
             echo "Error al crear el archivo TAR comprimido o al enviarlo al servicio: " . $e->getMessage();
         }
     }
 
-    public function validacionRecepcionPaqueteFactura(){
+    public function validacionRecepcionPaqueteFactura()
+    {
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
@@ -1643,13 +1490,13 @@ class VentaController extends Controller
         require "SiatController.php";
         $siat = new SiatController();
         $res = $siat->validacionRecepcionPaqueteFactura($puntoVenta, $codSucursal);
-         if ($res->RespuestaServicioFacturacion->codigoDescripcion === "VALIDADA") {
+        if ($res->RespuestaServicioFacturacion->codigoDescripcion === "VALIDADA") {
             $mensaje = $res->RespuestaServicioFacturacion->codigoDescripcion;
-        } else if($res->RespuestaServicioFacturacion->codigoDescripcion === "OBSERVADA"){
+        } else if ($res->RespuestaServicioFacturacion->codigoDescripcion === "OBSERVADA") {
             $mensajes = $res->RespuestaServicioFacturacion->mensajesList;
 
             if (is_array($mensajes)) {
-                $descripciones = array_map(function($mensaje) {
+                $descripciones = array_map(function ($mensaje) {
                     return $mensaje->descripcion;
                 }, $mensajes);
                 $mensaje = $descripciones;
@@ -1660,30 +1507,28 @@ class VentaController extends Controller
     }
 
 
-    public function eliminarDirectorio($directorio) {
+    public function eliminarDirectorio($directorio)
+    {
         if (!is_dir($directorio)) {
             return;
         }
-    
+
         $archivos = glob($directorio . '/*');
         foreach ($archivos as $archivo) {
             is_dir($archivo) ? $this->eliminarDirectorio($archivo) : unlink($archivo);
         }
-    
+
         rmdir($directorio);
     }
 
-<<<<<<< HEAD
     public function insertarFactura(Request $request, $idventa, $id_cliente, $numeroFactura, $cuf, $correo, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
     {
-=======
-    public function insertarFactura(Request $request, $id_cliente, $numeroFactura, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos){
->>>>>>> d0b3de9 (Mensaje de confirmación)
         if (!$request->ajax()) {
             return response()->json(['error' => 'Acceso no autorizado'], 401);
         }
 
         $factura = new Factura();
+        $factura->idventa = $idventa;
         $factura->idcliente = $id_cliente;
         $factura->numeroFactura = $numeroFactura;
         $factura->cuf = $cuf;
@@ -1695,13 +1540,12 @@ class VentaController extends Controller
         $factura->descuentoAdicional = $descuentoAdicional;
         $factura->productos = $productos;
         $factura->estado = 1;
-        
+
         $success = $factura->save();
-    
+
         return $success;
     }
 
-<<<<<<< HEAD
     public function insertarFacturaOffline(Request $request, $idventa, $id_cliente, $numeroFactura, $correo, $cuf, $fechaEmision, $codigoMetodoPago, $montoTotal, $montoTotalSujetoIva, $descuentoAdicional, $productos)
     {
         if (!$request->ajax()) {
@@ -1769,30 +1613,13 @@ class VentaController extends Controller
                     $hijo->addAttribute('xsi:nil', 'true', $ns_xsi);
                 } else {
                     $xml_temporal->addChild("$key", "$value");
-=======
-    public function formato_xml($temporal, $xml_temporal){
-        $ns_xsi="http://www.w3.org/2001/XMLSchema-instance";
-            foreach($temporal as $key => $value){
-                if(is_array($value)){
-                    if(!is_numeric($key)){
-                        $subnodo = $xml_temporal->addChild("$key");
-                        $this->formato_xml($value, $subnodo);
-                    }else{
-                        $this->formato_xml($value, $xml_temporal);
-                    }
-                }else{
-                    if($value == null && $value <> '0'){
-                        $hijo = $xml_temporal->addChild("$key", "$value");
-                        $hijo->addAttribute('xsi:nil', 'true', $ns_xsi);
-                    }else{
-                        $xml_temporal->addChild("$key", "$value");
-                    }
->>>>>>> d0b3de9 (Mensaje de confirmación)
                 }
             }
+        }
     }
 
-    public function anulacionFactura($cuf, $motivoSeleccionado){
+    public function anulacionFactura($cuf, $motivoSeleccionado)
+    {
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
@@ -1801,16 +1628,17 @@ class VentaController extends Controller
         require "SiatController.php";
         $siat = new SiatController();
         $res = $siat->anulacionFactura($cuf, $motivoSeleccionado, $puntoVenta, $codSucursal);
-        if($res->RespuestaServicioFacturacion->transaccion === true){
+        if ($res->RespuestaServicioFacturacion->transaccion === true) {
             $mensaje = $res->RespuestaServicioFacturacion->codigoDescripcion;
-        }else{
+        } else {
             $mensaje = $res->RespuestaServicioFacturacion->mensajesList->descripcion;
         }
         echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
         //var_dump($res);
     }
 
-    public function registroEventoSignificativo(Request $request){
+    public function registroEventoSignificativo(Request $request)
+    {
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
@@ -1825,7 +1653,7 @@ class VentaController extends Controller
         require "SiatController.php";
         $siat = new SiatController();
         $res = $siat->registroEventoSignificativo($descripcion, $cufdEvento, $codigoMotivoEvento, $inicioEvento, $finEvento, $puntoVenta, $codSucursal);
-         // Verificar el valor de transacción y asignar el mensaje correspondiente
+        // Verificar el valor de transacción y asignar el mensaje correspondiente
         if ($res->RespuestaListaEventos->transaccion === true) {
             $mensaje = $res->RespuestaListaEventos->codigoRecepcionEventoSignificativo;
             $_SESSION['scodigoevento'] = $res->RespuestaListaEventos->codigoRecepcionEventoSignificativo;
@@ -1838,7 +1666,8 @@ class VentaController extends Controller
         //var_dump($res);
     }
 
-    public function registroPuntoVenta(Request $request){
+    public function registroPuntoVenta(Request $request)
+    {
         $user = Auth::user();
         $puntoVenta = $user->idpuntoventa;
         $sucursal = $user->sucursal;
@@ -1853,7 +1682,7 @@ class VentaController extends Controller
         require "SiatController.php";
         $siat = new SiatController();
         $res = $siat->registroPuntoVenta($nombre, $descripcion, $nit, $idtipopuntoventa, $idsucursal, $puntoVenta, $codSucursal);
-         // Verificar el valor de transacción y asignar el mensaje correspondiente
+        // Verificar el valor de transacción y asignar el mensaje correspondiente
         if ($res->RespuestaRegistroPuntoVenta->transaccion === true) {
             $mensaje = $res->RespuestaRegistroPuntoVenta->codigoPuntoVenta;
         } else {
@@ -1865,7 +1694,8 @@ class VentaController extends Controller
         //var_dump($res);
     }
 
-    public function cierrePuntoVenta(Request $request){
+    public function cierrePuntoVenta(Request $request)
+    {
         $user = Auth::user();
         $sucursal = $user->sucursal;
         $codSucursal = $sucursal->codigoSucursal;
@@ -1876,30 +1706,25 @@ class VentaController extends Controller
         require "SiatController.php";
         $siat = new SiatController();
         $res = $siat->cierrePuntoVenta($codigoPuntoVenta, $nit, $codSucursal);
-         // Verificar el valor de transacción y asignar el mensaje correspondiente
+        // Verificar el valor de transacción y asignar el mensaje correspondiente
         if ($res->RespuestaCierrePuntoVenta->transaccion === true) {
             $mensaje = $res->RespuestaCierrePuntoVenta->codigoPuntoVenta;
         } else {
             $mensaje = $res->RespuestaCierrePuntoVenta->mensajesList->descripcion;
         }
 
-        // Imprimir o retornar el mensaje, o realizar otras acciones según tu necesidad
         echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
         //var_dump($res);
     }
 
-<<<<<<< HEAD
     public function imprimirFactura($id, $correo)
     {
-=======
-    public function imprimirFactura($id){
->>>>>>> d0b3de9 (Mensaje de confirmación)
 
         $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
-        ->select('facturas.*','personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
-        ->where('facturas.id', '=', $id)
-        ->orderBy('facturas.id', 'desc')->paginate(3);
-        
+            ->select('facturas.*', 'personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
+            ->where('facturas.id', '=', $id)
+            ->orderBy('facturas.id', 'desc')->paginate(6);
+
         Log::info('Resultado', [
             //'facturas' => $facturas,
             'idFactura' => $id,
@@ -1913,7 +1738,6 @@ class VentaController extends Controller
         $direccion = $archivoXML->cabecera[0]->direccion;
         $telefono = $archivoXML->cabecera[0]->telefono;
         $municipio = $archivoXML->cabecera[0]->municipio;
-<<<<<<< HEAD
         $fechaEmision = $archivoXML->cabecera[0]->fechaEmision;
         $documentoid = $archivoXML->cabecera[0]->numeroDocumento;
         $razonSocial = $archivoXML->cabecera[0]->nombreRazonSocial;
@@ -1922,26 +1746,17 @@ class VentaController extends Controller
         $montoGiftCard = $archivoXML->cabecera[0]->montoGiftCard;
         $descuentoAdicional = $archivoXML->cabecera[0]->descuentoAdicional;
         $leyenda = $archivoXML->cabecera[0]->leyenda;
-=======
-        $fechaEmision =  $archivoXML->cabecera[0]->fechaEmision;
-        $documentoid =  $archivoXML->cabecera[0]->numeroDocumento;
-        $razonSocial =  $archivoXML->cabecera[0]->nombreRazonSocial;
-        $codigoCliente =  $archivoXML->cabecera[0]->codigoCliente;
-        $montoTotal =  $archivoXML->cabecera[0]->montoTotal;
-        $descuentoAdicional =  $archivoXML->cabecera[0]->descuentoAdicional;
-        $leyenda =  $archivoXML->cabecera[0]->leyenda;
->>>>>>> d0b3de9 (Mensaje de confirmación)
         $complementoid = $archivoXML->cabecera[0]->complemento;
 
-        
-        $totalpagar = number_format(floatval($montoTotal),2);
-        $totalpagar = str_replace(',','', $totalpagar);
-        $totalpagar = str_replace('.',',', $totalpagar);
+
+        $totalpagar = number_format(floatval($montoTotal), 2);
+        $totalpagar = str_replace(',', '', $totalpagar);
+        $totalpagar = str_replace('.', ',', $totalpagar);
         $cifrasEnLetras = new CifrasEnLetrasController();
-        $letra=($cifrasEnLetras->convertirBolivianosEnLetras($totalpagar));
+        $letra = ($cifrasEnLetras->convertirBolivianosEnLetras($totalpagar));
 
 
-        $url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit='.$nitEmisor.'&cuf='.$cuf.'&numero='.$numeroFactura.'&t=2';
+        $url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=' . $nitEmisor . '&cuf=' . $cuf . '&numero=' . $numeroFactura . '&t=2';
         $options = new QROptions([
             'outputType' => QRCode::OUTPUT_IMAGE_PNG,
             'imageBase64' => false,
@@ -1950,60 +1765,53 @@ class VentaController extends Controller
         $qrCode = new QRCode($options);
         $qrCode->render($url, public_path('qr/qrcode.png'));
 
-        
-        $pdf = new FPDF('P','mm','Letter');
+
+        $pdf = new FPDF('P', 'mm', 'Letter');
         $pdf->AddPage();
         $pdf->SetFont('Arial', 'B', 8);
-        $pdf->Cell(60,4, utf8_decode('CONTAB SRL'),0,0,'C');
-        $pdf->Cell(40,4, '',0,0,'C');
-        $pdf->Cell(27,4, '',0,0,'C');
-        $pdf->Cell(38,4, 'NIT',0,0,'L');
-        $pdf->SetFont('Arial','',8);
-        $pdf->Cell(32,4, $nitEmisor,0,1,'L');
+        $pdf->Cell(60, 4, utf8_decode('CONTAB SRL'), 0, 0, 'C');
+        $pdf->Cell(40, 4, '', 0, 0, 'C');
+        $pdf->Cell(27, 4, '', 0, 0, 'C');
+        $pdf->Cell(38, 4, 'NIT', 0, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(32, 4, $nitEmisor, 0, 1, 'L');
 
-        $pdf->SetFont('Arial','B',8);
-        $pdf->Cell(60,4, utf8_decode('CASA MATRIZ'),0,0,'C');
-        $pdf->Cell(40,4, '',0,0,'C');
-        $pdf->Cell(27,4, '',0,0,'C');
-        $pdf->Cell(38,4, utf8_decode('FACTURA N°'),0,0,'L');
-        $pdf->SetFont('Arial','',8);
-        $pdf->Cell(32,4, $numeroFactura,0,1,'L');
-        
-        $pdf->Cell(60,4, utf8_decode('N° Punto de Venta 0'),0,0,'C');
-        $pdf->Cell(40,4, '',0,0,'C');
-        $pdf->Cell(27,4, '',0,0,'C');
-        $pdf->SetFont('Arial','B',8);
-        $pdf->Cell(38,4, utf8_decode('CÓD. AUTORIZACIÓN'),0,0,'L');
-        $pdf->SetFont('Arial','',8);
-        $y=$pdf->GetY();
-        $pdf->MultiCell(32,4, $cuf,0,'L');
-        
-        $pdf->SetY($y+4);
-        $pdf->MultiCell(60,3, utf8_decode($direccion),0,'C');
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(60, 4, utf8_decode('CASA MATRIZ'), 0, 0, 'C');
+        $pdf->Cell(40, 4, '', 0, 0, 'C');
+        $pdf->Cell(27, 4, '', 0, 0, 'C');
+        $pdf->Cell(38, 4, utf8_decode('FACTURA N°'), 0, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(32, 4, $numeroFactura, 0, 1, 'L');
 
-        $pdf->Cell(60,4, utf8_decode('Teléfono: '.$telefono),0,1,'C');
-        $pdf->Cell(60,4, utf8_decode($municipio),0,1,'C');
+        $pdf->Cell(60, 4, utf8_decode('N° Punto de Venta 0'), 0, 0, 'C');
+        $pdf->Cell(40, 4, '', 0, 0, 'C');
+        $pdf->Cell(27, 4, '', 0, 0, 'C');
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(38, 4, utf8_decode('CÓD. AUTORIZACIÓN'), 0, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $y = $pdf->GetY();
+        $pdf->MultiCell(32, 4, $cuf, 0, 'L');
 
-        $pdf->Ln(5);
-        $pdf->SetFont('Arial','B',14);
-        $pdf->Cell(0,6, utf8_decode('FACTURA'),0,1,'C');
-        
-        $pdf->SetFont('Arial','',8);
-        $pdf->Cell(0,4, utf8_decode('(Con Derecho a Crédito Fiscal)'),0,1,'C');
+        $pdf->SetY($y + 4);
+        $pdf->MultiCell(60, 3, utf8_decode($direccion), 0, 'C');
+
+        $pdf->Cell(60, 4, utf8_decode('Teléfono: ' . $telefono), 0, 1, 'C');
+        $pdf->Cell(60, 4, utf8_decode($municipio), 0, 1, 'C');
 
         $pdf->Ln(5);
-        $pdf->SetFont('Arial','B',8);
-        $pdf->Cell(40,5, utf8_decode('Fecha:'),0,0,'L');
-        $pdf->SetFont('Arial','',8);
-        $pdf->Cell(60,5, $fechaEmision,0,0,'L');
-        
-        $pdf->Cell(27,5, '',0,0,'C');
-        $pdf->SetFont('Arial','B',8);
-        $pdf->Cell(38,5, 'NIT/CI/CEX:    ',0,0,'R');
-        $pdf->SetFont('Arial','',8);
-        $pdf->Cell(32,5, $documentoid."-".$complementoid,0,1,'L');
+        $pdf->SetFont('Arial', 'B', 14);
+        $pdf->Cell(0, 6, utf8_decode('FACTURA'), 0, 1, 'C');
 
-<<<<<<< HEAD
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(0, 4, utf8_decode('(Con Derecho a Crédito Fiscal)'), 0, 1, 'C');
+
+        $pdf->Ln(5);
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(40, 5, utf8_decode('Fecha:'), 0, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(60, 5, $fechaEmision, 0, 0, 'L');
+
         $pdf->Cell(27, 5, '', 0, 0, 'C');
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell(38, 5, 'NIT/CI/CEX:    ', 0, 0, 'R');
@@ -2024,47 +1832,35 @@ class VentaController extends Controller
         $pdf->Cell(38, 5, 'Cod. Cliente:    ', 0, 0, 'R');
         $pdf->SetFont('Arial', '', 8);
         $pdf->Cell(32, 5, $documentoid, 0, 1, 'L');
-=======
-        $pdf->SetFont('Arial','B',8);
-        $pdf->Cell(40,5, utf8_decode('Nombre/Razón Social:'),0,0,'L');
-        $pdf->SetFont('Arial','',8);
-        $pdf->Cell(60,5, utf8_decode($razonSocial),0,0,'L');
-        $pdf->Cell(27,5, '',0,0,'C');
-        $pdf->SetFont('Arial','B',8);
-        $pdf->Cell(38,5, 'Cod. Cliente:    ',0,0,'R');
-        $pdf->SetFont('Arial','',8);
-        $pdf->Cell(32,5, $documentoid,0,1,'L');
->>>>>>> d0b3de9 (Mensaje de confirmación)
 
         $pdf->Ln(5);
-        $pdf->SetFont('Arial','B',8);
-        $y=$pdf->GetY();
-        $pdf->MultiCell(25,3.5, utf8_decode('CÓDIGO PRODUCTO / SERVICIO'),1,'C');
+        $pdf->SetFont('Arial', 'B', 8);
+        $y = $pdf->GetY();
+        $pdf->MultiCell(25, 3.5, utf8_decode('CÓDIGO PRODUCTO / SERVICIO'), 1, 'C');
         $pdf->SetY($y);
         $pdf->SetX(35);
-        $pdf->MultiCell(25,3.5, utf8_decode("\nCANTIDAD\n "),1,'C');
+        $pdf->MultiCell(25, 3.5, utf8_decode("\nCANTIDAD\n "), 1, 'C');
         $pdf->SetY($y);
         $pdf->SetX(60);
-        $pdf->MultiCell(20,3.5, utf8_decode("\nUNIDAD DE MEDIDA"),1,'C');
+        $pdf->MultiCell(20, 3.5, utf8_decode("\nUNIDAD DE MEDIDA"), 1, 'C');
         $pdf->SetY($y);
         $pdf->SetX(80);
-        $pdf->MultiCell(50,3.5, utf8_decode("\nDESCRIPCIÓN\n "),1,'C');
+        $pdf->MultiCell(50, 3.5, utf8_decode("\nDESCRIPCIÓN\n "), 1, 'C');
         $pdf->SetY($y);
         $pdf->SetX(130);
-        $pdf->MultiCell(25,3.5, utf8_decode("\nPRECIO UNITARIO"),1,'C');
+        $pdf->MultiCell(25, 3.5, utf8_decode("\nPRECIO UNITARIO"), 1, 'C');
         $pdf->SetY($y);
         $pdf->SetX(155);
-        $pdf->MultiCell(25,3.5, utf8_decode("\nDESCUENTO\n "),1,'C');
+        $pdf->MultiCell(25, 3.5, utf8_decode("\nDESCUENTO\n "), 1, 'C');
         $pdf->SetY($y);
         $pdf->SetX(180);
-        $pdf->MultiCell(27,3.5, utf8_decode("\nSUBTOTAL\n "),1,'C');
-        
+        $pdf->MultiCell(27, 3.5, utf8_decode("\nSUBTOTAL\n "), 1, 'C');
 
-        $pdf->SetFont('Arial','',8);
+
+        $pdf->SetFont('Arial', '', 8);
         $detalle = $archivoXML->detalle;
         $sumaSubTotales = 0.0;
         foreach ($detalle as $p) {
-<<<<<<< HEAD
             $pdf->Cell(25, 5, $p->codigoProducto, 1, 0, 'L');
             $pdf->Cell(25, 5, $p->cantidad, 1, 0, 'R');
             $pdf->Cell(20, 5, "UNIDAD", 1, 0, 'L');
@@ -2072,90 +1868,69 @@ class VentaController extends Controller
             $pdf->Cell(25, 5, number_format(floatval($p->precioUnitario), 2), 1, 0, 'R');
             $pdf->Cell(25, 5, number_format(floatval($p->montoDescuento), 2), 1, 0, 'R');
             $pdf->Cell(27, 5, number_format(floatval($p->subTotal), 2), 1, 1, 'R');
-=======
-            $pdf->Cell(25,5, $p->codigoProducto,1,0,'L');
-            $pdf->Cell(25,5, $p->cantidad,1,0,'R');
-            $pdf->Cell(20,5, $p->unidadMedida,1,0,'L');
-            $pdf->Cell(50,5, $p->descripcion,1,0,'L');
-            $pdf->Cell(25,5, number_format(floatval($p->precioUnitario),2),1,0,'R');
-            $pdf->Cell(25,5, number_format(floatval($p->montoDescuento),2),1,0,'R');
-            $pdf->Cell(27,5, number_format(floatval($p->subTotal),2),1,1,'R');
->>>>>>> d0b3de9 (Mensaje de confirmación)
 
             //Sumar el subTotal actual
             $sumaSubTotales += floatval($p->subTotal);
         }
 
-        $pdf->Cell(120,5, '',0,0,'L');
-        $pdf->Cell(50,5, 'SUBTOTAL Bs.',1,0,'R');
-        $pdf->Cell(27,5, number_format(floatval($sumaSubTotales),2),1,1,'R');
+        $pdf->Cell(120, 5, '', 0, 0, 'L');
+        $pdf->Cell(50, 5, 'SUBTOTAL Bs.', 1, 0, 'R');
+        $pdf->Cell(27, 5, number_format(floatval($sumaSubTotales), 2), 1, 1, 'R');
 
-        $pdf->Cell(120,5, '',0,0,'L');
-        $pdf->Cell(50,5, 'DESCUENTO Bs.',1,0,'R');
-        $pdf->Cell(27,5, number_format(floatval($descuentoAdicional),2),1,1,'R');
+        $pdf->Cell(120, 5, '', 0, 0, 'L');
+        $pdf->Cell(50, 5, 'DESCUENTO Bs.', 1, 0, 'R');
+        $pdf->Cell(27, 5, number_format(floatval($descuentoAdicional), 2), 1, 1, 'R');
 
-        $pdf->SetFont('Arial','B',8);
-        $pdf->Cell(120,5,'Son: '.ucfirst($letra),0,0,'L');
-        $pdf->SetFont('Arial','',8);
-        $pdf->Cell(50,5, 'TOTAL Bs.',1,0,'R');
-        $pdf->Cell(27,5, number_format(floatval(($montoTotal)),2),1,1,'R');
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(120, 5, 'Son: ' . ucfirst($letra), 0, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell(50, 5, 'TOTAL Bs.', 1, 0, 'R');
+        $pdf->Cell(27, 5, number_format(floatval(($montoTotal)), 2), 1, 1, 'R');
 
-<<<<<<< HEAD
         $pdf->Cell(120, 5, '', 0, 0, 'L');
         $pdf->Cell(50, 5, 'MONTO GIFT CARD Bs.', 1, 0, 'R');
         $pdf->Cell(27, 5, number_format(floatval(($montoGiftCard)), 2), 1, 1, 'R');
-=======
-        $pdf->Cell(120,5, '',0,0,'L');
-        $pdf->Cell(50,5, 'MONTO GIFT CARD Bs.',1,0,'R');
-        $pdf->Cell(27,5, '0.00',1,1,'R');
->>>>>>> d0b3de9 (Mensaje de confirmación)
 
-        $pdf->Cell(120,5, '',0,0,'L');
-        $pdf->SetFont('Arial','B',8);
-        $pdf->Cell(50,5, 'MONTO A PAGAR Bs.',1,0,'R');
-        $pdf->Cell(27,5,  number_format(floatval(($montoTotal)),2),1,1,'R');
+        $pdf->Cell(120, 5, '', 0, 0, 'L');
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(50, 5, 'MONTO A PAGAR Bs.', 1, 0, 'R');
+        $pdf->Cell(27, 5, number_format(floatval(($montoTotal)), 2), 1, 1, 'R');
 
-        $pdf->Cell(120,5, '',0,0,'L');
-        $pdf->Cell(50,5, utf8_decode('IMPORTE BASE CRÉDITO FISCAL'),1,0,'R');
-        $pdf->Cell(27,5,  number_format(floatval(($montoTotal)),2),1,1,'R');
--
-        $pdf->Ln(10);
+        $pdf->Cell(120, 5, '', 0, 0, 'L');
+        $pdf->Cell(50, 5, utf8_decode('IMPORTE BASE CRÉDITO FISCAL'), 1, 0, 'R');
+        $pdf->Cell(27, 5, number_format(floatval(($montoTotal)), 2), 1, 1, 'R');
+        -
+            $pdf->Ln(10);
         $y = $pdf->GetY();
-        $pdf->SetFont('Arial','',7);
-        $pdf->Cell(170,5, utf8_decode('ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS, EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE ACUERDO A LEY'),0,1,'C');
-        $pdf->Image(public_path('qr/qrcode.png'), 182, $y-3, 25, 'PNG');
-        
+        $pdf->SetFont('Arial', '', 7);
+        $pdf->Cell(170, 5, utf8_decode('ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS, EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE ACUERDO A LEY'), 0, 1, 'C');
+        $pdf->Image(public_path('qr/qrcode.png'), 182, $y - 3, 25, 'PNG');
+
         $pdf->Ln(4);
-        $pdf->Cell(170,5, utf8_decode($leyenda),0,1,'C');
+        $pdf->Cell(170, 5, utf8_decode($leyenda), 0, 1, 'C');
 
         $pdf->Ln(2);
-        $pdf->Cell(170,5, utf8_decode('"Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación en línea"'),0,1,'C');
+        $pdf->Cell(170, 5, utf8_decode('"Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación en línea"'), 0, 1, 'C');
 
         $pdf->Output(public_path('docs/facturaCarta.pdf'), 'F');
-<<<<<<< HEAD
 
         $pdfPath = public_path('docs/facturaCarta.pdf');
         $xmlPath = public_path("docs/facturaxml.xml");
 
         \Mail::to($correo)->send(new \App\Mail\MailPrueba($xmlPath, $pdfPath));
 
-=======
->>>>>>> d0b3de9 (Mensaje de confirmación)
         return response()->download(public_path('docs/facturaCarta.pdf'));
+
     }
 
-<<<<<<< HEAD
     public function imprimirFacturaRollo($id, $correo)
     {
-=======
-    public function imprimirFacturaRollo($id){
->>>>>>> d0b3de9 (Mensaje de confirmación)
 
         $facturas = Factura::join('personas', 'facturas.idcliente', '=', 'personas.id')
-        ->select('facturas.*','personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
-        ->where('facturas.id', '=', $id)
-        ->orderBy('facturas.id', 'desc')->paginate(3);
-        
+            ->select('facturas.*', 'personas.nombre as razonSocial', 'personas.email as email', 'personas.num_documento as documentoid', 'personas.complemento_id as complementoid')
+            ->where('facturas.id', '=', $id)
+            ->orderBy('facturas.id', 'desc')->paginate(6);
+
         Log::info('Resultado', [
             //'facturas' => $facturas,
             'idFactura' => $id,
@@ -2169,9 +1944,8 @@ class VentaController extends Controller
         $direccion = $archivoXML->cabecera[0]->direccion;
         $telefono = $archivoXML->cabecera[0]->telefono;
         $municipio = $archivoXML->cabecera[0]->municipio;
-        $fechaEmision =  $archivoXML->cabecera[0]->fechaEmision;
+        $fechaEmision = $archivoXML->cabecera[0]->fechaEmision;
         $fechaFormateada = date("d/m/Y h:i A", strtotime($fechaEmision));
-<<<<<<< HEAD
         $documentoid = $archivoXML->cabecera[0]->numeroDocumento;
         $razonSocial = $archivoXML->cabecera[0]->nombreRazonSocial;
         $codigoCliente = $archivoXML->cabecera[0]->codigoCliente;
@@ -2179,25 +1953,17 @@ class VentaController extends Controller
         $montoGiftCard = $archivoXML->cabecera[0]->montoGiftCard;
         $descuentoAdicional = $archivoXML->cabecera[0]->descuentoAdicional;
         $leyenda = $archivoXML->cabecera[0]->leyenda;
-=======
-        $documentoid =  $archivoXML->cabecera[0]->numeroDocumento;
-        $razonSocial =  $archivoXML->cabecera[0]->nombreRazonSocial;
-        $codigoCliente =  $archivoXML->cabecera[0]->codigoCliente;
-        $montoTotal =  $archivoXML->cabecera[0]->montoTotal;
-        $descuentoAdicional =  $archivoXML->cabecera[0]->descuentoAdicional;
-        $leyenda =  $archivoXML->cabecera[0]->leyenda;
->>>>>>> d0b3de9 (Mensaje de confirmación)
         $complementoid = $archivoXML->cabecera[0]->complemento;
 
-        
-        $totalpagar = number_format(floatval($montoTotal),2);
-        $totalpagar = str_replace(',','', $totalpagar);
-        $totalpagar = str_replace('.',',', $totalpagar);
+
+        $totalpagar = number_format(floatval($montoTotal), 2);
+        $totalpagar = str_replace(',', '', $totalpagar);
+        $totalpagar = str_replace('.', ',', $totalpagar);
         $cifrasEnLetras = new CifrasEnLetrasController();
-        $letra=($cifrasEnLetras->convertirBolivianosEnLetras($totalpagar));
+        $letra = ($cifrasEnLetras->convertirBolivianosEnLetras($totalpagar));
 
 
-        $url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit='.$nitEmisor.'&cuf='.$cuf.'&numero='.$numeroFactura.'&t=2';
+        $url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=' . $nitEmisor . '&cuf=' . $cuf . '&numero=' . $numeroFactura . '&t=2';
         $options = new QROptions([
             'outputType' => QRCode::OUTPUT_IMAGE_PNG,
             'imageBase64' => false,
@@ -2221,16 +1987,16 @@ class VentaController extends Controller
         $pdf->Cell(0, 3, utf8_decode('365 SOFT'), 0, 1, 'C');
         $pdf->Cell(0, 3, utf8_decode('Casa Matriz'), 0, 1, 'C');
         $pdf->Cell(0, 3, utf8_decode('No. Punto de Venta 0'), 0, 1, 'C');
-        
+
         $pdf->SetFont('Arial', '', 6);
         $pdf->MultiCell(0, 3, utf8_decode($direccion), 0, 'C');
-        
+
         $pdf->SetFont('Arial', '', 6);
-        $pdf->Cell(0, 3, utf8_decode('Tel. '.$telefono), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode('Tel. ' . $telefono), 0, 1, 'C');
         $pdf->Cell(0, 3, utf8_decode($municipio), 0, 1, 'C');
-        
-        $y = $pdf->GetY(); 
-        $pdf->SetY($y + 2); 
+
+        $y = $pdf->GetY();
+        $pdf->SetY($y + 2);
         $pdf->SetLineWidth(0.2);
         $pdf->SetDrawColor(0, 0, 0);
         $pdf->Cell(0, 3, '', 'T', 1, 'C');
@@ -2249,8 +2015,8 @@ class VentaController extends Controller
         $pdf->SetFont('Arial', '', 6);
         $pdf->MultiCell(0, 3, utf8_decode($cuf), 0, 'C');
 
-        $y = $pdf->GetY(); 
-        $pdf->SetY($y + 2); 
+        $y = $pdf->GetY();
+        $pdf->SetY($y + 2);
         $pdf->SetLineWidth(0.2);
         $pdf->SetDrawColor(0, 0, 0);
         $pdf->Cell(0, 3, '', 'T', 1, 'C');
@@ -2264,7 +2030,7 @@ class VentaController extends Controller
         $pdf->SetFont('Arial', '', 6);
         $pdf->Cell(0, 3, utf8_decode($razonSocial), 0, 1, 'C');
 
-        $spacingBetweenColumns = 10; 
+        $spacingBetweenColumns = 10;
         $pdf->SetX(($pdf->GetPageWidth() - $pdf->GetStringWidth('NIT/CI/CEX:') - $pdf->GetStringWidth($documentoid)) / 2);
         $pdf->SetFont('Arial', 'B', 6);
         $pdf->Cell(2.5, 3, 'NIT/CI/CEX:', 0, 0, 'C');
@@ -2272,7 +2038,7 @@ class VentaController extends Controller
         $pdf->SetFont('Arial', '', 6);
         $pdf->Cell(5.5, 3, utf8_decode($documentoid), 0, 1, 'C');
 
-        $spacingBetweenColumns = 10; 
+        $spacingBetweenColumns = 10;
         $pdf->SetX(($pdf->GetPageWidth() - $pdf->GetStringWidth('COD. CLIENTE:') - $pdf->GetStringWidth($codigoCliente)) / 2);
         $pdf->SetFont('Arial', 'B', 6);
         $pdf->Cell(2.5, 3, 'COD. CLIENTE:', 0, 0, 'C');
@@ -2280,7 +2046,7 @@ class VentaController extends Controller
         $pdf->SetFont('Arial', '', 6);
         $pdf->Cell(9, 3, utf8_decode($codigoCliente), 0, 1, 'C');
 
-        $spacingBetweenColumns = 10; 
+        $spacingBetweenColumns = 10;
         $pdf->SetX(($pdf->GetPageWidth() - $pdf->GetStringWidth('FECHA DE EMISIÓN:') - $pdf->GetStringWidth($fechaEmision)) / 2);
         $pdf->SetFont('Arial', 'B', 6);
         $pdf->Cell(21.5, 3, utf8_decode('FECHA DE EMISIÓN:'), 0, 0, 'C');
@@ -2288,8 +2054,8 @@ class VentaController extends Controller
         $pdf->SetFont('Arial', '', 6);
         $pdf->Cell(10, 3, utf8_decode($fechaFormateada), 0, 1, 'C');
 
-        $y = $pdf->GetY(); 
-        $pdf->SetY($y + 2); 
+        $y = $pdf->GetY();
+        $pdf->SetY($y + 2);
         $pdf->SetLineWidth(0.2);
         $pdf->SetDrawColor(0, 0, 0);
         $pdf->Cell(0, 3, '', 'T', 1, 'C');
@@ -2302,64 +2068,60 @@ class VentaController extends Controller
         foreach ($detalle as $p) {
             $pdf->SetFont('Arial', 'B', 6);
             $pdf->Cell(0, 3, $p->codigoProducto . " - " . $p->descripcion, 0, 1, 'L');
-            
+
             $medida = $p->unidadMedida;
             $nombreMedida = Medida::where('codigoClasificador', $medida)->value('descripcion_medida');
-            
+
             $pdf->SetFont('Arial', '', 6);
-            $pdf->Cell(0,3, "Unidad de Medida: ".$nombreMedida,0,1,'L');
-            $pdf->Cell(0,3, number_format(floatval($p->cantidad),2)." X ".number_format(floatval($p->precioUnitario),2)." - ".number_format(floatval($p->montoDescuento),2),0,0,'L');
-            $pdf->Cell(0,3, number_format(floatval($p->subTotal),2),0,1,'R');
+            $pdf->Cell(0, 3, "Unidad de Medida: " . $nombreMedida, 0, 1, 'L');
+            $pdf->Cell(0, 3, number_format(floatval($p->cantidad), 2) . " X " . number_format(floatval($p->precioUnitario), 2) . " - " . number_format(floatval($p->montoDescuento), 2), 0, 0, 'L');
+            $pdf->Cell(0, 3, number_format(floatval($p->subTotal), 2), 0, 1, 'R');
 
             $sumaSubTotales += floatval($p->subTotal);
         }
 
-        $y = $pdf->GetY(); 
-        $pdf->SetY($y + 2); 
+        $y = $pdf->GetY();
+        $pdf->SetY($y + 2);
         $pdf->SetLineWidth(0.2);
         $pdf->SetDrawColor(0, 0, 0);
         $pdf->Cell(0, 3, '', 'T', 1, 'C');
 
         $pdf->SetFont('Arial', '', 6);
         $pdf->Cell(0, 3, 'SUBTOTAL Bs', 0, 0, 'C');
-        $pdf->Cell(0, 3, number_format(floatval($sumaSubTotales),2), 0, 1,'R');
+        $pdf->Cell(0, 3, number_format(floatval($sumaSubTotales), 2), 0, 1, 'R');
         $pdf->Cell(0, 3, 'DESCUENTO Bs', 0, 0, 'C');
-        $pdf->Cell(0, 3, number_format(floatval($descuentoAdicional),2), 0, 1,'R');
+        $pdf->Cell(0, 3, number_format(floatval($descuentoAdicional), 2), 0, 1, 'R');
         $pdf->Cell(0, 3, 'TOTAL Bs', 0, 0, 'C');
-        $pdf->Cell(0, 3, number_format(floatval($montoTotal),2), 0, 1,'R');     
+        $pdf->Cell(0, 3, number_format(floatval($montoTotal), 2), 0, 1, 'R');
         $pdf->Cell(0, 3, 'MONTO GIFT CARD Bs', 0, 0, 'C');
-<<<<<<< HEAD
         $pdf->Cell(0, 3, number_format(floatval($montoGiftCard), 2), 0, 1, 'R');
-=======
-        $pdf->Cell(0, 3, '0.00', 0, 1,'R');     
->>>>>>> d0b3de9 (Mensaje de confirmación)
         $pdf->SetFont('Arial', 'B', 6);
         $pdf->Cell(0, 3, 'MONTO A PAGAR Bs', 0, 0, 'C');
-        $pdf->Cell(0, 3, number_format(floatval($montoTotal),2), 0, 1,'R');
+        $pdf->Cell(0, 3, number_format(floatval($montoTotal), 2), 0, 1, 'R');
         $pdf->SetFont('Arial', 'B', 5);
         $pdf->Cell(0, 3, utf8_decode('IMPORTE BASE CRÉDITO FISCAL Bs'), 0, 0, 'C');
         $pdf->SetFont('Arial', 'B', 6);
-        $pdf->Cell(0, 3, number_format(floatval($montoTotal),2), 0, 1,'R');
+        $pdf->Cell(0, 3, number_format(floatval($montoTotal), 2), 0, 1, 'R');
         $pdf->Ln(6);
         $pdf->SetFont('Arial', '', 6);
-        $pdf->Cell(0, 3, 'Son: '.$letra, 0, 1,'L');
+        $pdf->Cell(0, 3, 'Son: ' . $letra, 0, 1, 'L');
 
-        $y = $pdf->GetY(); 
-        $pdf->SetY($y + 2); 
+        $y = $pdf->GetY();
+        $pdf->SetY($y + 2);
         $pdf->SetLineWidth(0.2);
         $pdf->SetDrawColor(0, 0, 0);
         $pdf->Cell(0, 3, '', 'T', 1, 'C');
 
         $pdf->SetFont('Arial', '', 6);
-        $pdf->Cell(0, 3, utf8_decode('ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS,'), 0, 1,'C');
-        $pdf->Cell(0, 3, utf8_decode('EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE'), 0, 1,'C');
-        $pdf->Cell(0, 3, utf8_decode('ACUERDO A LA LEY'), 0, 1,'C');
+        $pdf->Cell(0, 3, utf8_decode('ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS,'), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode('EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE'), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode('ACUERDO A LA LEY'), 0, 1, 'C');
         $pdf->Ln(3);
         $pdf->SetFont('Arial', '', 5);
         $pdf->MultiCell(0, 3, utf8_decode($leyenda), 0, 'C');
         $pdf->Ln(3);
-        $pdf->Cell(0, 3, utf8_decode('Este documento es la Representación Gráfica de un'), 0, 1,'C');
-        $pdf->Cell(0, 3, utf8_decode('Documento Fiscal Digital emitido en una modalidad de'), 0, 1,'C');
+        $pdf->Cell(0, 3, utf8_decode('Este documento es la Representación Gráfica de un'), 0, 1, 'C');
+        $pdf->Cell(0, 3, utf8_decode('Documento Fiscal Digital emitido en una modalidad de'), 0, 1, 'C');
         $pdf->Cell(0, 3, utf8_decode('facturación en línea'), 0, 1, 'C');
         $pdf->Ln(3);
 
@@ -2373,7 +2135,6 @@ class VentaController extends Controller
 
 
         $pdf->Output(public_path('docs/facturaRollo.pdf'), 'F');
-<<<<<<< HEAD
 
         $pdfPath = public_path('docs/facturaRollo.pdf');
         $xmlPath = public_path("docs/facturaxml.xml");
@@ -2804,8 +2565,6 @@ class VentaController extends Controller
 
         \Mail::to($correo)->send(new \App\Mail\MailPrueba($xmlPath, $pdfPath));
 
-=======
->>>>>>> d0b3de9 (Mensaje de confirmación)
         return response()->download(public_path('docs/facturaRollo.pdf'));
     }
 
@@ -2816,5 +2575,101 @@ class VentaController extends Controller
         $roles = Rol::where('condicion', '=', '1')
             ->select('id', 'nombre')->orderBy('nombre', 'asc')->get();
         return ['roles' => $roles];
+    }
+
+    public function reporteVentasDiarias(Request $request)
+    {
+        // Validar la presencia de la fecha en la solicitud
+        $request->validate([
+            'fecha' => 'required|date',
+        ]);
+
+        // Obtener las ventas para la fecha dada
+        $ventas = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
+            ->join('users', 'ventas.idusuario', '=', 'users.id')
+            ->select(
+                'personas.nombre as cliente',
+                'ventas.total',
+                'ventas.num_comprobante',
+                'users.usuario as usuario',
+                'personas.num_documento as nit'
+            )
+            ->whereDate('ventas.created_at', $request->input('fecha'))
+            ->get();
+
+        if ($ventas->isEmpty()) {
+            return response()->json(['mensaje' => 'Ninguna Venta Realizada en la Fecha Indicada']);
+        }
+
+        $totalGanado = $ventas->sum('total');
+
+        // Devolver las ventas como JSON
+        return response()->json([
+            'ventas' => $ventas,
+            'totalGanado' => $totalGanado
+        ]);
+    }
+
+    public function topVendedores(Request $request)
+    {
+        $fechaInicio = $request->input('fecha_inicio');
+        $fechaFin = $request->input('fecha_fin');
+
+        $topVendedores = Venta::join('personas', 'ventas.idusuario', '=', 'personas.id')
+            ->select(
+                'ventas.idusuario',
+                'personas.nombre as nombreUsuario',
+                DB::raw('COUNT(*) as cantidadVentas'),
+                DB::raw('SUM(ventas.total) as totalVentas')
+            )
+            ->whereBetween('ventas.fecha_hora', [$fechaInicio, $fechaFin])
+            ->groupBy('ventas.idusuario', 'personas.nombre')
+            ->orderByDesc('cantidadVentas')
+            ->limit(10)
+            ->get();
+
+        return response()->json(['topVendedores' => $topVendedores]);
+    }
+    public function topClientes(Request $request)
+    {
+        $fechaInicio = $request->input('fecha_inicio');
+        $fechaFin = $request->input('fecha_fin');
+
+        $topVendedores = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
+            ->select(
+                'ventas.idcliente',
+                'personas.nombre as nombreCliente',
+                DB::raw('COUNT(*) as cantidadCompras'),
+                DB::raw('SUM(ventas.total) as totalGastado')
+            )
+            ->whereBetween('ventas.fecha_hora', [$fechaInicio, $fechaFin])
+            ->groupBy('ventas.idcliente', 'personas.nombre')
+            ->orderByDesc('cantidadCompras')
+            ->limit(10)
+            ->get();
+
+        return response()->json(['topClientes' => $topVendedores]);
+    }
+
+    public function topProductos(Request $request)
+    {
+        $fechaInicio = $request->input('fecha_inicio');
+        $fechaFin = $request->input('fecha_fin');
+
+        $topProductos = DetalleVenta::join('articulos', 'detalle_ventas.idarticulo', '=', 'articulos.id')
+            ->select(
+                'detalle_ventas.idarticulo',
+                'articulos.nombre as nombreArticulo',
+                DB::raw('SUM(detalle_ventas.cantidad) as cantidadTotal'),
+                DB::raw('COUNT(*) as vecesVendido')
+            )
+            ->join('ventas', 'detalle_ventas.idventa', '=', 'ventas.id')
+            ->whereBetween('ventas.fecha_hora', [$fechaInicio, $fechaFin])
+            ->groupBy('detalle_ventas.idarticulo', 'articulos.nombre')
+            ->orderByDesc('cantidadTotal')
+            ->limit(10)
+            ->get();
+
+        return response()->json(['topProductos' => $topProductos]);
     }
 }
