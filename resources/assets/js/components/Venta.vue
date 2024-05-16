@@ -1470,9 +1470,13 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-3" v-if="primera_cuota">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="select-input">Tipo de Pago</label>
+                            <div class="row" v-if="primera_cuota">
+                                <div class="col-md-5 form-group">
+                                    <label class="font-weight-bold">Monto a pagar</label>
+                                    <input type="number" class="form-control" v-model="primer_precio_cuota">
+                                </div>
+                                <div class="col-md-5 form-group">
+                                    <label class="font-weight-bold" for="select-input">Tipo de Pago</label>
                                     <select class="form-control" id="select-input" v-model="tipo_pago"
                                         @change="seleccionarTipoPago(tipo_pago)">
                                         <option v-for="(value, key) in tiposPago" :value="value">{{ key }}</option>
@@ -1768,6 +1772,8 @@ import { bancos } from '../constants/banks';
 export default {
     data() {
         return {
+
+
             cuentaSeleccionada: '',
             arrayCuentas: [],
             bancos: bancos,
@@ -3654,49 +3660,89 @@ export default {
             }
         },
         generarCuotas() {
-            this.cuotas = []; // Limpiamos la lista de cuotas
-            const fechaHoy = new Date(); // Obtenemos la fecha de hoy
+    this.cuotas = []; 
+    const fechaHoy = new Date(); 
 
-            // Calcular el monto entero y el monto con decimal
-            const montoEntero = Math.floor(this.calcularTotal / this.numero_cuotas);
-            const montoDecimal = (this.calcularTotal - montoEntero * (this.numero_cuotas - 1)).toFixed(2);
+    const montoEntero = Math.floor(this.calcularTotal / this.numero_cuotas);
+    const montoDecimal = (this.calcularTotal - montoEntero * (this.numero_cuotas - 1)).toFixed(2);
 
+    let fechaInicioPago;
+    let saldoRestante;
+    let estadoCuota;
 
-            let fechaInicioPago;
-            let saldos_total;
-            let estadoCuota;
-            if (this.primera_cuota) {
-                this.primer_precio_cuota = montoEntero;
-                console.log('primer_precio_cuota', this.primer_precio_cuota);
-                fechaInicioPago = fechaHoy;
-                saldos_total = (this.calcularTotal - this.primer_precio_cuota).toFixed(2);
-                console.log('saldos_total', saldos_total);
-                estadoCuota = 'Pagado';
-            } else {
-                this.primer_precio_cuota = 0;
-                fechaInicioPago = new Date(fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000); // Sumar 7 días
-                saldos_total = this.calcularTotal;
-                estadoCuota = 'Pendiente';
-            }
+    if (this.primera_cuota) {
+        const primerPago = Number(this.primer_precio_cuota) || 0; 
+        fechaInicioPago = fechaHoy;
+        saldoRestante = (this.calcularTotal - primerPago).toFixed(2);
+        estadoCuota = 'Pagado';
 
-            for (let i = 0; i < this.numero_cuotas; i++) {
-                const fechaPago = new Date(fechaInicioPago.getTime() + i * this.tiempo_diaz * 24 * 60 * 60 * 1000);
-                const dia = fechaPago.getDate();
-                const mes = fechaPago.getMonth() + 1;
-                const año = fechaPago.getFullYear();
+        const primeraCuota = {
+            fecha_pago: `${fechaHoy.getFullYear()}-${fechaHoy.getMonth() + 1}-${fechaHoy.getDate()} ${fechaHoy.toLocaleTimeString()}`,
+            precio_cuota: primerPago.toFixed(2),
+            totalCancelado: primerPago.toFixed(2),
+            saldo_restante: saldoRestante,
+            fecha_cancelado: `${fechaHoy.getFullYear()}-${fechaHoy.getMonth() + 1}-${fechaHoy.getDate()} ${fechaHoy.toLocaleTimeString()}`,
+            estado: 'Pagado',
+        };
 
-                const cuota = {
-                    fecha_pago: `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}`,
-                    precio_cuota: i === this.numero_cuotas - 1 ? parseFloat(montoDecimal).toFixed(2) : montoEntero,
-                    totalCancelado: i === 0 ? this.primer_precio_cuota : 0,
-                    saldo_restante: saldos_total,//saldo
-                    fecha_cancelado: i === 0 && this.primera_cuota ? `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}` : null,
-                    estado: i === 0 ? (this.primera_cuota ? 'Pagado' : estadoCuota) : 'Pendiente',
-                };
+        this.cuotas.push(primeraCuota);
 
-                this.cuotas.push(cuota);
-            }
-        },
+        const montoRestante = this.calcularTotal - primerPago;
+        const montoEnteroRestante = Math.floor(montoRestante / (this.numero_cuotas - 1));
+        const montoDecimalRestante = (montoRestante - montoEnteroRestante * (this.numero_cuotas - 2)).toFixed(2);
+
+        saldoRestante = montoRestante;
+        fechaInicioPago = new Date(fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000);
+        estadoCuota = 'Pendiente';
+
+        for (let i = 1; i < this.numero_cuotas; i++) {
+            const fechaPago = new Date(fechaInicioPago.getTime() + (i - 1) * this.tiempo_diaz * 24 * 60 * 60 * 1000);
+            const dia = fechaPago.getDate();
+            const mes = fechaPago.getMonth() + 1;
+            const año = fechaPago.getFullYear();
+
+            const cuota = {
+                fecha_pago: `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}`,
+                precio_cuota: i === this.numero_cuotas - 1 ? parseFloat(montoDecimalRestante).toFixed(2) : montoEnteroRestante,
+                totalCancelado: 0,
+                saldo_restante: saldoRestante,
+                fecha_cancelado: null,
+                estado: 'Pendiente',
+            };
+
+            saldoRestante -= cuota.precio_cuota;
+            saldoRestante = saldoRestante.toFixed(2);
+
+            this.cuotas.push(cuota);
+        }
+    } else {
+        fechaInicioPago = new Date(fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000);
+        saldoRestante = this.calcularTotal;
+        estadoCuota = 'Pendiente';
+
+        for (let i = 0; i < this.numero_cuotas; i++) {
+            const fechaPago = new Date(fechaInicioPago.getTime() + i * this.tiempo_diaz * 24 * 60 * 60 * 1000);
+            const dia = fechaPago.getDate();
+            const mes = fechaPago.getMonth() + 1;
+            const año = fechaPago.getFullYear();
+
+            const cuota = {
+                fecha_pago: `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}`,
+                precio_cuota: i === this.numero_cuotas - 1 ? parseFloat(montoDecimal).toFixed(2) : montoEntero,
+                totalCancelado: 0,
+                saldo_restante: saldoRestante,
+                fecha_cancelado: null,
+                estado: 'Pendiente',
+            };
+
+            saldoRestante -= cuota.precio_cuota;
+            saldoRestante = saldoRestante.toFixed(2);
+
+            this.cuotas.push(cuota);
+        }
+    }
+}
+
     },
 
     created() {
