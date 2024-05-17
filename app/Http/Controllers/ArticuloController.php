@@ -82,6 +82,7 @@ class ArticuloController extends Controller
                     'articulos.codigo_alfanumerico',
                     'articulos.descripcion_fabrica'
                 )
+                ->distinct()
                 ->orderBy('articulos.id', 'desc')->paginate(6);
         } else {
             $articulos = Articulo::join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
@@ -124,6 +125,7 @@ class ArticuloController extends Controller
                     'articulos.descripcion_fabrica'
                 )
                 ->where('articulos.' . $criterio, 'like', '%' . $buscar . '%')
+                ->distinct()
                 ->orderBy('articulos.id', 'desc')->paginate(6);
         }
 
