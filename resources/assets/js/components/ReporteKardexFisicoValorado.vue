@@ -2985,7 +2985,7 @@ reportePDF() {
                                 {
                                     //console.log('Proveedor',data)
                                     this.modal3 = 1;
-                                    this.tituloModal3 = 'Actualizar Proveedor';
+                                    this.tituloModal3 = 'Actualizar Provedor';
                                     this.tipoAccion2 = 10;
                                     this.proveedor_id = data['id'];
                                     this.nombre = data['nombre'];

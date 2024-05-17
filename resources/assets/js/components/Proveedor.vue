@@ -12,6 +12,10 @@
                         <button type="button" @click="abrirModal('persona','registrar')" class="btn btn-secondary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
+                         <button type="button" @click="abrirModalImportar()" class="btn btn-success">
+                        <i class="icon-plus"></i>&nbsp;Importar
+                        </button>
+                        
                     </div>
                     <div class="card-body">
                         <div class="form-group row">
@@ -363,7 +367,7 @@
                             {
                                 //console.log(data);
                                 this.modal=1;
-                                this.tituloModal='Actualizar Proveedor';
+                                this.tituloModal='Actualizar Provedor';
                                 this.tipoAccion=2;
                                 this.persona_id=data['id'];
                                 this.nombre = data['nombre'];
