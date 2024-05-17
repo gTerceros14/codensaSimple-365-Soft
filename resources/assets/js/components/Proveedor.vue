@@ -347,7 +347,7 @@
                             case 'registrar':
                             {
                                 this.modal = 1;
-                                this.tituloModal = 'Registrar Proveedor';
+                                this.tituloModal = 'Registrar Provedor';
                                 this.nombre= '';
                                 this.tipo_documento='RUC';
                                 this.num_documento='';

@@ -54,7 +54,7 @@ class PrecioController extends Controller
 
         $precio->nombre_precio = $request->nombre_precio;
         $precio->porcentage = $request->porcentage;
-        //$precio->condicion = $request->condicion ? '1' : '0';
+        //$precio->condicion = '1';
         $precio->condicion = '1';
         Log::info('DATOS REGISTRO PRECIO:', [
             'nombre_precio' => $request->nombre_precio,

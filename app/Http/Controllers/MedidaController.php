@@ -64,7 +64,7 @@ class MedidaController extends Controller
         $medida = new Medida();
         $medida->descripcion_medida = $request->descripcion_medida;
         $medida->codigoClasificador = $request->codigoClasificador;
-        $medida->estado = $request->estado ? '1' : '0';
+        $medida->estado = '1' ;
         $medida->save();
     }
   

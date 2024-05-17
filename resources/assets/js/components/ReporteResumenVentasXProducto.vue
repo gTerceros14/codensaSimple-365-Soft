@@ -2341,7 +2341,7 @@ export default {
                             case 'registrarProv':
                                 {
                                     this.modal3 = 1;
-                                    this.tituloModal3 = 'Registrar Proveedor';
+                                    this.tituloModal3 = 'Registrar Provedor';
                                     this.nombre = '';
                                     this.tipo_documento = 'RUC';
                                     this.num_documento = '';

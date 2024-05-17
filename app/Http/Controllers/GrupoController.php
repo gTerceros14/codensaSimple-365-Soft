@@ -38,7 +38,7 @@ class GrupoController extends Controller
             'grupos' => $grupos
         ];
     }
-    //registrar proveedor
+    //Registrar Provedor
     public function store(Request $request)
     {
         if (!$request->ajax()) return redirect('/');

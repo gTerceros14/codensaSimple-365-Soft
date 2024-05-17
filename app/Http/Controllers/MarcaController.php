@@ -66,7 +66,7 @@ class MarcaController extends Controller
         $marca = new Marca();
 
         $marca->nombre = $request->nombre;
-        $marca->condicion = $request->condicion ? '1' : '0';
+        $marca->condicion = '1';
         //$marca->condicion = '1';
         $marca->save();
     }
@@ -84,7 +84,7 @@ class MarcaController extends Controller
         if (!$request->ajax()) return redirect('/');
         $marca = Marca::findOrFail($request->id);
         $marca->nombre = $request->nombre;
-        $marca->condicion = $request->condicion ? '1' : '0';
+        $marca->condicion = '1';
         //$marca->condicion = '1';
         $marca->save();
     }

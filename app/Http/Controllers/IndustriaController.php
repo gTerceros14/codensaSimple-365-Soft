@@ -49,7 +49,7 @@ class IndustriaController extends Controller
             return redirect('/');
         $industria = new Industria();
         $industria->nombre = $request->nombre;
-        $industria->estado = $request->estado ? '1' : '0';
+        $industria->estado = '1' ;
         //$industria->estado = '1';
 
         $industria->save();
@@ -61,7 +61,7 @@ class IndustriaController extends Controller
             return redirect('/');
         $industrial = Industria::findOrFail($request->id);
         $industrial->nombre = $request->nombre;
-        $industrial->estado = $request->estado ? '1' : '0';
+        $industrial->estado = '1' ;
         //$industrial->estado = '1';
         $industrial->save();
     }
