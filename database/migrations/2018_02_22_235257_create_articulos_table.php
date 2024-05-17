@@ -21,7 +21,7 @@ class CreateArticulosTable extends Migration
 
             $table->integer('idmedida')->unsigned(); //new
 
-            $table->string('codigo', 50)->nullable();
+            $table->string('codigo', 50)->unique();
             $table->string('nombre', 100); //Nombre comercial
             $table->string('nombre_generico', 100); //aumente 5_julio
             $table->integer('unidad_envase'); //aumente
@@ -47,7 +47,7 @@ class CreateArticulosTable extends Migration
             //new
             $table->decimal('costo_compra', 10, 2);
             $table->foreign('idmedida')->references('id')->on('medidas');
-            $table->string('codigo_alfanumerico',50)->nullable();// aumente el 23-01-2024
+            $table->string('codigo_alfanumerico', 50)->nullable();// aumente el 23-01-2024
             $table->string('descripcion_fabrica', 50)->nullable();// aumente el 23-01-2024
         });
     }
