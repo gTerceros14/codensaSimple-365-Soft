@@ -172,23 +172,33 @@
                                     </div>
                                 </div>
                                 <div v-if="errorsImport.length == 0 && erroresNoExiste.length > 0">
-                                    <h4><i class="fa fa-exclamation-circle"></i> Datos no encontrados en la base de
-                                        datos</h4>
-                                    <table class="table table-bordered">
-                                        <tbody>
-                                            <tr v-for="(item, index) in erroresNoExiste" :key="index">
-                                                <td
-                                                    v-html="`<span class='font-weight-bold'>${item.split(' ')[0]}</span>: ${item.split(' ').slice(1).join(' ')}`">
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <div v-if="erroresNoExiste.length > 0" class="mt-3">
-                                        <p>¿Desea registrar estos datos?</p>
-                                        <button class="btn btn-success" type="button"
-                                            @click="confirmarRegistro">Confirmar</button>
-                                        <button class="btn btn-danger" type="button">Cancelar</button>
+                                    <template v-if="isLoading != true">
+
+                                        <h4><i class="fa fa-exclamation-circle"></i> Datos no encontrados en la base de
+                                            datos</h4>
+                                        <table class="table table-bordered">
+                                            <tbody>
+                                                <tr v-for="(item, index) in erroresNoExiste" :key="index">
+                                                    <td
+                                                        v-html="`<span class='font-weight-bold'>${item.split(' ')[0]}</span>: ${item.split(' ').slice(1).join(' ')}`">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div v-if="erroresNoExiste.length > 0" class="mt-3">
+                                            <p>¿Desea registrar estos datos?</p>
+                                            <button class="btn btn-success" type="button"
+                                                @click="confirmarRegistro">Confirmar</button>
+                                        </div>
+                                    </template>
+                                    <div v-if="isLoading" class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                        <h5 class="mt-3">Registrando datos...</h5>
+
                                     </div>
+
                                 </div>
                                 <div v-if="erroresNoExiste.length == 0 && errorsImport.length == 0 && successImport"
                                     class="text-center">
@@ -223,6 +233,7 @@ import * as XLSX from 'xlsx';
 export default {
     data() {
         return {
+            isLoading: false,
             arrayMonedas: [],
             monedaSeleccionada: {
                 id: 1,
@@ -304,6 +315,11 @@ export default {
 
         },
         async confirmarRegistro() {
+            console.log(this.isLoading);
+
+            this.isLoading = true;
+            console.log(this.isLoading);
+            console.log("Cargando los datos");
             for (const elemento of this.erroresNoExiste) {
                 const palabras = elemento.split(' ');
                 const primeraPalabra = palabras.shift();
@@ -318,8 +334,11 @@ export default {
                     } else if ("Industria" === primeraPalabra) {
                         await this.agregarIndustria(restoDelString);
                     }
+                    // this.isLoading = 0;
                 } catch (error) {
                     console.error("Ocurrió un error al agregar: " + error);
+                    this.isLoading = false;
+
                 }
             }
 
@@ -332,8 +351,12 @@ export default {
 
             }).then((response) => {
                 this.registrosSuccess.push("Se registro la marca " + nombre);
+                this.isLoading = false;
+
             }).catch((error) => {
                 console.log(error);
+                this.isLoading = false;
+
             });
         },
 
@@ -342,8 +365,12 @@ export default {
                 'nombre_grupo': nombre
             }).then((response) => {
                 this.registrosSuccess.push("Se registro el grupo " + nombre);
+                this.isLoading = false;
+
             }).catch((error) => {
                 console.log(error);
+                this.isLoading = false;
+
             });
         },
         agregarLinea(nombre) {
@@ -354,8 +381,14 @@ export default {
 
             }).then((response) => {
                 this.registrosSuccess.push("Se registro la linea " + nombre);
+                this.isLoading = false;
+
             }).catch((error) => {
                 console.log(error);
+                this.isLoading = false;
+
+
+
             });
         },
         agregarIndustria(nombre) {
@@ -363,8 +396,12 @@ export default {
                 'nombre': nombre
             }).then((response) => {
                 this.registrosSuccess.push("Se registro la industria " + nombre);
+                this.isLoading = false;
+
             }).catch((error) => {
                 console.log(error);
+                this.isLoading = false;
+
             });
         },
         handleFileChange(event) {
