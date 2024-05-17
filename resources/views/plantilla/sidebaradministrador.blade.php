@@ -34,9 +34,9 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Apertura/Cierre
                             Caja</a>
                     </li>
-                    <li @click="menu=66" class="nav-item">
+                    <!-- <li @click="menu=66" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Transferencias</a>
-                    </li>
+                    </li> -->
                     <li @click="menu=65" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Bancos</a>
                     </li>
@@ -170,29 +170,36 @@
                 </ul>
             </li>
             <li class="nav-item nav-dropdown">
-                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-line-chart"></i> Reportes Inventario</a>
+                <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-line-chart"></i> Reportes
+                    Inventario</a>
                 <ul class="nav-dropdown-items">
 
                     <!--<li @click="menu=49" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventarios</a>
                     </li>-->
                     <li @click="menu=51" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Fisico Valorado</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Fisico
+                            Valorado</a>
                     </li>
                     <li @click="menu=52" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Fisico</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex
+                            Fisico</a>
                     </li>
                     <li @click="menu=58" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Fisico</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen
+                            Fisico</a>
                     </li>
                     <li @click="menu=60" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Detallado Fisico de Movimientos</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Detallado Fisico
+                            de Movimientos</a>
                     </li>
                     <li @click="menu=63" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventario Fisico Valorado</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventario
+                            Fisico Valorado</a>
                     </li>
                     <li @click="menu=64" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventario Fisico</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Inventario
+                            Fisico</a>
                     </li>
 
                 </ul>
@@ -203,16 +210,20 @@
                 <ul class="nav-dropdown-items">
 
                     <li @click="menu=45" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Diarias</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas
+                            Diarias</a>
                     </li>
                     <li @click="menu=62" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Detallado</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas
+                            Detallado</a>
                     </li>
                     <li @click="menu=55" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas x Documento</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas x
+                            Documento</a>
                     </li>
                     <li @click="menu=57" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas x Producto</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas x
+                            Producto</a>
                     </li>
 
                 </ul>
@@ -223,25 +234,31 @@
                 <ul class="nav-dropdown-items">
 
                     <li @click="menu=10" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte Usuarios</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Reporte
+                            Usuarios</a>
                     </li>
                     <li @click="menu=50" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen de clientes</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen de
+                            clientes</a>
                     </li>
                     <li @click="menu=56" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Clientes Detallado Global</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Clientes
+                            Detallado Global</a>
                     </li>
 
                     <li @click="menu=59" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Clientes Resumen Global</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Clientes
+                            Resumen Global</a>
                     </li>
 
                     <li @click="menu=61" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Detalle - Recibo Cliente Por Documento</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Detalle - Recibo
+                            Cliente Por Documento</a>
                     </li>
 
                     <li @click="menu=68" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas Y Cobranzas</a>
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas Y
+                            Cobranzas</a>
                     </li>
 
                 </ul>
@@ -281,10 +298,12 @@
             </li>
 
             <li @click="menu=11" class="nav-item">
-                <a class="nav-link" href="#"><i class="fa fa-question-circle"></i> Ayuda <span class="badge badge-danger">PDF</span></a>
+                <a class="nav-link" href="#"><i class="fa fa-question-circle"></i> Ayuda <span
+                        class="badge badge-danger">PDF</span></a>
             </li>
             <li @click="menu=12" class="nav-item">
-                <a class="nav-link" href="#"><i class="fa fa-info-circle"></i> Acerca de...<span class="badge badge-info">IT</span></a>
+                <a class="nav-link" href="#"><i class="fa fa-info-circle"></i> Acerca de...<span
+                        class="badge badge-info">IT</span></a>
             </li>
 
 
