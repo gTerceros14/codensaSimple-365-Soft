@@ -393,7 +393,12 @@ export default {
 
         selectAllHeaders() {
             // Seleccionar todos los encabezados automáticamente
-            this.selectedHeadersFromFile = [...this.csvHeaders];
+            console.log("Headers del csv");
+            console.log(this.csvHeaders);
+            console.log("Headers del csv");
+
+
+            this.selectedHeadersFromFile = [...this.csvHeaders.slice(0, this.headersOrigin.length)];
         },
         updateData() {
 
