@@ -173,6 +173,9 @@
                 <!-- /.modal-dialog -->
             </div>
             <!--Fin del modal-->
+              <div v-if="modalImportar">
+                    <ImportarExcelProvedores @cerrar="cerrarModalImportar" />
+              </div>
         </main>
 </template>
 
@@ -205,7 +208,8 @@
                 },
                 offset : 3,
                 criterio : 'nombre',
-                buscar : ''
+                buscar : '',
+                modalImportar: 0,
             }
         },
         computed:{
@@ -251,6 +255,14 @@
             default:
                 return '';
             }
+        },
+
+        abrirModalImportar() {
+            this.modalImportar = 1;
+        },
+         cerrarModalImportar() {
+            this.modalImportar = 0;
+            this.listarPersona(1, '', 'nombre');
         },
             listarPersona (page,buscar,criterio){
                 let me=this;

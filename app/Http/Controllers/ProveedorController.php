@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 use App\Proveedor;
 use App\Persona;
-
+use App\Imports\ProvedorImport;
+use Exception;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProveedorController extends Controller
 {
@@ -93,7 +95,6 @@ class ProveedorController extends Controller
             $persona = new Persona();
             $persona->nombre = $request->nombre;
             $persona->usuario = Auth::user()->id;
-
             $persona->tipo_documento = $request->tipo_documento;
             $persona->num_documento = $request->num_documento;
             $persona->direccion = $request->direccion;
@@ -150,4 +151,31 @@ class ProveedorController extends Controller
         }
 
     }
+
+    public function importar(Request $request)
+    {
+        try {
+            $request->validate([
+                'archivo' => 'required|mimes:csv,txt',
+            ]);
+
+            $archivo = $request->file('archivo');
+
+            $import = new ProvedorImport();
+            Excel::import($import, $archivo);
+
+            $errors = $import->getErrors();
+
+            if (!empty($errors)) {
+                return response()->json(['errors' => $errors], 422);
+            } else {
+                return response()->json(['mensaje' => 'Importación exitosa'], 200);
+            }
+        } catch (Exception $e) {
+            Log::error('Error en la importación: ' . $e->getMessage());
+
+            return response()->json(['error' => 'Error en la importación', 'mensaje' => $e->getMessage()], 500);
+        }
+    }
+
 }

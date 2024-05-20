@@ -41,6 +41,10 @@ Vue.component(
   "ImportarExcelInventario",
   require("./components/productos/ImportarExcelInventario.vue")
 );
+Vue.component(
+  "ImportarExcelProvedores",
+  require("./components/compras/ImportarExcelProvedores.vue")
+);
 
 
 Vue.component("icon-button", require("./components/buttons/IconButton.vue"));

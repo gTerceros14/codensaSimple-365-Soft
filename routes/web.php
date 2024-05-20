@@ -131,6 +131,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/proveedor/registrar', 'ProveedorController@store');
         Route::put('/proveedor/actualizar', 'ProveedorController@update');
         Route::get('/proveedor/selectProveedor', 'ProveedorController@selectProveedor');
+        Route::post('/proveedor/importar', 'ProveedorController@importar')->name('provedores.importar');
 
         Route::get('/cliente', 'ClienteController@index');
         Route::post('/cliente/registrar', 'ClienteController@store');
