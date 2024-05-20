@@ -4,7 +4,7 @@
         <div class="modal-dialog modal-primary modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="myModalLabel"><i class="fa fa-upload"></i> Importar productos</h5>
+                    <h5 class="modal-title" id="myModalLabel"><i class="fa fa-upload"></i> Importar Provedores</h5>
                     <button type="button" class="close text-white" @click="cerrarModal()" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
