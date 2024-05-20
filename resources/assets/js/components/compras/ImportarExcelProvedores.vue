@@ -106,7 +106,7 @@
                                             <h5><i class="fa fa-eye"></i> Vista previa:</h5>
                                         </div>
                                         <div class="col">
-                                           
+
                                         </div>
                                     </div>
 
@@ -119,13 +119,13 @@
                                                         }}</th>
                                                 </tr>
                                             </thead>
-                                               <tbody>
-                                                            <tr v-for="(row, rowIndex) in previewCsv" :key="rowIndex">
-                                                            <td v-for="(cell, cellIndex) in row" :key="cellIndex">
-                                                                {{ cell }}
-                                                            </td>
-                                                            </tr>
-                                             </tbody>
+                                            <tbody>
+                                                <tr v-for="(row, rowIndex) in previewCsv" :key="rowIndex">
+                                                    <td v-for="(cell, cellIndex) in row" :key="cellIndex">
+                                                        {{ cell }}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
                                     <button @click="resetState2" type="button" class="btn btn-secondary mt-2">
@@ -212,7 +212,7 @@ import * as XLSX from 'xlsx';
 export default {
     data() {
         return {
-           
+
             registrosSuccess: [],
 
             headersOrigin: [
@@ -248,7 +248,7 @@ export default {
 
     },
     methods: {
-        
+
         resetState() {
             this.pageImportar = 0;
             this.selectedHeadersFromFile = [];
@@ -443,7 +443,7 @@ export default {
             };
 
             reader.readAsArrayBuffer(this.selectedFile);
-         
+
 
         },
 
@@ -516,7 +516,7 @@ export default {
             if (!this.previewCsv) {
                 return;
             }
-            let contentCsv = this.dividirElementos(this.previewCsv)
+            let contentCsv = this.previewCsv;
             this.pageImportar = 3;
             const csvContent = this.arrayToCsv(contentCsv);
             const blob = new Blob([csvContent], { type: 'text/csv' });
