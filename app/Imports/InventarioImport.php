@@ -30,7 +30,7 @@ class InventarioImport implements ToCollection
     }
     private function createArticuloMapping()
     {
-        return Articulo::pluck('nombre', 'id')->toArray();
+        return Articulo::pluck('codigo', 'id')->toArray();
     }
 
     public function collection(Collection $rows)

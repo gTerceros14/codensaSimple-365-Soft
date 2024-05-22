@@ -233,7 +233,7 @@ export default {
             headersOrigin: [
 
                 "Almacen",
-                "Articulo",
+                "Codigo Articulo",
                 "Fecha vencimiento",
                 "Saldo stock",
             ],

@@ -765,6 +765,8 @@
                 'data': this.arrayDetalle,
 
                 }).then(function (response) {
+                    me.cerrarModal_1(); // Cierra el modal después de un traspaso exitoso
+                     SweetAlert('¡Traspaso exitoso!'); // Muestra la alerta de éxito
                     me.eliminarDetalle();
                 }).catch(function (error) {
                     console.log(error);
@@ -857,6 +859,12 @@
                     }
                 })
             },
+            cerrarModal_1() {
+                    // Cierra el modal
+                    this.modal = 0;
+                    alert('¡Traspaso exitoso!');
+                },
+
             advertenciaSwal(){
                 swal({
                     title: "Advertencia",
