@@ -39,8 +39,14 @@ class ArticuloImport implements ToCollection
 
     private function createCategoriaMapping()
     {
-        return Categoria::pluck('nombre', 'id')->toArray();
+        // Obtener las categorías y convertir los nombres a mayúsculas
+        $categorias = Categoria::pluck('nombre', 'id')->map(function ($nombre) {
+            return strtoupper($nombre);
+        })->toArray();
+    
+        return $categorias;
     }
+    
 
     private function createPersonaMapping()
     {
@@ -182,6 +188,7 @@ class ArticuloImport implements ToCollection
 
     private function getCategoriaId($nombreCategoria)
     {
+        $nombreCategoria = strtoupper($nombreCategoria);
         $idCategoria = array_search($nombreCategoria, $this->categoriaMapping);
         return $idCategoria !== false ? $idCategoria : null;
     }
