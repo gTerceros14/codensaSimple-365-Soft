@@ -116,6 +116,20 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row" v-if="arrayMonedas.length != 0">
+                                        <div class="btn-group mt-2" role="group">
+                                            <button @click="resetState2" type="button" class="btn btn-secondary mx-1">
+                                                <i class="fa fa-arrow-left"></i> Volver
+                                            </button>
+                                            <button v-if="selectedFile" @click="downloadCsv()" type="button"
+                                                class="btn btn-outline-success mx-1">
+                                                <i class="fa fa-download"></i> Descargar
+                                            </button>
+                                            <button v-if="selectedFile" type="submit" class="btn btn-success mx-1">
+                                                <i class="fa fa-upload"></i> Importar datos
+                                            </button>
+                                        </div>
+                                    </div>
 
                                     <p class="text-muted">Este contenido se importará en la base de datos</p>
                                     <div class="table-responsive">
@@ -139,16 +153,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <button @click="resetState2" type="button" class="btn btn-secondary mt-2">
-                                        <i class="fa fa-arrow-left"></i> Volver
-                                    </button>
-                                    <button v-if="selectedFile" @click="downloadCsv()" type="button"
-                                        class="btn btn-outline-success mt-2">
-                                        <i class="fa fa-download"></i> Descargar
-                                    </button>
-                                    <button v-if="selectedFile" type="submit" class="btn btn-success mt-2">
-                                        <i class="fa fa-upload"></i> Importar datos
-                                    </button>
+
 
                                 </div>
                             </div>
@@ -161,7 +166,7 @@
                                     </div>
                                     <h5 class="mt-3">Importando Datos</h5>
                                 </div>
-                                <div v-if="errorsImport.length > 0">
+                                <div v-if="errorsImport.length > 0 && erroresNoExiste.length == 0">
                                     <div class="alert alert-danger" role="alert">
                                         <h4 class="alert-heading"><i class="fa fa-exclamation-triangle"></i> Error</h4>
                                         <p>No se pudo realizar la importación, verifique los datos del archivo</p>
@@ -171,34 +176,49 @@
                                         <i class="fa fa-exclamation-triangle"></i> {{ item }}
                                     </div>
                                 </div>
-                                <div v-if="errorsImport.length == 0 && erroresNoExiste.length > 0">
-                                    <template v-if="isLoading != true">
+                                <div v-if="errorsImport.length != 0 && erroresNoExiste.length > 0">
 
+                                    <table class="table table-bordered" v-if="registrosSuccess.length != 0">
+                                        <h4><i class="fa fa-exclamation-circle"></i> Cargando datos</h4>
+                                        <span>Espere por favor</span>
+
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar"
+                                                :style="{ width: (registrosSuccess.length / erroresNoExiste.length * 100) + '%' }"
+                                                :aria-valuenow="registrosSuccess.length" aria-valuemin="0"
+                                                :aria-valuemax="erroresNoExiste.length">
+                                                {{ registrosSuccess.length }}/{{ erroresNoExiste.length }}
+                                            </div>
+                                        </div>
+                                        <tbody>
+                                            <tr v-for="(item, index) in registrosSuccess.slice().reverse()"
+                                                :key="index">
+                                                <td>
+                                                    <i class="fa fa-check-circle-o  text-success"
+                                                        aria-hidden="true"></i> {{ item }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table table-bordered" v-if="registrosSuccess.length == 0">
                                         <h4><i class="fa fa-exclamation-circle"></i> Datos no encontrados en la base de
                                             datos</h4>
-                                        <table class="table table-bordered">
-                                            <tbody>
-                                                <tr v-for="(item, index) in erroresNoExiste" :key="index">
-                                                    <td
-                                                        v-html="`<span class='font-weight-bold'>${item.split(' ')[0]}</span>: ${item.split(' ').slice(1).join(' ')}`">
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <div v-if="erroresNoExiste.length > 0" class="mt-3">
-                                            <p>¿Desea registrar estos datos?</p>
-                                            <button class="btn btn-success" type="button"
-                                                @click="confirmarRegistro">Confirmar</button>
-                                        </div>
-                                    </template>
-                                    <div v-if="isLoading" class="text-center">
-                                        <div class="spinner-border text-primary" role="status">
-                                            <span class="sr-only">Loading...</span>
-                                        </div>
-                                        <h5 class="mt-3">Registrando datos...</h5>
+                                        <tbody>
+                                            <tr v-for="(item, index) in erroresNoExiste" :key="index">
+                                                <td
+                                                    v-html="`<span class='font-weight-bold'>${item.split(' ')[0]}</span>: ${item.split(' ').slice(1).join(' ')}`">
+                                                </td>
+                                            </tr>
+                                        </tbody>
 
+                                    </table>
+                                    <div v-if="erroresNoExiste.length > 0 && successImport.length != 0" class="mt-3">
+                                        <p>¿Desea registrar estos datos?</p>
+
+                                        <button class="btn btn-success" type="button"
+                                            @click="confirmarRegistro">Confirmar</button>
+                                        <button class="btn btn-danger" type="button">Cancelar</button>
                                     </div>
-
                                 </div>
                                 <div v-if="erroresNoExiste.length == 0 && errorsImport.length == 0 && successImport"
                                     class="text-center">
@@ -315,34 +335,36 @@ export default {
 
         },
         async confirmarRegistro() {
-            console.log(this.isLoading);
-
-            this.isLoading = true;
-            console.log(this.isLoading);
-            console.log("Cargando los datos");
-            for (const elemento of this.erroresNoExiste) {
-                const palabras = elemento.split(' ');
-                const primeraPalabra = palabras.shift();
-                const restoDelString = palabras.join(' ');
-                try {
-                    if ("Linea" === primeraPalabra) {
-                        await this.agregarLinea(restoDelString);
-                    } else if ("Marca" === primeraPalabra) {
-                        await this.agregarMarca(restoDelString);
-                    } else if ("Grupo" === primeraPalabra) {
-                        await this.agregarGrupo(restoDelString);
-                    } else if ("Industria" === primeraPalabra) {
-                        await this.agregarIndustria(restoDelString);
+            try {
+                console.log('Iniciando confirmación de registro');
+                this.isLoading = true;
+                console.log('isLoading:', this.isLoading);
+                for (const elemento of this.erroresNoExiste) {
+                    const palabras = elemento.split(' ');
+                    const primeraPalabra = palabras.shift();
+                    const restoDelString = palabras.join(' ');
+                    try {
+                        if ("Linea" === primeraPalabra) {
+                            await this.agregarLinea(restoDelString);
+                        } else if ("Marca" === primeraPalabra) {
+                            await this.agregarMarca(restoDelString);
+                        } else if ("Grupo" === primeraPalabra) {
+                            await this.agregarGrupo(restoDelString);
+                        } else if ("Industria" === primeraPalabra) {
+                            await this.agregarIndustria(restoDelString);
+                        }
+                    } catch (error) {
+                        console.error("Ocurrió un error al agregar: " + error);
                     }
-                    // this.isLoading = 0;
-                } catch (error) {
-                    console.error("Ocurrió un error al agregar: " + error);
-                    this.isLoading = false;
-
                 }
+                console.log("Termino de registrar")
+
+                this.submitForm();
+            } finally {
+                this.isLoading = false;
+                console.log('isLoading:', this.isLoading);
             }
 
-            this.submitForm();
         }
         ,
         agregarMarca(nombre) {
@@ -351,12 +373,8 @@ export default {
 
             }).then((response) => {
                 this.registrosSuccess.push("Se registro la marca " + nombre);
-                this.isLoading = false;
-
             }).catch((error) => {
                 console.log(error);
-                this.isLoading = false;
-
             });
         },
 
@@ -365,12 +383,8 @@ export default {
                 'nombre_grupo': nombre
             }).then((response) => {
                 this.registrosSuccess.push("Se registro el grupo " + nombre);
-                this.isLoading = false;
-
             }).catch((error) => {
                 console.log(error);
-                this.isLoading = false;
-
             });
         },
         agregarLinea(nombre) {
@@ -381,14 +395,8 @@ export default {
 
             }).then((response) => {
                 this.registrosSuccess.push("Se registro la linea " + nombre);
-                this.isLoading = false;
-
             }).catch((error) => {
                 console.log(error);
-                this.isLoading = false;
-
-
-
             });
         },
         agregarIndustria(nombre) {
@@ -396,12 +404,10 @@ export default {
                 'nombre': nombre
             }).then((response) => {
                 this.registrosSuccess.push("Se registro la industria " + nombre);
-                this.isLoading = false;
-
+                console.log("Registros sucees")
+                console.log(this.registrosSuccess);
             }).catch((error) => {
                 console.log(error);
-                this.isLoading = false;
-
             });
         },
         handleFileChange(event) {
@@ -653,6 +659,7 @@ export default {
             if (!this.previewCsv) {
                 return;
             }
+            console.log("REgistrando");
             let contentCsv = this.dividirElementos(this.previewCsv)
             this.pageImportar = 3;
             const csvContent = this.arrayToCsv(contentCsv);
@@ -665,8 +672,14 @@ export default {
                     this.erroresNoExiste = [];
                     this.errorsImport = [];
                     this.successImport = true;
+                    this.registrosSuccess = [];
+
+                    console.log("Respuesta");
+                    console.log(response)
+
                 })
                 .catch(error => {
+                    console.log(error.response)
                     if (error.response && error.response.status === 422) {
                         const datos = error.response.data.errors;
                         this.erroresNoExiste = datos.flatMap(item => {
@@ -675,6 +688,10 @@ export default {
                         });
                         this.errorsImport = datos.filter(item => !item.includes("No existe"));
                         this.erroresNoExiste = this.erroresNoExiste.filter((valor, indice, array) => array.indexOf(valor) === indice);
+                        console.log("Respuesta");
+
+                        console.log(this.erroresNoExiste);
+                        console.log(this.errorsImport);
                     } else {
                         console.error(error);
                     }

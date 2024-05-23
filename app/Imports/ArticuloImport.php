@@ -24,8 +24,6 @@ class ArticuloImport implements ToCollection
     private $marcaMapping;
     private $industriaMapping;
     private $personaMapping;
-
-
     private $errors = [];
 
     public function __construct()
@@ -37,7 +35,6 @@ class ArticuloImport implements ToCollection
         $this->marcaMapping = $this->createMarcaMapping();
         $this->industriaMapping = $this->createIndustriaMapping();
         $this->personaMapping = $this->createPersonaMapping();
-
     }
 
     private function createCategoriaMapping()
@@ -84,18 +81,33 @@ class ArticuloImport implements ToCollection
             \DB::beginTransaction();
 
             foreach ($rows as $row) {
+                $rowErrors = [];
 
                 $idCategoria = $this->getCategoriaId($row[16]);
-
                 $idGrupo = $this->getGrupoId($row[17]);
-
                 $idProveedor = $this->getProveedorId($row[18]);
-
                 $idMedida = $this->getMedidaId($row[19]);
-
                 $idMarca = $this->getMarcaId($row[20]);
-
                 $idIndustria = $this->getIndustriaId($row[21]);
+
+                if (!$idCategoria) {
+                    $rowErrors[] = "Error fila $rowNumber: No existe 'Linea $row[16]'";
+                }
+                if (!$idGrupo) {
+                    $rowErrors[] = "Error fila $rowNumber: No existe 'Grupo $row[17]'";
+                }
+                if (!$idProveedor) {
+                    $rowErrors[] = "Error fila $rowNumber: El proveedor '$row[18]' no está registrado";
+                }
+                if (!$idMedida) {
+                    $rowErrors[] = "Error fila $rowNumber: La medida '$row[19]' no está registrada en la base de datos";
+                }
+                if (!$idMarca) {
+                    $rowErrors[] = "Error fila $rowNumber: No existe 'Marca $row[20]'";
+                }
+                if (!$idIndustria) {
+                    $rowErrors[] = "Error fila $rowNumber: No existe 'Industria $row[21]'";
+                }
 
                 try {
                     Articulo::create([
@@ -122,28 +134,19 @@ class ArticuloImport implements ToCollection
                         'idmedida' => $idMedida,
                         'idmarca' => $idMarca,
                         'idindustria' => $idIndustria,
-
                     ]);
                 } catch (Exception $e) {
-                    if (!$idCategoria) {
-                        $this->errors[] = "Error fila $rowNumber: No existe 'Linea $row[16]' ";
-                    } else if (!$idGrupo) {
-                        $this->errors[] = "Error fila $rowNumber: No existe 'Grupo $row[17]'";
-                    } else if (!$idProveedor) {
-                        $this->errors[] = "Error fila $rowNumber: El proveedor '$row[18]' no está registrado";
-                    } else if (!$idMedida) {
-                        $this->errors[] = "Error fila $rowNumber: La medida '$row[19]' no está registrado en la base de datos";
-                    } else if (!$idMarca) {
-                        $this->errors[] = "Error fila $rowNumber: No existe 'Marca $row[20]'";
-                    } else if (!$idIndustria) {
-                        $this->errors[] = "Error fila $rowNumber: No existe 'Industria $row[21]'";
-                    } else if (strpos($e->getMessage(), "Integrity constraint violation: 1062") !== false) {
-                        $this->errors[] = "Error fila $rowNumber: El producto '$row[1]' ya existe";
+                    if (strpos($e->getMessage(), "Integrity constraint violation: 1062") !== false) {
+                        $rowErrors[] = "Error fila $rowNumber: El producto '$row[1]' ya existe";
                     } else {
-                        $this->errors[] = "Error al procesar fila: " . $e->getMessage();
+                        $rowErrors[] = "Error al procesar fila: " . $e->getMessage();
                     }
 
                     $importacionExitosa = false;
+                }
+
+                if (!empty($rowErrors)) {
+                    $this->errors = array_merge($this->errors, $rowErrors);
                 }
 
                 $rowNumber++;
@@ -180,43 +183,36 @@ class ArticuloImport implements ToCollection
     private function getCategoriaId($nombreCategoria)
     {
         $idCategoria = array_search($nombreCategoria, $this->categoriaMapping);
-
         return $idCategoria !== false ? $idCategoria : null;
     }
 
     private function getGrupoId($nombreGrupo)
     {
         $idGrupo = array_search($nombreGrupo, $this->grupoMapping);
-
         return $idGrupo !== false ? $idGrupo : null;
     }
 
     private function getProveedorId($nombreProveedor)
     {
         $idProveedor = array_search($nombreProveedor, $this->personaMapping);
-
         return $idProveedor !== false ? $idProveedor : null;
     }
-
 
     private function getMedidaId($descripcionMedida)
     {
         $idMedida = array_search($descripcionMedida, $this->medidaMapping);
-
         return $idMedida !== false ? $idMedida : null;
     }
 
     private function getMarcaId($nombreMarca)
     {
         $idMarca = array_search($nombreMarca, $this->marcaMapping);
-
         return $idMarca !== false ? $idMarca : null;
     }
 
     private function getIndustriaId($nombreIndustria)
     {
         $idIndustria = array_search($nombreIndustria, $this->industriaMapping);
-
         return $idIndustria !== false ? $idIndustria : null;
     }
 }
