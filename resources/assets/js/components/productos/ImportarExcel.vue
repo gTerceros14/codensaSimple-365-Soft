@@ -518,15 +518,9 @@ export default {
                 this.headersArray = newArray;
             }
         },
-        splitRow(row) {
-            const regex = /("[^"]*"|[^,]+)(?=,|$)/g;
-            const columns = [];
-            let match;
-            while ((match = regex.exec(row)) !== null) {
-                columns.push(match[0].replace(/(^,)|(,$)/g, '').trim());
-            }
-            return columns;
-        },
+       splitRow(row) {
+                return [row];
+            },
         assignHeaders() {
             if (!this.selectedFile) {
                 console.error("No se ha seleccionado un archivo.");

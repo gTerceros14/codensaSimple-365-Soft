@@ -862,7 +862,14 @@
             cerrarModal_1() {
                     // Cierra el modal
                     this.modal = 0;
-                    alert('¡Traspaso exitoso!');
+                    
+                    // Muestra una alerta de SweetAlert2
+                    Swal.fire({
+                            title: '¡Éxito!',
+                            text: 'Traspaso exitoso',
+                            icon: 'success',
+                            confirmButtonText: 'Cerrar'
+                        });
                 },
 
             advertenciaSwal(){
