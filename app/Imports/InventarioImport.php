@@ -31,40 +31,40 @@ class InventarioImport implements ToCollection
     private function createArticuloMapping()
     {
         return Articulo::pluck('codigo', 'id')->toArray();
-    }
-
+    }  
     public function collection(Collection $rows)
     {
         $rowNumber = 1;
         $importacionExitosa = true;
         try {
             \DB::beginTransaction();
-
+    
             foreach ($rows as $row) {
                 $idAlmacen = $this->getAlmacenId($row[0]);
                 $idArticulo = $this->getArticuloId($row[1]);
                 try {
+                    $fechaVencimiento = $row[2] ?? '2099-01-01'; // Asignar fecha por defecto si no se proporciona
                     Inventario::create([
                         'idalmacen' => $idAlmacen,
                         'idarticulo' => $idArticulo,
-                        'fecha_vencimiento' => $row[2],
+                        'fecha_vencimiento' => $fechaVencimiento,
                         'saldo_stock' => $row[3],
-                    ]);
+                    ]); 
                 } catch (Exception $e) {
                     if (!$idAlmacen) {
-                        $this->errors[] = "Error fila $rowNumber: No existe 'El almacen $row[0]' ";
+                        $this->errors[] = "Error fila $rowNumber: No existe 'El almacen $row[0]'";
                     } else if (!$idArticulo) {
-                        $this->errors[] = "Error fila $rowNumber: No se encontro 'Articulo $row[1]' en la base de datos";
+                        $this->errors[] = "Error fila $rowNumber: No se encontró 'Articulo $row[1]' en la base de datos";
                     } else {
                         $this->errors[] = "Error al procesar fila: " . $e->getMessage();
                     }
-
+    
                     $importacionExitosa = false;
                 }
-
+    
                 $rowNumber++;
             }
-
+    
             if ($importacionExitosa) {
                 \DB::commit(); // Confirmar la transacción si no hay errores
             } else {
@@ -77,6 +77,9 @@ class InventarioImport implements ToCollection
         }
         return $this->getErrorsResponse($importacionExitosa);
     }
+    
+
+    
     private function getArticuloId($nombreArticulo)
     {
         $idArticulo = array_search($nombreArticulo, $this->articuloMapping);
