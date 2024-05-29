@@ -62,20 +62,19 @@
                                     <th>Product</th>
                                     <th>Unidad X Paq.</th>                                   
                                     <th>Saldo_stock_total</th>
+                                    <th>Cantidad</th>
                                     <th>Almacen</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="inventario in arrayInventario" :key="inventario.id">
-                                    <!-- <td>
-                                        <button type="button" @click="abrirModal('almacenes','actualizar',inventario)" class="btn btn-warning btn-sm">
-                                        <i class="icon-pencil"></i>
-                                        </button> &nbsp;
-                                    </td> -->
+                                  
                                     <td v-text="inventario.nombre_producto"></td>
                                     <td v-text="inventario.unidad_envase"></td>
                                     <td v-text="inventario.saldo_stock_total"></td>
+                                    <td v-text="inventario.cantidad"></td>
                                     <td v-text="inventario.nombre_almacen"></td>
+
                                 </tr>                                
                             </tbody>
                         </table>
@@ -89,6 +88,7 @@
                                     <th>Unid.X.Paq</th>
                                     <th>Costo Unidad</th>
                                     <th>Saldo Stock</th>
+                                    <th>Cantidad</th>
                                     <th>Fecha Ingreso</th>
                                     <th>Fecha Vencimiento</th>
                                     <th>Almacen</th>
@@ -100,6 +100,7 @@
                                     <td v-text="inventario.unidad_envase"></td>
                                     <td v-text="inventario.precio_costo_unid"></td>
                                     <td v-text="inventario.saldo_stock"></td>
+                                     <td v-text="inventario.cantidad"></td>
                                     <td v-text="inventario.fecha_ingreso"></td>
                                     <td v-text="inventario.fecha_vencimiento"></td>
                                     <td v-text="inventario.nombre_almacen"></td>

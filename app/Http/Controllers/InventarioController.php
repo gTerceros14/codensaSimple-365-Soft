@@ -429,10 +429,11 @@ class InventarioController extends Controller
                 'articulos.nombre as nombre_producto',
                 'articulos.unidad_envase',
                 'almacens.nombre_almacen',
+                'inventarios.cantidad',
                 DB::raw('SUM(inventarios.saldo_stock) as saldo_stock_total')
             )
             ->where('inventarios.idalmacen', '=', $idAlmacen)
-            ->groupBy('articulos.nombre', 'almacens.nombre_almacen','articulos.unidad_envase')
+            ->groupBy('articulos.nombre', 'almacens.nombre_almacen','articulos.unidad_envase','inventarios.cantidad',)
             ->orderBy('articulos.nombre')
             ->orderBy('almacens.nombre_almacen');
             //->get();
@@ -444,34 +445,18 @@ class InventarioController extends Controller
                 'articulos.unidad_envase',
                 'articulos.precio_costo_unid',
                 'inventarios.saldo_stock',
+                'inventarios.cantidad',
                 DB::raw('DATE_FORMAT(inventarios.created_at, "%Y-%m-%d") as fecha_ingreso'), // Formato deseado
                 'inventarios.fecha_vencimiento',
-                //'inventarios.created_at',
+                
                 'almacens.nombre_almacen',
             )
             ->where('inventarios.idalmacen', '=', $idAlmacen)
-            //->orderBy('almacens.nombre_almacen');
+           
             ->orderBy('articulos.nombre');
-        // }elseif ($tipo === 'lote') {
-        //     $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
-        //     ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
-        //     ->join('detalle_ingresos', 'detalle_ingresos.idarticulo', '=', 'articulos.id')
-        //     ->join('ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
-        //     ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
-        //     ->join('personas', 'proveedores.id', '=', 'personas.id')
-        //     ->select(
-        //         'articulos.nombre as nombre_producto',
-        //         'articulos.unidad_envase',
-        //         'articulos.precio_costo_unid',
-        //         'inventarios.saldo_stock',
-        //         DB::raw('DATE_FORMAT(ingresos.fecha_hora, "%d-%m-%Y") as fecha_ingreso'),
-        //         'inventarios.fecha_vencimiento',
-        //         'almacens.nombre_almacen',
-        //     )
-        //     ->where('inventarios.idalmacen', '=', $idAlmacen)
-        //     ->orderBy('almacens.nombre_almacen');
+    
         }
-        //---------------------------------------
+       
         if (!empty($buscar)) {
             $inventarios = $inventarios->where(function ($query) use ($criterio, $buscar, $tipo) {
                 $query->where('articulos.' . $criterio, 'like', '%' . $buscar . '%');
@@ -481,7 +466,7 @@ class InventarioController extends Controller
             });
         }
         $inventarios = $inventarios->get();
-        //---------------------------------
+        
         return ['inventarios' => $inventarios];
     }
     //LISTA PARA OBTENER EL SALDO_STOCK POR ITEM POR EL ALMACEN,NOMBRE Y ID DE ARTICULO
@@ -546,47 +531,6 @@ class InventarioController extends Controller
         //---------------------------------
         return  response()->json(['inventarios' => $inventarios]);
     }
-    // public function store(Request $request)
-    // {
-    //     if (!$request->ajax()) {
-    //         return redirect('/');
-    //     }
-
-    //     // Verificar si el idarticulo existe en la tabla de articulos
-    //     $articulo = Articulo::find($request->idarticulo);
-
-    //     if ($articulo) {
-    //         // El idarticulo existe, obtener todos los inventarios con el mismo idarticulo
-    //         $inventarios = Inventario::where('idarticulo', $request->idarticulo)->get();
-
-    //         $foundInventory = false;
-    //         foreach ($inventarios as $inventario) {
-    //             // Comparar solo la fecha de vencimiento (día, mes y año)
-    //             if ($inventario->fecha_vencimiento->format('Y-m-d') === date('Y-m-d', strtotime($request->fecha_vencimiento))) {
-    //                 // Si la fecha de vencimiento coincide, sumar el saldo_stock
-    //                 $inventario->saldo_stock += $request->saldo_stock;
-    //                 $inventario->save();
-    //                 $foundInventory = true;
-    //                 break;
-    //             }
-    //         }
-
-    //         if (!$foundInventory) {
-    //             // Si no hay coincidencias de fecha de vencimiento, registrar normalmente
-    //             $inventario = new Inventario();
-    //             $inventario->idalmacen = $request->idalmacen;
-    //             $inventario->idarticulo = $request->idarticulo;
-    //             $inventario->fecha_vencimiento = $request->fecha_vencimiento;
-    //             $inventario->saldo_stock = $request->saldo_stock;
-    //             $inventario->save();
-    //         }
-    //     } else {
-    //         // El idarticulo no existe, registrar normalmente
-    //         Log::info("No existe el articulo");
-    //     }
-    // }
-
-
 
     public function importar(Request $request)
     {

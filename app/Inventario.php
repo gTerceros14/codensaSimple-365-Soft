@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Inventario extends Model
 {
-    protected $fillable = ['idalmacen', 'idarticulo', 'fecha_vencimiento', 'saldo_stock'];
+    protected $fillable = ['idalmacen', 'idarticulo', 'fecha_vencimiento', 'saldo_stock','cantidad'];
 
     public function almacen()
     {

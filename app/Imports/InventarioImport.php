@@ -49,6 +49,7 @@ class InventarioImport implements ToCollection
                         'idarticulo' => $idArticulo,
                         'fecha_vencimiento' => $fechaVencimiento,
                         'saldo_stock' => $row[3],
+                        'cantidad'=> $row[3],
                     ]); 
                 } catch (Exception $e) {
                     if (!$idAlmacen) {

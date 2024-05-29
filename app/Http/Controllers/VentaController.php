@@ -585,12 +585,30 @@ class VentaController extends Controller
 
     private function actualizarInventario($idAlmacen, $detalle)
     {
-        $inventario = Inventario::where('idalmacen', $idAlmacen)
+        $cantidadRestante = $detalle['cantidad'];
+        $inventarios = Inventario::where('idalmacen', $idAlmacen)
             ->where('idarticulo', $detalle['idarticulo'])
-            ->firstOrFail();
-        $inventario->saldo_stock -= $detalle['cantidad'];
-        $inventario->save();
+            ->orderBy('id')
+            ->get();
+    
+        foreach ($inventarios as $inventario) {
+            if ($cantidadRestante <= 0) {
+                break;
+            }
+    
+            if ($inventario->saldo_stock >= $cantidadRestante) {
+                $inventario->saldo_stock -= $cantidadRestante;
+                $cantidadRestante = 0;
+            } else {
+    
+                $cantidadRestante -= $inventario->saldo_stock;
+                $inventario->saldo_stock = 0;
+            }
+    
+            $inventario->save();
+        }
     }
+
 
     private function notificarAdministradores()
     {
@@ -610,176 +628,6 @@ class VentaController extends Controller
             $user->notify(new NotifyAdmin($arreglosDatos));
         }
     }
-
-    // public function store(Request $request)
-    // {
-    //     if (!$request->ajax())
-    //         return redirect('/');
-
-    //     try {
-    //         DB::beginTransaction();
-
-    //         $descu = '';
-    //         $valorMaximoDescuentoEmpresa = Empresa::first();
-    //         $valorMaximo = $valorMaximoDescuentoEmpresa->valorMaximoDescuento;
-    //         $detalles = $request->data; //Array de detalles
-    //         $idAlmacen = $request->idAlmacen;
-
-    //         foreach ($detalles as $ep => $det) {
-    //             $descu = $det['descuento'];
-    //         }
-
-    //         if ($descu > $valorMaximoDescuentoEmpresa->valorMaximoDescuento) {
-    //             return [
-    //                 'id' => -1,
-    //                 'valorMaximo' => $valorMaximo
-    //             ];
-    //         } else {
-
-    //             $ultimaCaja = Caja::latest()->first();
-
-    //             if ($ultimaCaja) {
-    //                 if ($ultimaCaja->estado == '1') {
-    //                     $venta = new Venta();
-    //                     $venta->idcliente = $request->idcliente;
-    //                     $venta->idusuario = \Auth::user()->id;
-    //                     $venta->idtipo_pago = $request->idtipo_pago;
-    //                     //  tipo ventas cambiado por tipo ventas
-    //                     $venta->idtipo_venta = $request->idtipo_venta;
-    //                     //
-    //                     $venta->tipo_comprobante = $request->tipo_comprobante;
-    //                     $venta->serie_comprobante = $request->serie_comprobante;
-    //                     $venta->num_comprobante = $request->num_comprobante;
-    //                     $venta->fecha_hora = now()->setTimezone('America/La_Paz');
-    //                     $venta->impuesto = $request->impuesto;
-    //                     $venta->total = $request->total;
-    //                     $venta->estado = 'Registrado';
-    //                     $venta->idcaja = $ultimaCaja->id;
-    //                     //---------registro credito_Ventas---
-    //                     Log::info('DATOS REGISTRO ARTICULO VENTA:', [
-    //                         'idcliente' => $request->idcliente,
-    //                         'idusuario' => $request->id,
-    //                         'idtipo_pago' => $request->idtipo_pago,
-    //                         //
-    //                         'idtipo_venta' => $request->idtipo_venta,
-    //                         //
-    //                         'tipo_comprobante' => $request->tipo_comprobante,
-    //                         'serie_comprobante' => $request->serie_comprobante,
-    //                         'num_comprobante' => $request->num_comprobante,
-    //                         'fecha_hora' => $request->fecha_hora,
-    //                         'impuesto' => $request->impuesto,
-    //                         'total' => $request->total,
-    //                         //'estado' => $request->precio_venta,
-    //                         'idcaja' => $request->id,
-    //                     ]);
-    //                     $venta->save();
-    //                     //-----hasta aqui---- cambiando tipo pagos por tipo de venta
-
-    //                     if ($request->idtipo_venta == 2) {
-    //                         //----REGIStRADO DE CREDITOS_VENTAAS--
-    //                         $creditoventa = new CreditoVenta();
-    //                         $creditoventa->idventa = $venta->id;
-    //                         $creditoventa->idpersona = $request->idpersona;
-    //                         $creditoventa->numero_cuotas = $request->numero_cuotas;
-    //                         $creditoventa->tiempo_dias_cuota = $request->tiempo_dias_cuota;
-    //                         $creditoventa->estado = $request->estadocrevent; //--OJO CON ESTO REPIDE EN VARIOS
-    //                         Log::info('LLEGA_2 CREDITOS_VENTAS:', [
-    //                             'DATOS' => $creditoventa,
-    //                         ]);
-    //                         $creditoventa->save();
-    //                         //----HASTA AQUI REGIStRADO DE CREDITOS_VENTAS--
-
-    //                         //------para Ver que daTos llega
-    //                         $detallescuota = $request->cuotaspago; //Array de detalles
-    //                         //Recorro todos los elementos
-    //                         Log::info('LLEGA_3 CUOTAS_CREDITO:', [
-    //                             'DATOS' => $detallescuota,
-    //                         ]);
-    //                         //----REGIStRADO DE CUOTAS_CREDITO--
-    //                         foreach ($detallescuota as $detalle) {
-    //                             $cuotascredito = new CuotasCredito();
-    //                             $cuotascredito->idcredito = $creditoventa->id;
-    //                             $cuotascredito->fecha_pago = $detalle['fechaPago'];
-    //                             $cuotascredito->fecha_cancelado = $detalle['fechaCancelado'];
-    //                             $cuotascredito->precio_cuota = $detalle['precioCuota'];
-    //                             $cuotascredito->total_cancelado = $detalle['totalCancelado'];
-    //                             $cuotascredito->saldo = $detalle['saldo'];
-    //                             $cuotascredito->estado = $detalle['estadocuocre'];
-    //                             $cuotascredito->save();
-    //                         }
-    //                         //---hastaa qui REGIStRADO DE CUOTAS_CREDITO--
-
-    //                     }
-
-    //                     $ultimaCaja->ventasContado = ($request->total) + ($ultimaCaja->ventasContado);
-    //                     $ultimaCaja->save();
-
-    //                     Log::info('venta', [
-    //                         'data' => $ultimaCaja,
-    //                         'idalmacen' => $idAlmacen,
-    //                     ]);
-
-    //                     foreach ($detalles as $ep => $det) {
-
-    //                         $disminuirStock = Inventario::where('idalmacen', $idAlmacen)
-    //                             ->where('idarticulo', $det['idarticulo'])
-    //                             ->firstOrFail();
-    //                         $disminuirStock->saldo_stock -= $det['cantidad'];
-    //                         $disminuirStock->save();
-
-    //                         $detalle = new DetalleVenta();
-    //                         $detalle->idventa = $venta->id;
-    //                         $detalle->idarticulo = $det['idarticulo'];
-    //                         $detalle->cantidad = $det['cantidad'];
-    //                         $detalle->precio = $det['precioseleccionado'];
-    //                         $detalle->descuento = $det['descuento'];
-    //                         $detalle->save();
-    //                     }
-    //                     $fechaActual = date('Y-m-d');
-    //                     $numVentas = DB::table('ventas')->whereDate('created_at', $fechaActual)->count();
-    //                     $numIngresos = DB::table('ingresos')->whereDate('created_at', $fechaActual)->count();
-
-    //                     $arreglosDatos = [
-    //                         'ventas' => [
-    //                             'numero' => $numVentas,
-    //                             'msj' => 'Ventas'
-    //                         ],
-    //                         'ingresos' => [
-    //                             'numero' => $numIngresos,
-    //                             'msj' => 'Ingresos'
-    //                         ]
-    //                     ];
-    //                     $allUsers = User::all();
-
-    //                     foreach ($allUsers as $notificar) {
-    //                         User::findOrFail($notificar->id)->notify(new NotifyAdmin($arreglosDatos));
-    //                     }
-    //                     DB::commit();
-    //                     return [
-    //                         'id' => $venta->id
-    //                     ];
-    //                 } else {
-    //                     return [
-    //                         'id' => -1,
-    //                         'caja_validado' => 'Debe tener una caja abierta'
-    //                     ];
-    //                 }
-    //             } else {
-    //                 return [
-    //                     'id' => -1,
-    //                     'caja_validado' => 'Debe crear primero una apertura de caja'
-    //                 ];
-    //             }
-
-    //         }
-    //     } catch (Exception $e) {
-    //         DB::rollBack();
-    //         return [
-    //             'id' => -1,
-    //             'error' => 'Error interno del servidor'
-    //         ];
-    //     }
-    // }
 
     public function desactivar(Request $request)
     {

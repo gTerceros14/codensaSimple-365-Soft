@@ -21,6 +21,7 @@ class CreateInventariosTable extends Migration
             $table->foreign('idarticulo')->references('id')->on('articulos');
             $table->date('fecha_vencimiento')->nullable()->default('2099-01-01');
             $table->integer('saldo_stock'); //saldo_stock
+            $table->integer('cantidad'); //saldo_stock
             $table->timestamps();
         });
     }
