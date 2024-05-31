@@ -173,6 +173,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/credito/cuotas', 'CreditoVentaController@obtenerCuotasCredito');
         Route::post('/credito/cuotas/registrar', 'CreditoVentaController@registrarPagoCuota');
         Route::get('/credito/cuotas/venta/{idventa}', 'CreditoVentaController@obtenerCreditoYCuotas');
+
+        Route::get('/credito/{id}/comprobante-pago', "CreditoVentaController@pdf")->name('credito.comprobante-pago');
+
+
         // cuota_credito
         Route::get('/cuota', 'CuotasCreditoController@index');
         Route::post('/cuota/registrar', 'CuotasCreditoController@store');
