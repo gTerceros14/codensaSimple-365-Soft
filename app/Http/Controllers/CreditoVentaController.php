@@ -227,20 +227,20 @@ class CreditoVentaController extends Controller
     }
 
     private function actualizarCaja($request)
-{
+    {
 
-    $ultimaCaja = Caja::latest()->first();
+        $ultimaCaja = Caja::latest()->first();
 
-    if ($request->tipo_pago == 1) {
-        // Actualizar caja en cuota y cuota efectivo
-      $ultimaCaja->PagoCuotaEfectivo += $request->monto_pago;
-      $ultimaCaja->saldoCaja += $request->monto_pago;
+        if ($request->tipo_pago == 1) {
+            // Actualizar caja en cuota y cuota efectivo
+            $ultimaCaja->PagoCuotaEfectivo += $request->monto_pago;
+            $ultimaCaja->saldoCaja += $request->monto_pago;
 
+        }
+        $ultimaCaja->cuotasventasCredito += $request->monto_pago;
+
+        $ultimaCaja->save();
     }
-    $ultimaCaja->cuotasventasCredito += $request->monto_pago;
-    
-    $ultimaCaja->save();
-}
 
     public function obtenerCreditoYCuotas(Request $request)
     {
@@ -257,4 +257,70 @@ class CreditoVentaController extends Controller
             'cuotasCredito' => $cuotasCredito
         ], 200);
     }
+
+    public function pdf(Request $request, $id)
+    {
+        // Obtener la venta y los detalles del cliente
+        $venta = CreditoVenta::join('personas', 'credito_ventas.idcliente', '=', 'personas.id')
+            ->join('ventas', 'credito_ventas.idventa', '=', 'ventas.id')
+            ->select(
+                'credito_ventas.id',
+                'credito_ventas.total',
+                'personas.nombre',
+                'personas.tipo_documento',
+                'personas.num_documento',
+                'personas.direccion',
+                'personas.email',
+                'personas.telefono',
+                'ventas.created_at'
+            )
+            ->where('credito_ventas.id', '=', $id)
+            ->first();
+
+        Log::info("Estos son es de venta\n");
+        Log::info($venta);
+
+
+        // Obtener las cuotas pagadas
+        $cuotasPagadas = CuotasCredito::where('idcredito', $id)
+            ->where('estado', 'Pagado')
+            ->select(
+                'numero_cuota',
+                'fecha_cancelado as fecha_pago',
+                'precio_cuota as monto_pagado'
+            )
+            ->get();
+        Log::info("Estos son las cuotas pagadas\n");
+        Log::info($cuotasPagadas);
+
+        // Obtener las cuotas pendientes
+        $cuotasPendientes = CuotasCredito::where('idcredito', $id)
+            ->where('estado', '!=', 'Pagado')
+            ->select(
+                'numero_cuota',
+                'fecha_pago as fecha_vencimiento',
+                'precio_cuota as monto_pendiente'
+            )
+            ->get();
+        Log::info("Estos son las cuotas pendientes\n");
+        Log::info($cuotasPendientes);
+
+        // Calcular el total pagado
+        $totalPagado = $cuotasPagadas->sum('monto_pagado');
+        Log::info("Este es el total pagado\n");
+        Log::info($totalPagado);
+
+
+        // Generar el PDF usando la vista
+        $pdf = \PDF::loadView('pdf.pagocuotas', [
+            'venta' => $venta,
+            'cuotasPagadas' => $cuotasPagadas,
+            'cuotasPendientes' => $cuotasPendientes,
+            'totalPagado' => $totalPagado
+        ]);
+
+        // Descargar el PDF
+        return $pdf->download('comprobante_pago_' . $id . '.pdf');
+    }
+
 }
