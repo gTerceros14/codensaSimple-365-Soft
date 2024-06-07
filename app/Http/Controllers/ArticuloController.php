@@ -438,6 +438,8 @@ class ArticuloController extends Controller
             $articulo->nombre_generico = $request->nombre_generico; //aumente esto 5 julio
 
             $articulo->precio_venta = $request->precio_venta;
+            $articulo->precio_costo_paq = $request->precio_costo_paq;
+            $articulo->precio_costo_unid = $request->precio_costo_unid;
 
             $articulo->precio_uno = $request->precio_uno;
             $articulo->precio_dos = $request->precio_dos;
