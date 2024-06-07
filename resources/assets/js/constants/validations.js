@@ -60,7 +60,6 @@ export const esquemaKits = yup.object().shape({
     .min(1, "El precio no puede ser menor o igual que 0")
     .typeError("Debe ser un número"),
   fecha_final: yup.string().required("La fecha final es obligatoria"),
-  
 });
 
 export const esquemaOfertasEspeciales = yup.object().shape({
@@ -71,53 +70,67 @@ export const esquemaOfertasEspeciales = yup.object().shape({
   fecha_final: yup.string().required("La fecha final es obligatoria"),
 
   precio_r1: yup
-  .number()
-  .required("El precio del rango 1 es obligatorio")
-  .min(1, "El precio no puede ser menor o igual que 0")
-  .typeError("Debe ser un número"),
+    .number()
+    .required("El precio del rango 1 es obligatorio")
+    .min(1, "El precio no puede ser menor o igual que 0")
+    .typeError("Debe ser un número"),
   rango_inicio_r1: yup
-  .number()
-  .required("El rango inicio 1 es obligatorio")
-  .min(1, "El rango no puede ser menor o igual que 0")
-  .typeError("Debe ser un número"),
+    .number()
+    .required("El rango inicio 1 es obligatorio")
+    .min(1, "El rango no puede ser menor o igual que 0")
+    .typeError("Debe ser un número"),
   rango_final_r1: yup
     .number()
     .required("El precio es obligatorio")
-    .min(yup.ref('rango_inicio_r1'), "El rango final debe ser mayor que el rango inicial")
+    .min(
+      yup.ref("rango_inicio_r1"),
+      "El rango final debe ser mayor que el rango inicial"
+    )
     .typeError("Debe ser un número"),
-  
-    precio_r2: yup
+
+  precio_r2: yup
     .number()
     .required("El precio del rango 2 es obligatorio")
     .min(1, "El precio no puede ser menor o igual que 0")
     .typeError("Debe ser un número"),
-    rango_inicio_r2: yup
+  rango_inicio_r2: yup
     .number()
     .required("El precio es obligatorio")
-    .min(yup.ref('rango_final_r1'), "El rango inicio 2 debe ser mayor al rango final 1")
+    .min(
+      yup.ref("rango_final_r1"),
+      "El rango inicio 2 debe ser mayor al rango final 1"
+    )
     .typeError("Debe ser un número"),
-    rango_final_r2: yup
+  rango_final_r2: yup
     .number()
     .required("El precio es obligatorio")
-    .min(yup.ref('rango_inicio_r2'), "El rango final 2 debe ser mayor al rango inicio 2")
+    .min(
+      yup.ref("rango_inicio_r2"),
+      "El rango final 2 debe ser mayor al rango inicio 2"
+    )
     .typeError("Debe ser un número"),
-  
-    precio_r3: yup
+
+  precio_r3: yup
     .number()
     .required("El precio es obligatorio")
     .min(1, "El precio no puede ser menor o igual que 0")
     .typeError("Debe ser un número"),
-    rango_inicio_r3: yup
+  rango_inicio_r3: yup
     .number()
     .required("El precio es obligatorio")
-    .min(yup.ref('rango_final_r2'), "El rango inicio 3 debe ser mayor al rango final 2")
+    .min(
+      yup.ref("rango_final_r2"),
+      "El rango inicio 3 debe ser mayor al rango final 2"
+    )
     .typeError("Debe ser un número"),
-    rango_final_r3: yup
+  rango_final_r3: yup
     .number()
     .required("El precio es obligatorio")
-    .min(yup.ref('rango_inicio_r3'), "El rango final 3 debe ser mayor al rango inicio 3")
+    .min(
+      yup.ref("rango_inicio_r3"),
+      "El rango final 3 debe ser mayor al rango inicio 3"
+    )
     .typeError("Debe ser un número"),
-  
 });
 
 export const esquemaOfertas = yup.object().shape({
@@ -259,4 +272,22 @@ export const esquemaBanco = yup.object().shape({
     .required("El número de cuenta es obligatorio")
     .min(1, "El número de cuenta no puede ser igual o menor a cero"),
   tipo_cuenta: yup.string().required("El tipo de cuenta es obligatorio"),
+});
+
+export const esquemaProveedor = yup.object().shape({
+  nombre: yup.string().required("El nombre es obligatorio"),
+  direccion: yup.string().required("La dirección es obligatoria"),
+  telefono: yup.string().required("El teléfono es obligatorio"),
+  tipo_documento: yup.string().required("Seleccione un tipo de documento"),
+  num_documento: yup
+    .string()
+    .required("El numero del documento es obligatorio"),
+  email: yup
+    .string()
+    .email("Introduce un correo electrónico válido")
+    .required("El correo electrónico es obligatorio"),
+  contacto: yup.string().required("El contacto es obligatorio"),
+  telefono_contacto: yup
+    .string()
+    .required("El teléfono del contacto es obligatorio"),
 });

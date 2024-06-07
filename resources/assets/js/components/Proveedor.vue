@@ -1,38 +1,40 @@
 <template>
-            <main class="main">
-            <!-- Breadcrumb -->
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
-            </ol>
-            <div class="container-fluid">
-                <!-- Ejemplo de tabla Listado -->
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Proveedores
-                        <button type="button" @click="abrirModal('persona','registrar')" class="btn btn-secondary">
-                            <i class="icon-plus"></i>&nbsp;Nuevo
-                        </button>
-                         <button type="button" @click="abrirModalImportar()" class="btn btn-success">
+    <main class="main">
+        <!-- Breadcrumb -->
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
+        </ol>
+        <div class="container-fluid">
+            <!-- Ejemplo de tabla Listado -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-align-justify"></i> Proveedores
+                    <button type="button" @click="abrirModal('persona', 'registrar')" class="btn btn-secondary">
+                        <i class="icon-plus"></i>&nbsp;Nuevo
+                    </button>
+                    <button type="button" @click="abrirModalImportar()" class="btn btn-success">
                         <i class="icon-plus"></i>&nbsp;Importar
-                        </button>
-                        
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
-                                      <option value="nombre">Nombre</option>
-                                      <option value="num_documento">Documento</option>
-                                      <option value="email">Email</option>
-                                      <option value="telefono">Teléfono</option>
-                                    </select>
-                                    <input type="text" v-model="buscar" @keyup.enter="listarPersona(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listarPersona(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                </div>
+                    </button>
+
+                </div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <select class="form-control col-md-3" v-model="criterio">
+                                    <option value="nombre">Nombre</option>
+                                    <option value="num_documento">Documento</option>
+                                    <option value="email">Email</option>
+                                    <option value="telefono">Teléfono</option>
+                                </select>
+                                <input type="text" v-model="buscar" @keyup.enter="listarPersona(1, buscar, criterio)"
+                                    class="form-control" placeholder="Texto a buscar">
+                                <button type="submit" @click="listarPersona(1, buscar, criterio)"
+                                    class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                             </div>
                         </div>
-                        <div class="table-responsive">
+                    </div>
+                    <div class="table-responsive">
 
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
@@ -51,8 +53,9 @@
                             <tbody>
                                 <tr v-for="persona in arrayPersona" :key="persona.id">
                                     <td>
-                                        <button type="button" @click="abrirModal('persona','actualizar',persona)" class="btn btn-warning btn-sm">
-                                          <i class="icon-pencil"></i>
+                                        <button type="button" @click="abrirModal('persona', 'actualizar', persona)"
+                                            class="btn btn-warning btn-sm">
+                                            <i class="icon-pencil"></i>
                                         </button>
                                     </td>
                                     <td v-text="persona.nombre"></td>
@@ -62,363 +65,368 @@
                                     <td v-text="persona.telefono"></td>
                                     <td v-text="persona.email"></td>
                                     <td v-text="persona.contacto"></td>
-                                </tr>                                
+                                </tr>
                             </tbody>
                         </table>
                     </div>
 
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item" v-if="pagination.current_page > 1">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Ant</a>
-                                </li>
-                                <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(page,buscar,criterio)" v-text="page"></a>
-                                </li>
-                                <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Sig</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item" v-if="pagination.current_page > 1">
+                                <a class="page-link" href="#"
+                                    @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
+                            </li>
+                            <li class="page-item" v-for="page in pagesNumber" :key="page"
+                                :class="[page == isActived ? 'active' : '']">
+                                <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
+                                    v-text="page"></a>
+                            </li>
+                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                                <a class="page-link" href="#"
+                                    @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
-                <!-- Fin ejemplo de tabla Listado -->
             </div>
-            <!--Inicio del modal agregar/actualizar-->
-            <div class="modal" tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
-                <div class="modal-dialog modal-primary modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" v-text="tituloModal"></h4>
-                            <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
+            <!-- Fin ejemplo de tabla Listado -->
+        </div>
+        <!--Inicio del modal agregar/actualizar-->
+        <div class="modal" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
+            style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-primary modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" v-text="tituloModal"></h4>
+                        <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form @submit.prevent="enviarFormulario">
+
                         <div class="modal-body">
-                            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Nombre (*)</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de la persona">                                        
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Tipo Documento</label>
-                                    <div class="col-md-9">
-                                        <select v-model="tipo_documento" class="form-control">
-                                            <option value="" disabled>Selecciona una tipo de documento</option>
-                                            <option value="1">CI - CEDULA DE IDENTIDAD</option>
-                                            <option value="2">CEX - CEDULA DE IDENTIDAD DE EXTRANJERO</option>
-                                            <option value="5">NIT - NÚMERO DE IDENTIFICACIÓN TRIBUTARIA</option>
-                                            <option value="3">PAS - PASAPORTE</option>
-                                            <option value="4">OD - OTRO DOCUMENTO DE IDENTIDAD</option>   
-                                        </select>                                      
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Número</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="num_documento" class="form-control" placeholder="Número de documento">                                        
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Dirección</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="direccion" class="form-control" placeholder="Dirección">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Teléfono</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="telefono" class="form-control" placeholder="Teléfono">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Email</label>
-                                    <div class="col-md-9">
-                                        <input type="email" v-model="email" class="form-control" placeholder="Email">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Contacto</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="contacto" class="form-control" placeholder="Nombre del contacto">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Teléfono de contacto</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="telefono_contacto" class="form-control" placeholder="Teléfono del contacto">
-                                    </div>
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Nombre del proveedor <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" v-model="datosFormulario.nombre" class="form-control"
+                                        placeholder="Ej. Proveedores S.A." :class="{ 'is-invalid': errores.nombre }"
+                                        @input="validarCampo('nombre')">
+                                    <p class="text-danger" v-if="errores.nombre">{{ errores.nombre }}</p>
                                 </div>
 
-                                <div v-show="errorPersona" class="form-group row div-error">
-                                    <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjPersona" :key="error" v-text="error">
-
-                                        </div>
-                                    </div>
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Dirección <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" v-model="datosFormulario.direccion" class="form-control"
+                                        placeholder="Ej. Calle Falsa 123" :class="{ 'is-invalid': errores.direccion }"
+                                        @input="validarCampo('direccion')">
+                                    <p class="text-danger" v-if="errores.direccion">{{ errores.direccion }}</p>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label for="tipo_documento" class="font-weight-bold">Tipo de documento <span
+                                            class="text-danger">*</span></label>
+                                    <select v-model="datosFormulario.tipo_documento" class="form-control"
+                                        :class="{ 'is-invalid': errores.tipo_documento }"
+                                        @change="validarCampo('tipo_documento')">
+                                        <option value="" disabled>Selecciona un tipo de documento</option>
+                                        <option v-for="documento in tiposDocumentos" :value="documento.valor"
+                                            :key="documento.valor">{{ documento.etiqueta }}</option>
+                                    </select>
+                                    <p class="text-danger" v-if="errores.tipo_documento">{{ errores.tipo_documento }}
+                                    </p>
                                 </div>
 
-                            </form>
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Nro de documento<span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" v-model="datosFormulario.num_documento" class="form-control"
+                                        placeholder="Ej. 1234567890" :class="{ 'is-invalid': errores.num_documento }"
+                                        @input="validarCampo('num_documento')">
+                                    <p class="text-danger" v-if="errores.num_documento">{{ errores.num_documento }}</p>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Correo electrónico <span
+                                            class="text-danger">*</span></label>
+                                    <input type="email" v-model="datosFormulario.email" class="form-control"
+                                        placeholder="Ej. proveedor@ejemplo.com" :class="{ 'is-invalid': errores.email }"
+                                        @input="validarCampo('email')">
+                                    <p class="text-danger" v-if="errores.email">{{ errores.email }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Teléfono <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" v-model="datosFormulario.telefono" class="form-control"
+                                        placeholder="Ej. 1234567890" :class="{ 'is-invalid': errores.telefono }"
+                                        @input="validarCampo('telefono')">
+                                    <p class="text-danger" v-if="errores.telefono">{{ errores.telefono }}</p>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Contacto <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" v-model="datosFormulario.contacto" class="form-control"
+                                        placeholder="Ej. Juan Pérez" :class="{ 'is-invalid': errores.contacto }"
+                                        @input="validarCampo('contacto')">
+                                    <p class="text-danger" v-if="errores.contacto">{{ errores.contacto }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="" class="font-weight-bold">Teléfono de contacto <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" v-model="datosFormulario.telefono_contacto"
+                                        class="form-control" placeholder="Ej. 0987654321"
+                                        :class="{ 'is-invalid': errores.telefono_contacto }"
+                                        @input="validarCampo('telefono_contacto')">
+                                    <p class="text-danger" v-if="errores.telefono_contacto">{{ errores.telefono_contacto
+                                        }}</p>
+                                </div>
+                            </div>
                         </div>
+
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarPersona()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarPersona()">Actualizar</button>
+                            <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
+                            <button type="submit" v-if="tipoAccion == 1" class="btn btn-success">Guardar</button>
+                            <button type="submit" v-if="tipoAccion == 2" class="btn btn-success">Actualizar</button>
                         </div>
-                    </div>
-                    <!-- /.modal-content -->
+                    </form>
                 </div>
-                <!-- /.modal-dialog -->
+                <!-- /.modal-content -->
             </div>
-            <!--Fin del modal-->
-              <div v-if="modalImportar">
-                    <ImportarExcelProvedores @cerrar="cerrarModalImportar" />
-              </div>
-        </main>
+            <!-- /.modal-dialog -->
+        </div>
+        <!--Fin del modal-->
+        <div v-if="modalImportar">
+            <ImportarExcelProvedores @cerrar="cerrarModalImportar" />
+        </div>
+    </main>
 </template>
 
 <script>
-    export default {
-        data (){
-            return {
-                persona_id: 0,
-                nombre : '',
-                tipo_documento : 'DNI',
-                num_documento : '',
-                direccion : '',
-                telefono : '',
-                email : '',
-                contacto : '',
-                telefono_contacto : '',
-                arrayPersona : [],
-                modal : 0,
-                tituloModal : '',
-                tipoAccion : 0,
-                errorPersona : 0,
-                errorMostrarMsjPersona : [],
-                pagination : {
-                    'total' : 0,
-                    'current_page' : 0,
-                    'per_page' : 0,
-                    'last_page' : 0,
-                    'from' : 0,
-                    'to' : 0,
-                },
-                offset : 3,
-                criterio : 'nombre',
-                buscar : '',
-                modalImportar: 0,
-            }
-        },
-        computed:{
-            isActived: function(){
-                return this.pagination.current_page;
+import { esquemaProveedor } from '../constants/validations';
+
+export default {
+    data() {
+        return {
+            datosFormulario: {
+                nombre: '',
+                tipo_documento: '',
+                num_documento: '',
+                direccion: '',
+                telefono: '',
+                email: '',
+                contacto: '',
+                telefono_contacto: ''
             },
-            //Calcula los elementos de la paginación
-            pagesNumber: function() {
-                if(!this.pagination.to) {
-                    return [];
-                }
-                
-                var from = this.pagination.current_page - this.offset; 
-                if(from < 1) {
-                    from = 1;
-                }
 
-                var to = from + (this.offset * 2); 
-                if(to >= this.pagination.last_page){
-                    to = this.pagination.last_page;
-                }  
+            errores: {},
+            tiposDocumentos: [
+                { valor: "1", etiqueta: "CI - CEDULA DE IDENTIDAD" },
+                { valor: "2", etiqueta: "CEX - CEDULA DE IDENTIDAD DE EXTRANJERO" },
+                { valor: "5", etiqueta: "NIT - NÚMERO DE IDENTIFICACIÓN TRIBUTARIA" },
+                { valor: "3", etiqueta: "PAS - PASAPORTE" },
+                { valor: "4", etiqueta: "OD - OTRO DOCUMENTO DE IDENTIDAD" }
+            ],
+            persona_id: 0,
+            arrayPersona: [],
+            modal: 0,
+            tituloModal: '',
+            tipoAccion: 0,
+            errorPersona: 0,
+            errorMostrarMsjPersona: [],
+            pagination: {
+                'total': 0,
+                'current_page': 0,
+                'per_page': 0,
+                'last_page': 0,
+                'from': 0,
+                'to': 0,
+            },
+            offset: 3,
+            criterio: 'nombre',
+            buscar: '',
+            modalImportar: 0,
+        }
+    },
+    computed: {
+        isActived: function () {
+            return this.pagination.current_page;
+        },
+        //Calcula los elementos de la paginación
+        pagesNumber: function () {
+            if (!this.pagination.to) {
+                return [];
+            }
 
-                var pagesArray = [];
-                while(from <= to) {
-                    pagesArray.push(from);
-                    from++;
-                }
-                return pagesArray;             
+            var from = this.pagination.current_page - this.offset;
+            if (from < 1) {
+                from = 1;
+            }
 
+            var to = from + (this.offset * 2);
+            if (to >= this.pagination.last_page) {
+                to = this.pagination.last_page;
+            }
+
+            var pagesArray = [];
+            while (from <= to) {
+                pagesArray.push(from);
+                from++;
+            }
+            return pagesArray;
+
+        }
+    },
+    methods: {
+        async validarCampo(campo) {
+            try {
+                await esquemaProveedor.validateAt(campo, this.datosFormulario);
+                this.errores[campo] = null;
+            } catch (error) {
+                this.errores[campo] = error.message;
             }
         },
-        methods : {
-            getTipoDocumentoText(value) {
-        switch(value) {
-            case '1':
-                return 'CI';
-            case '2':
-                return 'CEX';
-            case '4':
-                return 'NIT';
-            case '3':
-                return 'PAS';
-            default:
-                return '';
-            }
+        async enviarFormulario() {
+
+            await esquemaProveedor.validate(this.datosFormulario, { abortEarly: false })
+                .then(() => {
+                    if (this.tipoAccion == 2) {
+                        this.actualizarPersona(this.datosFormulario);
+                    } else {
+                        this.registrarPersona(this.datosFormulario);
+                    }
+                })
+                .catch((error) => {
+                    const erroresValidacion = {};
+                    error.inner.forEach((e) => {
+                        erroresValidacion[e.path] = e.message;
+                    });
+
+                    this.errores = erroresValidacion;
+                });
+        },
+        getTipoDocumentoText(value) {
+            const documento = this.tiposDocumentos.find(doc => doc.valor === value);
+            return documento ? documento.etiqueta : '';
         },
 
         abrirModalImportar() {
             this.modalImportar = 1;
         },
-         cerrarModalImportar() {
+        cerrarModalImportar() {
             this.modalImportar = 0;
             this.listarPersona(1, '', 'nombre');
         },
-            listarPersona (page,buscar,criterio){
-                let me=this;
-                var url= '/proveedor?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
-                axios.get(url).then(function (response) {
-                    var respuesta= response.data;
-                    me.arrayPersona = respuesta.personas.data;
-                    me.pagination= respuesta.pagination;
-                })
+        listarPersona(page, buscar, criterio) {
+            let me = this;
+            var url = '/proveedor?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.arrayPersona = respuesta.personas.data;
+                me.pagination = respuesta.pagination;
+            })
                 .catch(function (error) {
                     console.log(error);
                 });
-            },
-            cambiarPagina(page,buscar,criterio){
-                let me = this;
-                //Actualiza la página actual
-                me.pagination.current_page = page;
-                //Envia la petición para visualizar la data de esa página
-                me.listarPersona(page,buscar,criterio);
-            },
-            registrarPersona(){
-                if (this.validarPersona()){
-                    return;
-                }
-                
-                let me = this;
+        },
+        cambiarPagina(page, buscar, criterio) {
+            let me = this;
+            me.pagination.current_page = page;
+            me.listarPersona(page, buscar, criterio);
+        },
+        registrarPersona(data) {
 
-                axios.post('/proveedor/registrar',{
-                    'nombre': this.nombre,
-                    'tipo_documento': this.tipo_documento,
-                    'num_documento' : this.num_documento,
-                    'direccion' : this.direccion,
-                    'telefono' : this.telefono,
-                    'email' : this.email,
-                    'contacto': this.contacto,
-                    'telefono_contacto': this.telefono_contacto
+            console.log("Registrando");
+            console.log(data);
+            let me = this;
 
-                }).then(function (response) {
-                    me.cerrarModal();
-                    me.listarPersona(1,'','nombre');
-                }).catch(function (error) {
-                    console.log(error);
-                });
-            },
-            actualizarPersona(){
-               if (this.validarPersona()){
-                    return;
-                }
-                
-                let me = this;
+            axios.post('/proveedor/registrar', data).then(function (response) {
+                me.cerrarModal();
+                me.listarPersona(1, '', 'nombre');
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        actualizarPersona(data) {
+            let me = this;
 
-                axios.put('/proveedor/actualizar',{
-                    'nombre': this.nombre,
-                    'tipo_documento': this.tipo_documento,
-                    'num_documento' : this.num_documento,
-                    'direccion' : this.direccion,
-                    'telefono' : this.telefono,
-                    'email' : this.email,
-                    'contacto': this.contacto,
-                    'telefono_contacto': this.telefono_contacto,
-                    'id': this.persona_id
-                }).then(function (response) {
-                    me.cerrarModal();
-                    me.listarPersona(1,'','nombre');
-                }).catch(function (error) {
-                    console.log(error);
-                }); 
-            },            
-            validarPersona(){
-                this.errorPersona=0;
-                this.errorMostrarMsjPersona =[];
+            axios.put('/proveedor/actualizar', data).then(function (response) {
+                me.cerrarModal();
+                me.listarPersona(1, '', 'nombre');
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        cerrarModal() {
+            this.modal = 0;
+            this.tituloModal = '';
 
-                if (!this.nombre) this.errorMostrarMsjPersona.push("El nombre de la persona no puede estar vacío.");
-
-                if (this.errorMostrarMsjPersona.length) this.errorPersona = 1;
-
-                return this.errorPersona;
-            },
-            cerrarModal(){
-                this.modal=0;
-                this.tituloModal='';
-                this.nombre='';
-                this.tipo_documento='RUC';
-                this.num_documento='';
-                this.direccion='';
-                this.telefono='';
-                this.email='';
-                this.contacto='';
-                this.telefono_contacto='';
-                this.errorPersona=0;
-
-            },
-            abrirModal(modelo, accion, data = []){
-                switch(modelo){
-                    case "persona":
+        },
+        abrirModal(modelo, accion, data = []) {
+            switch (modelo) {
+                case "persona":
                     {
-                        switch(accion){
+                        switch (accion) {
                             case 'registrar':
-                            {
-                                this.modal = 1;
-                                this.tituloModal = 'Registrar Provedor';
-                                this.nombre= '';
-                                this.tipo_documento='RUC';
-                                this.num_documento='';
-                                this.direccion='';
-                                this.telefono='';
-                                this.email='';
-                                this.contacto='';
-                                this.telefono_contacto='';
-                                this.tipoAccion = 1;
-                                break;
-                            }
+                                {
+                                    this.modal = 1;
+                                    this.tituloModal = 'Registrar Proveedor';
+                                    this.tipoAccion = 1;
+                                    this.datosFormulario = {
+                                        nombre: '',
+                                        tipo_documento: '',
+                                        num_documento: '',
+                                        direccion: '',
+                                        telefono: '',
+                                        email: '',
+                                        contacto: '',
+                                        telefono_contacto: ''
+                                    };
+                                    break;
+                                }
                             case 'actualizar':
-                            {
-                                //console.log(data);
-                                this.modal=1;
-                                this.tituloModal='Actualizar Provedor';
-                                this.tipoAccion=2;
-                                this.persona_id=data['id'];
-                                this.nombre = data['nombre'];
-                                this.tipo_documento = data['tipo_documento'];
-                                this.num_documento = data['num_documento'];
-                                this.direccion = data['direccion'];
-                                this.telefono = data['telefono'];
-                                this.email = data['email'];
-                                this.contacto = data['contacto'];
-                                this.telefono_contacto = data['telefono_contacto'];
-                                break;
-                            }
+                                {
+                                    this.modal = 1;
+                                    this.tituloModal = 'Actualizar Proveedor';
+                                    this.tipoAccion = 2;
+                                    this.datosFormulario = data;
+                                    this.persona_id = data['id'];
+                                    break;
+                                }
                         }
                     }
-                }
             }
-        },
-        mounted() {
-            this.listarPersona(1,this.buscar,this.criterio);
         }
+    },
+    mounted() {
+        this.listarPersona(1, this.buscar, this.criterio);
     }
+}
 </script>
-<style>    
-    .modal-content{
-        width: 100% !important;
-        position: absolute !important;
-    }
-    .mostrar{
-        display: list-item !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        background-color: #3c29297a !important;
-    }
-    .div-error{
-        display: flex;
-        justify-content: center;
-    }
-    .text-error{
-        color: red !important;
-        font-weight: bold;
-    }
+<style>
+.modal-content {
+    width: 100% !important;
+    position: absolute !important;
+}
+
+.mostrar {
+    display: list-item !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    background-color: #3c29297a !important;
+}
+
+.div-error {
+    display: flex;
+    justify-content: center;
+}
+
+.text-error {
+    color: red !important;
+    font-weight: bold;
+}
 </style>
