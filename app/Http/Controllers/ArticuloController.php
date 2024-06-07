@@ -580,7 +580,7 @@ class ArticuloController extends Controller
     {
         try {
             $request->validate([
-                'archivo' => 'required|mimes:csv,txt',
+                'archivo' => 'required|mimes:xlsx,xls',
             ]);
 
             $archivo = $request->file('archivo');

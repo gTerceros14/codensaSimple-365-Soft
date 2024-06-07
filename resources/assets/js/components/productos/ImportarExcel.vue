@@ -125,13 +125,20 @@
                                                 class="btn btn-outline-success mx-1">
                                                 <i class="fa fa-download"></i> Descargar
                                             </button>
-                                            <button v-if="selectedFile" type="submit" class="btn btn-success mx-1">
+                                            <button v-if="selectedFile && erroresPrevios.length == 0" type="submit"
+                                                class="btn btn-success mx-1">
                                                 <i class="fa fa-upload"></i> Importar datos
                                             </button>
                                         </div>
                                     </div>
 
                                     <p class="text-muted">Este contenido se importará en la base de datos</p>
+                                    <span><i class="fa fa-exclamation-circle"></i> ADVERTENCIA</span>
+                                    <div v-for="(item, index) in erroresPrevios" :key="index">
+                                        <div class="alert alert-danger" role="alert">
+                                            {{ item }}
+                                        </div>
+                                    </div>
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
                                             <thead>
@@ -262,6 +269,7 @@ export default {
                 tipo_cambio: "1.00"
             },
             registrosSuccess: [],
+            erroresPrevios: [],
 
             headersOrigin: [
                 "Codigo",
@@ -518,9 +526,47 @@ export default {
                 this.headersArray = newArray;
             }
         },
-       splitRow(row) {
-                return [row];
-            },
+        splitRow(row, index) {
+
+            const columns = [];
+            let currentColumn = '';
+            let withinQuotes = false;
+            let columnCount = 0;
+
+            for (let i = 0; i < row.length; i++) {
+                const char = row[i];
+                if (char === ',' && !withinQuotes) {
+                    columns.push(currentColumn.trim());
+                    if (currentColumn.trim() == "") {
+                        let error = "Campo vacio en la fila " + (index + 1) + " Columna " + (columnCount + 1)
+                        this.erroresPrevios.push(error);
+                    }
+                    currentColumn = '';
+                    columnCount++;
+                    if (columnCount === this.headersOrigin.length) // Salir del bucle si ya hemos alcanzado las 5 columnas
+                        break;
+                } else if (char === '"') {
+                    if (i < row.length - 1 && row[i + 1] === '"') {
+                        currentColumn += '"';
+                        i++;
+                    } else {
+                        withinQuotes = !withinQuotes;
+                    }
+                } else {
+                    currentColumn += char;
+                }
+            }
+
+            // Agregar la última columna si hay menos de 5 columnas
+            if (columnCount < this.headersOrigin.length) {
+
+
+                columns.push(currentColumn.trim());
+            }
+
+            return columns;
+        },
+
         assignHeaders() {
             if (!this.selectedFile) {
                 console.error("No se ha seleccionado un archivo.");
@@ -555,9 +601,14 @@ export default {
                     const worksheet = workbook.Sheets[firstSheetName];
                     content = XLSX.utils.sheet_to_csv(worksheet);
                     const rows = content.split('\n');
-                    const arrayOfArrays = rows.map(row => this.splitRow(row));
+                    const arrayOfArrays = rows.map((row, index) => this.splitRow(row, index));
+                    console.log("DATO FINAL");
+                    console.log(arrayOfArrays);
+                    console.log("DATO FINAL");
 
                     let newContent = this.getCsvSubset(arrayOfArrays, this.selectedHeadersFromFile);
+
+
 
                     if (this.includeHeader) {
                         newContent.shift();
@@ -567,6 +618,9 @@ export default {
 
                     }
                     this.previewCsv = newContent;
+                    console.log("CSV ARCHIVO");
+                    console.log(this.previewCsv);
+                    console.log("CSV ARCHIVO");
 
                 } else {
                     console.error("Formato de archivo no compatible.");
@@ -645,9 +699,29 @@ export default {
         arrayToCsv(contentCsv) {
             let csvContent = '';
             contentCsv.forEach(row => {
-                csvContent += row.join(',') + '\n';
+                csvContent += row.join(';') + '\n';
             });
             return csvContent;
+        },
+        arrayToExcel(data, fileName) {
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+            const excelBlob = this.workbookToBlob(workbook);
+
+            const excelFile = new File([excelBlob], fileName, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+            return excelFile;
+        }
+        ,
+        workbookToBlob(workbook) {
+            const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+            const excelBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+            return excelBlob;
         },
         submitForm() {
             if (!this.previewCsv) {
@@ -655,12 +729,18 @@ export default {
             }
             console.log("REgistrando");
             let contentCsv = this.dividirElementos(this.previewCsv)
+
+
             this.pageImportar = 3;
-            const csvContent = this.arrayToCsv(contentCsv);
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const newCsvFile = new File([blob], 'nuevo_csv.csv', { type: 'text/csv' });
+            // ANtes era en csv ahora quier convertir ese array a excel y enviar el excel
+            // const csvContent = this.arrayToCsv(contentCsv);
+            // const blob = new Blob([csvContent], { type: 'text/csv' });
+            // const newCsvFile = new File([blob], 'nuevo_csv.csv', { type: 'text/csv' });
+            // const formData = new FormData();
+            // formData.append('archivo', newCsvFile);
+            const excelFile = this.arrayToExcel(contentCsv, 'nuevo_excel.xlsx');
             const formData = new FormData();
-            formData.append('archivo', newCsvFile);
+            formData.append('archivo', excelFile);
             axios.post('/articulos/importar', formData)
                 .then(response => {
                     this.erroresNoExiste = [];
