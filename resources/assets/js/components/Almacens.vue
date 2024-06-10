@@ -8,11 +8,7 @@
       <div class="card">
         <div class="card-header">
           <i class="fa fa-align-justify"></i> Almacenes
-          <button
-            type="button"
-            @click="abrirModal('almacenes', 'registrar')"
-            class="btn btn-secondary"
-          >
+          <button type="button" @click="abrirModal('almacenes', 'registrar')" class="btn btn-secondary">
             <i class="icon-plus"></i>&nbsp;Nuevo
           </button>
         </div>
@@ -25,18 +21,9 @@
                   <option value="nombre_encargado">Nombre Encargado</option>
                   <option value="nombre_sucursal">Nombre Sucursal</option>
                 </select>
-                <input
-                  type="text"
-                  v-model="buscar"
-                  @keyup.enter="listarAlmacenes(1, buscar, criterio)"
-                  class="form-control"
-                  placeholder="Texto a buscar"
-                />
-                <button
-                  type="submit"
-                  @click="listarAlmacenes(1, buscar, criterio)"
-                  class="btn btn-primary"
-                >
+                <input type="text" v-model="buscar" @keyup.enter="listarAlmacenes(1, buscar, criterio)"
+                  class="form-control" placeholder="Texto a buscar" />
+                <button type="submit" @click="listarAlmacenes(1, buscar, criterio)" class="btn btn-primary">
                   <i class="fa fa-search"></i> Buscar
                 </button>
               </div>
@@ -58,11 +45,8 @@
               <tbody>
                 <tr v-for="almacen in arrayAlmacen" :key="almacen.id">
                   <td>
-                    <button
-                      type="button"
-                      @click="abrirModal('almacenes', 'actualizar', almacen)"
-                      class="btn btn-warning btn-sm"
-                    >
+                    <button type="button" @click="abrirModal('almacenes', 'actualizar', almacen)"
+                      class="btn btn-warning btn-sm">
                       <i class="icon-pencil"></i>
                     </button>
                     &nbsp;
@@ -84,40 +68,18 @@
           <nav>
             <ul class="pagination">
               <li class="page-item" v-if="pagination.current_page > 1">
-                <a
-                  class="page-link"
-                  href="#"
-                  @click.prevent="
-                    cambiarPagina(pagination.current_page - 1, buscar, criterio)
-                  "
-                  >Ant</a
-                >
+                <a class="page-link" href="#" @click.prevent="
+            cambiarPagina(pagination.current_page - 1, buscar, criterio)
+            ">Ant</a>
               </li>
-              <li
-                class="page-item"
-                v-for="page in pagesNumber"
-                :key="page"
-                :class="[page == isActived ? 'active' : '']"
-              >
-                <a
-                  class="page-link"
-                  href="#"
-                  @click.prevent="cambiarPagina(page, buscar, criterio)"
-                  v-text="page"
-                ></a>
+              <li class="page-item" v-for="page in pagesNumber" :key="page"
+                :class="[page == isActived ? 'active' : '']">
+                <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)" v-text="page"></a>
               </li>
-              <li
-                class="page-item"
-                v-if="pagination.current_page < pagination.last_page"
-              >
-                <a
-                  class="page-link"
-                  href="#"
-                  @click.prevent="
-                    cambiarPagina(pagination.current_page + 1, buscar, criterio)
-                  "
-                  >Sig</a
-                >
+              <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                <a class="page-link" href="#" @click.prevent="
+            cambiarPagina(pagination.current_page + 1, buscar, criterio)
+            ">Sig</a>
               </li>
             </ul>
           </nav>
@@ -126,25 +88,13 @@
       <!-- Fin ejemplo de tabla Listado -->
     </div>
     <!--Inicio del modal agregar/actualizar-->
-    <div
-      class="modal "
-      tabindex="-1"
-      :class="{ mostrar: modal }"
-      role="dialog"
-      aria-labelledby="myModalLabel"
-      style="display: none;"
-      aria-hidden="true"
-    >
+    <div class="modal " tabindex="-1" :class="{ mostrar: modal }" role="dialog" aria-labelledby="myModalLabel"
+      style="display: none;" aria-hidden="true">
       <div class="modal-dialog modal-primary modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h4 class="modal-title" v-text="tituloModal"></h4>
-            <button
-              type="button"
-              class="close"
-              @click="cerrarModal()"
-              aria-label="Close"
-            >
+            <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
               <span aria-hidden="true">×</span>
             </button>
           </div>
@@ -152,36 +102,20 @@
             <div class="modal-body">
               <div class="form-group row">
                 <div class="col-md-6">
-                  <label for="nombre_almacen" class="font-weight-bold"
-                    >Nombre del almacén
-                    <span class="text-danger">*</span></label
-                  >
-                  <input
-                    type="text"
-                    id="nombre_almacen"
-                    v-model="datosFormulario.nombre_almacen"
-                    class="form-control"
-                    placeholder="Ej. Almacén Principal"
-                    :class="{ 'is-invalid': errores.nombre_almacen }"
-                    @input="validarCampo('nombre_almacen')"
-                  />
+                  <label for="nombre_almacen" class="font-weight-bold">Nombre del almacén
+                    <span class="text-danger">*</span></label>
+                  <input type="text" id="nombre_almacen" v-model="datosFormulario.nombre_almacen" class="form-control"
+                    placeholder="Ej. Almacén Principal" :class="{ 'is-invalid': errores.nombre_almacen }"
+                    @input="validarCampo('nombre_almacen')" />
                   <p class="text-danger" v-if="errores.nombre_almacen">
                     {{ errores.nombre_almacen }}
                   </p>
                 </div>
                 <div class="col-md-6">
-                  <label for="ubicacion" class="font-weight-bold"
-                    >Ubicacion <span class="text-danger">*</span></label
-                  >
-                  <input
-                    type="text"
-                    id="ubicacion"
-                    v-model="datosFormulario.ubicacion"
-                    class="form-control"
-                    placeholder="Ej. Calle 123, Ciudad"
-                    :class="{ 'is-invalid': errores.ubicacion }"
-                    @input="validarCampo('ubicacion')"
-                  />
+                  <label for="ubicacion" class="font-weight-bold">Ubicacion <span class="text-danger">*</span></label>
+                  <input type="text" id="ubicacion" v-model="datosFormulario.ubicacion" class="form-control"
+                    placeholder="Ej. Calle 123, Ciudad" :class="{ 'is-invalid': errores.ubicacion }"
+                    @input="validarCampo('ubicacion')" />
                   <p class="text-danger" v-if="errores.ubicacion">
                     {{ errores.ubicacion }}
                   </p>
@@ -190,37 +124,20 @@
 
               <div class="form-group row">
                 <div class="col-md-6">
-                  <label for="encargado" class="font-weight-bold"
-                    >Encargados <span class="text-danger">*</span></label
-                  >
-                  <v-select
-                    :on-search="selectUsuario"
-                    label="nombre"
-                    :options="arrayUsuario"
-                    :class="{ 'is-invalid': errores.encargado }"
-                    placeholder="Buscar encargados..."
-                    multiple
-                    :onChange="getDatosUsuarios"
-                    v-model="usuariosSeleccionados"
-                  >
+                  <label for="encargado" class="font-weight-bold">Encargados <span class="text-danger">*</span></label>
+                  <v-select :on-search="selectUsuario" label="nombre" :options="arrayUsuario"
+                    :class="{ 'is-invalid': errores.encargado }" placeholder="Buscar encargados..." multiple
+                    :onChange="getDatosUsuarios" v-model="usuariosSeleccionados">
                   </v-select>
                   <p class="text-danger" v-if="errores.encargado">
                     {{ errores.encargado }}
                   </p>
                 </div>
                 <div class="col-md-6">
-                  <label for="telefono" class="font-weight-bold"
-                    >Teléfono <span class="text-danger">*</span></label
-                  >
-                  <input
-                    type="number"
-                    id="telefono"
-                    v-model="datosFormulario.telefono"
-                    class="form-control"
-                    placeholder="Ej. 123456789"
-                    :class="{ 'is-invalid': errores.telefono }"
-                    @input="validarCampo('telefono')"
-                  />
+                  <label for="telefono" class="font-weight-bold">Teléfono <span class="text-danger">*</span></label>
+                  <input type="number" id="telefono" v-model="datosFormulario.telefono" class="form-control"
+                    placeholder="Ej. 123456789" :class="{ 'is-invalid': errores.telefono }"
+                    @input="validarCampo('telefono')" />
                   <p class="text-danger" v-if="errores.telefono">
                     {{ errores.telefono }}
                   </p>
@@ -229,56 +146,30 @@
 
               <div class="form-group row">
                 <div class="col-md-6">
-                  <label for="sucursal" class="font-weight-bold"
-                    >Sucursal <span class="text-danger">*</span></label
-                  >
-                  <v-select
-                    :on-search="selectSucursal"
-                    label="nombre"
-                    :options="arraySucursal"
-                    :class="{ 'is-invalid': errores.sucursal }"
-                    placeholder="Buscar Sucursales..."
-                    :onChange="getDatosSucursales"
-                    v-model="sucursalSeleccionado"
-                  >
+                  <label for="sucursal" class="font-weight-bold">Sucursal <span class="text-danger">*</span></label>
+                  <v-select :on-search="selectSucursal" label="nombre" :options="arraySucursal"
+                    :class="{ 'is-invalid': errores.sucursal }" placeholder="Buscar Sucursales..."
+                    :onChange="getDatosSucursales" v-model="sucursalSeleccionado">
                   </v-select>
                   <p class="text-danger" v-if="errores.sucursal">
                     {{ errores.sucursal }}
                   </p>
                 </div>
                 <div class="col-md-6">
-                  <label for="observaciones" class="font-weight-bold"
-                    >Observaciones</label
-                  >
-                  <textarea
-                    id="observaciones"
-                    v-model="datosFormulario.observaciones"
-                    class="form-control"
-                    placeholder="Ej. Horario de funcionamiento, Capacitad de almacenamiento, etc."
-                  ></textarea>
+                  <label for="observaciones" class="font-weight-bold">Observaciones</label>
+                  <textarea id="observaciones" v-model="datosFormulario.observaciones" class="form-control"
+                    placeholder="Ej. Horario de funcionamiento, Capacitad de almacenamiento, etc."></textarea>
                 </div>
               </div>
             </div>
             <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                @click="cerrarModal()"
-              >
+              <button type="button" class="btn btn-secondary" @click="cerrarModal()">
                 Cerrar
               </button>
-              <button
-                type="submit"
-                v-if="tipoAccion == 1"
-                class="btn btn-primary"
-              >
+              <button type="submit" v-if="tipoAccion == 1" class="btn btn-primary">
                 Guardar
               </button>
-              <button
-                type="submit"
-                v-if="tipoAccion == 2"
-                class="btn btn-primary"
-              >
+              <button type="submit" v-if="tipoAccion == 2" class="btn btn-primary">
                 Actualizar
               </button>
             </div>
@@ -331,10 +222,10 @@ export default {
     };
   },
   computed: {
-    isActived: function() {
+    isActived: function () {
       return this.pagination.current_page;
     },
-    pagesNumber: function() {
+    pagesNumber: function () {
       if (!this.pagination.to) {
         return [];
       }
@@ -390,13 +281,13 @@ export default {
       let url = "/sucursal/selectedSucursal/filter?filtro=" + search;
       axios
         .get(url)
-        .then(function(response) {
+        .then(function (response) {
           let respuesta = response.data;
           me.arraySucursal = respuesta.sucursales;
           console.log(respuesta);
           loading(false);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
     },
@@ -406,13 +297,13 @@ export default {
       let url = "/user/selectUser/filter?filtro=" + search + "&idrol=3"; // Agregar el parámetro idrol=3 al URL
       axios
         .get(url)
-        .then(function(response) {
+        .then(function (response) {
           let respuesta = response.data;
           me.arrayUsuario = respuesta.usuarios;
           console.log(respuesta);
           loading(false);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
     },
@@ -426,26 +317,44 @@ export default {
       }
     },
     async enviarFormulario() {
-      console.log("Llego aca", this.datosFormulario);
-      await esquemaAlmacen
-        .validate(this.datosFormulario, { abortEarly: false })
+      await esquemaAlmacen.validate(this.datosFormulario, { abortEarly: false })
         .then(() => {
-          console.log(this.datosFormulario);
+          // Verificar si el nombre del almacén está vacío
+          if (!this.datosFormulario.nombre_almacen) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Campo vacío',
+              text: 'El nombre del almacén debe ser llenado.',
+            })
+            return
+          }
+
+          // Verificar si el nombre del almacén ya existe
+          const almacenExistente = this.arrayAlmacen.find(almacen => almacen.nombre_almacen === this.datosFormulario.nombre_almacen)
+          if (almacenExistente) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Nombre duplicado',
+              text: 'El nombre del almacén ya existe.',
+            })
+            return
+          }
+
           if (this.tipoAccion == 2) {
-            this.actualizarAlmacen(this.datosFormulario);
+            this.actualizarAlmacen(this.datosFormulario)
           } else {
-            this.registrarAlmacen(this.datosFormulario);
+            this.registrarAlmacen(this.datosFormulario)
           }
         })
         .catch((error) => {
-          console.log(error);
-          const erroresValidacion = {};
+          console.log(error)
+          const erroresValidacion = {}
           error.inner.forEach((e) => {
-            erroresValidacion[e.path] = e.message;
-          });
+            erroresValidacion[e.path] = e.message
+          })
 
-          this.errores = erroresValidacion;
-        });
+          this.errores = erroresValidacion
+        })
     },
     cambiarPagina(page, buscar, criterio) {
       let me = this;
@@ -458,13 +367,13 @@ export default {
         "/almacen?page=" + page + "&buscar=" + buscar + "&criterio=" + criterio;
       axios
         .get(url)
-        .then(function(response) {
+        .then(function (response) {
           let respuesta = response.data;
           me.arrayAlmacen = respuesta.almacenes.data;
           me.pagination = respuesta.pagination;
           console.log("Array de almacenes:", me.arrayAlmacen); // Verifica los datos en arrayAlmacen
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
     },
@@ -473,11 +382,11 @@ export default {
       let me = this;
       axios
         .post("/almacen/registrar", data)
-        .then(function(response) {
+        .then(function (response) {
           me.cerrarModal();
           me.listarAlmacenes(1, "", "nombre_almacen");
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
     },
@@ -485,12 +394,12 @@ export default {
       let me = this;
       axios
         .put("/almacen/editar", data)
-        .then(function(response) {
+        .then(function (response) {
           me.cerrarModal();
           //console.log(response)
           me.listarAlmacenes(1, "", "nombre_almacen");
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
     },

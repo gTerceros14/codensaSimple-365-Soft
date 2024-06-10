@@ -6,14 +6,14 @@
             <li class="breadcrumb-item"><a class=" text-decoration-none" href="/">Compras</a></li>
             <li class="breadcrumb-item active " aria-current="page">Ingresos</li>
         </ol>
-        
+
 
         <div class="container-fluid">
             <!-- Ejemplo de tabla Listado -->
-            <div class="card" v-if="listado!=0">
+            <div class="card" v-if="listado != 0">
                 <div class="card-header">
                     <i class="fa fa-align-justify"></i> Ingresos
-                    <button type="button" @click="mostrarDetalle()" v-if="listado!=0" class="btn btn-secondary">
+                    <button type="button" @click="mostrarDetalle()" v-if="listado != 0" class="btn btn-secondary">
                         <i class="icon-plus"></i>&nbsp;Nuevo
                     </button>
                 </div>
@@ -46,7 +46,7 @@
                                         <th>Número Comprobante</th>
                                         <th>Fecha Hora</th>
                                         <th>Total</th>
-                                        <th>Impuesto</th>
+
                                         <th>Estado</th>
                                     </tr>
                                 </thead>
@@ -70,9 +70,10 @@
                                         <td v-text="ingreso.serie_comprobante"></td>
                                         <td v-text="ingreso.num_comprobante"></td>
                                         <td v-text="ingreso.fecha_hora"></td>
-                                        <td >
-                            {{( ingreso.total *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
-                                        
+                                        <td>
+                                            {{ (ingreso.total * parseFloat(monedaCompra[0])).toFixed(2) }} {{
+                monedaCompra[1] }}
+
                                         </td>
                                         <td v-text="ingreso.impuesto"></td>
                                         <td v-text="ingreso.estado"></td>
@@ -108,10 +109,7 @@
                                     <p v-text="proveedor"></p>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <label for="">Impuesto</label>
-                                <p v-text="impuesto"></p>
-                            </div>
+
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Tipo Comprobante</label>
@@ -146,37 +144,36 @@
                                         <tr v-for="detalle in arrayDetalle" :key="detalle.id">
                                             <td v-text="detalle.articulo">
                                             </td>
-                                            <td >
-                            {{( detalle.precio *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+                                            <td>
+                                                {{ (detalle.precio * parseFloat(monedaCompra[0])).toFixed(2) }} {{
+                monedaCompra[1] }}
 
                                             </td>
                                             <td v-text="detalle.cantidad">
                                             </td>
                                             <td>
-                            {{( ( detalle.precio * detalle.cantidad ) *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+                                                {{ ((detalle.precio * detalle.cantidad)
+                * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
 
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="3" align="right"><strong>Total Parcial:</strong></td>
                                             <td>
-                            {{( (totalParcial=(total - totalImpuesto)) *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
-                                            
+                                                {{ ((totalParcial = (total - totalImpuesto))
+                * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
+
                                             </td>
                                         </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Impuesto:</strong></td>
-                                            <td>
-                            {{( (totalImpuesto=(total * impuesto)) *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
-                                            
-                                            </td>
-                                        </tr>
+
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="3" align="right"><strong>Total Neto:</strong></td>
                                             <td>
-                            {{(total *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
-                                            
-                                                </td>
+                                                {{ (total * parseFloat(monedaCompra[0])).toFixed(2) }} {{
+                monedaCompra[1]
+            }}
+
+                                            </td>
                                         </tr>
                                     </tbody>
                                     <tbody v-else>
@@ -191,7 +188,8 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-md-12">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                                <button type="button" @click="ocultarDetalle()"
+                                    class="btn btn-secondary">Cerrar</button>
                             </div>
                         </div>
                     </div>
@@ -199,12 +197,15 @@
             </div>
         </div>
         <div v-if="showModalArticulos">
-            <modalagregarproductos @cerrar="cerrarModal" @agregarArticulo="agregarArticuloSeleccionado" :idproveedor="idproveedor" :monedaPrincipal="monedaCompra"></modalagregarproductos>
+            <modalagregarproductos @cerrar="cerrarModal" @agregarArticulo="agregarArticuloSeleccionado"
+                :idproveedor="idproveedor" :monedaPrincipal="monedaCompra"></modalagregarproductos>
         </div>
-        <div v-if="listado ==0" class="mx-3">
+        <div v-if="listado == 0" class="mx-3">
 
-        <registrarcompra  @cerrar="ocultarDetalle" @listarArticuloProveedor="listarArticuloProveedor" @abrirModalArticulos="abrirModal" @listarIngreso="listarIngresosTabla" :arrayArticuloSeleccionado="arrayArticuloSeleccionado" :monedaCompra="monedaCompra"></registrarcompra>
-</div>
+            <registrarcompra @cerrar="ocultarDetalle" @listarArticuloProveedor="listarArticuloProveedor"
+                @abrirModalArticulos="abrirModal" @listarIngreso="listarIngresosTabla"
+                :arrayArticuloSeleccionado="arrayArticuloSeleccionado" :monedaCompra="monedaCompra"></registrarcompra>
+        </div>
     </main>
 </template>
 <script>
@@ -212,14 +213,14 @@ import vSelect from 'vue-select';
 export default {
     data() {
         return {
-            monedaCompra:[],
-            showModalArticulos:false,
+            monedaCompra: [],
+            showModalArticulos: false,
             tipoUnidadSeleccionada: "Unidades",
-            arrayArticuloSeleccionado:{},
-            fechavencimiento:null,
+            arrayArticuloSeleccionado: {},
+            fechavencimiento: null,
 
-            AlmacenSeleccionado:'',
-            arrayAlmacenes:[],
+            AlmacenSeleccionado: '',
+            arrayAlmacenes: [],
             ingreso_id: 0,
             idproveedor: 0,
             proveedor: '',
@@ -310,7 +311,7 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
 
-                me.monedaCompra=[respuesta.configuracionTrabajo.valor_moneda_compra,respuesta.configuracionTrabajo.simbolo_moneda_compra]
+                me.monedaCompra = [respuesta.configuracionTrabajo.valor_moneda_compra, respuesta.configuracionTrabajo.simbolo_moneda_compra]
                 console.log("MostrarCostos: " + me.mostrarCostos);
                 console.log("ProveedorEstado: " + me.mostrarProveedores);
                 console.log("MostrarSaldosStock: " + me.mostrarSaldosStock);
@@ -362,11 +363,11 @@ export default {
                 this.$refs.cantidadRef.focus();
             }
         },
-        listarIngresosTabla(dato){
-            const page=dato.page;
-            const buscar=dato.buscar;
-            const criterio=dato.criterio;
-            this.listarIngreso(page,buscar,criterio);
+        listarIngresosTabla(dato) {
+            const page = dato.page;
+            const buscar = dato.buscar;
+            const criterio = dato.criterio;
+            this.listarIngreso(page, buscar, criterio);
         },
         listarIngreso(page, buscar, criterio) {
 
@@ -407,7 +408,7 @@ export default {
                 var respuesta = response.data;
                 me.arrayArticulo = respuesta.articulos;
                 if (me.arrayArticulo.length > 0) {
-                    me.arrayArticuloSeleccionado=me.arrayArticulo[0];
+                    me.arrayArticuloSeleccionado = me.arrayArticulo[0];
                     // me.articulo = me.arrayArticulo[0]['nombre'];
                     // me.idarticulo = me.arrayArticulo[0]['id'];
                     console.log("==========");
@@ -452,7 +453,7 @@ export default {
             console.log(me.AlmacenSeleccionado);
             console.log("Almacen seleccionadop");
 
-            if (me.arrayArticuloSeleccionado.length==0 || me.cantidad == 0 ||me.fechavencimiento==null ||me.AlmacenSeleccionado==0) {
+            if (me.arrayArticuloSeleccionado.length == 0 || me.cantidad == 0 || me.fechavencimiento == null || me.AlmacenSeleccionado == 0) {
                 console.log("Seleccione un producto o la fecha o verifique la cantidads o almacen");
             } else {
                 if (me.encuentra(me.arrayArticuloSeleccionado.id)) {
@@ -461,46 +462,46 @@ export default {
                         title: 'Error...',
                         text: 'Este Artículo ya se encuentra agregado!',
                     })
-                 } 
+                }
                 else {
-                    if (me.tipoUnidadSeleccionada=="Paquetes"){
+                    if (me.tipoUnidadSeleccionada == "Paquetes") {
 
                         me.arrayDetalle.push({
 
-                        idarticulo: me.arrayArticuloSeleccionado.id,
-                        idalmacen:me.AlmacenSeleccionado,
-                        codigo:me.arrayArticuloSeleccionado.codigo,
-                        articulo: me.arrayArticuloSeleccionado.nombre,
-                        precio: me.arrayArticuloSeleccionado.precio_costo_unid,
-                        unidad_x_paquete:me.arrayArticuloSeleccionado.unidad_envase,
-                        
+                            idarticulo: me.arrayArticuloSeleccionado.id,
+                            idalmacen: me.AlmacenSeleccionado,
+                            codigo: me.arrayArticuloSeleccionado.codigo,
+                            articulo: me.arrayArticuloSeleccionado.nombre,
+                            precio: me.arrayArticuloSeleccionado.precio_costo_unid,
+                            unidad_x_paquete: me.arrayArticuloSeleccionado.unidad_envase,
 
-                        fecha_vencimiento:me.fechavencimiento,
-                        cantidad: me.cantidad*me.arrayArticuloSeleccionado.unidad_envase,
-                    });
-                    }else{
-                        
-                    
-                    me.arrayDetalle.push({
-                        idarticulo: me.arrayArticuloSeleccionado.id,
-                        idalmacen:me.AlmacenSeleccionado,
 
-                        codigo:me.arrayArticuloSeleccionado.codigo,
-                        articulo: me.arrayArticuloSeleccionado.nombre,
-                        precio: me.arrayArticuloSeleccionado.precio_costo_unid,
-                        unidad_x_paquete:me.arrayArticuloSeleccionado.unidad_envase,
+                            fecha_vencimiento: me.fechavencimiento,
+                            cantidad: me.cantidad * me.arrayArticuloSeleccionado.unidad_envase,
+                        });
+                    } else {
 
-                        fecha_vencimiento:me.fechavencimiento,
-                        cantidad: me.cantidad,
-                    });
-                }
-                    me.arrayArticuloSeleccionado={};
+
+                        me.arrayDetalle.push({
+                            idarticulo: me.arrayArticuloSeleccionado.id,
+                            idalmacen: me.AlmacenSeleccionado,
+
+                            codigo: me.arrayArticuloSeleccionado.codigo,
+                            articulo: me.arrayArticuloSeleccionado.nombre,
+                            precio: me.arrayArticuloSeleccionado.precio_costo_unid,
+                            unidad_x_paquete: me.arrayArticuloSeleccionado.unidad_envase,
+
+                            fecha_vencimiento: me.fechavencimiento,
+                            cantidad: me.cantidad,
+                        });
+                    }
+                    me.arrayArticuloSeleccionado = {};
                     me.codigo = '';
                     me.idarticulo = 0;
                     me.articulo = '';
                     me.cantidad = 1;
                     me.precio = 0;
-                    me.fechavencimiento=null;
+                    me.fechavencimiento = null;
                 }
 
             }
@@ -518,18 +519,18 @@ export default {
                 console.log("==========");
                 console.log(data);
                 console.log("==========");
-                me.arrayArticuloSeleccionado={
-                    codigo:data['codigo'],
-                    descripcion:data['descripcion'],
-                    fotografia:data['fotografia'],
-                    id:data['id'],
-                    nombre:data['nombre'],
-                    precio_costo_unid:data['precio_costo_unid'],
-                    unidad_envase:data['unidad_envase']
+                me.arrayArticuloSeleccionado = {
+                    codigo: data['codigo'],
+                    descripcion: data['descripcion'],
+                    fotografia: data['fotografia'],
+                    id: data['id'],
+                    nombre: data['nombre'],
+                    precio_costo_unid: data['precio_costo_unid'],
+                    unidad_envase: data['unidad_envase']
 
                 }
-                me.codigo=me.arrayArticuloSeleccionado.codigo;
-                this.showModalArticulos=false;
+                me.codigo = me.arrayArticuloSeleccionado.codigo;
+                this.showModalArticulos = false;
             }
         },
         listarArticulo(buscar, criterio) {
@@ -546,7 +547,7 @@ export default {
                 });
         },
         guardarInventarios() {
-                axios.post('/inventarios/registrar', { inventarios: this.arrayDetalle })
+            axios.post('/inventarios/registrar', { inventarios: this.arrayDetalle })
                 .then(response => {
                     console.log(response.data);
                 })
@@ -568,7 +569,7 @@ export default {
                 console.log(me.arrayDetalle[i]);
 
             }
- 
+
             axios.post('/ingreso/registrar', {
                 'idproveedor': this.idproveedor,
                 'tipo_comprobante': this.tipo_comprobante,
@@ -579,8 +580,7 @@ export default {
                 'data': this.arrayDetalle
 
             }).then(function (response) {
-                if(response.data.id > 0)
-                {
+                if (response.data.id > 0) {
                     me.guardarInventarios();
                     me.listado = 1;
                     me.listarIngreso(1, '', 'num_comprobante');
@@ -595,13 +595,13 @@ export default {
                     me.cantidad = 1;
                     me.precio = 0;
                     me.arrayDetalle = [];
-                }else{
+                } else {
                     swal(
                         'Aviso',
                         response.data.caja_validado,
                         'warning'
                     )
-                    return; 
+                    return;
                 }
 
             }).catch(function (error) {
@@ -681,19 +681,19 @@ export default {
         },
         cerrarModal() {
             this.modal = 0;
-            this.showModalArticulos=false;
+            this.showModalArticulos = false;
             this.tituloModal = '';
         },
         abrirModal() {
-            this.listarArticulo("","");
+            this.listarArticulo("", "");
             this.arrayArticulo = [];
             this.modal = 1;
-            this.showModalArticulos=true;
+            this.showModalArticulos = true;
             this.tituloModal = 'Seleccione los articulos que desee';
 
         },
-        listarArticuloProveedor(dato){
-            this.idproveedor=dato.idproveedor;
+        listarArticuloProveedor(dato) {
+            this.idproveedor = dato.idproveedor;
         },
 
         desactivarIngreso(id) {
@@ -744,40 +744,39 @@ export default {
     }
 }
 </script>
-<style>    
-
-
+<style>
 .card-img {
-  width: 120px;
-  height: auto;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
+    width: 120px;
+    height: auto;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
 }
 
 .modal-content {
-        width: 100% !important;
-        position: absolute !important;
-    }
+    width: 100% !important;
+    position: absolute !important;
+}
 
-    .mostrar {
-        display: list-item !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        background-color: #3c29297a !important;
-    }
+.mostrar {
+    display: list-item !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    background-color: #3c29297a !important;
+}
 
-    .div-error {
-        display: flex;
-        justify-content: center;
-    }
+.div-error {
+    display: flex;
+    justify-content: center;
+}
 
-    .text-error {
-        color: red !important;
-        font-weight: bold;
-    }
+.text-error {
+    color: red !important;
+    font-weight: bold;
+}
 
-    @media (min-width: 600px) {
-        .btnagregar {
-            margin-top: 2rem;
-        }
-    }</style>
+@media (min-width: 600px) {
+    .btnagregar {
+        margin-top: 2rem;
+    }
+}
+</style>

@@ -234,7 +234,7 @@ export const esquemaCliente = yup.object().shape({
     .string()
     .required("El nombre del cliente es obligatorio")
     .max(80, "El nombre del cliente no puede tener más de 80 caracteres"),
-  direccion: yup.string().required("La dirección del cliente es obligatoria"),
+
   tipo_documento: yup.string().required("El tipo de documento es obligatorio"),
   num_documento: yup.string().required("El número de documento es obligatorio"),
   telefono: yup.string().required("El teléfono es obligatorio"),

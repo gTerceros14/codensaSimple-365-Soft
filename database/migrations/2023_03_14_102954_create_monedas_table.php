@@ -29,19 +29,13 @@ class CreateMonedasTable extends Migration
             array(
                 'id' => '1',
                 'idempresa' => '1',
-                'nombre' => 'Dolar estadounidense',
-                'pais' => 'Estados unidos',
-                'simbolo' => 'USD',
+                'nombre' => 'Bolivianos',
+                'pais' => 'Bolivia',
+                'simbolo' => 'BS',
                 'tipo_cambio' => '1'
             )
         );
     }
-
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('monedas');

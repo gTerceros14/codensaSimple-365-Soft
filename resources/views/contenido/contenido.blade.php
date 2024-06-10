@@ -4,8 +4,9 @@
 @if(Auth::check())
 @if (Auth::user()->idrol == 1)
 <template v-if="menu==0">
-    <dashboard></dashboard>
+    <venta></venta>
 </template>
+
 
 <template v-if="menu==1">
     <categoria></categoria>
@@ -24,7 +25,7 @@
 </template>
 
 <template v-if="menu==5">
-    <venta></venta>
+    <dashboard></dashboard>
 </template>
 
 <template v-if="menu==6">
@@ -230,7 +231,7 @@
 </template>
 
 <template v-if="menu==68">
-    <resumenventasycobranzas></resumenventasycobranzas>
+    <resumenventasycobranz></resumenventasycobranz>a
 </template>
 
 <template v-if="menu==61">

@@ -80,6 +80,14 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     Route::group(['middleware' => ['Administrador']], function () {
+        Route::get('/api/clientes/existe', 'ClienteController@verificarExistencia');
+        Route::post('/qr/generarqr', 'QrController@generarQr');
+        Route::post('/qr/verificarestado', 'QrController@verificarEstado');
+        Route::post('/enviarWhatsapp', 'WhatsappController@enviaReporte');
+        Route::get('/ventas-diarias', 'VentaController@reporteVentasDiarias');
+
+        Route::get('/usuario/selectUsuario', 'VentaController@selectUsuarios');
+        Route::post('/venta/emitirRecibo', 'VentaController@emitirRecibo');
 
         Route::get('/empresa', 'EmpresaController@index');
         //Route::post('/empresa/registrar', 'EmpresaController@store');
