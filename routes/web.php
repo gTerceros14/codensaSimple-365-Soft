@@ -217,6 +217,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/ingreso/desactivar', 'IngresoController@desactivar');
         Route::get('/ingreso/obtenerCabecera', 'IngresoController@obtenerCabecera');
         Route::get('/ingreso/obtenerDetalles', 'IngresoController@obtenerDetalles');
+        Route::get('/ingreso/pdf/{id}', 'VentaController@pdf')->name('venta_pdf');
+        Route::get('/ingreso/generar-pdf-boleta/{idIngreso}', 'IngresoController@generarPdfBoleta');
 
         //------sucursales
         //Lisar sucursal

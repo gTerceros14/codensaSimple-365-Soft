@@ -125,6 +125,7 @@ class InventarioController extends Controller
                         // Verificar si el índice 'cantidad' está presente antes de usarlo
                         if (isset($inventario['cantidad'])) {
                             $newInventario->saldo_stock = $inventario['cantidad'];
+                            $newInventario->cantidad = $inventario['cantidad'];
                         } else {
                             // Asignar un valor por defecto en caso de que el índice 'cantidad' no esté presente
                             $newInventario->saldo_stock = 0;

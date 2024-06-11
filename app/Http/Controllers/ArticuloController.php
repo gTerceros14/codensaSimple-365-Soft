@@ -349,7 +349,7 @@ class ArticuloController extends Controller
         $articulo->idmarca = $request->idmarca;
         $articulo->idindustria = $request->idindustria;
         $articulo->idgrupo = $request->idgrupo; //aumente 12 junio
-
+        $articulo->vencimiento = $request->fechaVencimientoSeleccion; 
         $articulo->idmedida = $request->idmedida; //new
 
         $articulo->codigo = $request->codigo;
@@ -416,6 +416,7 @@ class ArticuloController extends Controller
 
         ]);
         $articulo->save();
+        return ['idArticulo' => $articulo->id];
     }
     public function update(Request $request)
     {

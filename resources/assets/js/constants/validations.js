@@ -210,8 +210,22 @@ export const esquemaArticulos = yup.object().shape({
   idgrupo: yup.number().required("El campo Grupo o Familia es obligatorio"),
   idproveedor: yup.number().required("El campo Proveedor es obligatorio"),
   idmedida: yup.number().required("El campo Medida es obligatorio"),
+  
 });
-
+export const esquemaInventario = yup.object().shape({
+  AlmacenSeleccionado: yup.number().required('El campo Almacen es obligatorio'),
+  fechaVencimientoAlmacen : yup
+    .string()
+    .required("La fecha de vencimiento es obligatorio"),
+  unidadStock: yup
+  .number()
+  .required("La cantidad de Stock es obligatoria")
+  .typeError("Debe ingresar un número válido")
+  .min(
+    0.01,
+    "Cantidad en stock no puede ser menor o igual a 0"
+  ),
+});
 export const esquemaAlmacen = yup.object().shape({
   nombre_almacen: yup
     .string()
