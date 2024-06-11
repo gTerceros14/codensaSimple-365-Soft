@@ -7,6 +7,7 @@ use App\CreditoVenta;
 use Illuminate\Http\Request;
 use App\Persona;
 use App\Exports\ClientExport;
+use App\Imports\ClienteImport;
 use App\User;
 use App\Venta;
 use Illuminate\Support\Facades\Auth;
@@ -108,7 +109,8 @@ class ClienteController extends Controller
         $usuarios = Persona::whereNotIn('id', function ($query) {
             $query->select('id')->from('users');
         });
-
+        $usuarios = $usuarios->whereNull('direccion')->where('usuario', '>', 0);
+        
         if (!empty($usuarioid)) {
             $usuarios = $usuarios->where('personas.usuario', '=', $usuarioid);
         }
@@ -143,7 +145,8 @@ class ClienteController extends Controller
 
         $filtro = $request->filtro;
         $clientes = Persona::where('nombre', 'like', '%' . $filtro . '%')
-            ->orWhere('num_documento', 'like', '%' . $filtro . '%')
+            ->whereNull('direccion')
+            ->where('usuario', '>', 0)
             ->select('id', 'nombre', 'tipo_documento',  'num_documento','complemento_id', 'email', 'telefono')
             ->orderBy('nombre', 'asc')
             ->take(5)
@@ -157,7 +160,7 @@ class ClienteController extends Controller
             return $cliente;
         });
 
-        return ['clientes' => $clientes];
+        return ['clientes' => $clientesConCreditos];
     }
 
 
@@ -167,12 +170,13 @@ class ClienteController extends Controller
             return redirect('/');
 
         $filtro = $request->numero;
-        $clientes = Persona::where('num_documento', 'like', '%' . $filtro . '%')
+        $clientes = Persona::where('num_documento', 'like', '%'. $filtro .'%')
+            ->whereNull('direccion')
+            ->where('usuario', '>', 0)
             ->select('id', 'nombre', 'tipo_documento', 'num_documento', 'email', 'telefono')
             ->orderBy('tipo_documento', 'desc')
             ->take(5)
             ->get();
-
         $clientesConCreditos = $clientes->map(function ($cliente) {
             $cantidadCreditos = CreditoVenta::where('idcliente', $cliente->id)
                 ->where('estado', '!=', 'Completado')
@@ -198,13 +202,8 @@ class ClienteController extends Controller
         $persona->tipo_documento = $request->tipo_documento;
         $persona->num_documento = $request->num_documento;
         $persona->complemento_id = $request->complemento;
-        $persona->direccion = $request->direccion;
-        $persona->telefono = $request->telefono;
-        $persona->email = $request->email;
-        Log::info('DAtOS PERSONA:', [
-            'DATOS' => $persona,
-        ]);
         $persona->save();
+        return ['id' => $persona->id];
     }
 
     public function update(Request $request)
@@ -217,9 +216,6 @@ class ClienteController extends Controller
         $persona->tipo_documento = $request->tipo_documento;
         $persona->num_documento = $request->num_documento;
         $persona->complemento_id = $request->complemento;
-        $persona->direccion = $request->direccion;
-        $persona->telefono = $request->telefono;
-        $persona->email = $request->email;
         $persona->save();
         Log::info('DAtOS ACTU8ALIZAR!!:', [
             'DATOS' => $persona,
@@ -337,4 +333,20 @@ class ClienteController extends Controller
     //         'personas' => $personas
     //     ];
     // }
+
+    public function importarCliente(Request $request){
+        $path = $request->file('select_users_file')->getRealPath();
+        Excel::import(new ClienteImport, $path);
+    }
+    public function verificarExistencia(Request $request)
+    {
+        $documento = $request->query('documento');
+        $cliente = Persona::where('num_documento', $documento)->first();
+
+        if ($cliente) {
+            return response()->json(['existe' => true, 'cliente' => $cliente]);
+        } else {
+            return response()->json(['existe' => false]);
+        }
+    }
 }
