@@ -203,7 +203,7 @@
 
         <!--Inicio del modal agregar/actualizar-->
         <div class="modal" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
-            style="display: none;" aria-hidden="true">
+            style="display: ;" aria-hidden="true">
             <div class="modal-dialog modal-primary modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -444,9 +444,7 @@
                                     <p class="text-danger" v-if="errores.idmedida">{{ errores.idmedida }}</p>
                                 </div>
                             </div>
-
-
-
+                            
                             <div class="form-group row">
                                 <div class="col-md-6">
                                     <label for="" class="font-weight-bold">Precio unitario <span
@@ -507,8 +505,65 @@
                                     <p class="text-danger" v-if="errores.precio_venta">{{ errores.precio_venta }}</p>
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <div class=" d-flex align-items-center">
+                                        <label for="" class="font-weight-bold mb-0">
+                                            Fecha de vencimiento 
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="custom-select ml-2" v-model="fechaVencimientoSeleccion">
+                                            <option value="1">Si</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class=" d-flex align-items-center">
+                                        <label for="" class="font-weight-bold mb-0">
+                                            Agregar a stock 
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="custom-select ml-2" v-model="agregarStock">
+                                            <option value="si">Si</option>
+                                            <option value="no">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="agregarStock ==='si'" class="form-group row">
+                                    <div class="col-md-4">
+                                        <label for="" class="font-weight-bold">Unidad Stock <span
+                                                class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="number" v-model="unidadStock" class="form-control"
+                                            :class="{ 'is-invalid': erroresinventario.unidadStock }"
+                                            @input="validarCampoInventario('unidadStock')" min="0" />
+                                            <p class="text-danger" v-if="erroresinventario.unidadStock">{{ erroresinventario.unidadStock }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="" class="font-weight-bold">Fecha de Vencimiento <span
+                                                class="text-danger">*</span></label>
+                                        <input v-if="fechaVencimientoSeleccion == '0'" type="date" v-model="fechaPorDefecto" class="form-control" readonly/>
+                                        <input v-else type="date" v-model="fechaVencimientoAlmacen" class="form-control"
+                                            :class="{ 'is-invalid': erroresinventario.fechaVencimientoAlmacen }"
+                                            @input="validarCampoInventario('fechaVencimientoAlmacen')" />
+                                        <p class="text-danger" v-if="erroresinventario.fechaVencimientoAlmacen">{{ erroresinventario.fechaVencimientoAlmacen }}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="" class="font-weight-bold">Almacen <span class="text-danger">*</span></label>
 
+                                        <select class="form-control" v-model="AlmacenSeleccionado"
+                                                :class="{ 'is-invalid': errores.AlmacenSeleccionado }"
+                                                @change="validarCampoInventario('AlmacenSeleccionado')">
+                                            <option value="0" disabled selected>Seleccione</option>
+                                            <option v-for="opcion in arrayAlmacenes" :key="opcion.id" :value="opcion.id">{{ opcion.nombre_almacen }}</option>
+                                        </select>
+                                        <p class="text-danger" v-if="erroresinventario.AlmacenSeleccionado">{{ erroresinventario.AlmacenSeleccionado }}</p>
+                                    </div>
 
+                            </div>
 
 
                             <div v-for="(precio, index) in precios" :key="precio.id" class="d-flex form-group row">
@@ -1167,13 +1222,20 @@
 
 <script>
 
-import { esquemaArticulos } from '../constants/validations';
+import { esquemaArticulos, esquemaInventario } from '../constants/validations';
 
 import VueBarcode from 'vue-barcode';
 export default {
     data() {
         return {
             tipo_stock: "paquetes",
+            agregarStock: 'no',
+            unidadStock: null,
+            idarticulo : 0,
+            fechaVencimientoAlmacen: null,
+            fechaVencimientoSeleccion: '0',
+            arrayAlmacenes: [],
+            AlmacenSeleccionado: null,
             datosFormulario: {
                 nombre: '',
                 descripcion: '',
@@ -1196,10 +1258,18 @@ export default {
                 idindustria: null,
                 idgrupo: null,
                 idproveedor: null,
-                idmedida: null
+                idmedida: null,
+                fechaVencimientoSeleccion:'0',
+                
+
+            },
+            datosFormularioInventario : {
+                AlmacenSeleccionado : null ,
+                fechaVencimientoAlmacen : null,
+                unidadStock : null
             },
             errores: {},
-
+            erroresinventario :{},
             monedaPrincipal: [],
 
             modalImportar: 0,
@@ -1363,6 +1433,13 @@ export default {
         imagen() {
             return this.fotoMuestra;
         },
+        fechaPorDefecto() {
+            if (this.fechaVencimientoSeleccion == '0' && !this.fechaVencimientoAlmacen) {
+                this.fechaVencimientoAlmacen = '2099-12-31'
+                return this.fechaVencimientoAlmacen;
+            }
+            return this.fechaVencimientoAlmacen;
+        }
     },
     watch: {
         previewCsv: 'parseCsv', // Llama a parseCsv cuando previewCsv cambie
@@ -1406,6 +1483,7 @@ export default {
             this.datosFormulario.precio_tres = this.convertDolar(this.precio_tres);
             this.datosFormulario.precio_cuatro = this.convertDolar(this.precio_cuatro);
             this.datosFormulario.costo_compra = this.convertDolar(this.datosFormulario.costo_compra);
+            this.datosFormulario.fechaVencimientoSeleccion = this.fechaVencimientoSeleccion;
         },
         async validarCampo(campo) {
             this.asignarCampos();
@@ -1415,32 +1493,98 @@ export default {
             } catch (error) {
                 this.errores[campo] = error.message;
             }
+            /*if (this.agregarStock === 'si') {
+                this.datosFormularioInventario.AlmacenSeleccionado = this.AlmacenSeleccionado;
+                this.datosFormularioInventario.unidadStock = this.unidadStock;
+                this.datosFormularioInventario.fechaVencimientoAlmacen = this.fechaVencimientoAlmacen;
+                try {
+                    await esquemaInventario.validateAt(campo, this.datosFormularioInventario);
+                    this.errores[campo] = null;
+                } catch (error) {
+                    this.errores[campo] = error.message;
+                }
+            }*/
+
+        },
+        async validarCampoInventario(campo){
+            this.asignarCampos();
+            try {
+                await esquemaInventario.validateAt(campo, this.datosFormularioInventario);
+                this.erroresinventario[campo] = null;
+            } catch (error) {
+                this.erroresinventario[campo] = error.message;
+            }
         },
         async enviarFormulario() {
             this.asignarCampos();
 
-            await esquemaArticulos.validate(this.datosFormulario, { abortEarly: false })
-                .then(() => {
-                    this.datosFormulario.fotografia = this.fotografia
-                    if (this.tipo_stock == "paquetes") {
-                        this.datosFormulario.stock = this.datosFormulario.unidad_envase * this.datosFormulario.stock
-                    }
+            console.log("UNIDAD STOCK ", this.unidadStock);
+            console.log("ALMACEN ", this.AlmacenSeleccionado);
+            console.log("agregar ", this.agregarStock);
 
-                    if (this.tipoAccion == 2) {
-                        this.actualizarArticulo(this.datosFormulario)
-                    } else {
-                        this.registrarArticulo(this.datosFormulario)
+            if (this.agregarStock === 'si') {
+                console.log("Asignando valores adicionales al formulario");
+                this.datosFormularioInventario.AlmacenSeleccionado = this.AlmacenSeleccionado;
+                this.datosFormularioInventario.unidadStock = this.unidadStock;
+                this.datosFormularioInventario.fechaVencimientoAlmacen = this.fechaVencimientoAlmacen;
+            }
 
-                    }
-                })
-                .catch((error) => {
+            console.log("DATOS FORMULARIO ANTES DE VALIDAR: ", this.datosFormulario);
+            console.log("DATOS FORMULARIO ANTES DE VALIDAR: ", this.datosFormularioInventario);
+
+            let validacionExitosa = true;
+            let validacionInventarioExitosa = true;
+
+            try {
+                await esquemaArticulos.validate(this.datosFormulario, { abortEarly: false });
+                console.log("Validación de esquemaArticulos exitosa");
+            } catch (error) {
+                validacionExitosa = false;
+                const erroresValidacion = {};
+                error.inner.forEach((e) => {
+                    erroresValidacion[e.path] = e.message;
+                });
+                this.errores = { ...this.errores, ...erroresValidacion };
+                console.log("Errores en esquemaArticulos: ", this.errores);
+            }
+
+            if (this.tipoAccion != 2 && this.agregarStock === 'si') {
+                try {
+                    await esquemaInventario.validate(this.datosFormularioInventario, { abortEarly: false });
+                    console.log("Validación de esquemaInventario exitosa");
+                } catch (error) {
+                    validacionInventarioExitosa = false;
                     const erroresValidacion = {};
                     error.inner.forEach((e) => {
                         erroresValidacion[e.path] = e.message;
                     });
+                    this.errores = { ...this.errores, ...erroresValidacion };
+                    console.log("Errores en esquemaInventario: ", this.errores);
+                }
+            }
 
-                    this.errores = erroresValidacion;
-                });
+            if (this.tipoAccion == 2 && validacionExitosa) {
+                // Actualización del artículo
+                try {
+                    await this.actualizarArticulo(this.datosFormulario);
+                    console.log("Actualización de artículo exitosa");
+                } catch (error) {
+                    console.error("Error al actualizar el artículo: ", error);
+                }
+            } else if (this.tipoAccion != 2 && validacionExitosa && validacionInventarioExitosa) {
+                // Registro del artículo
+                this.datosFormulario.fotografia = this.fotografia;
+                if (this.tipo_stock == "paquetes") {
+                    this.datosFormulario.stock = this.datosFormulario.unidad_envase * this.datosFormulario.stock;
+                }
+
+                try {
+                    await this.registrarArticulo(this.datosFormulario);
+                    console.log("Registro de artículo exitoso");
+                } catch (error) {
+                    console.error("Error al registrar el artículo: ", error);
+                }
+            }
         },
         obtenerConfiguracionTrabajo() {
             // Utiliza Axios para realizar la solicitud al backend
@@ -1605,7 +1749,18 @@ export default {
                     console.log(error);
                 });
         },
+        selectAlmacen() {
+            let me = this;
+            var url = '/almacen/selectAlmacen';
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.arrayAlmacenes = respuesta.almacenes;
 
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
         abrirModal2(titulo) {
             if (titulo == "Marcas") {
 
@@ -1900,20 +2055,38 @@ export default {
                     formulario.append(key, data[key]);
                 }
             }
+
             axios.post('/articulo/registrar', formulario, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data' 
-                    }
-                }).then(function (response) {
+                headers: {
+                    'Content-Type': 'multipart/form-data' 
+                }
+            }).then(function (response) {
+                var respuesta = response.data;
+                me.idarticulo = respuesta.idArticulo;
+                console.log("respuesta = ", me.idarticulo)
                 me.cerrarModal();
                 me.listarArticulo(1, '', 'nombre');
-                me.toastSuccess("Articulo registrado correctamente")
+                me.toastSuccess("Articulo registrado correctamente");
 
+                if (me.agregarStock === 'si') {
+                    let arrayArticulos = [
+                        {
+                            idarticulo: me.idarticulo,
+                            idalmacen: me.AlmacenSeleccionado,
+                            cantidad: me.unidadStock,
+                            fecha_vencimiento: me.fechaVencimientoAlmacen
+                        }
+                    ];
+                    return axios.post('/inventarios/registrar', { inventarios: arrayArticulos });
+                }
+            }).then(function (response) {
+                if (response) {
+                    console.log(response.data);
+                }
             }).catch(function (error) {
-                console.log(error);
-                me.toastError("Hubo un error al registrar el articulo")
+                console.error(error);
+                me.toastError("Hubo un error al registrar el articulo o inventario");
             });
-
         },
 
         //---actuslizar articulo
@@ -2691,6 +2864,7 @@ export default {
 
     },
     mounted() {
+        this.selectAlmacen();
         this.recuperarIdRol();
         this.datosConfiguracion();
         this.obtenerConfiguracionTrabajo();

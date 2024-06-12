@@ -524,51 +524,69 @@ export default {
 
         },
         registrarIngreso() {
-            if (this.validarIngreso()) {
-                return;
-            }
+    if (this.validarIngreso()) {
+        return;
+    }
 
-            let me = this;
+    let me = this;
 
-            axios.post('/ingreso/registrar', {
-                'idproveedor': this.idproveedor,
-                'tipo_comprobante': this.tipo_comprobante,
-                'serie_comprobante': this.serie_comprobante,
-                'num_comprobante': this.num_comprobante,
-                'impuesto': this.impuesto,
-                'total': this.total,
-                'data': this.arrayDetalle
+    axios.post('/ingreso/registrar', {
+        'idproveedor': this.idproveedor,
+        'tipo_comprobante': this.tipo_comprobante,
+        'serie_comprobante': this.serie_comprobante,
+        'num_comprobante': this.num_comprobante,
+        'impuesto': this.impuesto,
+        'total': this.total,
+        'data': this.arrayDetalle
+    }).then(function (response) {
+        console.log("response ", response.data);
+        if (response.data.id > 0) {
+            me.guardarInventarios();
+            me.listado = 1;
+            me.listarIngreso(1, '', 'num_comprobante');
+            me.cerrarFormulario();
+            me.idproveedor = 0;
+            me.tipo_comprobante = 'BOLETA';
+            me.serie_comprobante = '';
+            me.num_comprobante = '';
+            me.impuesto = 0.18;
+            me.total = 0.0;
+            me.idarticulo = 0;
+            me.articulo = '';
+            me.cantidad = 1;
+            me.precio = 0;
+            me.arrayDetalle = [];
+            me.id_ingreso = response.data.id;
+            console.log('id ingreso ', me.id_ingreso);
 
-            }).then(function (response) {
-                if (response.data.id > 0) {
-                    me.guardarInventarios();
-                    me.listado = 1;
-                    me.listarIngreso(1, '', 'num_comprobante');
-                    me.cerrarFormulario();
-                    me.idproveedor = 0;
-                    me.tipo_comprobante = 'BOLETA';
-                    me.serie_comprobante = '';
-                    me.num_comprobante = '';
-                    me.impuesto = 0.18;
-                    me.total = 0.0;
-                    me.idarticulo = 0;
-                    me.articulo = '';
-                    me.cantidad = 1;
-                    me.precio = 0;
-                    me.arrayDetalle = [];
-                } else {
-                    swal(
-                        'Aviso',
-                        response.data.caja_validado,
-                        'warning'
-                    )
-                    return;
-                }
-
-            }).catch(function (error) {
-                console.log(error);
+            // Genera y descarga el PDF
+            axios({
+                url: '/ingreso/generar-pdf-boleta/' + me.id_ingreso,
+                method: 'GET',
+                responseType: 'blob' // Importante para manejar el archivo como blob
+            }).then((response) => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'venta.pdf');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }).catch((error) => {
+                console.log("Error al generar el PDF: ", error);
             });
-        },
+        } else {
+            swal(
+                'Aviso',
+                response.data.caja_validado,
+                'warning'
+            );
+            return;
+        }
+    }).catch(function (error) {
+        console.log(error);
+    });
+},
         guardarInventarios() {
             this.editarEstado();
 
