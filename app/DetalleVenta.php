@@ -15,4 +15,8 @@ class DetalleVenta extends Model
         'descuento'
     ];
     public $timestamps = false;
+     public function producto()
+{
+    return $this->belongsTo(Articulo::class, 'idarticulo');
+}
 }

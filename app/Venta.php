@@ -24,4 +24,8 @@ class Venta extends Model
     {
         return $this->belongsTo('App\Caja', 'id');
     }
+    public function detalles()
+{
+    return $this->hasMany(DetalleVenta::class, 'idventa');
+}
 }
