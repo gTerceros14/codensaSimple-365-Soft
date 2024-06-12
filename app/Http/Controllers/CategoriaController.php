@@ -26,7 +26,7 @@ class CategoriaController extends Controller
         $criterio = $request->criterio;
         
         if ($buscar==''){
-            $categorias = Categoria::orderBy('id', 'desc')->paginate(6);
+            $categorias = Categoria::orderBy('id', 'desc')->paginate(10);
         }
         else{
             $categorias = Categoria::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(6);

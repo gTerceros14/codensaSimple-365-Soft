@@ -57,6 +57,10 @@
                                                 class="btn btn-success btn-sm">
                                                 <i class="icon-eye"></i>
                                             </button> &nbsp;
+                                            <button type="button" @click="pdfboleta(ingreso.id)"
+                                                class="btn btn-info btn-sm mr-1">
+                                                <i class="icon-doc"></i>
+                                            </button>
                                             <template v-if="ingreso.estado == 'Registrado'">
                                                 <button type="button" class="btn btn-danger btn-sm"
                                                     @click="desactivarIngreso(ingreso.id)">
@@ -75,7 +79,6 @@
                 monedaCompra[1] }}
 
                                         </td>
-                                        <td v-text="ingreso.impuesto"></td>
                                         <td v-text="ingreso.estado"></td>
                                     </tr>
                                 </tbody>
@@ -304,6 +307,9 @@ export default {
         }
     },
     methods: {
+        pdfboleta(id) {
+            window.open("/ingreso/generar-pdf-boleta/" + id, "_blank");
+        },
         datosConfiguracion() {
             let me = this;
             var url = '/configuracion';

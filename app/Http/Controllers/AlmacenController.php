@@ -26,7 +26,7 @@ class AlmacenController extends Controller
                     ->orWhere('sucursales.nombre', 'like', '%' . $buscar . '%');
             })
             ->orderBy('almacens.id', 'desc')
-            ->paginate(6);
+            ->paginate(10);
 
       foreach ($almacenes as $almacen) {
     $encargadosIds = explode(',', $almacen->encargado);

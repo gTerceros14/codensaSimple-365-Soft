@@ -22,7 +22,7 @@ class IndustriaController extends Controller
         if ($buscar == '') {
             $industrias = Industria::orderBy('id', 'desc')->paginate(6);
         } else {
-            $industrias = Industria::where($criterio, 'like', '%' . $buscar . '%')->orderBy('id', 'desc')->paginate(6);
+            $industrias = Industria::where($criterio, 'like', '%' . $buscar . '%')->orderBy('id', 'desc')->paginate(10);
         }
 
 

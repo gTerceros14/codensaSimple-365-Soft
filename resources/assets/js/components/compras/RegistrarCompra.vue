@@ -9,20 +9,14 @@
 
 
                     <v-select :on-search="selectProveedor" label="nombre" :options="arrayProveedor"
-                        placeholder="Buscar Proveedores..." :onChange="getDatosProveedor" v-model="proveedorSeleccionado">
+                        placeholder="Buscar Proveedores..." :onChange="getDatosProveedor"
+                        v-model="proveedorSeleccionado">
                     </v-select>
                     <span class="text-danger small" v-show="idproveedor == 0">(!) Seleccione Proveedor</span>
                 </div>
             </div>
 
-            <div class="col-md-1">
-                <label for="" class="font-weight-bold">Impuesto <span class="text-danger">*</span></label>
-                <div>
-                    <input type="text" class="form-control" v-model="impuesto" ref="impuestoRef" v-if="actualizarIva === 1">
-                    <input type="text" class="form-control" v-model="impuesto" ref="impuestoRef" readonly v-else>
-                </div>
-                <!-- <label class="small" for="impuesto">Shift + Q</label> -->
-            </div>
+
 
             <div class="col-md-2">
                 <div class="form-group">
@@ -64,7 +58,7 @@
                     <select class="form-control" v-model="AlmacenSeleccionado">
                         <option value="0" disabled selected>Seleccione</option>
                         <option v-for="opcion in arrayAlmacenes" :key="opcion.id" :value="opcion.id">{{
-                            opcion.nombre_almacen }}</option>
+                        opcion.nombre_almacen }}</option>
                     </select>
                 </div>
             </div>
@@ -85,7 +79,8 @@
             <div class="row ">
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label for="" class="font-weight-bold">Seleccione producto<span class="text-danger">*</span></label>
+                        <label for="" class="font-weight-bold">Seleccione producto<span
+                                class="text-danger">*</span></label>
 
                         <div class="form-inline">
                             <input v-if="idproveedor == 0" disabled type="text" class="form-control" v-model="codigo"
@@ -108,12 +103,16 @@
                         <p class="card-text">
                             {{ this.arrayArticuloSeleccionado.descripcion }}
                             <br>
-                            <b>Costo unitario</b> 
-                            {{( this.arrayArticuloSeleccionado.precio_costo_unid  *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
-                            
+                            <b>Costo unitario</b>
+                            {{ (this.arrayArticuloSeleccionado.precio_costo_unid
+                        * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
+
                             <br>
                             <b>Costo paquete</b>
-                            {{( (this.arrayArticuloSeleccionado.unidad_envase * this.arrayArticuloSeleccionado.precio_costo_unid) *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+                            {{ ((this.arrayArticuloSeleccionado.unidad_envase *
+                        this.arrayArticuloSeleccionado.precio_costo_unid) * parseFloat(monedaCompra[0])).toFixed(2)
+                            }}
+                            {{ monedaCompra[1] }}
 
                             <br>
                             <b>Unidades por envase</b> {{ this.arrayArticuloSeleccionado.unidad_envase }}
@@ -157,20 +156,21 @@
                         <input type="date" class="form-control" v-model="fechavencimiento">
                     </div>
                 </div>
-           
+
                 <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
                     <div class="form-group">
                         <label for="campo2">Precio total</label>
-                       
+
                         <div class="input-group">
-                            <input disabled type="number" class="form-control" :value="(resultadoMultiplicacion*parseFloat(monedaCompra[0])).toFixed(2)" >
+                            <input disabled type="number" class="form-control"
+                                :value="(resultadoMultiplicacion * parseFloat(monedaCompra[0])).toFixed(2)">
                             <div class="input-group-append">
                                 <span class="input-group-text">
                                     {{ monedaCompra[1] }}
                                 </span>
                             </div>
                         </div>
-                                                
+
                     </div>
                 </div>
 
@@ -241,7 +241,7 @@
                             <td v-text="detalle.articulo"></td>
 
                             <td>
-                            {{( detalle.precio  *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+                                {{ (detalle.precio * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
 
                             </td>
                             <td v-text="detalle.unidad_x_paquete"></td>
@@ -254,29 +254,35 @@
                                 <input type="date" class="form-control" v-model="detalle.fecha_vencimiento">
                             </td>
                             <td>
-                            {{( (detalle.precio * detalle.cantidad)  *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
+                                {{ ((detalle.precio * detalle.cantidad) * parseFloat(monedaCompra[0])).toFixed(2) }} {{
+                        monedaCompra[1] }}
 
                             </td>
                         </tr>
                         <tr style="background-color: #CEECF5;">
                             <td colspan="8" align="right"><strong>Total Parcial:</strong></td>
                             <td>
-                            {{( (totalParcial=(total - totalImpuesto))  *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
-                                
+                                {{ ((totalParcial = (total - totalImpuesto)) * parseFloat(monedaCompra[0])).toFixed(2)
+                                }} {{
+                        monedaCompra[1] }}
+
                             </td>
                         </tr>
                         <tr style="background-color: #CEECF5;">
                             <td colspan="8" align="right"><strong>Total Impuesto:</strong></td>
                             <td>
-                            {{( (totalImpuesto=((total * impuesto) / (1 + impuesto)))  *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
-                                
+                                {{ ((totalImpuesto = ((total * impuesto) / (1 + impuesto)))
+                        * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
+
                             </td>
                         </tr>
                         <tr style="background-color: #CEECF5;">
                             <td colspan="8" align="right"><strong>Total Neto:</strong></td>
                             <td>
-                            {{( (total=calcularTotal)  *parseFloat(monedaCompra[0])).toFixed(2)}} {{ monedaCompra[1] }}
-                                
+                                {{ ((total = calcularTotal) * parseFloat(monedaCompra[0])).toFixed(2) }} {{
+                        monedaCompra[1]
+                                }}
+
                             </td>
                         </tr>
                     </tbody>
@@ -300,7 +306,7 @@
 
     </div>
 </template>
-  
+
 <script>
 import vSelect from 'vue-select';
 
@@ -524,69 +530,69 @@ export default {
 
         },
         registrarIngreso() {
-    if (this.validarIngreso()) {
-        return;
-    }
+            if (this.validarIngreso()) {
+                return;
+            }
 
-    let me = this;
+            let me = this;
 
-    axios.post('/ingreso/registrar', {
-        'idproveedor': this.idproveedor,
-        'tipo_comprobante': this.tipo_comprobante,
-        'serie_comprobante': this.serie_comprobante,
-        'num_comprobante': this.num_comprobante,
-        'impuesto': this.impuesto,
-        'total': this.total,
-        'data': this.arrayDetalle
-    }).then(function (response) {
-        console.log("response ", response.data);
-        if (response.data.id > 0) {
-            me.guardarInventarios();
-            me.listado = 1;
-            me.listarIngreso(1, '', 'num_comprobante');
-            me.cerrarFormulario();
-            me.idproveedor = 0;
-            me.tipo_comprobante = 'BOLETA';
-            me.serie_comprobante = '';
-            me.num_comprobante = '';
-            me.impuesto = 0.18;
-            me.total = 0.0;
-            me.idarticulo = 0;
-            me.articulo = '';
-            me.cantidad = 1;
-            me.precio = 0;
-            me.arrayDetalle = [];
-            me.id_ingreso = response.data.id;
-            console.log('id ingreso ', me.id_ingreso);
+            axios.post('/ingreso/registrar', {
+                'idproveedor': this.idproveedor,
+                'tipo_comprobante': this.tipo_comprobante,
+                'serie_comprobante': this.serie_comprobante,
+                'num_comprobante': this.num_comprobante,
+                'impuesto': this.impuesto,
+                'total': this.total,
+                'data': this.arrayDetalle
+            }).then(function (response) {
+                console.log("response ", response.data);
+                if (response.data.id > 0) {
+                    me.guardarInventarios();
+                    me.listado = 1;
+                    me.listarIngreso(1, '', 'num_comprobante');
+                    me.cerrarFormulario();
+                    me.idproveedor = 0;
+                    me.tipo_comprobante = 'BOLETA';
+                    me.serie_comprobante = '';
+                    me.num_comprobante = '';
+                    me.impuesto = 0.18;
+                    me.total = 0.0;
+                    me.idarticulo = 0;
+                    me.articulo = '';
+                    me.cantidad = 1;
+                    me.precio = 0;
+                    me.arrayDetalle = [];
+                    me.id_ingreso = response.data.id;
+                    console.log('id ingreso ', me.id_ingreso);
 
-            // Genera y descarga el PDF
-            axios({
-                url: '/ingreso/generar-pdf-boleta/' + me.id_ingreso,
-                method: 'GET',
-                responseType: 'blob' // Importante para manejar el archivo como blob
-            }).then((response) => {
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', 'venta.pdf');
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }).catch((error) => {
-                console.log("Error al generar el PDF: ", error);
+                    // Genera y descarga el PDF
+                    axios({
+                        url: '/ingreso/generar-pdf-boleta/' + me.id_ingreso,
+                        method: 'GET',
+                        responseType: 'blob' // Importante para manejar el archivo como blob
+                    }).then((response) => {
+                        const url = window.URL.createObjectURL(new Blob([response.data]));
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', 'venta.pdf');
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }).catch((error) => {
+                        console.log("Error al generar el PDF: ", error);
+                    });
+                } else {
+                    swal(
+                        'Aviso',
+                        response.data.caja_validado,
+                        'warning'
+                    );
+                    return;
+                }
+            }).catch(function (error) {
+                console.log(error);
             });
-        } else {
-            swal(
-                'Aviso',
-                response.data.caja_validado,
-                'warning'
-            );
-            return;
-        }
-    }).catch(function (error) {
-        console.log(error);
-    });
-},
+        },
         guardarInventarios() {
             this.editarEstado();
 
@@ -673,4 +679,3 @@ export default {
     }
 };
 </script>
-  
