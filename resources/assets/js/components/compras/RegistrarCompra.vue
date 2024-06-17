@@ -247,6 +247,7 @@
                     <label for="">Shift + T</label>
                 </div>
             </div>-->
+            </div>
             <div v-show="step === 3" class="step-content">
                 <div class="form-group row ">
                     <div class="table-responsive col-md-12">
