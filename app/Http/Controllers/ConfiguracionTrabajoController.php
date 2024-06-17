@@ -120,7 +120,7 @@ class ConfiguracionTrabajoController extends Controller
             $configuracionTrabajo->gestion = $request->selectedYear;
             $configuracionTrabajo->codigoProductos = $request->codigoProducto;
             $configuracionTrabajo->maximoDescuento = $request->maximoDescuento;
-            // $configuracionTrabajo->valuacionInventario = $request->valuacionInventario;
+            $configuracionTrabajo->valuacionInventario = $request->valuacionInventario;
             $configuracionTrabajo->backupAutomatico = $request->backupAutomatico;
             $configuracionTrabajo->rutaBackup = $request->rutaBackup;
             $configuracionTrabajo->saldosNegativos = $request->saldosNegativos;

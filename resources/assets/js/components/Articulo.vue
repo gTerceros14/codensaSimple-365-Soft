@@ -53,7 +53,7 @@
                                     </th>
 
                                     <!-- <th v-if="rolUsuario === 1">Presio venta</th> -->
-                                    <th v-if="rolUsuario === 1 && mostrarCostos === 1">PRECIO VENTA</th>
+                                    <!--<th v-if="rolUsuario === 1 && mostrarCostos === 1">PRECIO VENTA</th> -->
 
                                     <th>LINEA</th>
                                     <th>INDUSTRIA</th>
@@ -135,11 +135,11 @@
                                     </td>
 
                                     <!-- <td v-if="rolUsuario === 1" v-text="articulo.precio_venta"></td> -->
-                                    <td v-if="rolUsuario === 1 && mostrarCostos === 1">
+                                    <!--<td v-if="rolUsuario === 1 && mostrarCostos === 1">
                                         {{ (articulo.precio_venta * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
                         monedaPrincipal[1] }}
 
-                                    </td>
+                                    </td>-->
 
                                     <td v-text="articulo.nombre_categoria"></td>
                                     <td v-text="articulo.nombre_industria"></td>
@@ -424,7 +424,7 @@
                                     <label for="" class="font-weight-bold">Unidades por paquete <span
                                             class="text-danger">*</span></label>
                                     <input type="number" v-model="datosFormulario.unidad_envase" class="form-control"
-                                        placeholder="Ej. unidad_envase@dominio.com"
+                                        placeholder="unidades por paquete"
                                         :class="{ 'is-invalid': errores.unidad_envase }"
                                         @input="validarCampo('unidad_envase')" />
                                     <p class="text-danger" v-if="errores.unidad_envase">{{ errores.unidad_envase }}</p>
@@ -485,26 +485,6 @@
                                 </div>
 
                             </div>
-
-                            <div class="form-group row">
-                                <div class="col-md-6">
-                                    <label for="" class="font-weight-bold">Costo compra <span
-                                            class="text-danger">*</span></label>
-                                    <input type="number" v-model="datosFormulario.costo_compra" class="form-control"
-                                        placeholder="Ej. costo_compra@dominio.com"
-                                        :class="{ 'is-invalid': errores.costo_compra }"
-                                        @input="validarCampo('costo_compra')" />
-                                    <p class="text-danger" v-if="errores.costo_compra">{{ errores.costo_compra }}</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="" class="font-weight-bold">Precio venta <span
-                                            class="text-danger">*</span></label>
-                                    <input type="number" v-model="datosFormulario.precio_venta" class="form-control"
-                                        placeholder="Ej. 123456789" :class="{ 'is-invalid': errores.precio_venta }"
-                                        @input="validarCampo('precio_venta')" />
-                                    <p class="text-danger" v-if="errores.precio_venta">{{ errores.precio_venta }}</p>
-                                </div>
-                            </div>
                             <div class="form-group row">
                                 <div class="col-md-6">
                                     <div class=" d-flex align-items-center">
@@ -518,7 +498,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" v-if="tipoAccion == 1">
                                     <div class=" d-flex align-items-center">
                                         <label for="" class="font-weight-bold mb-0">
                                             Agregar a stock 
@@ -531,7 +511,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-if="agregarStock ==='si'" class="form-group row">
+                            <div v-if="agregarStock ==='si' && tipoAccion==1" class="form-group row">
                                     <div class="col-md-4">
                                         <label for="" class="font-weight-bold">Unidad Stock <span
                                                 class="text-danger">*</span></label>
@@ -546,7 +526,7 @@
                                         <label for="" class="font-weight-bold">Fecha de Vencimiento <span
                                                 class="text-danger">*</span></label>
                                         <input v-if="fechaVencimientoSeleccion == '0'" type="date" v-model="fechaPorDefecto" class="form-control" readonly/>
-                                        <input v-else type="date" v-model="fechaVencimientoAlmacen" class="form-control"
+                                        <input v-else type="date" v-model="fechaPorDefecto" class="form-control"
                                             :class="{ 'is-invalid': erroresinventario.fechaVencimientoAlmacen }"
                                             @input="validarCampoInventario('fechaVencimientoAlmacen')" />
                                         <p class="text-danger" v-if="erroresinventario.fechaVencimientoAlmacen">{{ erroresinventario.fechaVencimientoAlmacen }}</p>
@@ -1437,6 +1417,12 @@ export default {
             if (this.fechaVencimientoSeleccion == '0' && !this.fechaVencimientoAlmacen) {
                 this.fechaVencimientoAlmacen = '2099-12-31'
                 return this.fechaVencimientoAlmacen;
+            }else {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0'); // Los meses son indexados desde 0
+                const day = String(today.getDate()).padStart(2, '0');
+                this.fechaVencimientoAlmacen = `${year}-${month}-${day}`;
             }
             return this.fechaVencimientoAlmacen;
         }
@@ -1571,16 +1557,17 @@ export default {
                 } catch (error) {
                     console.error("Error al actualizar el artículo: ", error);
                 }
-            } else if (this.tipoAccion != 2 && validacionExitosa && validacionInventarioExitosa) {
+            } else if (this.tipoAccion != 2 && validacionExitosa || validacionInventarioExitosa) {
                 // Registro del artículo
                 this.datosFormulario.fotografia = this.fotografia;
                 if (this.tipo_stock == "paquetes") {
                     this.datosFormulario.stock = this.datosFormulario.unidad_envase * this.datosFormulario.stock;
+                    console.log("paquetes ",this.datosFormulario.stock)
                 }
 
                 try {
                     await this.registrarArticulo(this.datosFormulario);
-                    console.log("Registro de artículo exitoso");
+                    console.log("Registro de artículo exitoso",this.datosFormulario);
                 } catch (error) {
                     console.error("Error al registrar el artículo: ", error);
                 }
@@ -2536,6 +2523,7 @@ export default {
                                     // this.precios.forEach((precio) => {
                                     //     this.calcularPrecio(precio);
                                     // });
+                                    this.fechaVencimientoSeleccion = data['vencimiento'];
                                     break;
 
                                 }

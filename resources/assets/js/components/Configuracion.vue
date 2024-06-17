@@ -90,7 +90,7 @@
                                 <label for="opcion1">Valuación inventario:</label>
                                 <select class="form-control" v-model="valuacionInventario">
                                     <option value="Ninguno">Ninguno</option>
-                                    <option value="opcion1_valor2">Valor 2</option>
+                                    <option value="costo_reposicion">Costo por Reposicion</option>
                                     <option value="opcion1_valor3">Valor 3</option>
                                 </select>
                             </div>

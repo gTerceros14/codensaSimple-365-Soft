@@ -53,7 +53,7 @@ class ArticuloController extends Controller
                     'articulos.nombre_generico',
                     'articulos.costo_compra',
                     //aumente12julio
-
+                    'articulos.vencimiento',
                     'articulos.unidad_envase',
                     'articulos.precio_list_unid',
                     'articulos.precio_costo_unid',
@@ -173,6 +173,8 @@ class ArticuloController extends Controller
                     'articulos.condicion',
                     'articulos.unidad_envase',
                     'articulos.fotografia',
+                    'articulos.precio_costo_paq',
+                    'articulos.vencimiento',
                     // agregado el 26.01,2024
                     'articulos.codigo_alfanumerico',
                     'articulos.descripcion_fabrica'
@@ -196,6 +198,8 @@ class ArticuloController extends Controller
                     'articulos.condicion',
                     'articulos.unidad_envase',
                     'articulos.fotografia',
+                    'articulos.precio_costo_paq',
+                    'articulos.vencimiento',
                     // agregado el 26.01,2024
                     'articulos.codigo_alfanumerico',
                     'articulos.descripcion_fabrica'
@@ -604,5 +608,14 @@ class ArticuloController extends Controller
             return response()->json(['error' => 'Error en la importación', 'mensaje' => $e->getMessage()], 500);
         }
     }
-
+    public function editarPrecioCompraVenta(Request $request){
+        $articulo = Articulo::findOrFail($request->id);
+        $articulo->precio_costo_unid = $request->precio_costo_unidad;
+        $articulo->precio_costo_paq = $request->precio_costo_paquete;
+        $articulo->precio_uno = $request->precio_uno;
+        $articulo->precio_dos = $request->precio_dos;
+        $articulo->precio_tres = $request->precio_tres;
+        $articulo->precio_cuatro = $request->precio_cuatro;
+        $articulo->save();
+    }
 }

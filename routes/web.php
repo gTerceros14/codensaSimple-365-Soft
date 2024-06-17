@@ -134,7 +134,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/articulo/listarPdf', 'ArticuloController@listarPdf')->name('articulos_pdf');
         Route::get('/articulo/listarArticuloPedido', 'ArticuloController@listPedProve'); //aumente esto 21 sept
         Route::post('/articulos/importar', 'ArticuloController@importar')->name('articulos.importar');
-
+        Route::post('/articulo/actualizarPrecios', 'ArticuloController@editarPrecioCompraVenta');
         Route::get('/proveedor', 'ProveedorController@index');
         Route::post('/proveedor/registrar', 'ProveedorController@store');
         Route::put('/proveedor/actualizar', 'ProveedorController@update');

@@ -104,13 +104,11 @@
                             {{ this.arrayArticuloSeleccionado.descripcion }}
                             <br>
                             <b>Costo unitario</b>
-                            {{ (this.arrayArticuloSeleccionado.precio_costo_unid
-                        * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
+                            {{ parseFloat(this.arrayArticuloSeleccionado.precio_costo_unid).toFixed(2)}} {{ monedaCompra[1] }}
 
                             <br>
                             <b>Costo paquete</b>
-                            {{ ((this.arrayArticuloSeleccionado.unidad_envase *
-                        this.arrayArticuloSeleccionado.precio_costo_unid) * parseFloat(monedaCompra[0])).toFixed(2)
+                            {{ parseFloat(this.arrayArticuloSeleccionado.precio_costo_paq).toFixed(2)
                             }}
                             {{ monedaCompra[1] }}
 
@@ -153,7 +151,9 @@
                 <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
                     <div class="form-group">
                         <label for="campo2">Fecha vencimiento</label>
-                        <input type="date" class="form-control" v-model="fechavencimiento">
+                        <input v-if="arrayArticuloSeleccionado.vencimiento == 0" type="date" class="form-control" v-model="fechaPorDefecto" readonly>
+                        <input v-if="arrayArticuloSeleccionado.vencimiento == 1" type="date" class="form-control" v-model="fechaPorDefecto">
+
                     </div>
                 </div>
 
@@ -173,7 +173,23 @@
 
                     </div>
                 </div>
+                <div class="col-md-3" v-if="arrayArticuloSeleccionado.id && valuacionInventario === 'costo_reposicion'">
+                    <div class="form-group">
+                        <label for="campo2">Editar precio</label>
+                        
+                        <div class="input-group">
+                            <select class="form-control" v-model="editarPrecios">
+                                <option value="" disabled selected>Elegir opción</option>
+                                <option value="1">Costo unitario</option>
+                                <option value="0">Costo paquete</option>
+                            </select>
+                            <input v-if="editarPrecios == ''" type="number" class="form-control" v-model="nuevoPrecio" min="0"  readonly>
+                            <input v-else type="number" class="form-control" v-model="nuevoPrecio" min="0"  >
+                            <button @click="editarPrecio" class="btn btn-success"><i class="bi bi-check2"></i></button>
+                        </div>
 
+                    </div>
+                </div>
                 <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
                     <div class="form-group">
                         <button @click="agregarDetalle()" class="btn btn-success form-control btnagregar"><i
@@ -309,7 +325,6 @@
 
 <script>
 import vSelect from 'vue-select';
-
 export default {
     props: {
         arrayArticuloSeleccionado: {
@@ -345,6 +360,16 @@ export default {
     },
     data() {
         return {
+            editarPrecios: '',
+            nuevoPrecio: 0,
+            nuevoCostoUnidad: 0,
+            nuevoCostoPaquete: 0,
+            precios:[],
+            precio_uno: 0,
+            precio_dos: 0,
+            precio_tres: 0,
+            precio_cuatro: 0,
+            valuacionInventario: '',
             actualizarIva: null,
             proveedorSeleccionado: "",
             tipoUnidadSeleccionada: "Unidades",
@@ -397,6 +422,11 @@ export default {
         vSelect
     },
     watch: {
+        codigo(newValue) {
+            if (newValue) {
+                this.buscarArticulo();
+            }
+        },
         arrayDetalle: {
             deep: true,
             handler: function (newVal) {
@@ -429,13 +459,65 @@ export default {
                 resultado = resultado + (this.arrayDetalle[i].precio * this.arrayDetalle[i].cantidad)
             }
             return resultado;
+        },
+        fechaPorDefecto() {
+            if (this.arrayArticuloSeleccionado.vencimiento == 0) {
+                this.fechavencimiento = '2099-12-31';
+            } else {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0'); // Los meses son indexados desde 0
+                const day = String(today.getDate()).padStart(2, '0');
+                this.fechavencimiento = `${year}-${month}-${day}`;
+            }
+            return this.fechavencimiento;
         }
 
     },
     mounted() {
         this.obtenerIva();
+        this.listarPrecio();
+        this.datosConfiguracion();
     },
     methods: {
+        buscarArticulo() {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
+                let me = this;
+                var url = '/articulo/listarArticulo?buscar=' + me.codigo + '&criterio=' + 'codigo' + '&idProveedor=' + this.idproveedor
+                axios
+                    .get(url)
+                    .then(function (response) {
+                        let respuesta = response.data;
+                        me.arrayArticuloSeleccionado = respuesta.articulos.data[0];
+                        console.log(me.arrayArticuloSeleccionado);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }, 1000);
+        },
+        /*buscarArticulo() {
+            clearTimeout(this.timer);
+            console.log("Buscando")
+            console.log(this.idproveedor);
+            this.timer = setTimeout(() => {
+                let me = this;
+                var url = '/articulo/listarArticulo?buscar=' + me.codigo + '&criterio=' + 'codigo' + '&idProveedor=' + this.idproveedor;
+                axios.get(url).then(function (response) {
+                    var respuesta = response.data;
+                    me.arrayArticuloSeleccionado = respuesta.articulos.data;
+                    console.log(me.arrayArticuloSeleccionado);
+                })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }, 1000);
+        },*/
+        eliminarDetalle(index) {
+            let me = this;
+            me.arrayDetalle.splice(index, 1);
+        },
         cambiarTipoUnidad() {
             if (this.tipoUnidadSeleccionada == "Paquetes") {
                 this.tipoUnidadSeleccionada = "Unidades";
@@ -507,6 +589,96 @@ export default {
                 .catch(function (error) {
                     console.log(error);
                 });
+        },
+        editarPrecio(){
+            console.log("NUEVO PRECIO ",this.nuevoPrecio);
+            console.log("ARTICULO SELECCIONADO ",this.arrayArticuloSeleccionado);
+            let me = this;
+            if(me.editarPrecios == '1'){
+                me.nuevoCostoPaquete =(me.nuevoPrecio* me.arrayArticuloSeleccionado.unidad_envase).toFixed(2);
+                console.log("NUEVO PRECIO2 ",this.nuevoCostoPaquete);
+                me.arrayArticuloSeleccionado.precio_costo_paq = me.nuevoCostoPaquete;
+                me.arrayArticuloSeleccionado.precio_costo_unid=me.nuevoPrecio;
+                this.cambiarPrecios(me.arrayArticuloSeleccionado.precio_costo_unid,me.nuevoCostoPaquete,'Costo unitario');
+                
+                
+            }
+            if(me.editarPrecios == '0'){
+                me.nuevoCostoUnidad =(me.nuevoPrecio/ me.arrayArticuloSeleccionado.unidad_envase).toFixed(2);
+                console.log("NUEVO PRECIO2 ",this.nuevoCostoUnidad);
+                me.arrayArticuloSeleccionado.precio_costo_unid = me.nuevoCostoUnidad;
+                me.arrayArticuloSeleccionado.precio_costo_paq=me.nuevoPrecio;
+                this.cambiarPrecios(me.nuevoCostoUnidad,me.arrayArticuloSeleccionado.precio_costo_paq,'Costo paquete');
+                
+            }                
+        }, 
+        calcularPrecio(precio, index,preciounidad) {
+            const margen_ganancia = parseFloat(preciounidad) * (parseFloat(precio.porcentage) / 100);
+            const precio_publico = parseFloat(preciounidad) + margen_ganancia;
+
+            if (index === 0) {
+                this.precio_uno = precio_publico.toFixed(2);
+            } else if (index === 1) {
+                this.precio_dos = precio_publico.toFixed(2);
+            } else if (index === 2) {
+                this.precio_tres = precio_publico.toFixed(2);
+            } else if (index === 3) {
+                this.precio_cuatro = precio_publico.toFixed(2);
+            }
+        },
+        cambiarPrecios(precioUnidad,precioPaquete,editarPrecios){
+            let me = this;
+            console.log("tipo ",typeof me.precios)
+            console.log("tipo ", me.precios)
+            me.precios.forEach((precio, index) => {
+                me.calcularPrecio(precio, index,precioUnidad);
+            });
+            swal({
+                title: 'Esta seguro de cambiar el '+editarPrecios,
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    axios.post('/articulo/actualizarPrecios',{
+                        id: me.arrayArticuloSeleccionado.id,
+                        precio_costo_paquete: precioPaquete,
+                        precio_costo_unidad: precioUnidad,
+                        precio_uno: me.precio_uno,
+                        precio_dos: me.precio_dos,
+                        precio_tres: me.precio_tres,
+                        precio_cuatro: me.precio_cuatro
+                    }).then(response => {
+                        me.nuevoPrecio = '',
+                        me.editarPrecios= ''
+                    }).catch(error => {
+                        console.error(error);
+                    })
+
+                } else if (
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+
+                }
+            })
+        },
+        listarPrecio() {
+            let me = this;
+            var url = '/precios';
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.precios = respuesta.precio.data;
+                //me.precioCount = me.arrayBuscador.length;
+            }).catch(function (error) {
+                console.log(error);
+            });
         },
         obtenerIva() {
             let me = this;
@@ -617,6 +789,20 @@ export default {
             if (this.errorMostrarMsjIngreso.length) this.errorIngreso = 1;
 
             return this.errorIngreso;
+        },
+        datosConfiguracion() {
+            let me = this;
+            var url = '/configuracion';
+
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.valuacionInventario = respuesta.configuracionTrabajo.valuacionInventario;
+                console.log(" valuacion ",me.valuacionInventario)
+
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
         agregarDetalle() {
             let me = this;

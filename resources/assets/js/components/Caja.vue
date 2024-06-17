@@ -139,28 +139,27 @@
                               <span aria-hidden="true">×</span>
                             </button>
                         </div>
-                        <div class="modal-body">
-                            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Saldo Inicial</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="saldoInicial" class="form-control" placeholder="0.00">   
-                                    </div>
-                                </div>
-                                <div v-show="errorCaja" class="form-group row div-error">
-                                    <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjCaja" :key="error" v-text="error">
-
+                        <form @submit.prevent="registrarCaja">    
+                            <div class="modal-body">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 form-control-label" for="text-input">Saldo Inicial</label>
+                                        <div class="col-md-9">
+                                            <input type="text" v-model="saldoInicial" class="form-control" placeholder="0.00">   
                                         </div>
                                     </div>
-                                </div>
+                                    <div v-show="errorCaja" class="form-group row div-error">
+                                        <div class="text-center text-error">
+                                            <div v-for="error in errorMostrarMsjCaja" :key="error" v-text="error">
 
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarCaja()">Guardar</button>
-                        </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
+                                <button type="submit" v-if="tipoAccion==1" class="btn btn-primary">Guardar</button>
+                            </div>
+                        </form>
                     </div>
                     <!-- /.modal-content -->
                 </div>

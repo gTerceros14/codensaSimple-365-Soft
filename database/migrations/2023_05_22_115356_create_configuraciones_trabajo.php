@@ -21,7 +21,7 @@ class CreateConfiguracionesTrabajo extends Migration
             $table->string('codigoProductos', 100);
             // $table->boolean('consultasAlmacenes')->default(1);
             $table->decimal('maximoDescuento', 6)->nullable();
-            // $table->string('valuacionInventario', 100);
+            $table->string('valuacionInventario', 100);
             $table->boolean('backupAutomatico')->default(0);
 
             $table->string('rutaBackup', 100)->nullable();

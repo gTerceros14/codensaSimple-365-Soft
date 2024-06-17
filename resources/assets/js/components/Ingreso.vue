@@ -532,7 +532,9 @@ export default {
                     id: data['id'],
                     nombre: data['nombre'],
                     precio_costo_unid: data['precio_costo_unid'],
-                    unidad_envase: data['unidad_envase']
+                    unidad_envase: data['unidad_envase'],
+                    precio_costo_paq: data['precio_costo_paq'],
+                    vencimiento: data['vencimiento']
 
                 }
                 me.codigo = me.arrayArticuloSeleccionado.codigo;
