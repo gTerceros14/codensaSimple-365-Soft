@@ -4,11 +4,11 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+import { BootstrapVue } from "bootstrap-vue";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+import "bootstrap/dist/css/bootstrap.css";
 import Vue from "vue";
 import Toasted from "vue-toasted";
-import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
 require("./bootstrap");
 
 window.$ = window.jQuery = require("jquery");
@@ -46,7 +46,6 @@ Vue.component(
   require("./components/compras/ImportarExcelProvedores.vue")
 );
 
-
 Vue.component("icon-button", require("./components/buttons/IconButton.vue"));
 
 Vue.component("empresa", require("./components/Empresa.vue"));
@@ -69,7 +68,10 @@ Vue.component("rol", require("./components/Rol.vue"));
 Vue.component("user", require("./components/User.vue"));
 Vue.component("venta", require("./components/Venta.vue"));
 
-Vue.component("registrarventa", require("./components/ventas/RegistrarVentas.vue"));
+Vue.component(
+  "registrarventa",
+  require("./components/ventas/RegistrarVentas.vue")
+);
 Vue.component("dashboard", require("./components/Dashboard.vue"));
 Vue.component("consultaingreso", require("./components/ConsultaIngreso.vue"));
 Vue.component("consultaventa", require("./components/ConsultaVenta.vue"));
@@ -206,7 +208,7 @@ Vue.component(
 Vue.component(
   "resumenventasycobranzas",
   require("./components/ReporteResumenVentasYCobranzas.vue")
-)
+);
 
 Vue.component(
   "resumenventaxdocumento",
@@ -276,10 +278,7 @@ Vue.component(
   require("./components/Tables/TransaccionExtra.vue")
 );
 
-Vue.component(
-  "mayoreo",
-  require("./components/OfertasEspecialesMayoreo.vue")
-);
+Vue.component("mayoreo", require("./components/OfertasEspecialesMayoreo.vue"));
 
 Vue.use(BootstrapVue);
 Vue.use(Toasted);
@@ -289,7 +288,7 @@ const app = new Vue({
     menu: 0,
     notifications: [],
   },
-  mounted() { },
+  mounted() {},
   created() {
     let me = this;
     axios

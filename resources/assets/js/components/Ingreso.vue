@@ -1,204 +1,194 @@
 <template>
     <main class="main">
-        <!-- Breadcrumb -->
-        <ol class="breadcrumb ">
-            <li class="breadcrumb-item"><a class=" text-decoration-none" href="/">Escritorio</a></li>
-            <li class="breadcrumb-item"><a class=" text-decoration-none" href="/">Compras</a></li>
-            <li class="breadcrumb-item active " aria-current="page">Ingresos</li>
-        </ol>
+        <!-- Ejemplo de tabla Listado -->
+        <div class="card" v-if="listado != 0">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Ingresos
+                <button type="button" @click="mostrarDetalle()" v-if="listado != 0" class="btn btn-secondary">
+                    <i class="icon-plus"></i>&nbsp;Nuevo
+                </button>
+            </div>
+            <!-- Listado-->
+            <template v-if="listado == 1">
 
-
-        <div class="container-fluid">
-            <!-- Ejemplo de tabla Listado -->
-            <div class="card" v-if="listado != 0">
-                <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Ingresos
-                    <button type="button" @click="mostrarDetalle()" v-if="listado != 0" class="btn btn-secondary">
-                        <i class="icon-plus"></i>&nbsp;Nuevo
-                    </button>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <select class="form-control col-md-3" v-model="criterio">
+                                <option value="tipo_comprobante">Tipo Comprobante</option>
+                                <option value="num_comprobante">Número Comprobante</option>
+                                <option value="fecha_hora">Fecha-Hora</option>
+                            </select>
+                            <input type="text" v-model="buscar" @keyup="listarIngreso(1, buscar, criterio)"
+                                class="form-control" placeholder="Texto a buscar">
+                            <!--button type="submit" @click="listarIngreso(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button-->
+                        </div>
+                    </div>
                 </div>
-                <!-- Listado-->
-                <template v-if="listado == 1">
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
-                                        <option value="tipo_comprobante">Tipo Comprobante</option>
-                                        <option value="num_comprobante">Número Comprobante</option>
-                                        <option value="fecha_hora">Fecha-Hora</option>
-                                    </select>
-                                    <input type="text" v-model="buscar" @keyup="listarIngreso(1, buscar, criterio)"
-                                        class="form-control" placeholder="Texto a buscar">
-                                    <!--button type="submit" @click="listarIngreso(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button-->
-                                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Acciones</th>
+                                <th class="d-none d-md-table-cell">Usuario</th>
+                                <th>Proveedor</th>
+                                <th class="d-none d-md-table-cell">Tipo Comprobante</th>
+                                <th class="d-none d-md-table-cell">Serie Comprobante</th>
+                                <th class="d-none d-md-table-cell">Número Comprobante</th>
+                                <th>Fecha Hora</th>
+                                <th>Total</th>
+
+                                <th class="d-none d-md-table-cell">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="ingreso in arrayIngreso" :key="ingreso.id">
+                                <td>
+                                    <button type="button" @click="verIngreso(ingreso.id)"
+                                        class="btn btn-success btn-sm">
+                                        <i class="icon-eye"></i>
+                                    </button> &nbsp;
+                                    <button type="button" @click="pdfboleta(ingreso.id)"
+                                        class="btn btn-info btn-sm mr-1">
+                                        <i class="icon-doc"></i>
+                                    </button>
+                                    <template v-if="ingreso.estado == 'Registrado'">
+                                        <button type="button" class="btn btn-danger btn-sm"
+                                            @click="desactivarIngreso(ingreso.id)">
+                                            <i class="icon-trash"></i>
+                                        </button>
+                                    </template>
+                                </td>
+                                <td class="d-none d-md-table-cell" v-text="ingreso.usuario"></td>
+                                <td v-text="ingreso.nombre"></td>
+                                <td class="d-none d-md-table-cell" v-text="ingreso.tipo_comprobante"></td>
+                                <td class="d-none d-md-table-cell" v-text="ingreso.serie_comprobante"></td>
+                                <td class="d-none d-md-table-cell" v-text="ingreso.num_comprobante"></td>
+                                <td v-text="ingreso.fecha_hora"></td>
+                                <td>
+                                    {{ (ingreso.total * parseFloat(monedaCompra[0])).toFixed(2) }} {{
+            monedaCompra[1] }}
+
+                                </td>
+                                <td class="d-none d-md-table-cell" v-text="ingreso.estado"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <nav>
+                    <ul class="pagination">
+                        <li class="page-item" v-if="pagination.current_page > 1">
+                            <a class="page-link" href="#"
+                                @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
+                        </li>
+                        <li class="page-item" v-for="page in pagesNumber" :key="page"
+                            :class="[page == isActived ? 'active' : '']">
+                            <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
+                                v-text="page"></a>
+                        </li>
+                        <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                            <a class="page-link" href="#"
+                                @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
+                        </li>
+                    </ul>
+                </nav>
+
+            </template>
+            <template v-else-if="listado == 2">
+                <div class="card-body">
+                    <div class="form-group row border">
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                <label for="">Proveedor</label>
+                                <p v-text="proveedor"></p>
                             </div>
                         </div>
-                        <div class="table-responsive">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Tipo Comprobante</label>
+                                <p v-text="tipo_comprobante"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Serie Comprobante</label>
+                                <p v-text="serie_comprobante"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Número Comprobante</label>
+                                <p v-text="num_comprobante"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row border">
+                        <div class="table-responsive col-md-12">
                             <table class="table table-bordered table-striped table-sm">
                                 <thead>
                                     <tr>
-                                        <th>Acciones</th>
-                                        <th>Usuario</th>
-                                        <th>Proveedor</th>
-                                        <th>Tipo Comprobante</th>
-                                        <th>Serie Comprobante</th>
-                                        <th>Número Comprobante</th>
-                                        <th>Fecha Hora</th>
-                                        <th>Total</th>
-
-                                        <th>Estado</th>
+                                        <th>Artículo</th>
+                                        <th>Precio</th>
+                                        <th>Cantidad</th>
+                                        <th>Subtotal</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr v-for="ingreso in arrayIngreso" :key="ingreso.id">
-                                        <td>
-                                            <button type="button" @click="verIngreso(ingreso.id)"
-                                                class="btn btn-success btn-sm">
-                                                <i class="icon-eye"></i>
-                                            </button> &nbsp;
-                                            <button type="button" @click="pdfboleta(ingreso.id)"
-                                                class="btn btn-info btn-sm mr-1">
-                                                <i class="icon-doc"></i>
-                                            </button>
-                                            <template v-if="ingreso.estado == 'Registrado'">
-                                                <button type="button" class="btn btn-danger btn-sm"
-                                                    @click="desactivarIngreso(ingreso.id)">
-                                                    <i class="icon-trash"></i>
-                                                </button>
-                                            </template>
+                                <tbody v-if="arrayDetalle.length">
+                                    <tr v-for="detalle in arrayDetalle" :key="detalle.id">
+                                        <td v-text="detalle.articulo">
                                         </td>
-                                        <td v-text="ingreso.usuario"></td>
-                                        <td v-text="ingreso.nombre"></td>
-                                        <td v-text="ingreso.tipo_comprobante"></td>
-                                        <td v-text="ingreso.serie_comprobante"></td>
-                                        <td v-text="ingreso.num_comprobante"></td>
-                                        <td v-text="ingreso.fecha_hora"></td>
                                         <td>
-                                            {{ (ingreso.total * parseFloat(monedaCompra[0])).toFixed(2) }} {{
-                monedaCompra[1] }}
+                                            {{ (detalle.precio * parseFloat(monedaCompra[0])).toFixed(2) }} {{
+            monedaCompra[1] }}
 
                                         </td>
-                                        <td v-text="ingreso.estado"></td>
+                                        <td v-text="detalle.cantidad">
+                                        </td>
+                                        <td>
+                                            {{ ((detalle.precio * detalle.cantidad)
+            * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
+
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color: #CEECF5;">
+                                        <td colspan="3" align="right"><strong>Total Parcial:</strong></td>
+                                        <td>
+                                            {{ ((totalParcial = (total - totalImpuesto))
+            * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
+
+                                        </td>
+                                    </tr>
+
+                                    <tr style="background-color: #CEECF5;">
+                                        <td colspan="3" align="right"><strong>Total Neto:</strong></td>
+                                        <td>
+                                            {{ (total * parseFloat(monedaCompra[0])).toFixed(2) }} {{
+            monedaCompra[1]
+        }}
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody v-else>
+                                    <tr>
+                                        <td colspan="4">
+                                            No hay articulos agregados
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item" v-if="pagination.current_page > 1">
-                                    <a class="page-link" href="#"
-                                        @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
-                                </li>
-                                <li class="page-item" v-for="page in pagesNumber" :key="page"
-                                    :class="[page == isActived ? 'active' : '']">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                        v-text="page"></a>
-                                </li>
-                                <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                    <a class="page-link" href="#"
-                                        @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
-                                </li>
-                            </ul>
-                        </nav>
                     </div>
-                </template>
-                <template v-else-if="listado == 2">
-                    <div class="card-body">
-                        <div class="form-group row border">
-                            <div class="col-md-9">
-                                <div class="form-group">
-                                    <label for="">Proveedor</label>
-                                    <p v-text="proveedor"></p>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Tipo Comprobante</label>
-                                    <p v-text="tipo_comprobante"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Serie Comprobante</label>
-                                    <p v-text="serie_comprobante"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Número Comprobante</label>
-                                    <p v-text="num_comprobante"></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group row border">
-                            <div class="table-responsive col-md-12">
-                                <table class="table table-bordered table-striped table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Artículo</th>
-                                            <th>Precio</th>
-                                            <th>Cantidad</th>
-                                            <th>Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody v-if="arrayDetalle.length">
-                                        <tr v-for="detalle in arrayDetalle" :key="detalle.id">
-                                            <td v-text="detalle.articulo">
-                                            </td>
-                                            <td>
-                                                {{ (detalle.precio * parseFloat(monedaCompra[0])).toFixed(2) }} {{
-                monedaCompra[1] }}
-
-                                            </td>
-                                            <td v-text="detalle.cantidad">
-                                            </td>
-                                            <td>
-                                                {{ ((detalle.precio * detalle.cantidad)
-                * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
-
-                                            </td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Parcial:</strong></td>
-                                            <td>
-                                                {{ ((totalParcial = (total - totalImpuesto))
-                * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
-
-                                            </td>
-                                        </tr>
-
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Neto:</strong></td>
-                                            <td>
-                                                {{ (total * parseFloat(monedaCompra[0])).toFixed(2) }} {{
-                monedaCompra[1]
-            }}
-
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                    <tbody v-else>
-                                        <tr>
-                                            <td colspan="4">
-                                                No hay articulos agregados
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <button type="button" @click="ocultarDetalle()"
-                                    class="btn btn-secondary">Cerrar</button>
-                            </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
                         </div>
                     </div>
-                </template>
-            </div>
+                </div>
+            </template>
         </div>
+
         <div v-if="showModalArticulos">
             <modalagregarproductos @cerrar="cerrarModal" @agregarArticulo="agregarArticuloSeleccionado"
                 :idproveedor="idproveedor" :monedaPrincipal="monedaCompra"></modalagregarproductos>
