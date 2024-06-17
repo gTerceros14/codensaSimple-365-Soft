@@ -3,9 +3,6 @@
 
 
     <main class="main">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
-        </ol>
         <div class="container-fluid">
             <!-- Ejemplo de tabla Listado -->
             <div class="card">

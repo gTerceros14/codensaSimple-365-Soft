@@ -97,15 +97,88 @@
                         </ul>
                     </nav>
                 </template>
+                <template v-if="listado == 2">
+                    <div class="row mb-3">
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                <label>Cliente</label>
+                                <p>{{ cliente }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Impuesto</label>
+                            <p>{{ impuesto }}</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Tipo Comprobante</label>
+                                <p>{{ tipo_comprobante }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Serie Comprobante</label>
+                                <p>{{ serie_comprobante }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Número Comprobante</label>
+                                <p>{{ num_comprobante }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-sm">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Artículo</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                    <th>Descuento</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody v-if="arrayDetalle.length">
+                                <tr v-for="detalle in arrayDetalle" :key="detalle.id">
+                                    <td>{{ detalle.articulo }}</td>
+                                    <td>{{ detalle.precio }}</td>
+                                    <td>{{ detalle.cantidad }}</td>
+                                    <td>{{ detalle.descuento }}</td>
+                                    <td>{{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
+                                    </td>
+                                </tr>
+                                <tr class="table-active">
+                                    <td colspan="4" class="text-end fw-bold">Total:</td>
+                                    <td>$ {{ total.toFixed(2) }}</td>
+                                </tr>
+                            </tbody>
+                            <tbody v-else>
+                                <tr>
+                                    <td colspan="5" class="text-center">No hay artículos agregados</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <div class="col-md-12">
+                            <button type="button" @click="ocultarDetalle()" class="btn btn-secondary w-100">
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </main>
 </template>
 
 <script>
+import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import axios from 'axios';
 import * as XLSX from 'xlsx-js-style';
 
 export default {

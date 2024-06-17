@@ -1,96 +1,132 @@
 <template class="">
-    <div class="card card-body p-2" style="padding:5px">
+    <div class="card card-body p-2">
         <div class="card-header"> Registrar compra</div>
-
-        <div class="form-group row ">
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label for="" class="font-weight-bold">Proveedor <span class="text-danger">*</span></label>
-
-
-                    <v-select :on-search="selectProveedor" label="nombre" :options="arrayProveedor"
-                        placeholder="Buscar Proveedores..." :onChange="getDatosProveedor"
-                        v-model="proveedorSeleccionado">
-                    </v-select>
-                    <span class="text-danger small" v-show="idproveedor == 0">(!) Seleccione Proveedor</span>
+        <div class="modal-body">
+            <div class="linear-stepper">
+                <div class="step-container">
+                    <div class="step" :class="{ active: step === 1, completed: step > 1 }">
+                        <span class="step-number" v-if="step > 1">✔</span>
+                        <span class="step-number" v-else>1</span>
+                        <span class="step-name">Cliente</span>
+                    </div>
+                    <div class="step-line" v-if="step >= 2"></div>
                 </div>
-            </div>
-
-
-
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label for="" class="font-weight-bold">Tipo comprobante <span class="text-danger">*</span></label>
-
-                    <select class="form-control" v-model="tipo_comprobante">
-                        <option value="0">Seleccione</option>
-                        <option value="BOLETA">Boleta</option>
-                        <option value="FACTURA">Factura</option>
-                        <option value="TICKET">Ticket</option>
-                    </select>
+                <div class="step-container">
+                    <div class="step" :class="{ active: step === 2, completed: step > 2 }">
+                        <span class="step-number" v-if="step > 2">✔</span>
+                        <span class="step-number" v-else>2</span>
+                        <span class="step-name">Producto</span>
+                    </div>
+                    <div class="step-line" v-if="step >= 3"></div>
                 </div>
-            </div>
-
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label for="" class="font-weight-bold">Serie comprobante <span class="text-danger">*</span></label>
-
-                    <input type="text" class="form-control" v-model="serie_comprobante" placeholder="000x"
-                        ref="serieComprobanteRef">
-                    <label class="small" for="serieComprobante">Shift + W</label>
-                </div>
-            </div>
-
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label for="" class="font-weight-bold">N° Comprobante <span class="text-danger">*</span></label>
-
-                    <input type="text" class="form-control" v-model="num_comprobante" placeholder="000xx"
-                        ref="numeroComprobanteRef">
-                    <label class="small" for="numComprobante">Shift + E</label>
-                </div>
-            </div>
-
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label for="" class="font-weight-bold">Almacen <span class="text-danger">*</span></label>
-
-                    <select class="form-control" v-model="AlmacenSeleccionado">
-                        <option value="0" disabled selected>Seleccione</option>
-                        <option v-for="opcion in arrayAlmacenes" :key="opcion.id" :value="opcion.id">{{
-                        opcion.nombre_almacen }}</option>
-                    </select>
-                </div>
-            </div>
-
-
-
-
-            <div class="col-md-12">
-                <div v-show="errorIngreso" class="form-group row div-error">
-                    <div class="text-center text-error">
-                        <div v-for="error in errorMostrarMsjIngreso" :key="error" v-text="error"></div>
+                <div class="step-container">
+                    <div class="step" :class="{ active: step === 3, completed: step > 3 }">
+                        <span class="step-number" v-if="step > 3">✔</span>
+                        <span class="step-number" v-else>3</span>
+                        <span class="step-name">Pagos</span>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="card">
+            <div v-show="step === 1" class="step-content">
+                <div class="card">
+                    <div class="container">
+                        <div class="row">
+                            <!-- Proveedor -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="" class="font-weight-bold">Proveedor <span
+                                            class="text-danger">*</span></label>
+                                    <v-select :on-search="selectProveedor" label="nombre" :options="arrayProveedor"
+                                        placeholder="Buscar Proveedores..." :onChange="getDatosProveedor"
+                                        v-model="proveedorSeleccionado">
+                                    </v-select>
+                                    <span class="text-danger small" v-show="idproveedor == 0">(!) Seleccione
+                                        Proveedor</span>
+                                </div>
+                            </div>
 
-            <div class="row ">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="" class="font-weight-bold">Seleccione producto<span
-                                class="text-danger">*</span></label>
+                            <!-- Tipo comprobante -->
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="" class="font-weight-bold">Tipo comprobante <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-control" v-model="tipo_comprobante">
+                                        <option value="0">Seleccione</option>
+                                        <option value="BOLETA">Boleta</option>
+                                        <option value="FACTURA">Factura</option>
+                                        <option value="TICKET">Ticket</option>
+                                    </select>
+                                </div>
+                            </div>
 
-                        <div class="form-inline">
-                            <input v-if="idproveedor == 0" disabled type="text" class="form-control" v-model="codigo"
-                                @keyup="buscarArticulo()" placeholder="Escriba el codigo" ref="articuloRef">
-                            <input v-if="idproveedor != 0" type="text" class="form-control" v-model="codigo"
-                                @keyup="buscarArticulo()" placeholder="Escriba el codigo" ref="articuloRef">
-                            <button @click="abrirArticulos()" class="btn btn-primary" v-if="idproveedor == 0"
-                                disabled>...</button>
-                            <button @click="abrirArticulos()" class="btn btn-primary" v-else>...</button>
-                            <label class="small light-gray-text" for="">Shift + R</label>
+                            <!-- Serie comprobante -->
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="" class="font-weight-bold">Serie comprobante <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" v-model="serie_comprobante"
+                                        placeholder="000x" ref="serieComprobanteRef">
+                                    <label class="small" for="serieComprobante">Shift + W</label>
+                                </div>
+                            </div>
+
+                            <!-- Número comprobante -->
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="" class="font-weight-bold">N° Comprobante <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" v-model="num_comprobante"
+                                        placeholder="000xx" ref="numeroComprobanteRef">
+                                    <label class="small" for="numComprobante">Shift + E</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Error Message -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div v-show="errorIngreso" class="form-group div-error">
+                                    <div class="text-center text-error">
+                                        <div v-for="error in errorMostrarMsjIngreso" :key="error" v-text="error"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div v-show="step === 2" class="step-content">
+                <div class="card">
+
+                    <div class="row ">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="" class="font-weight-bold">Almacen <span
+                                        class="text-danger">*</span></label>
+
+                                <select class="form-control" v-model="AlmacenSeleccionado">
+                                    <option value="0" disabled selected>Seleccione</option>
+                                    <option v-for="opcion in arrayAlmacenes" :key="opcion.id" :value="opcion.id">{{
+                        opcion.nombre_almacen }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="" class="font-weight-bold">Seleccione producto<span
+                                        class="text-danger">*</span></label>
+
+                                <div class="form-inline">
+                                    <input v-if="idproveedor == 0" disabled type="text" class="form-control"
+                                        v-model="codigo" @keyup="buscarArticulo()" placeholder="Escriba el codigo"
+                                        ref="articuloRef">
+                                    <input v-if="idproveedor != 0" type="text" class="form-control" v-model="codigo"
+                                        @keyup="buscarArticulo()" placeholder="Escriba el codigo" ref="articuloRef">
+                                    <button @click="abrirArticulos()" class="btn btn-primary" v-if="idproveedor == 0"
+                                        disabled>...</button>
+                                    <button @click="abrirArticulos()" class="btn btn-primary" v-else>...</button>
+                                    <label class="small light-gray-text" for="">Shift + R</label>
 
                             <!-- <input type="text" readonly class="form-control" v-model="articulo"> -->
                         </div>
@@ -112,36 +148,36 @@
                             }}
                             {{ monedaCompra[1] }}
 
-                            <br>
-                            <b>Unidades por envase</b> {{ this.arrayArticuloSeleccionado.unidad_envase }}
+                                    <br>
+                                    <b>Unidades por envase</b> {{ this.arrayArticuloSeleccionado.unidad_envase }}
 
-                        </p>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Parte Derecha con la Imagen -->
+                        <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
+                            <img :src="'img/articulo/' + this.arrayArticuloSeleccionado.fotografia + '?t=' + new Date().getTime()"
+                                v-if="this.arrayArticuloSeleccionado.fotografia" width="50" height="50" ref="imagen"
+                                class="card-img">
+                            <img v-else src="https://www.bicifan.uy/wp-content/uploads/2016/09/producto-sin-imagen.png"
+                                alt="Imagen del Card" class="card-img">
+
+                        </div>
                     </div>
-                </div>
 
-                <!-- Parte Derecha con la Imagen -->
-                <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
-                    <img :src="'img/articulo/' + this.arrayArticuloSeleccionado.fotografia + '?t=' + new Date().getTime()"
-                        v-if="this.arrayArticuloSeleccionado.fotografia" width="50" height="50" ref="imagen"
-                        class="card-img">
-                    <img v-else src="https://www.bicifan.uy/wp-content/uploads/2016/09/producto-sin-imagen.png"
-                        alt="Imagen del Card" class="card-img">
-
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="m-1 p-1"></div>
+                    <div class="row">
+                        <div class="m-1 p-1"></div>
 
 
 
-                <div class="col-md-2">
-                    <div class="form-group" v-if="arrayArticuloSeleccionado.id">
-                        <label for="campo1">{{ tipoUnidadSeleccionada }}:
-                            <i class="fa fa-exchange small" @click="cambiarTipoUnidad()"></i>
+                        <div class="col-md-2">
+                            <div class="form-group" v-if="arrayArticuloSeleccionado.id">
+                                <label for="campo1">{{ tipoUnidadSeleccionada }}:
+                                    <i class="fa fa-exchange small" @click="cambiarTipoUnidad()"></i>
 
 
-                        </label>
+                                </label>
 
 
 
@@ -157,19 +193,19 @@
                     </div>
                 </div>
 
-                <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
-                    <div class="form-group">
-                        <label for="campo2">Precio total</label>
+                        <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
+                            <div class="form-group">
+                                <label for="campo2">Precio total</label>
 
-                        <div class="input-group">
-                            <input disabled type="number" class="form-control"
-                                :value="(resultadoMultiplicacion * parseFloat(monedaCompra[0])).toFixed(2)">
-                            <div class="input-group-append">
-                                <span class="input-group-text">
-                                    {{ monedaCompra[1] }}
-                                </span>
-                            </div>
-                        </div>
+                                <div class="input-group">
+                                    <input disabled type="number" class="form-control"
+                                        :value="(resultadoMultiplicacion * parseFloat(monedaCompra[0])).toFixed(2)">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            {{ monedaCompra[1] }}
+                                        </span>
+                                    </div>
+                                </div>
 
                     </div>
                 </div>
@@ -210,116 +246,116 @@
                     <input type="number" value="0" step="any" class="form-control" v-model="precio" ref="precioRef">
                     <label for="">Shift + T</label>
                 </div>
-            </div>
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label>Cantidad </label>
-                    <input type="number" value="0" class="form-control" v-model="cantidad" ref="cantidadRef">
-                    <label for="">Shift + Y</label>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="form-group">
-                    <button @click="agregarDetalle()" class="btn btn-success form-control btnagregar"><i
-                            class="icon-plus"></i></button>
-                </div>
-            </div>
-        </div> -->
-        <div class="form-group row ">
-            <div class="table-responsive col-md-12">
-                <table class="table table-bordered table-striped table-sm">
-                    <thead>
-                        <tr>
-                            <th>Acciones</th>
-                            <th>Codigo</th>
+            </div>-->
+            <div v-show="step === 3" class="step-content">
+                <div class="form-group row ">
+                    <div class="table-responsive col-md-12">
+                        <table class="table table-bordered table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Acciones</th>
+                                    <th>Codigo</th>
 
-                            <th>Producto</th>
-                            <th>Costo unitario</th>
+                                    <th>Producto</th>
+                                    <th>Costo unitario</th>
 
-                            <th>Unidad por Paquete</th>
-                            <th>Paquetes</th>
+                                    <th>Unidad por Paquete</th>
+                                    <th>Paquetes</th>
 
-                            <th>Unidades</th>
+                                    <th>Unidades</th>
 
-                            <th>Fecha vencimiento</th>
+                                    <th>Fecha vencimiento</th>
 
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody v-if="arrayDetallePedido || arrayDetalle">
-                        <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
-                            <td>
-                                <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
-                                    <i class="icon-close"></i>
-                                </button>
-                            </td>
-                            <td v-text="detalle.codigo"></td>
-                            <td v-text="detalle.articulo"></td>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody v-if="arrayDetallePedido || arrayDetalle">
+                                <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
+                                    <td>
+                                        <button @click="eliminarDetalle(index)" type="button"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="icon-close"></i>
+                                        </button>
+                                    </td>
+                                    <td v-text="detalle.codigo"></td>
+                                    <td v-text="detalle.articulo"></td>
 
-                            <td>
-                                {{ (detalle.precio * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
+                                    <td>
+                                        {{ (detalle.precio * parseFloat(monedaCompra[0])).toFixed(2) }} {{
+                        monedaCompra[1]
+                    }}
 
-                            </td>
-                            <td v-text="detalle.unidad_x_paquete"></td>
-                            <td v-text="(detalle.cantidad / detalle.unidad_x_paquete).toFixed(2)"></td>
+                                    </td>
+                                    <td v-text="detalle.unidad_x_paquete"></td>
+                                    <td v-text="(detalle.cantidad / detalle.unidad_x_paquete).toFixed(2)"></td>
 
-                            <td>
-                                <input v-model="detalle.cantidad" type="number" value="2" class="form-control">
-                            </td>
-                            <td>
-                                <input type="date" class="form-control" v-model="detalle.fecha_vencimiento">
-                            </td>
-                            <td>
-                                {{ ((detalle.precio * detalle.cantidad) * parseFloat(monedaCompra[0])).toFixed(2) }} {{
+                                    <td>
+                                        <input v-model="detalle.cantidad" type="number" value="2" class="form-control">
+                                    </td>
+                                    <td>
+                                        <input type="date" class="form-control" v-model="detalle.fecha_vencimiento">
+                                    </td>
+                                    <td>
+                                        {{ ((detalle.precio * detalle.cantidad) *
+                        parseFloat(monedaCompra[0])).toFixed(2) }}
+                                        {{
                         monedaCompra[1] }}
 
-                            </td>
-                        </tr>
-                        <tr style="background-color: #CEECF5;">
-                            <td colspan="8" align="right"><strong>Total Parcial:</strong></td>
-                            <td>
-                                {{ ((totalParcial = (total - totalImpuesto)) * parseFloat(monedaCompra[0])).toFixed(2)
-                                }} {{
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #CEECF5;">
+                                    <td colspan="8" align="right"><strong>Total Parcial:</strong></td>
+                                    <td>
+                                        {{ ((totalParcial = (total - totalImpuesto)) *
+                        parseFloat(monedaCompra[0])).toFixed(2)
+                                        }} {{
                         monedaCompra[1] }}
 
-                            </td>
-                        </tr>
-                        <tr style="background-color: #CEECF5;">
-                            <td colspan="8" align="right"><strong>Total Impuesto:</strong></td>
-                            <td>
-                                {{ ((totalImpuesto = ((total * impuesto) / (1 + impuesto)))
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #CEECF5;">
+                                    <td colspan="8" align="right"><strong>Total Impuesto:</strong></td>
+                                    <td>
+                                        {{ ((totalImpuesto = ((total * impuesto) / (1 + impuesto)))
                         * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
 
-                            </td>
-                        </tr>
-                        <tr style="background-color: #CEECF5;">
-                            <td colspan="8" align="right"><strong>Total Neto:</strong></td>
-                            <td>
-                                {{ ((total = calcularTotal) * parseFloat(monedaCompra[0])).toFixed(2) }} {{
-                        monedaCompra[1]
-                                }}
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #CEECF5;">
+                                    <td colspan="8" align="right"><strong>Total Neto:</strong></td>
+                                    <td>
+                                        {{ ((total = calcularTotal) * parseFloat(monedaCompra[0])).toFixed(2) }} {{
+                                        monedaCompra[1]
+                                        }}
 
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tbody v-else>
-                        <tr>
-                            <td colspan="9">
-                                No hay articulos agregados
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tbody v-else>
+                                <tr>
+                                    <td colspan="9">
+                                        No hay articulos agregados
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <button type="button" @click="cerrarFormulario()" class="btn btn-secondary">Cerrar</button>
+                        <button type="button" class="btn btn-primary" @click="registrarIngreso()">Registrar
+                            Compra</button>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-md-12">
-                <button type="button" @click="cerrarFormulario()" class="btn btn-secondary">Cerrar</button>
-                <button type="button" class="btn btn-primary" @click="registrarIngreso()">Registrar
-                    Compra</button>
-            </div>
-        </div>
 
+            <div class="buttons d-flex justify-content-center">
+                <button class="btn btn-primary mr-2" @click="prevStep" :disabled="step === 1">Anterior</button>
+                <button class="btn btn-primary" @click="nextStep" :disabled="step === 3">Siguiente</button>
+            </div>
+
+        </div>
     </div>
 </template>
 
@@ -370,6 +406,7 @@ export default {
             precio_tres: 0,
             precio_cuatro: 0,
             valuacionInventario: '',
+            step: 1,
             actualizarIva: null,
             proveedorSeleccionado: "",
             tipoUnidadSeleccionada: "Unidades",
@@ -480,6 +517,16 @@ export default {
         this.datosConfiguracion();
     },
     methods: {
+        nextStep() {
+            if (this.step < 3) {
+                this.step++;
+            }
+        },
+        prevStep() {
+            if (this.step > 1) {
+                this.step--;
+            }
+        },
         buscarArticulo() {
             clearTimeout(this.timer);
             this.timer = setTimeout(() => {
@@ -807,48 +854,52 @@ export default {
         agregarDetalle() {
             let me = this;
 
-            if (me.arrayArticuloSeleccionado.length == 0 || me.cantidad == 0 || me.fechavencimiento == null || me.AlmacenSeleccionado == 0) {
-                console.log("Seleccione un producto o la fecha o verifique la cantidads o almacen");
+            if (me.arrayArticuloSeleccionado.length == 0 || me.cantidad == 0 || me.AlmacenSeleccionado == 0) {
+                console.log("Seleccione un producto, verifique la cantidad o almacén");
+            } else if (me.fechavencimiento == null) {
+                swal({
+                    type: 'error',
+                    title: 'Error...',
+                    text: 'No se ingresó fecha de vencimiento!',
+                });
             } else {
                 if (me.encuentra(me.arrayArticuloSeleccionado.id)) {
                     swal({
                         type: 'error',
                         title: 'Error...',
                         text: 'Este Artículo ya se encuentra agregado!',
-                    })
-                }
-                else {
+                    });
+                } else {
                     if (me.tipoUnidadSeleccionada == "Paquetes") {
-
                         me.arrayDetalle.push({
-
                             idarticulo: me.arrayArticuloSeleccionado.id,
                             idalmacen: me.AlmacenSeleccionado,
                             codigo: me.arrayArticuloSeleccionado.codigo,
                             articulo: me.arrayArticuloSeleccionado.nombre,
                             precio: me.arrayArticuloSeleccionado.precio_costo_unid,
                             unidad_x_paquete: me.arrayArticuloSeleccionado.unidad_envase,
-
-
                             fecha_vencimiento: me.fechavencimiento,
                             cantidad: me.cantidad * me.arrayArticuloSeleccionado.unidad_envase,
                         });
                     } else {
-
-
                         me.arrayDetalle.push({
                             idarticulo: me.arrayArticuloSeleccionado.id,
                             idalmacen: me.AlmacenSeleccionado,
-
                             codigo: me.arrayArticuloSeleccionado.codigo,
                             articulo: me.arrayArticuloSeleccionado.nombre,
                             precio: me.arrayArticuloSeleccionado.precio_costo_unid,
                             unidad_x_paquete: me.arrayArticuloSeleccionado.unidad_envase,
-
                             fecha_vencimiento: me.fechavencimiento,
                             cantidad: me.cantidad,
                         });
                     }
+
+                    // Mostrar mensaje de éxito
+                    swal({
+                        type: 'success',
+                        title: 'Éxito!',
+                        text: 'Artículo agregado correctamente!',
+                    });
 
                     me.arrayArticuloSeleccionadoLocal = {};
                     me.codigo = '';
@@ -858,10 +909,78 @@ export default {
                     me.precio = 0;
                     me.fechavencimiento = null;
                 }
-
             }
-
-        },
+        }
     }
 };
 </script>
+<style>
+.linear-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2px 0;
+    position: relative;
+}
+
+.step-container {
+    display: flex;
+    align-items: center;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px;
+    opacity: 0.5;
+    position: relative;
+}
+
+.step.active,
+.step.completed {
+    opacity: 1;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ccc;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    z-index: 1;
+}
+
+.step.active .step-number {
+    background-color: #007bff;
+}
+
+.step.completed .step-number {
+    background-color: #34bc9b;
+}
+
+.step-line {
+    height: 3px;
+    width: 40px;
+    background-color: #ccc;
+    transition: background-color 0.3s;
+    z-index: 0;
+}
+
+.step.completed+.step-line {
+    background-color: #34bc9b;
+}
+
+.step.active+.step-line {
+    background-color: #007bff;
+}
+
+.step-name {
+    margin-top: 10px;
+}
+</style>

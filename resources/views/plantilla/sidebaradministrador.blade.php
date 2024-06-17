@@ -38,9 +38,9 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Bancos</a>
                     </li>-->
 
-                   <li @click="menu=15" class="nav-item">
+                  <!--  <li @click="menu=15" class="nav-item">
     <a class="nav-link" href="#"><i class="fas fa-money-bill-alt"></i> Moneda</a>
-</li>
+</li>-->
 
                 </ul>
             </li>
@@ -185,6 +185,7 @@
                     <li @click="menu=45" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Diarias</a>
                     </li>
+                    <!--
                     <li @click="menu=62" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas Detallado</a>
                     </li>
@@ -193,7 +194,7 @@
                     </li>
                     <li @click="menu=57" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ventas x Producto</a>
-                    </li>
+                    </li>-->
 
                 </ul>
             </li>
@@ -208,6 +209,7 @@
             <li @click="menu=50" class="nav-item">
                 <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen de clientes</a>
             </li>
+            <!--
             <li @click="menu=56" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Kardex Clientes Detallado Global</a>
                     </li>
@@ -224,8 +226,9 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Resumen Ventas Y Cobranzas</a>
                     </li>
 
-                </ul>-->
+                </ul>
             </li>
+            -->
         </ul>
     </nav>
     <button class="sidebar-minimizer brand-minimizer" type="button"></button>
