@@ -187,7 +187,8 @@
                 <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
                     <div class="form-group">
                         <label for="campo2">Fecha vencimiento</label>
-                        <input v-if="arrayArticuloSeleccionado.vencimiento == 0" type="date" class="form-control" v-model="fechaPorDefecto" readonly>
+                        <input v-if="arrayArticuloSeleccionado.vencimiento == 0 " type="date" class="form-control" v-model="fechaPorDefecto" readonly>
+                        <input v-if="arrayArticuloSeleccionado.vencimiento == null" type="date" class="form-control" v-model="fechaPorDefecto">
                         <input v-if="arrayArticuloSeleccionado.vencimiento == 1" type="date" class="form-control" v-model="fechaPorDefecto">
 
                     </div>
