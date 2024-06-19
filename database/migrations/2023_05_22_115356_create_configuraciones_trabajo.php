@@ -59,7 +59,9 @@ class CreateConfiguracionesTrabajo extends Migration
                 'separadorDecimales' => ',',
                 'idMonedaPrincipal' => '1',
                 'idMonedaVenta' => '1',
-                'idMonedaCompra' => '1'
+                'idMonedaCompra' => '1',
+                'valuacionInventario'=>'ninguno'
+
             )
         );
     }

@@ -15,20 +15,8 @@
 
 /* Asignar Colores Aqui */
 :root {
-  --color-sidebar: #044b7b;
+  --color-sidebar: #3c3c3c;
   --color-top-bar: #fff;
-}
-.table {
-  margin-bottom: 0;
-}
-
-.table thead th {
-  background-color: #343a40;
-  color: #ffffff;
-}
-
-.table tbody td {
-  vertical-align: middle;
 }
 
 @media print {
@@ -231,13 +219,13 @@ sup {
 }
 
 a {
-  color: #20a8d8;
+  color: #ea1f15;
   text-decoration: none;
   background-color: transparent;
   -webkit-text-decoration-skip: objects;
 }
 a:hover {
-  color: #167495;
+  color: #952d16;
   text-decoration: underline;
 }
 
@@ -10187,15 +10175,23 @@ base-chart.chart {
   margin-top: 0;
   border: 0;
 }
+.table thead th {
+  background-color: #343a40;
+  color: #ffffff;
+}
+
+.table tbody td {
+  vertical-align: middle;
+}
 
 .app-header.navbar {
   position: relative;
   -ms-flex-direction: row;
   flex-direction: row;
-  height: 55px;
+  height: 58px;
   padding: 0;
   margin: 0;
-  background-color: var(--color-top-bar);
+  background-color: #33b378;
   border-bottom: 1px solid #c2cfd6;
 }
 .app-header.navbar .navbar-brand {
@@ -10205,12 +10201,12 @@ base-chart.chart {
   padding: 0.5rem 1rem;
   margin-right: 0;
   background-color: #fff;
-  background-image: url("../img/logocodensapng.png");
+  background-image: url("../img/AVATAR-RRSS_1-COLOR_NEGRO-2.png");
   background-color: transparent;
-  background-image: url("../img/logocodensapng.png");
+  background-image: url("../img/AVATAR-RRSS_1-COLOR_NEGRO-2.png");
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: 100px auto;
+  background-size: 89px auto;
   border-bottom: 1px solid #c2cfd6;
 }
 .app-header.navbar .navbar-toggler {
@@ -10336,7 +10332,7 @@ base-chart.chart {
   .brand-minimized .app-header.navbar .navbar-brand {
     width: 50px;
     background-color: #fff;
-    background-image: url("../img/logo-symbol.png");
+    background-image: url("../img/logologin.jpeg");
     background-size: 24px;
     border-bottom: 1px solid #c2cfd6;
   }
@@ -10363,9 +10359,9 @@ base-chart.chart {
   -ms-flex-direction: column;
   flex-direction: column;
   padding: 0;
-  color: #fff;
+  color: #064226;
   font-size: 14px;
-  background: var(--color-sidebar);
+  background: #212529;
 }
 .sidebar .sidebar-close {
   position: absolute;
@@ -10375,7 +10371,7 @@ base-chart.chart {
   font-size: 24px;
   font-weight: 800;
   line-height: 55px;
-  color: #fff;
+  color: #064226;
   background: 0;
   border: 0;
   opacity: 0.8;
@@ -10391,8 +10387,8 @@ base-chart.chart {
   background: rgba(0, 0, 0, 0.2);
 }
 .sidebar .sidebar-form .form-control {
-  color: #fff;
-  background: #151b1f;
+  color: #064226;
+  background: #064226;
   border: 0;
 }
 .sidebar .sidebar-form .form-control::-webkit-input-placeholder {
@@ -10512,7 +10508,7 @@ base-chart.chart {
 .sidebar .navbar .dropdown-toggle:hover,
 .navbar .sidebar .dropdown-toggle:hover {
   color: #fff;
-  background: #20a8d8;
+  background: #a0a0a0;
 }
 .sidebar .nav-link:hover i,
 .sidebar .navbar .dropdown-toggle:hover i,
@@ -12622,7 +12618,7 @@ hr.transparent {
 .container-input input {
   width: 100%;
   border: none;
-  border-bottom: 1px solid var(--color-sidebar);
+  border-bottom: 1px solid #374151;
   height: 35px;
 }
 
@@ -12630,7 +12626,7 @@ hr.transparent {
   padding: 5px;
   width: 100%;
   height: 35px;
-  background-color: var(--color-sidebar);
+  background-color: #374151;
   border: none;
   color: white;
 }

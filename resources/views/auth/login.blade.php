@@ -4,42 +4,42 @@
 
 
 <div class="content">
-    <div class="container-login">
-        <div class="left">
-            <form class="formulario" method="POST" action="{{ route('login')}}">
-                {{ csrf_field() }}
-                <br>
-                <br>
+  <div class="container-login">
+    <div class="left">
+      <form class="formulario" method="POST" action="{{ route('login')}}">
+        {{ csrf_field() }}
+        <br>
+        <br>
 
-                <div class="container-title">
-                    <h1>Bienvenido</h1>
-                    <p>Inicia sesión para continuar</p>
-                </div>
-                <br>
-                <br>
+        <div class="container-title">
+          <h1>Bienvenido</h1>
+          <p>Inicia sesión para continuar</p>
+        </div>
+        <br>
+        <br>
 
-                <div class="container-input">
-                    <input type="text" value="{{old('usuario')}}" name="usuario" id="usuario" class="input-texto-arriba" placeholder="Usuario">
-                    <div class="message">
-                    {!!$errors->first('usuario','<span class="invalid-feedback">El campo Usuario es obligatorio.</span>')!!}
-                    </div>
-                </div>
-                <div class="container-input">
-                    <input type="password" name="password" id="password" class="input-texto-arriba" placeholder="Contraseña">
-                    <div class="message">
-                        {!!$errors->first('password','<span class="invalid-feedback">El campo Contraseña es obligatorio</span>')!!}
-                    </div>
-                </div>
-                <br>
-                <div class="container-input">
-                    <button type="submit">Ingresar</button>
-                </div>
-            </form>
+        <div class="container-input">
+          <input type="text" value="{{old('usuario')}}" name="usuario" id="usuario" class="input-texto-arriba" placeholder="Usuario">
+          <div class="message">
+            {!!$errors->first('usuario','<span class="invalid-feedback">El campo Usuario es obligatorio.</span>')!!}
+          </div>
         </div>
-        <div class="right">
-            <img class="portada" src="img/farmacia.jpg" alt="">
+        <div class="container-input">
+          <input type="password" name="password" id="password" class="input-texto-arriba" placeholder="Contraseña">
+          <div class="message">
+            {!!$errors->first('password','<span class="invalid-feedback">El campo Contraseña es obligatorio</span>')!!}
+          </div>
         </div>
+        <br>
+        <div class="container-input">
+          <button type="submit">Ingresar</button>
+        </div>
+      </form>
     </div>
+    <div class="right">
+      <img class="portada" src="img/logomates.png" alt="">
+    </div>
+  </div>
 </div>
 <script>
   // Escuchamos el evento input en los campos de input

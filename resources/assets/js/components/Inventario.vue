@@ -3,146 +3,146 @@
 
 
     <main class="main">
-        <div class="container-fluid">
-            <!-- Ejemplo de tabla Listado -->
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <i class="fa fa-align-justify"></i> Inventario
-                        <button type="button" @click="abrirModalImportar()" class="btn btn-success">
-                            <i class="icon-plus"></i>&nbsp;Importar
-                        </button>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label> ALMACEN DE TRABAJO </label>
-                                <select class="form-control" v-model="AlmacenSeleccionado" @change="getDatosAlmacen">
-                                    <option value="0" disabled>Seleccione</option>
-                                    <option v-for="opcion in arrayAlmacenes" :key="opcion.id" :value="opcion.id">{{
-                            opcion.nombre_almacen }}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="d-flex flex-column">
-                                <label class="mb-1"> MODO VISTA </label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" v-model="tipoSeleccionado" value="item"
-                                        @change="cambiarTipo">
-                                    <label class="form-check-label ms-2">Por Item</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" v-model="tipoSeleccionado" value="lote"
-                                        @change="cambiarTipo">
-                                    <label class="form-check-label ms-2">Por Lote</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+        <!-- Ejemplo de tabla Listado -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <i class="fa fa-align-justify"></i> Inventario
+                    <button type="button" @click="abrirModalImportar()" class="btn btn-success">
+                        <i class="icon-plus"></i>&nbsp;Importar
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div class="form-group row">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <select class="form-control col-md-3" v-model="criterio">
-                                    <option value="nombre">Nombre Producto</option>
-                                    <!-- <option value="descripcion">Descripción</option> -->
-                                </select>
-                                <input type="text" v-model="buscar" @keyup="listarInventario(1, buscar, criterio)"
-                                    class="form-control" placeholder="Texto a buscar">
-                                <button type="button" @click="listarInventario" class="btn btn-primary"><i
-                                        class="fa fa-search"></i> Buscar</button>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label> ALMACEN DE TRABAJO </label>
+                            <select class="form-control" v-model="AlmacenSeleccionado" @change="getDatosAlmacen">
+                                <option value="0" disabled>Seleccione</option>
+                                <option v-for="opcion in arrayAlmacenes" :key="opcion.id" :value="opcion.id">{{
+                        opcion.nombre_almacen }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex flex-column">
+                            <label class="mb-1"> MODO VISTA </label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" v-model="tipoSeleccionado" value="item"
+                                    @change="cambiarTipo">
+                                <label class="form-check-label ms-2">Por Item</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" v-model="tipoSeleccionado" value="lote"
+                                    @change="cambiarTipo">
+                                <label class="form-check-label ms-2">Por Lote</label>
                             </div>
                         </div>
                     </div>
-                    <div v-if="tipoSeleccionado == 'item'" class="table-responsive">
-                        <table class="table table-bordered table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    <!-- <th>Opciones</th> -->
-                                    <th>Product</th>
-                                    <th>Unidad X Paq.</th>
-                                    <th>Saldo_stock_total</th>
-                                    <th>Cantidad</th>
-                                    <th>Almacen</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="inventario in arrayInventario" :key="inventario.id">
-
-                                    <td v-text="inventario.nombre_producto"></td>
-                                    <td v-text="inventario.unidad_envase"></td>
-                                    <td v-text="inventario.saldo_stock_total"></td>
-                                    <td v-text="inventario.cantidad"></td>
-                                    <td v-text="inventario.nombre_almacen"></td>
-
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!--#####################################-LIStADO LOTE-###############-->
-                    <div v-if="tipoSeleccionado == 'lote'" class="table-responsive">
-                        <table class="table table-bordered table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Unid.X.Paq</th>
-                                    <th>Costo Unidad</th>
-                                    <th>Saldo Stock</th>
-                                    <th>Cantidad</th>
-                                    <th>Fecha Ingreso</th>
-                                    <th>Fecha Vencimiento</th>
-                                    <th>Almacen</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="inventario in arrayInventario" :key="inventario.id">
-                                    <td v-text="inventario.nombre_producto"></td>
-                                    <td v-text="inventario.unidad_envase"></td>
-                                    <td v-text="inventario.precio_costo_unid"></td>
-                                    <td v-text="inventario.saldo_stock"></td>
-                                    <td v-text="inventario.cantidad"></td>
-                                    <td v-text="inventario.fecha_ingreso"></td>
-                                    <td v-text="inventario.fecha_vencimiento"></td>
-                                    <td v-text="inventario.nombre_almacen"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!--######################################-hasta AQUI#################-->
-                    <nav>
-                        <ul class="pagination">
-                            <li class="page-item" v-if="pagination.current_page > 1">
-                                <a class="page-link" href="#" @click.prevent="
-                            cambiarPagina(
-                                pagination.current_page - 1,
-                                buscar,
-                                criterio
-                            )
-                            ">Ant</a>
-                            </li>
-                            <li class="page-item" v-for="page in pagesNumber" :key="page"
-                                :class="[page == isActived ? 'active' : '']">
-                                <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                    v-text="page"></a>
-                            </li>
-                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                <a class="page-link" href="#" @click.prevent="
-                            cambiarPagina(
-                                pagination.current_page + 1,
-                                buscar,
-                                criterio
-                            )
-                            ">Sig</a>
-                            </li>
-                        </ul>
-                    </nav>
-
                 </div>
             </div>
-            <!-- Fin ejemplo de tabla Listado -->
+            <div class="card-body">
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <select class="form-control col-md-3" v-model="criterio">
+                                <option value="nombre">Nombre Producto</option>
+                                <!-- <option value="descripcion">Descripción</option> -->
+                            </select>
+                            <input type="text" v-model="buscar" @keyup="listarInventario(1, buscar, criterio)"
+                                class="form-control" placeholder="Texto a buscar">
+                            <button type="button" @click="listarInventario" class="btn btn-primary"><i
+                                    class="fa fa-search"></i> Buscar</button>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="tipoSeleccionado == 'item'" class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <!-- <th>Opciones</th> -->
+                                <th>Product</th>
+                                <th>Unidad X Paq.</th>
+                                <th>Saldo_stock_total</th>
+                                <th>Cantidad</th>
+                                <th>Almacen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="inventario in arrayInventario" :key="inventario.id">
+
+                                <td v-text="inventario.nombre_producto"></td>
+                                <td v-text="inventario.unidad_envase"></td>
+                                <td v-text="inventario.saldo_stock_total"></td>
+                                <td v-text="inventario.cantidad"></td>
+                                <td v-text="inventario.nombre_almacen"></td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--#####################################-LIStADO LOTE-###############-->
+                <div v-if="tipoSeleccionado == 'lote'" class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Unid.X.Paq</th>
+                                <th>Costo Unidad</th>
+                                <th>Saldo Stock</th>
+                                <th>Cantidad</th>
+                                <th>Fecha Ingreso</th>
+                                <th>Fecha Vencimiento</th>
+                                <th>Almacen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="inventario in arrayInventario" :key="inventario.id">
+                                <td v-text="inventario.nombre_producto"></td>
+                                <td v-text="inventario.unidad_envase"></td>
+                                <td v-text="inventario.precio_costo_unid"></td>
+                                <td v-text="inventario.saldo_stock"></td>
+                                <td v-text="inventario.cantidad"></td>
+                                <td v-text="inventario.fecha_ingreso"></td>
+                                <td v-text="inventario.fecha_vencimiento"></td>
+                                <td v-text="inventario.nombre_almacen"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--######################################-hasta AQUI#################-->
+                <nav>
+                    <ul class="pagination">
+                        <li class="page-item" v-if="pagination.current_page > 1">
+                            <a class="page-link" href="#" @click.prevent="
+                        cambiarPagina(
+                            pagination.current_page - 1,
+                            buscar,
+                            criterio
+                        )
+                        ">Ant</a>
+                        </li>
+                        <li class="page-item" v-for="page in pagesNumber" :key="page"
+                            :class="[page == isActived ? 'active' : '']">
+                            <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
+                                v-text="page"></a>
+                        </li>
+                        <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                            <a class="page-link" href="#" @click.prevent="
+                        cambiarPagina(
+                            pagination.current_page + 1,
+                            buscar,
+                            criterio
+                        )
+                        ">Sig</a>
+                        </li>
+                    </ul>
+                </nav>
+
+            </div>
         </div>
+        <!-- Fin ejemplo de tabla Listado -->
+
         <!--Inicio del modal agregar/actualizar-->
 
         <!--Fin del modal-->

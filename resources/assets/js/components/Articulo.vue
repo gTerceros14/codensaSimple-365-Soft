@@ -1,7 +1,5 @@
 <template>
     <main class="main">
-       
-
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">

@@ -1,92 +1,92 @@
 <template>
     <main class="main">
-        <div class="container-fluid">
-            <!-- Ejemplo de tabla Listado -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Proveedores
-                    <button type="button" @click="abrirModal('persona', 'registrar')" class="btn btn-secondary">
-                        <i class="icon-plus"></i>&nbsp;Nuevo
-                    </button>
-                    <button type="button" @click="abrirModalImportar()" class="btn btn-success">
-                        <i class="icon-plus"></i>&nbsp;Importar
-                    </button>
 
-                </div>
-                <div class="card-body">
-                    <div class="form-group row">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <select class="form-control col-md-3" v-model="criterio">
-                                    <option value="nombre">Nombre</option>
-                                    <option value="num_documento">Documento</option>
-                                    <option value="email">Email</option>
-                                    <option value="telefono">Teléfono</option>
-                                </select>
-                                <input type="text" v-model="buscar" @keyup.enter="listarPersona(1, buscar, criterio)"
-                                    class="form-control" placeholder="Texto a buscar">
-                                <button type="submit" @click="listarPersona(1, buscar, criterio)"
-                                    class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                            </div>
+        <!-- Ejemplo de tabla Listado -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Proveedores
+                <button type="button" @click="abrirModal('persona', 'registrar')" class="btn btn-secondary">
+                    <i class="icon-plus"></i>&nbsp;Nuevo
+                </button>
+                <button type="button" @click="abrirModalImportar()" class="btn btn-success">
+                    <i class="icon-plus"></i>&nbsp;Importar
+                </button>
+
+            </div>
+            <div class="card-body">
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <select class="form-control col-md-3" v-model="criterio">
+                                <option value="nombre">Nombre</option>
+                                <option value="num_documento">Documento</option>
+                                <option value="email">Email</option>
+                                <option value="telefono">Teléfono</option>
+                            </select>
+                            <input type="text" v-model="buscar" @keyup.enter="listarPersona(1, buscar, criterio)"
+                                class="form-control" placeholder="Texto a buscar">
+                            <button type="submit" @click="listarPersona(1, buscar, criterio)" class="btn btn-primary"><i
+                                    class="fa fa-search"></i> Buscar</button>
                         </div>
                     </div>
-                    <div class="table-responsive">
-
-                        <table class="table table-bordered table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Opciones</th>
-                                    <th>Nombre_proveedor</th>
-                                    <th>Tipo Documento</th>
-                                    <th>NIT/CI</th>
-                                    <!-- <th>Número</th> -->
-                                    <th>Dirección</th>
-                                    <th>Teléfono</th>
-                                    <th>Email</th>
-                                    <th>Contacto</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="persona in arrayPersona" :key="persona.id">
-                                    <td>
-                                        <button type="button" @click="abrirModal('persona', 'actualizar', persona)"
-                                            class="btn btn-warning btn-sm">
-                                            <i class="icon-pencil"></i>
-                                        </button>
-                                    </td>
-                                    <td v-text="persona.nombre"></td>
-                                    <td v-text="getTipoDocumentoText(persona.tipo_documento)"></td>
-                                    <td v-text="persona.num_documento"></td>
-                                    <td v-text="persona.direccion"></td>
-                                    <td v-text="persona.telefono"></td>
-                                    <td v-text="persona.email"></td>
-                                    <td v-text="persona.contacto"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <nav>
-                        <ul class="pagination">
-                            <li class="page-item" v-if="pagination.current_page > 1">
-                                <a class="page-link" href="#"
-                                    @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
-                            </li>
-                            <li class="page-item" v-for="page in pagesNumber" :key="page"
-                                :class="[page == isActived ? 'active' : '']">
-                                <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                    v-text="page"></a>
-                            </li>
-                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                <a class="page-link" href="#"
-                                    @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
-                            </li>
-                        </ul>
-                    </nav>
                 </div>
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Opciones</th>
+                                <th>Nombre_proveedor</th>
+                                <th>Tipo Documento</th>
+                                <th>NIT/CI</th>
+                                <!-- <th>Número</th> -->
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Contacto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="persona in arrayPersona" :key="persona.id">
+                                <td>
+                                    <button type="button" @click="abrirModal('persona', 'actualizar', persona)"
+                                        class="btn btn-warning btn-sm">
+                                        <i class="icon-pencil"></i>
+                                    </button>
+                                </td>
+                                <td v-text="persona.nombre"></td>
+                                <td v-text="getTipoDocumentoText(persona.tipo_documento)"></td>
+                                <td v-text="persona.num_documento"></td>
+                                <td v-text="persona.direccion"></td>
+                                <td v-text="persona.telefono"></td>
+                                <td v-text="persona.email"></td>
+                                <td v-text="persona.contacto"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav>
+                    <ul class="pagination">
+                        <li class="page-item" v-if="pagination.current_page > 1">
+                            <a class="page-link" href="#"
+                                @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
+                        </li>
+                        <li class="page-item" v-for="page in pagesNumber" :key="page"
+                            :class="[page == isActived ? 'active' : '']">
+                            <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
+                                v-text="page"></a>
+                        </li>
+                        <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                            <a class="page-link" href="#"
+                                @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-            <!-- Fin ejemplo de tabla Listado -->
         </div>
+        <!-- Fin ejemplo de tabla Listado -->
+
         <!--Inicio del modal agregar/actualizar-->
         <div class="modal" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
             style="display: none;" aria-hidden="true">
