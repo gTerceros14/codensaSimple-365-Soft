@@ -1,7 +1,7 @@
-<template class="">
-    <div class="card card-body p-2">
+<template>
+    <div class="card ">
         <div class="card-header"> Registrar compra</div>
-        <div class="modal-body">
+        <div class="card-body">
             <div class="linear-stepper">
                 <div class="step-container">
                     <div class="step" :class="{ active: step === 1, completed: step > 1 }">
@@ -128,25 +128,26 @@
                                     <button @click="abrirArticulos()" class="btn btn-primary" v-else>...</button>
                                     <label class="small light-gray-text" for="">Shift + R</label>
 
-                            <!-- <input type="text" readonly class="form-control" v-model="articulo"> -->
+                                    <!-- <input type="text" readonly class="form-control" v-model="articulo"> -->
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <!-- Parte Izquierda con Texto -->
-                <div class="col-md-7" v-if="arrayArticuloSeleccionado.id">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ this.arrayArticuloSeleccionado.nombre }}</h5>
-                        <p class="card-text">
-                            {{ this.arrayArticuloSeleccionado.descripcion }}
-                            <br>
-                            <b>Costo unitario</b>
-                            {{ parseFloat(this.arrayArticuloSeleccionado.precio_costo_unid).toFixed(2)}} {{ monedaCompra[1] }}
+                        <!-- Parte Izquierda con Texto -->
+                        <div class="col-md-7" v-if="arrayArticuloSeleccionado.id">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ this.arrayArticuloSeleccionado.nombre }}</h5>
+                                <p class="card-text">
+                                    {{ this.arrayArticuloSeleccionado.descripcion }}
+                                    <br>
+                                    <b>Costo unitario</b>
+                                    {{ parseFloat(this.arrayArticuloSeleccionado.precio_costo_unid).toFixed(2) }} {{
+                        monedaCompra[1] }}
 
-                            <br>
-                            <b>Costo paquete</b>
-                            {{ parseFloat(this.arrayArticuloSeleccionado.precio_costo_paq).toFixed(2)
-                            }}
-                            {{ monedaCompra[1] }}
+                                    <br>
+                                    <b>Costo paquete</b>
+                                    {{ parseFloat(this.arrayArticuloSeleccionado.precio_costo_paq).toFixed(2)
+                                    }}
+                                    {{ monedaCompra[1] }}
 
                                     <br>
                                     <b>Unidades por envase</b> {{ this.arrayArticuloSeleccionado.unidad_envase }}
@@ -181,18 +182,21 @@
 
 
 
-                        <input type="number" class="form-control" v-model="cantidad">
-                    </div>
-                </div>
-                <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
-                    <div class="form-group">
-                        <label for="campo2">Fecha vencimiento</label>
-                        <input v-if="arrayArticuloSeleccionado.vencimiento == 0 " type="date" class="form-control" v-model="fechaPorDefecto" readonly>
-                        <input v-if="arrayArticuloSeleccionado.vencimiento == null" type="date" class="form-control" v-model="fechaPorDefecto">
-                        <input v-if="arrayArticuloSeleccionado.vencimiento == 1" type="date" class="form-control" v-model="fechaPorDefecto">
+                                <input type="number" class="form-control" v-model="cantidad">
+                            </div>
+                        </div>
+                        <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
+                            <div class="form-group">
+                                <label for="campo2">Fecha vencimiento</label>
+                                <input v-if="arrayArticuloSeleccionado.vencimiento == 0" type="date"
+                                    class="form-control" v-model="fechaPorDefecto" readonly>
+                                <input v-if="arrayArticuloSeleccionado.vencimiento == null" type="date"
+                                    class="form-control" v-model="fechaPorDefecto">
+                                <input v-if="arrayArticuloSeleccionado.vencimiento == 1" type="date"
+                                    class="form-control" v-model="fechaPorDefecto">
 
-                    </div>
-                </div>
+                            </div>
+                        </div>
 
                         <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
                             <div class="form-group">
@@ -208,34 +212,37 @@
                                     </div>
                                 </div>
 
-                    </div>
-                </div>
-                <div class="col-md-3" v-if="arrayArticuloSeleccionado.id && valuacionInventario === 'costo_reposicion'">
-                    <div class="form-group">
-                        <label for="campo2">Editar precio</label>
-                        
-                        <div class="input-group">
-                            <select class="form-control" v-model="editarPrecios">
-                                <option value="" disabled selected>Elegir opción</option>
-                                <option value="1">Costo unitario</option>
-                                <option value="0">Costo paquete</option>
-                            </select>
-                            <input v-if="editarPrecios == ''" type="number" class="form-control" v-model="nuevoPrecio" min="0"  readonly>
-                            <input v-else type="number" class="form-control" v-model="nuevoPrecio" min="0"  >
-                            <button @click="editarPrecio" class="btn btn-success"><i class="bi bi-check2"></i></button>
+                            </div>
                         </div>
+                        <div class="col-md-3"
+                            v-if="arrayArticuloSeleccionado.id && valuacionInventario === 'costo_reposicion'">
+                            <div class="form-group">
+                                <label for="campo2">Editar precio</label>
 
+                                <div class="input-group">
+                                    <select class="form-control" v-model="editarPrecios">
+                                        <option value="" disabled selected>Elegir opción</option>
+                                        <option value="1">Costo unitario</option>
+                                        <option value="0">Costo paquete</option>
+                                    </select>
+                                    <input v-if="editarPrecios == ''" type="number" class="form-control"
+                                        v-model="nuevoPrecio" min="0" readonly>
+                                    <input v-else type="number" class="form-control" v-model="nuevoPrecio" min="0">
+                                    <button @click="editarPrecio" class="btn btn-success"><i
+                                            class="bi bi-check2"></i></button>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
+                            <div class="form-group">
+                                <button @click="agregarDetalle()" class="btn btn-success form-control btnagregar"><i
+                                        class="icon-plus"></i> Agregar</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-2" v-if="arrayArticuloSeleccionado.id">
-                    <div class="form-group">
-                        <button @click="agregarDetalle()" class="btn btn-success form-control btnagregar"><i
-                                class="icon-plus"></i> Agregar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- <div class="form-group row ">
+                <!-- <div class="form-group row ">
        
             <div class="container mt-4">
 
@@ -327,7 +334,7 @@
                                     <td colspan="8" align="right"><strong>Total Neto:</strong></td>
                                     <td>
                                         {{ ((total = calcularTotal) * parseFloat(monedaCompra[0])).toFixed(2) }} {{
-                                        monedaCompra[1]
+                        monedaCompra[1]
                                         }}
 
                                     </td>
@@ -354,7 +361,7 @@
 
             <div class="buttons d-flex justify-content-center">
                 <button class="btn btn-primary mr-2" @click="prevStep" :disabled="step === 1">Anterior</button>
-                <button class="btn btn-primary" @click="nextStep" :disabled="step === 3">Siguiente</button>
+                <button class="btn btn-primary" @click="validarYAvanzar" :disabled="step === 3">Siguiente</button>
             </div>
 
         </div>
@@ -402,7 +409,7 @@ export default {
             nuevoPrecio: 0,
             nuevoCostoUnidad: 0,
             nuevoCostoPaquete: 0,
-            precios:[],
+            precios: [],
             precio_uno: 0,
             precio_dos: 0,
             precio_tres: 0,
@@ -519,6 +526,28 @@ export default {
         this.datosConfiguracion();
     },
     methods: {
+        validarYAvanzar() {
+            const errores = [];
+
+            if (this.step === 1) {
+                if (this.idproveedor === 0) errores.push('Seleccione un proveedor');
+                if (this.tipo_comprobante === '0') errores.push('Seleccione un tipo de comprobante');
+                if (!this.serie_comprobante) errores.push('Ingrese la serie del comprobante');
+                if (!this.num_comprobante) errores.push('Ingrese el número de comprobante');
+            } else if (this.step === 2) {
+                if (this.AlmacenSeleccionado === '0' || this.AlmacenSeleccionado === 0) errores.push('Seleccione un almacén');
+                if (!this.arrayArticuloSeleccionado.id) errores.push('Seleccione un producto');
+                if (this.cantidad === 0) errores.push('Ingrese una cantidad válida');
+            }
+
+            if (errores.length > 0) {
+                const mensaje = errores.join('\n');
+                swal('Campos incompletos', mensaje, 'warning');
+            } else {
+                this.nextStep();
+            }
+        },
+
         nextStep() {
             if (this.step < 3) {
                 this.step++;
@@ -627,6 +656,11 @@ export default {
         },
         selectProveedor(search, loading) {
             let me = this;
+            if (search.trim() === '') {
+                swal("Aviso", "Debe seleccionar un proveedor", "warning");
+                loading(false);
+                return;
+            }
             loading(true)
             var url = '/proveedor/selectProveedor?filtro=' + search;
             axios.get(url).then(function (response) {
@@ -639,29 +673,29 @@ export default {
                     console.log(error);
                 });
         },
-        editarPrecio(){
-            console.log("NUEVO PRECIO ",this.nuevoPrecio);
-            console.log("ARTICULO SELECCIONADO ",this.arrayArticuloSeleccionado);
+        editarPrecio() {
+            console.log("NUEVO PRECIO ", this.nuevoPrecio);
+            console.log("ARTICULO SELECCIONADO ", this.arrayArticuloSeleccionado);
             let me = this;
-            if(me.editarPrecios == '1'){
-                me.nuevoCostoPaquete =(me.nuevoPrecio* me.arrayArticuloSeleccionado.unidad_envase).toFixed(2);
-                console.log("NUEVO PRECIO2 ",this.nuevoCostoPaquete);
+            if (me.editarPrecios == '1') {
+                me.nuevoCostoPaquete = (me.nuevoPrecio * me.arrayArticuloSeleccionado.unidad_envase).toFixed(2);
+                console.log("NUEVO PRECIO2 ", this.nuevoCostoPaquete);
                 me.arrayArticuloSeleccionado.precio_costo_paq = me.nuevoCostoPaquete;
-                me.arrayArticuloSeleccionado.precio_costo_unid=me.nuevoPrecio;
-                this.cambiarPrecios(me.arrayArticuloSeleccionado.precio_costo_unid,me.nuevoCostoPaquete,'Costo unitario');
-                
-                
+                me.arrayArticuloSeleccionado.precio_costo_unid = me.nuevoPrecio;
+                this.cambiarPrecios(me.arrayArticuloSeleccionado.precio_costo_unid, me.nuevoCostoPaquete, 'Costo unitario');
+
+
             }
-            if(me.editarPrecios == '0'){
-                me.nuevoCostoUnidad =(me.nuevoPrecio/ me.arrayArticuloSeleccionado.unidad_envase).toFixed(2);
-                console.log("NUEVO PRECIO2 ",this.nuevoCostoUnidad);
+            if (me.editarPrecios == '0') {
+                me.nuevoCostoUnidad = (me.nuevoPrecio / me.arrayArticuloSeleccionado.unidad_envase).toFixed(2);
+                console.log("NUEVO PRECIO2 ", this.nuevoCostoUnidad);
                 me.arrayArticuloSeleccionado.precio_costo_unid = me.nuevoCostoUnidad;
-                me.arrayArticuloSeleccionado.precio_costo_paq=me.nuevoPrecio;
-                this.cambiarPrecios(me.nuevoCostoUnidad,me.arrayArticuloSeleccionado.precio_costo_paq,'Costo paquete');
-                
-            }                
-        }, 
-        calcularPrecio(precio, index,preciounidad) {
+                me.arrayArticuloSeleccionado.precio_costo_paq = me.nuevoPrecio;
+                this.cambiarPrecios(me.nuevoCostoUnidad, me.arrayArticuloSeleccionado.precio_costo_paq, 'Costo paquete');
+
+            }
+        },
+        calcularPrecio(precio, index, preciounidad) {
             const margen_ganancia = parseFloat(preciounidad) * (parseFloat(precio.porcentage) / 100);
             const precio_publico = parseFloat(preciounidad) + margen_ganancia;
 
@@ -675,15 +709,15 @@ export default {
                 this.precio_cuatro = precio_publico.toFixed(2);
             }
         },
-        cambiarPrecios(precioUnidad,precioPaquete,editarPrecios){
+        cambiarPrecios(precioUnidad, precioPaquete, editarPrecios) {
             let me = this;
-            console.log("tipo ",typeof me.precios)
+            console.log("tipo ", typeof me.precios)
             console.log("tipo ", me.precios)
             me.precios.forEach((precio, index) => {
-                me.calcularPrecio(precio, index,precioUnidad);
+                me.calcularPrecio(precio, index, precioUnidad);
             });
             swal({
-                title: 'Esta seguro de cambiar el '+editarPrecios,
+                title: 'Esta seguro de cambiar el ' + editarPrecios,
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -696,7 +730,7 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.value) {
-                    axios.post('/articulo/actualizarPrecios',{
+                    axios.post('/articulo/actualizarPrecios', {
                         id: me.arrayArticuloSeleccionado.id,
                         precio_costo_paquete: precioPaquete,
                         precio_costo_unidad: precioUnidad,
@@ -706,7 +740,7 @@ export default {
                         precio_cuatro: me.precio_cuatro
                     }).then(response => {
                         me.nuevoPrecio = '',
-                        me.editarPrecios= ''
+                            me.editarPrecios = ''
                     }).catch(error => {
                         console.error(error);
                     })
@@ -754,7 +788,10 @@ export default {
             if (this.validarIngreso()) {
                 return;
             }
-
+            if (this.arrayDetalle.length === 0) {
+                swal('Error', 'No se ha seleccionado ningún producto. No se puede realizar la compra.', 'error');
+                return;
+            }
             let me = this;
 
             axios.post('/ingreso/registrar', {
@@ -846,7 +883,7 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.valuacionInventario = respuesta.configuracionTrabajo.valuacionInventario;
-                console.log(" valuacion ",me.valuacionInventario)
+                console.log(" valuacion ", me.valuacionInventario)
 
             })
                 .catch(function (error) {
@@ -917,6 +954,10 @@ export default {
 };
 </script>
 <style>
+.step-content {
+    margin-top: 1.5rem;
+}
+
 .linear-stepper {
     display: flex;
     align-items: center;

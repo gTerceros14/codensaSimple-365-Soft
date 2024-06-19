@@ -151,11 +151,16 @@
                                                 <tr v-for="(row, rowIndex) in previewCsv" :key="rowIndex">
                                                     <td v-for="(cell, cellIndex) in row" :key="cellIndex">
                                                         {{
-                                                            [5, 6, 7, 8, 9, 10, 11, 12, 13].includes(cellIndex) ?
-                                                                cell + " " + monedaSeleccionada.simbolo : cell
+                                                        [5, 6, 7, 8, 9, 10, 11, 12, 13].includes(cellIndex) ?
+                                                        cell + " " + monedaSeleccionada.simbolo : cell
                                                         }}
 
                                                     </td>
+                                                    <td>{{ row[0] }}</td> <!-- Código -->
+                                                    <td>{{ row[1] }}</td> <!-- Nombre -->
+                                                    <td>{{ row[2] }}</td> <!-- Nombre genérico -->
+                                                    <td>{{ row[3] }}</td> <!-- Descripción -->
+                                                    <td>{{ row[4] }}</td> <!-- Unidad envase -->
                                                 </tr>
                                             </tbody>
                                         </table>

@@ -16,7 +16,7 @@
                 <div class="form-group row">
                     <div class="col-md-8">
                         <div class="input-group">
-                            <select class=  "selectpicker show-tick" v-model="criterio">
+                            <select class="selectpicker show-tick" v-model="criterio">
                                 <option value="" disabled selected>Seleccione</option>
                                 <option value="tipo_comprobante">Tipo Comprobante</option>
                                 <option value="num_comprobante">Número Comprobante</option>
@@ -151,18 +151,18 @@
                                             <td v-text="detalle.articulo"></td>
                                             <td>
                                                 {{
-                                                (detalle.precio * parseFloat(monedaVenta[0])).toFixed(2)
-                                                }}
+                    (detalle.precio * parseFloat(monedaVenta[0])).toFixed(2)
+                }}
                                                 {{ monedaVenta[1] }}
                                             </td>
                                             <td v-text="detalle.cantidad"></td>
                                             <td>
                                                 {{
-                                                (
-                                                (detalle.precio * detalle.cantidad) *
-                                                parseFloat(monedaVenta[0])
-                                                ).toFixed(2)
-                                                }}
+                    (
+                        (detalle.precio * detalle.cantidad) *
+                        parseFloat(monedaVenta[0])
+                    ).toFixed(2)
+                }}
                                                 {{ monedaVenta[1] }}
                                             </td>
                                         </tr>
@@ -369,35 +369,35 @@
                                                     <span class="badge bg-primary">Medida: {{ arraySeleccionado.medida
                                                         }}</span>
                                                     <span class="badge bg-primary">Linea: {{
-                                                        arraySeleccionado.nombre_categoria }}</span>
+                    arraySeleccionado.nombre_categoria }}</span>
                                                     <p>{{ arraySeleccionado.descripcion }}</p>
                                                     <h3 v-if="arrayPromocion && arrayPromocion.id"
                                                         style="display:flex;align-items:center;margin:0px;">
                                                         <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
                                                         <b v-else>{{
-                                                            (calcularPrecioConDescuento(resultadoMultiplicacion,
-                                                            arrayPromocion.porcentaje)
-                                                            *
-                                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
+                    (calcularPrecioConDescuento(resultadoMultiplicacion,
+                        arrayPromocion.porcentaje)
+                        *
+                        parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
                                                             }}</b>
                                                         <s style="font-size:15px" class="lead">{{
-                                                            calcularPrecioConDescuento(resultadoMultiplicacion
-                                                            *
-                                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
+                    calcularPrecioConDescuento(resultadoMultiplicacion
+                        *
+                        parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
                                                             }}</s>
                                                     </h3>
                                                     <h3 v-else style="display:flex;align-items:center;margin:0px;">
                                                         <b>{{ calcularPrecioConDescuento(resultadoMultiplicacion *
-                                                            parseFloat(monedaVenta[0])).toFixed(2)
+                    parseFloat(monedaVenta[0])).toFixed(2)
                                                             }} {{ monedaVenta[1] }}</b>
                                                     </h3>
                                                     <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id"
                                                         class="lead">{{
-                                                        arrayPromocion.porcentaje }} % de descuento</p>
+                    arrayPromocion.porcentaje }} % de descuento</p>
                                                     <p style="margin:0px" v-if="arrayPromocion && arrayPromocion.id"
                                                         class="text-danger"><i class="fa fa-clock-o"
                                                             aria-hidden="true"></i> Esta oferta termina en {{
-                                                        calcularDiasRestantes(arrayPromocion.fecha_final) }} días</p>
+                    calcularDiasRestantes(arrayPromocion.fecha_final) }} días</p>
                                                 </div>
                                             </div>
                                             <div class="col-md-3 d-flex flex-column align-items-center">
@@ -414,9 +414,9 @@
                 }" role="alert">
                                                     <p style="margin:0px">Stock disponible</p>
                                                     <b>{{ arraySeleccionado.saldo_stock / unidadPaquete - cantidad }} {{
-                                                        unidadPaquete == 1 ?
-                                                        "Unidades"
-                                                        : "Paquetes" }}</b>
+                    unidadPaquete == 1 ?
+                        "Unidades"
+                        : "Paquetes" }}</b>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
@@ -481,16 +481,16 @@
                                                         </td>
                                                         <td v-text="detalle.articulo"></td>
                                                         <td>{{ (detalle.precioseleccionado *
-                                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                            monedaVenta[1]
-                                                            }}</td>
+                    parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                    monedaVenta[1]
+                }}</td>
                                                         <td>
                                                             <input type="number" v-model="detalle.cantidad" min="1"
                                                                 @input="actualizarDetalle(index)"
                                                                 style="border: none; outline: none; width: 50px; text-align: center;" />
                                                         </td>
                                                         <td>{{ (detalle.precioseleccionado * detalle.cantidad *
-                                                            parseFloat(monedaVenta[0])).toFixed(2)
+                    parseFloat(monedaVenta[0])).toFixed(2)
                                                             }}
                                                             {{ monedaVenta[1] }}</td>
                                                     </tr>
@@ -498,8 +498,8 @@
                                                         <td colspan="4" style="text-align: right; font-weight: bold;">
                                                             Total Neto:</td>
                                                         <td id="montoTotal">{{ (calcularTotal *
-                                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                            monedaVenta[1] }}</td>
+                    parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                    monedaVenta[1] }}</td>
                                                     </tr>
                                                 </tbody>
                                                 <tbody v-else>
@@ -572,17 +572,17 @@
                                                         <div class="d-flex justify-content-between mb-2">
                                                             <span><i class="fa fa-dollar mr-2"></i> Monto Total:</span>
                                                             <span class="font-weight-bold">{{ (calcularTotal *
-                                                                parseFloat(monedaVenta[0])).toFixed(2)
+                    parseFloat(monedaVenta[0])).toFixed(2)
                                                                 }}
                                                                 {{
-                                                                monedaVenta[1] }}</span>
+                    monedaVenta[1] }}</span>
                                                         </div>
                                                         <div class="d-flex justify-content-between">
                                                             <span><i class="fa fa-money mr-2"></i> Total a Pagar:</span>
                                                             <span class="font-weight-bold h5">{{ (calcularTotal *
-                                                                parseFloat(monedaVenta[0])).toFixed(2)
+                    parseFloat(monedaVenta[0])).toFixed(2)
                                                                 }} {{
-                                                                monedaVenta[1] }}</span>
+                    monedaVenta[1] }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -603,7 +603,7 @@
                                                     <div class="form-group">
                                                         <label for="montoEfectivo">Monto:</label>
                                                         <span class="font-weight-bold">{{ montoEfectivo =
-                                                            (calcularTotal).toFixed(2) }}</span>
+                (calcularTotal).toFixed(2) }}</span>
                                                     </div>
                                                     <button class="btn btn-primary mb-2" @click="generarQr">Generar
                                                         QR</button>
@@ -637,7 +637,7 @@
                             <div class="buttons d-flex justify-content-center">
                                 <button class="btn btn-primary mr-2" @click="prevStep"
                                     :disabled="step === 1">Anterior</button>
-                                <button class="btn btn-primary" @click="nextStep"
+                                <button class="btn btn-primary" @click="validarYAvanzar"
                                     :disabled="step === 3">Siguiente</button>
                             </div>
                         </div>
@@ -1011,6 +1011,23 @@ export default {
     },
 
     methods: {
+        validarYAvanzar() {
+            const errores = [];
+
+            if (this.step === 1) {
+                if (this.idcliente === 0) errores.push('Seleccione un cliente');
+                if (this.tipo_comprobante === '0') errores.push('Seleccione un tipo de comprobante');
+            } else if (this.step === 2) {
+                if (!this.idAlmacen) errores.push('Seleccione un almacén');
+            }
+
+            if (errores.length > 0) {
+                const mensaje = errores.join('\n');
+                swal('Campos incompletos', mensaje, 'warning');
+            } else {
+                this.nextStep();
+            }
+        },
         abrirModal() {
             this.showModal = true;
         },

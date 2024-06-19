@@ -1,92 +1,89 @@
 <template>
   <main class="main">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
-    </ol>
-    <div class="container-fluid">
-      <!-- Ejemplo de tabla Listado -->
-      <div class="card">
-        <div class="card-header">
-          <i class="fa fa-align-justify"></i> Almacenes
-          <button type="button" @click="abrirModal('almacenes', 'registrar')" class="btn btn-secondary">
-            <i class="icon-plus"></i>&nbsp;Nuevo
-          </button>
-        </div>
-        <div class="card-body">
-          <div class="form-group row">
-            <div class="col-md-6">
-              <div class="input-group">
-                <select class="form-control col-md-4" v-model="criterio">
-                  <option value="nombre_almacen">Nombre Almacen</option>
-                  <option value="nombre_encargado">Nombre Encargado</option>
-                  <option value="nombre_sucursal">Nombre Sucursal</option>
-                </select>
-                <input type="text" v-model="buscar" @keyup.enter="listarAlmacenes(1, buscar, criterio)"
-                  class="form-control" placeholder="Texto a buscar" />
-                <button type="submit" @click="listarAlmacenes(1, buscar, criterio)" class="btn btn-primary">
-                  <i class="fa fa-search"></i> Buscar
-                </button>
-              </div>
+
+
+    <!-- Ejemplo de tabla Listado -->
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-align-justify"></i> Almacenes
+        <button type="button" @click="abrirModal('almacenes', 'registrar')" class="btn btn-secondary">
+          <i class="icon-plus"></i>&nbsp;Nuevo
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="form-group row">
+          <div class="col-md-6">
+            <div class="input-group">
+              <select class="form-control col-md-4" v-model="criterio">
+                <option value="nombre_almacen">Nombre Almacen</option>
+                <option value="nombre_encargado">Nombre Encargado</option>
+                <option value="nombre_sucursal">Nombre Sucursal</option>
+              </select>
+              <input type="text" v-model="buscar" @keyup.enter="listarAlmacenes(1, buscar, criterio)"
+                class="form-control" placeholder="Texto a buscar" />
+              <button type="submit" @click="listarAlmacenes(1, buscar, criterio)" class="btn btn-primary">
+                <i class="fa fa-search"></i> Buscar
+              </button>
             </div>
           </div>
-          <div class="table-responsive">
-            <table class="table table-bordered table-striped table-sm">
-              <thead>
-                <tr>
-                  <th>Acciones</th>
-                  <th>Nombre del Almacén</th>
-                  <th>Dirección (Ubicación)</th>
-                  <th>Encargado</th>
-                  <th>Teléfono</th>
-                  <th>Sucursal</th>
-                  <th>Observación</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="almacen in arrayAlmacen" :key="almacen.id">
-                  <td>
-                    <button type="button" @click="abrirModal('almacenes', 'actualizar', almacen)"
-                      class="btn btn-warning btn-sm">
-                      <i class="icon-pencil"></i>
-                    </button>
-                    &nbsp;
-                  </td>
-                  <td>{{ almacen.nombre_almacen }}</td>
-                  <td>{{ almacen.ubicacion }}</td>
-                  <td>{{ almacen.encargados_nombres }}</td>
-
-                  <td>{{ almacen.telefono }}</td>
-                  <td>{{ almacen.nombre_sucursal }}</td>
-                  <td>{{ almacen.observacion }}</td>
-
-                  <!-- Asegúrate de que los campos existan y tengan valores -->
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <nav>
-            <ul class="pagination">
-              <li class="page-item" v-if="pagination.current_page > 1">
-                <a class="page-link" href="#" @click.prevent="
-            cambiarPagina(pagination.current_page - 1, buscar, criterio)
-            ">Ant</a>
-              </li>
-              <li class="page-item" v-for="page in pagesNumber" :key="page"
-                :class="[page == isActived ? 'active' : '']">
-                <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)" v-text="page"></a>
-              </li>
-              <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                <a class="page-link" href="#" @click.prevent="
-            cambiarPagina(pagination.current_page + 1, buscar, criterio)
-            ">Sig</a>
-              </li>
-            </ul>
-          </nav>
         </div>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped table-sm">
+            <thead>
+              <tr>
+                <th>Acciones</th>
+                <th>Nombre del Almacén</th>
+                <th>Dirección (Ubicación)</th>
+                <th>Encargado</th>
+                <th>Teléfono</th>
+                <th>Sucursal</th>
+                <th>Observación</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="almacen in arrayAlmacen" :key="almacen.id">
+                <td>
+                  <button type="button" @click="abrirModal('almacenes', 'actualizar', almacen)"
+                    class="btn btn-warning btn-sm">
+                    <i class="icon-pencil"></i>
+                  </button>
+                  &nbsp;
+                </td>
+                <td>{{ almacen.nombre_almacen }}</td>
+                <td>{{ almacen.ubicacion }}</td>
+                <td>{{ almacen.encargados_nombres }}</td>
+
+                <td>{{ almacen.telefono }}</td>
+                <td>{{ almacen.nombre_sucursal }}</td>
+                <td>{{ almacen.observacion }}</td>
+
+                <!-- Asegúrate de que los campos existan y tengan valores -->
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <nav>
+          <ul class="pagination">
+            <li class="page-item" v-if="pagination.current_page > 1">
+              <a class="page-link" href="#" @click.prevent="
+          cambiarPagina(pagination.current_page - 1, buscar, criterio)
+          ">Ant</a>
+            </li>
+            <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
+              <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)" v-text="page"></a>
+            </li>
+            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+              <a class="page-link" href="#" @click.prevent="
+          cambiarPagina(pagination.current_page + 1, buscar, criterio)
+          ">Sig</a>
+            </li>
+          </ul>
+        </nav>
       </div>
-      <!-- Fin ejemplo de tabla Listado -->
     </div>
+    <!-- Fin ejemplo de tabla Listado -->
+
     <!--Inicio del modal agregar/actualizar-->
     <div class="modal " tabindex="-1" :class="{ mostrar: modal }" role="dialog" aria-labelledby="myModalLabel"
       style="display: none;" aria-hidden="true">
