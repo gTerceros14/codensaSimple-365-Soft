@@ -98,7 +98,7 @@ class InventarioController extends Controller
                         $fechaVencimiento = new \DateTime($invExistente->fecha_vencimiento);
 
                         // Comparar solo la fecha de vencimiento (día, mes y año)
-                        if ($fechaVencimiento->format('Y-m-d') === date('Y-m-d', strtotime($inventario['fecha_vencimiento']))) {
+                        if ($fechaVencimiento->format('Y-m-d') === date('Y-m-d', strtotime($inventario['fecha_vencimiento']) && $invExistente->idalmacen == $inventario['idalmacen'])) {
                             // Verificar si el índice 'cantidad' está presente antes de usarlo
                             Log::info("se comparo");
 
