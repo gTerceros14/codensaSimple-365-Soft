@@ -246,35 +246,14 @@
                                 <div class="form-group row border">
                                     <!-- Cliente Selection -->
                                     <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label class="font-weight-bold">Cliente <span
-                                                    class="text-danger">*</span></label>
-                                            <div class="d-flex">
-                                                <select class="form-control col-md-4 mr-2" v-model="criterioVenta">
-                                                    <option value="" disabled selected>Seleccione</option>
-                                                    <option value="ci">CI</option>
-                                                    <option value="nombre">Nombre</option>
-                                                </select>
-                                                <v-select v-if="criterioVenta === 'ci'" class="flex-grow-1"
-                                                    :on-search="selectCliente" label="num_documento"
-                                                    :options="arrayCliente" placeholder="Num de documento..."
-                                                    :onChange="getDatosCliente"></v-select>
-                                                <v-select v-else-if="criterioVenta === 'nombre'" class="flex-grow-1"
-                                                    :on-search="selectClienteNombre" label="nombre"
-                                                    :options="arrayCliente" placeholder="Nombre..."
-                                                    :onChange="getDatosCliente2"></v-select>
-                                            </div>
-                                        </div>
+                                        <label class="font-weight-bold">Documento <span class="text-danger">*</span></label>
+                                        <input type="text" id="documento" class="form-control" v-model="documento" @keyup.enter="buscarClientePorDocumento" />
                                     </div>
 
                                     <!-- Nombre Input -->
                                     <div class="col-md-4">
-                                        <label class="font-weight-bold">Nombre <span
-                                                class="text-danger">*</span></label>
-                                        <input v-if="cantidadClientes > 0" type="text" id="nombreCliente"
-                                            class="form-control" v-model="nombreCliente" ref="nombreRef" readonly />
-                                        <input v-else type="text" id="nombreCliente" class="form-control"
-                                            v-model="nombreCliente" ref="nombreRef" />
+                                        <label class="font-weight-bold">Cliente <span class="text-danger">*</span></label>
+                                        <input type="text" id="nombreCliente" class="form-control" v-model="nombreCliente" :readonly="!nombreClienteEditable" />
                                     </div>
 
                                     <!-- Hidden Inputs -->
@@ -290,29 +269,6 @@
                                         v-model="puntoVentaAutenticado" readonly />
                                     <input type="hidden" id="email" class="form-control" v-model="email" readonly />
 
-                                    <!-- Tipo de Documento Selection -->
-                                    <div v-if="cantidadClientes === 0" class="col-md-4">
-                                        <label class="font-weight-bold">Tipo de documento <span
-                                                class="text-danger">*</span></label>
-                                        <select class="form-control" v-model="tipo_documento">
-                                            <option value="" disabled>Selecciona una tipo de documento</option>
-                                            <option value="1">CI - CEDULA DE IDENTIDAD</option>
-                                            <option value="2">CEX - CEDULA DE IDENTIDAD DE EXTRANJERO</option>
-                                            <option value="5">NIT - NÚMERO DE IDENTIFICACIÓN TRIBUTARIA</option>
-                                            <option value="3">PAS - PASAPORTE</option>
-                                            <option value="4">OD - OTRO DOCUMENTO DE IDENTIDAD</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Documento Input -->
-                                    <div class="col-md-4">
-                                        <label class="font-weight-bold">Documento <span
-                                                class="text-danger">*</span></label>
-                                        <input v-if="cantidadClientes > 0" type="text" id="documento"
-                                            class="form-control" v-model="documento" ref="documentoRef" readonly />
-                                        <input v-else type="text" id="documento" class="form-control"
-                                            v-model="documento" ref="documentoRef" />
-                                    </div>
                                     <!-- Tipo de Comprobante Selection -->
                                     <div class="col-md-4">
                                         <label class="font-weight-bold">Tipo de comprobante <span
@@ -806,6 +762,7 @@ export default {
             cliente: "",
             email: "",
             nombreCliente: "",
+            nombreClienteEditable: false,
             documento: "",
             tipo_documento: "1",
             complemento_id: "",
@@ -1015,7 +972,7 @@ export default {
             const errores = [];
 
             if (this.step === 1) {
-                if (this.idcliente === 0) errores.push('Seleccione un cliente');
+                if (this.nombreCliente === '') errores.push('Necesita un nombre del Cliente');
                 if (this.tipo_comprobante === '0') errores.push('Seleccione un tipo de comprobante');
             } else if (this.step === 2) {
                 if (!this.idAlmacen) errores.push('Seleccione un almacén');
@@ -2046,13 +2003,16 @@ export default {
             console.log("hola");
             console.log(this.primer_precio_cuota);
             if (this.tipo_comprobante === "RESIVO") {
-                if (this.arrayCliente == 0) {
+                const response = await axios.get(`/api/clientes/existe?documento=${this.documento}`);
+                if (!response.data.existe) {
                     const nuevoClienteResponse = await axios.post('/cliente/registrar', {
                         'nombre': this.nombreCliente,
                         'num_documento': this.documento,
-                        'tipo_documento': this.tipo_documento
+                        'tipo_documento': '5'
                     });
                     this.idcliente = nuevoClienteResponse.data.id;
+                } else {
+                    this.idcliente = response.data.cliente.id;
                 }
                 axios
                     .post("/venta/registrar", {
@@ -2398,6 +2358,28 @@ export default {
                 this.cambio = (this.efectivo - this.calcularTotal).toFixed(2);
                 this.faltante = 0;
             }
+        },
+
+        buscarClientePorDocumento() {
+            axios.get(`/api/clientes?documento=${this.documento}`)
+                .then(response => {
+                    const cliente = response.data;
+                    console.log(cliente);
+                    this.nombreCliente = cliente.nombre;
+                    this.nombreClienteEditable = false; // Deshabilita el input si se encuentra el cliente
+                })
+                .catch(error => {
+                    if (error.response && error.response.status === 404) {
+                        this.nombreCliente = '';
+                        this.nombreClienteEditable = true; // Habilita el input si no se encuentra el cliente
+                        alert('Cliente no encontrado');
+                    } else {
+                        console.error('Error al buscar el cliente:', error);
+                        this.nombreCliente = '';
+                        this.nombreClienteEditable = false; // Asegura que el input esté deshabilitado en caso de error
+                        alert('Error al buscar el cliente');
+                    }
+                });
         },
     },
     created() {
