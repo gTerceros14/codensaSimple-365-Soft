@@ -251,11 +251,6 @@ export const esquemaCliente = yup.object().shape({
 
   tipo_documento: yup.string().required("El tipo de documento es obligatorio"),
   num_documento: yup.string().required("El número de documento es obligatorio"),
-  telefono: yup.string().required("El teléfono es obligatorio"),
-  email: yup
-    .string()
-    .email("El correo electrónico debe tener un formato válido")
-    .required("El correo electrónico es obligatorio"),
 });
 
 export const esquemaPuntoDeVenta = yup.object().shape({

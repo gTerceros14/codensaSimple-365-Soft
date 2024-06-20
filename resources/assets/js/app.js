@@ -3,18 +3,15 @@
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
-
-import { BootstrapVue } from "bootstrap-vue";
-import "bootstrap-vue/dist/bootstrap-vue.css";
-import "bootstrap/dist/css/bootstrap.css";
 import Vue from "vue";
 import Toasted from "vue-toasted";
-import { IconsPlugin } from "bootstrap-vue";
+import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
-import 'bootstrap-icons/font/bootstrap-icons.css'
 require("./bootstrap");
 
+
+import 'bootstrap-icons/font/bootstrap-icons.css'
 window.$ = window.jQuery = require("jquery");
 window.Vue = require("vue");
 
