@@ -437,7 +437,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/resumen-ventas-documento-detallado', 'ReportesVentas@ResumenVentasPorDocumentoDetallado');
         Route::get('/reporte-inventario-fisico-valorado/{tipo}', 'ReportesInventariosController@inventarioFisicoValorado');
 
-
+        //RECIVO
+        Route::post('/venta/emitirRecibo', 'VentaController@emitirRecibo');
+        Route::get('/resivo/imprimirRollo/{id}', 'VentaController@imprimirResivoRollo');
+        Route::get('/resivo/imprimirCarta/{id}', 'VentaController@imprimirResivo');
 
         //VARIABLES TEMPORALES
         Route::post('/variables/registrarVariable', 'VentasInstitucionalesController@registrarVariable');
