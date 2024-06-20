@@ -451,6 +451,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/variables/emitirFacturaInstitucional', 'VentaController@emitirFacturaInstitucional');
         Route::post('/variables/insertarFacturaInstitucional', 'VentaController@insertarFacturaInstitucional');
         Route::get('/variables/imprimirCarta/{id}/{idventainstitucional}', 'VentasInstitucionalesController@imprimirFactura');
+
+        //BUSCAR CLIENTE
+        Route::get('/api/clientes', 'ClienteController@buscarPorDocumento');
     });
 
     //RUTA PARA RECUPERAR LA SESSION CON EL ID DE LA PERSONA LOGUEADA
