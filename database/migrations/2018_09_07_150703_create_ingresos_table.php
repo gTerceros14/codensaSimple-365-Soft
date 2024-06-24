@@ -28,6 +28,7 @@ class CreateIngresosTable extends Migration
             $table->string('estado', 20);
             $table->integer('idcaja')->unsigned();
             $table->foreign('idcaja')->references('id')->on('cajas');
+            $table->decimal('descuento_global')->nullable();
             $table->timestamps();
         });
     }

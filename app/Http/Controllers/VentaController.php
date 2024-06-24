@@ -550,8 +550,10 @@ class VentaController extends Controller
     private function actualizarInventario($idAlmacen, $detalle)
     {
         $cantidadRestante = $detalle['cantidad'];
+        $fechaActual = now();
         $inventarios = Inventario::where('idalmacen', $idAlmacen)
             ->where('idarticulo', $detalle['idarticulo'])
+            ->where('fecha_vencimiento','>',$fechaActual)
             ->orderBy('id')
             ->get();
 
