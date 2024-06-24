@@ -318,7 +318,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/medida/import_excel', 'MedidaController@importsaveExecelUser')->name('import_excel');
 
         //Obtener último numero de comprobante
-        Route::get('/ruta-a-tu-endpoint-laravel-para-obtener-ultimo-comprobante', 'VentaController@obtenerUltimoComprobante');
+        Route::get('/obtener-ultimo-comprobante', 'VentaController@obtenerUltimoComprobante');
 
         //Obtener último numero de codigoSucursal
         Route::get('/ruta-api-para-obtener-ultimo-codigo-sucursal', 'SucursalController@obtenerUltimoCodigoSucursal');

@@ -1251,30 +1251,38 @@ class VentaController extends Controller
 
         return response()->json(['topProductos' => $topProductos]);
     }
-    public function obtenerUltimoComprobante(Request $request)
-    {
-        $ultimoComprobanteFacturas = DB::table('facturas')
+    public function obtenerUltimoComprobante(Request $request) {
+        $idsucursal = $request->idsucursal;
+    
+        /*$ultimoComprobanteFacturas = DB::table('facturas')
             ->select('numeroFactura')
+            ->where('idsucursal', $idsucursal)
             ->orderBy('numeroFactura', 'desc')
             ->limit(1)
-            ->first();
-        $ultimoComprobanteVentas = DB::table('ventas')
-            ->select('num_comprobante')
-            ->orderBy('num_comprobante', 'desc')
+            ->first();*/
+    
+        $ultimoComprobanteVentas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
+            ->select('ventas.num_comprobante')
+            ->where('users.idsucursal', $idsucursal)
+            ->orderBy('ventas.num_comprobante', 'desc')
             ->limit(1)
             ->first();
-        $ultimoComprobanteFueraLineas = DB::table('factura_fuera_lineas')
+    
+        /*$ultimoComprobanteFueraLineas = DB::table('factura_fuera_lineas')
             ->select('numeroFactura')
+            ->where('idsucursal', $idsucursal)
             ->orderBy('numeroFactura', 'desc')
             ->limit(1)
-            ->first();
-
-        $lastComprobanteFacturas = $ultimoComprobanteFacturas ? $ultimoComprobanteFacturas->numeroFactura : 0;
-        $lastComprobanteFueraLineas = $ultimoComprobanteFueraLineas ? $ultimoComprobanteFueraLineas->numeroFactura : 0;
+            ->first();*/
+    
+        //$lastComprobanteFacturas = $ultimoComprobanteFacturas ? $ultimoComprobanteFacturas->numeroFactura : 0;
+        //$lastComprobanteFueraLineas = $ultimoComprobanteFueraLineas ? $ultimoComprobanteFueraLineas->numeroFactura : 0;
         $lastComprobanteVentas = $ultimoComprobanteVentas ? $ultimoComprobanteVentas->num_comprobante : 0;
-        // Obtener el número mayor entre las dos tablas
-        $lastComprobante = max($lastComprobanteFacturas, $lastComprobanteFueraLineas, $lastComprobanteVentas);
-
+    
+        // Obtener el número mayor entre las tres tablas
+        $lastComprobante = $lastComprobanteVentas;
+    
         return response()->json(['last_comprobante' => $lastComprobante]);
     }
+    
 }
