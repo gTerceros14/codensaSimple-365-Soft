@@ -68,14 +68,14 @@ class IngresoController extends Controller
                 ->join('users', 'ingresos.idusuario', '=', 'users.id')
                 ->select('ingresos.id', 'ingresos.tipo_comprobante', 'ingresos.serie_comprobante',
                     'ingresos.num_comprobante', 'ingresos.fecha_hora', 'ingresos.impuesto', 'ingresos.total',
-                    'ingresos.estado', 'personas.nombre', 'users.usuario')
+                    'ingresos.estado', 'personas.nombre', 'users.usuario','descuento_global')
                 ->orderBy('ingresos.id', 'desc')->paginate(8);
         } else {
             $ingresos = Ingreso::join('personas', 'ingresos.idproveedor', '=', 'personas.id')
                 ->join('users', 'ingresos.idusuario', '=', 'users.id')
                 ->select('ingresos.id', 'ingresos.tipo_comprobante', 'ingresos.serie_comprobante',
                     'ingresos.num_comprobante', 'ingresos.fecha_hora', 'ingresos.impuesto', 'ingresos.total',
-                    'ingresos.estado', 'personas.nombre', 'users.usuario')
+                    'ingresos.estado', 'personas.nombre', 'users.usuario','descuento_global')
                 ->where('ingresos.' . $criterio, 'like', '%' . $buscar . '%')->orderBy('ingresos.id', 'desc')->paginate(3);
         }
 
@@ -144,6 +144,9 @@ public function store(Request $request)
             $ingreso->total = $request->total;
             $ingreso->estado = 'Registrado';
             $ingreso->idcaja = $ultimaCaja->id;
+            //$ingreso->descuento_global = $request->descuento_global;
+            $ingreso->descuento_global = 0;
+
             $ingreso->save();
 
             $ultimaCaja->comprasContado += $request->total;
@@ -155,6 +158,9 @@ public function store(Request $request)
                 $detalle->idingreso = $ingreso->id;
                 $detalle->idarticulo = $det['idarticulo'];
                 $detalle->cantidad = $det['cantidad'];
+                //$detalle->descuento = $det['descuento'];
+                $detalle->descuento = 0;
+
                 $detalle->precio = $det['precio'];
                 $detalle->save();
             }

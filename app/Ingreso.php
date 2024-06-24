@@ -16,7 +16,8 @@ class Ingreso extends Model
         'impuesto',
         'total',
         'estado',
-        'idcaja'
+        'idcaja',
+        'descuento_global'
      ];
      public function usuario()
      {

@@ -191,9 +191,9 @@
                                 <input v-if="arrayArticuloSeleccionado.vencimiento == 0" type="date"
                                     class="form-control" v-model="fechaPorDefecto" readonly>
                                 <input v-if="arrayArticuloSeleccionado.vencimiento == null" type="date"
-                                    class="form-control" v-model="fechaPorDefecto">
+                                    class="form-control" v-model="fechavencimiento">
                                 <input v-if="arrayArticuloSeleccionado.vencimiento == 1" type="date"
-                                    class="form-control" v-model="fechaPorDefecto">
+                                    class="form-control" v-model="fechavencimiento">
 
                             </div>
                         </div>
