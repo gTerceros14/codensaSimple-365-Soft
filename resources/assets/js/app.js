@@ -4,14 +4,29 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 import Vue from "vue";
+
+import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
+
 import Toasted from "vue-toasted";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
+
+
+/*import 'bootstrap-icons/font/bootstrap-icons.css'
 import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";*/
+
+import 'primeflex/primeflex.css';
+import 'primevue/resources/themes/lara-light-blue/theme.css';
+import 'primevue/resources/primevue.min.css';
+import 'primeicons/primeicons.css';
+
+//Vue.use(PrimeVue);
+Vue.use(PrimeVue, {ripple: true});
+Vue.use(ToastService);
+
 require("./bootstrap");
 
-
-import 'bootstrap-icons/font/bootstrap-icons.css'
 window.$ = window.jQuery = require("jquery");
 window.Vue = require("vue");
 
@@ -281,15 +296,20 @@ Vue.component(
 
 Vue.component("mayoreo", require("./components/OfertasEspecialesMayoreo.vue"));
 
+Vue.component("nuevacompra", require("./components/compras/NuevaCompra.vue"));
+
 Vue.use(BootstrapVue);
 Vue.use(Toasted);
+
 const app = new Vue({
   el: "#app",
   data: {
     menu: 0,
     notifications: [],
   },
-  mounted() {},
+  mounted() {
+    console.log('Vue app mounted');
+  },
   created() {
     let me = this;
     axios

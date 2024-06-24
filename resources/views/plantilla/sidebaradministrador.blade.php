@@ -68,7 +68,7 @@
 
 
                 </ul>
-            </li>z
+            </li>
 
             <li class="nav-item nav-dropdown">
                 <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-shopping-bag" aria-hidden="true"></i>
@@ -84,6 +84,9 @@
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Pedidos a
                             Prov.</a>
                     </li> -->
+                    <li @click="menu=70" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px"></i> Nueva Compra</a>
+                    </li>
 
                 </ul>
             </li>
