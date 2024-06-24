@@ -42,7 +42,7 @@
                                 <th class="d-none d-md-table-cell">Fecha y Hora</th>
                                 <th>Total</th>
                                 <th class="d-none d-md-table-cell">Estado</th>
-                                <th class="d-none d-md-table-cell">Recibo</th>
+                                <!--<th class="d-none d-md-table-cell">Recibo</th>-->
                             </tr>
                         </thead>
                         <tbody>
@@ -52,15 +52,22 @@
                                         class="btn btn-success btn-sm mr-1">
                                         <i class="icon-eye"></i>
                                     </button>
+                                    <!--
                                     <button type="button" @click="pdfVenta(venta.id)" class="btn btn-info btn-sm mr-1">
                                         <i class="icon-doc"></i>
                                     </button>
+                                    -->
+
                                     <template v-if="venta.estado == 'Registrado'">
                                         <button type="button" class="btn btn-danger btn-sm mr-1"
                                             @click="desactivarVenta(venta.id)">
                                             <i class="icon-trash"></i>
                                         </button>
                                     </template>
+                                    <button class="btn btn-primary" type="button"
+                                        @click="imprimirResivo(venta.id, venta.correo)">
+                                        <i class="icon-printer"></i>
+                                    </button>
                                     <template v-if="venta.idtipo_venta == 2 && venta.estado == 'Pendiente'">
                                         <button type="button" class="btn btn-primary btn-sm mr-1"
                                             @click="abrirModalCuotas(venta.id)">
@@ -76,12 +83,12 @@
                                 <td>{{ (venta.total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
                                 </td>
                                 <td class="d-none d-md-table-cell" v-text="venta.estado"></td>
-                                <td class="d-none d-md-table-cell">
+                                <!--<td class="d-none d-md-table-cell">
                                     <button class="btn btn-primary" type="button"
                                         @click="imprimirResivo(venta.id, venta.correo)">
                                         <i class="icon-printer"></i>
                                     </button>
-                                </td>
+                                </td>-->
                             </tr>
                         </tbody>
                     </table>
@@ -246,14 +253,18 @@
                                 <div class="form-group row border">
                                     <!-- Cliente Selection -->
                                     <div class="col-md-4">
-                                        <label class="font-weight-bold">Documento <span class="text-danger">*</span></label>
-                                        <input type="text" id="documento" class="form-control" v-model="documento" @keyup.enter="buscarClientePorDocumento" />
+                                        <label class="font-weight-bold">Documento <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" id="documento" class="form-control" v-model="documento"
+                                            @keyup.enter="buscarClientePorDocumento" />
                                     </div>
 
                                     <!-- Nombre Input -->
                                     <div class="col-md-4">
-                                        <label class="font-weight-bold">Cliente <span class="text-danger">*</span></label>
-                                        <input type="text" id="nombreCliente" class="form-control" v-model="nombreCliente" :readonly="!nombreClienteEditable" />
+                                        <label class="font-weight-bold">Cliente <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" id="nombreCliente" class="form-control"
+                                            v-model="nombreCliente" :readonly="!nombreClienteEditable" />
                                     </div>
 
                                     <!-- Hidden Inputs -->
@@ -281,12 +292,8 @@
                                     </div>
 
                                     <!-- Numero de Comprobante Input -->
-                                    <div class="col-md-4">
-                                        <label class="font-weight-bold">Numero de comprobante <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" id="num_comprobante" class="form-control"
+                                        <input type="hidden" id="num_comprobante" class="form-control"
                                             v-model="num_comprob" disabled />
-                                    </div>
                                 </div>
 
                             </div>
@@ -575,8 +582,8 @@
                                                         <div class="font-weight-bold">Estado Actual:</div>
                                                         <div>
                                                             <span :class="'badge badge-' + badgeSeverity">{{
-                                                                estadoTransaccion.objeto.estadoActual
-                                                                }}</span>
+                    estadoTransaccion.objeto.estadoActual
+                }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -655,11 +662,11 @@
                                                                 <td v-text="articulo.nombre_categoria"></td>
                                                                 <td>
                                                                     {{
-                                                                    (
-                                                                    articulo.precio_venta *
-                                                                    parseFloat(monedaVenta[0])
-                                                                    ).toFixed(2)
-                                                                    }}
+                    (
+                        articulo.precio_venta *
+                        parseFloat(monedaVenta[0])
+                    ).toFixed(2)
+                }}
                                                                     {{ monedaVenta[1] }}
                                                                 </td>
                                                                 <td v-text="articulo.saldo_stock"></td>
@@ -759,6 +766,7 @@ export default {
             idcliente: 0,
             usuarioAutenticado: null,
             puntoVentaAutenticado: null,
+            idsucursalAutenticado:  null,
             cliente: "",
             email: "",
             nombreCliente: "",
@@ -971,10 +979,7 @@ export default {
         validarYAvanzar() {
             const errores = [];
 
-            if (this.step === 1) {
-                if (this.nombreCliente === '') errores.push('Necesita un nombre del Cliente');
-                if (this.tipo_comprobante === '0') errores.push('Seleccione un tipo de comprobante');
-            } else if (this.step === 2) {
+            if (this.step === 2) {
                 if (!this.idAlmacen) errores.push('Seleccione un almacén');
             }
 
@@ -1456,6 +1461,44 @@ export default {
                     console.error("Error:", error);
                 });
         },
+
+        async obtenerDatosUsuario() {
+            try {
+                const response = await axios.get('/venta');
+                this.usuarioAutenticado = response.data.usuario.usuario;
+                this.usuario_autenticado = this.usuarioAutenticado;
+                this.idrol = response.data.usuario.idrol;
+                this.idsucursalAutenticado = response.data.usuario.idsucursal;
+                console.log("Obtener Datos Usuario: " + this.idsucursalAutenticado);
+                this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+
+        async obtenerDatosSesionYComprobante() {
+            try {
+                const idsucursal = this.idsucursalAutenticado;
+                console.log("El idsucursal es: " + idsucursal);
+                const response = await axios.get('/obtener-ultimo-comprobante', {
+                    params: {
+                        idsucursal: idsucursal
+                    }
+                });
+                const lastComprobante = response.data.last_comprobante;
+                this.last_comprobante = lastComprobante;
+                console.log("El ultimo comprobante es: " + this.last_comprobante);
+                this.nextNumber(lastComprobante);
+            } catch (error) {
+                console.error('Error al obtener el último comprobante:', error);
+            }
+        },
+
+        async ejecutarFlujoCompleto() {
+            await this.obtenerDatosUsuario();
+            await this.obtenerDatosSesionYComprobante();
+        },
+
         nextNumber() {
             if (!this.num_comprob || this.num_comprob === "") {
                 this.last_comprobante++;
@@ -1750,17 +1793,7 @@ export default {
                     console.log(error);
                 });
         },
-        obtenerDatosUsuario() {
-            axios
-                .get("/venta")
-                .then((response) => {
-                    this.usuarioAutenticado = response.data.usuario.usuario;
-                    this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-        },
+        
         selectAlmacen() {
             let me = this;
             let url = "/almacen/selectAlmacen";
@@ -2032,6 +2065,7 @@ export default {
                         if (response.data.id > 0) {
                             // Restablecer valores después de una venta exitosa
                             me.listado = 1;
+                            me.ejecutarFlujoCompleto();
                             me.listarVenta(1, "", "num_comprob");
                             me.cerrarModal2();
                             me.cerrarModal3();
@@ -2061,10 +2095,12 @@ export default {
                             me.recibido = 0;
                         } else {
                             console.log(response);
+                            me.ejecutarFlujoCompleto();
                             // Manejo de errores
                         }
                     })
                     .catch((error) => {
+                        me.ejecutarFlujoCompleto();
                         console.log(error);
                     });
             } else {
@@ -2151,15 +2187,21 @@ export default {
         },
 
         mostrarDetalle() {
-            axios.get('/ruta-a-tu-endpoint-laravel-para-obtener-ultimo-comprobante')
-                .then(response => {
-                    const lastComprobante = response.data.last_comprobante;
-                    this.last_comprobante = lastComprobante;
-                    this.nextNumber();
-                })
-                .catch(error => {
-                    console.error('Error al obtener el último comprobante:', error);
-                });
+            /*const idsucursal = this.idsucursalAutenticado;
+            console.log("El idsucursal es: " + idsucursal);
+            axios.get('/obtener-ultimo-comprobante', {
+                params: {
+                    idsucursal: idsucursal
+                }
+            })
+            .then(response => {
+                const lastComprobante = response.data.last_comprobante;
+                this.last_comprobante = lastComprobante;
+                this.nextNumber(lastComprobante);
+            })
+            .catch(error => {
+                console.error('Error al obtener el último comprobante:', error);
+            });*/
             let me = this;
             me.selectAlmacen();
             me.listado = 0;
@@ -2384,25 +2426,14 @@ export default {
     },
     created() {
         this.listarPrecio();
-        axios
-            .get("/ruta-a-tu-endpoint-laravel-para-obtener-ultimo-comprobante")
-            .then((response) => {
-                const lastComprobante = response.data.last_comprobante;
-
-                this.last_comprobante = lastComprobante;
-
-                this.nextNumber();
-            })
-            .catch((error) => {
-                console.error("Error al obtener el último comprobante:", error);
-            });
     },
     mounted() {
         this.datosConfiguracion();
         this.selectAlmacen();
         this.listarVenta(1, this.buscar, this.criterio);
-        this.obtenerDatosUsuario();
+        //this.obtenerDatosUsuario();
         this.actualizarFechaHora();
+        this.ejecutarFlujoCompleto();
     },
 };
 </script>

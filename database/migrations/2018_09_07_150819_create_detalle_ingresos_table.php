@@ -20,6 +20,7 @@ class CreateDetalleIngresosTable extends Migration
             $table->integer('idarticulo')->unsigned();
             $table->foreign('idarticulo')->references('id')->on('articulos');
             $table->integer('cantidad');
+            $table->decimal('descuento',11,2)->nullable();
             $table->decimal('precio', 11, 2);
         });
     }
