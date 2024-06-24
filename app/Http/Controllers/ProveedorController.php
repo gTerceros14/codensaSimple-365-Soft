@@ -17,46 +17,33 @@ class ProveedorController extends Controller
 {
     public function index(Request $request)
     {
-        if (!$request->ajax())
+        if (!$request->ajax()) {
             return redirect('/');
-
-        $buscar = $request->buscar;
-        $criterio = $request->criterio;
-
-        if ($buscar == '') {
-            $personas = Proveedor::join('personas', 'proveedores.id', '=', 'personas.id')
-                ->select(
-                    'personas.id',
-                    'personas.nombre',
-                    'personas.tipo_documento',
-                    'personas.num_documento',
-                    'personas.direccion',
-                    'personas.telefono',
-                    'personas.email',
-                    'proveedores.contacto',
-                    'proveedores.telefono_contacto'
-                )
-                ->distinct()
-                ->orderBy('personas.id', 'desc')->paginate(10);
-        } else {
-            $personas = Proveedor::join('personas', 'proveedores.id', '=', 'personas.id')
-                ->select(
-                    'personas.id',
-                    'personas.nombre',
-                    'personas.tipo_documento',
-                    'personas.num_documento',
-                    'personas.direccion',
-                    'personas.telefono',
-                    'personas.email',
-                    'proveedores.contacto',
-                    'proveedores.telefono_contacto'
-                )
-                ->where('personas.' . $criterio, 'like', '%' . $buscar . '%')
-                ->distinct()
-                ->orderBy('personas.id', 'desc')->paginate(10);
         }
-
-
+    
+        $buscar = $request->buscar;
+    
+        $personas = Proveedor::join('personas', 'proveedores.id', '=', 'personas.id')
+            ->select(
+                'personas.id',
+                'personas.nombre',
+                'personas.tipo_documento',
+                'personas.num_documento',
+                'personas.direccion',
+                'personas.telefono',
+                'personas.email',
+                'proveedores.contacto',
+                'proveedores.telefono_contacto'
+            )
+            ->where(function ($query) use ($buscar) {
+                $query->where('personas.nombre', 'like', '%' . $buscar . '%')
+                    ->orWhere('personas.num_documento', 'like', '%' . $buscar . '%')
+                    ->orWhere('personas.telefono', 'like', '%' . $buscar . '%');
+            })
+            ->distinct()
+            ->orderBy('personas.id', 'desc')
+            ->paginate(10);
+        
         return [
             'pagination' => [
                 'total' => $personas->total(),
@@ -69,6 +56,7 @@ class ProveedorController extends Controller
             'personas' => $personas
         ];
     }
+
 
     public function selectProveedor(Request $request)
     {

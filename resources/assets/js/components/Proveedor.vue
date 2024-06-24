@@ -16,19 +16,11 @@
             <div class="card-body">
                 <div class="form-group row">
                     <div class="col-md-6">
-                        <div class="input-group">
-                            <select class="form-control col-md-3" v-model="criterio">
-                                <option value="nombre">Nombre</option>
-                                <option value="num_documento">Documento</option>
-                                <option value="email">Email</option>
-                                <option value="telefono">Teléfono</option>
-                            </select>
-                            <input type="text" v-model="buscar" @keyup.enter="listarPersona(1, buscar, criterio)"
-                                class="form-control" placeholder="Texto a buscar">
-                            <button type="submit" @click="listarPersona(1, buscar, criterio)" class="btn btn-primary"><i
-                                    class="fa fa-search"></i> Buscar</button>
-                        </div>
+                    <div class="input-group">
+                        <input type="text" v-model="buscar" @input="buscarProveedores" class="form-control" placeholder="Texto a buscar">
+                        <button type="button" @click="listarPersona(1, buscar, criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                     </div>
+                </div>
                 </div>
                 <div class="table-responsive">
 
@@ -243,7 +235,7 @@ export default {
                 'to': 0,
             },
             offset: 3,
-            criterio: 'nombre',
+            criterio: 'todos',
             buscar: '',
             modalImportar: 0,
         }
@@ -319,16 +311,37 @@ export default {
         },
         listarPersona(page, buscar, criterio) {
             let me = this;
-            var url = '/proveedor?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                me.arrayPersona = respuesta.personas.data;
-                me.pagination = respuesta.pagination;
-            })
+            var url = `/proveedor?page=${page}&buscar=${buscar}&criterio=${criterio}`;
+            axios.get(url)
+                .then(function (response) {
+                    var respuesta = response.data;
+                    me.arrayPersona = respuesta.personas.data;
+                    me.pagination = respuesta.pagination;
+                })
                 .catch(function (error) {
                     console.log(error);
                 });
         },
+        buscarProveedores() {
+            // Llama a listarPersona cuando se modifica el valor de buscar
+            this.listarPersona(1, this.buscar, this.criterio);
+        },
+        
+
+
+
+        //listarPersona(page, buscar, criterio) {
+        //    let me = this;
+        //    var url = '/proveedor?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+        //    axios.get(url).then(function (response) {
+        //        var respuesta = response.data;
+        //        me.arrayPersona = respuesta.personas.data;
+        //        me.pagination = respuesta.pagination;
+        //    })
+        //        .catch(function (error) {
+        //            console.log(error);
+        //        });
+        //},
         cambiarPagina(page, buscar, criterio) {
             let me = this;
             me.pagination.current_page = page;
