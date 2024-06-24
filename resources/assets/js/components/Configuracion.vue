@@ -53,19 +53,12 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            <label for="opcion3">Consultas almacenes: </label>
-
-                            <div class="form-group">
-
-                                <label> 
-                                    <input type="checkbox" v-model="consultarAlmacenes"
-                                        true-value="1"
-                                        false-value="0"
-                                        >
-                                        
-                                    {{ consultarAlmacenes }}
-                                </label>
-                            </div>
+                            <label for="opcion3">Almacén Predeterminado: </label>
+                            <select v-model="almacenSeleccionado" class="form-control">
+                                <option v-for="almacen in almacenes" :key="almacen.id" :value="almacen.id">
+                                    {{ almacen.nombre_almacen }}
+                                </option>
+                            </select>
                         </div>
                         <div class="col">
                             <div class="form-group">
@@ -374,6 +367,7 @@ export default {
 
             id: 0,
             selectedYear: '',
+            almacenPredeterminado: '',
             codigoProducto: '',
             consultarAlmacenes: '',
             limiteDescuento: '',
@@ -418,6 +412,8 @@ export default {
             nombre_precio : '',
             porcentage : '',
             condicion : 1,
+            almacenes: [],
+            almacenSeleccionado: '',
         };
     },
     computed: {
@@ -452,10 +448,9 @@ export default {
                 me.idMonedaCompra=respuesta.configuracionTrabajo.idMonedaCompra;
                 me.idMonedaVenta=respuesta.configuracionTrabajo.idMonedaVenta;
                 me.idMonedaPrincipal=respuesta.configuracionTrabajo.idMonedaPrincipal;
-
+                me.almacenPredeterminado = respuesta.configuracionTrabajo.almacenSeleccionado;
                 me.selectedYear = respuesta.configuracionTrabajo.gestion;
                 me.codigoProducto = respuesta.configuracionTrabajo.codigoProductos;
-                me.consultarAlmacenes = respuesta.configuracionTrabajo.consultasAlmacenes;
                 me.limiteDescuento = respuesta.configuracionTrabajo.limiteDescuento;
                 me.maximoDescuento = respuesta.configuracionTrabajo.maximoDescuento;
                 me.valuacionInventario = respuesta.configuracionTrabajo.valuacionInventario;
@@ -486,14 +481,14 @@ export default {
             });
 
             let me = this;
-
+            console.log(this.almacenSeleccionado);
             axios.put('/configuracion/actualizar', {
                 'idMonedaCompra':this.idMonedaCompra,
                 'idMonedaVenta':this.idMonedaVenta,
                 'idMonedaPrincipal':this.idMonedaPrincipal,
                 'selectedYear': this.selectedYear,
+                'almacenPredeterminado': this.almacenSeleccionado,
                 'codigoProducto': this.codigoProducto,
-                'consultarAlmacenes': this.consultarAlmacenes,
                 'limiteDescuento': this.limiteDescuento,
                 'maximoDescuento': this.maximoDescuento,
                 'valuacionInventario': this.valuacionInventario,
@@ -607,7 +602,22 @@ export default {
         this.nombre_precio='';
         this.porcentage='';
         },
+
+        async obtenerAlmacenes() {
+            try {
+                const response = await axios.get('/configuracion/ruta-a-tu-endpoint-para-obtener-almacenes');
+                this.almacenes = response.data; 
+                console.log(this.almacenes);
+            } catch (error) {
+                console.error('Error al obtener los almacenes:', error);
+            }
+        }
     },
+
+    created() {
+        this.obtenerAlmacenes();
+    },
+
     mounted() {
         this.listarMonedas();
         this.listarPrecio();
