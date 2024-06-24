@@ -31,7 +31,6 @@ use SebastianBergmann\Environment\Console;
 use SimpleXMLElement;
 use SoapClient;
 use TheSeer\Tokenizer\Exception;
-use App\Helpers\CustomHelpers;
 use App\Medida;
 use App\Rol;
 use Illuminate\Support\Facades\File;
@@ -52,101 +51,56 @@ class VentaController extends Controller
         session_start();
     }
     public function index(Request $request)
-    {
-        if (!$request->ajax())
-            return redirect('/');
-
-        $buscar = $request->buscar;
-        $criterio = $request->criterio;
-        $usuario = \Auth::user();
-        $idRolUsuario = Auth::user()->idrol; // Obtener el rol del usuario autenticado
-
-        if ($buscar == '') {
-            $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
-                ->join('personas', 'ventas.idcliente', '=', 'personas.id')
-                ->select(
-                    'ventas.tipo_comprobante as tipo_comprobante',
-                    'ventas.idcliente',
-                    'ventas.id',
-                    'ventas.tipo_comprobante',
-                    'ventas.serie_comprobante',
-                    'ventas.num_comprobante',
-                    'ventas.fecha_hora',
-                    'ventas.impuesto',
-                    'ventas.total',
-                    'ventas.estado',
-                    'users.usuario',
-                    'personas.nombre as razonSocial',
-                    'personas.num_documento as documentoid',
-                )
-                ->orderBy('ventas.id', 'desc');
-
-            if ($idRolUsuario != 1) { // Si no es administrador
-                $ventas = $ventas->where('ventas.idusuario', Auth::user()->id); // Filtrar solo las ventas del usuario autenticado
-            }
-
-            $ventas = $ventas->paginate(10);
-        } else {
-            if ($criterio === 'usuario') { // Buscar por usuario
-                $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
-                    ->select(
-                        'ventas.idcliente',
-                        'ventas.id',
-                        'ventas.tipo_comprobante',
-                        'ventas.serie_comprobante',
-                        'ventas.num_comprobante',
-                        'ventas.fecha_hora',
-                        'ventas.impuesto',
-                        'ventas.total',
-                        'ventas.estado',
-                        'users.usuario'
-                    )
-                    ->where('users.usuario', 'like', '%' . $buscar . '%')
-                    ->orderBy('ventas.id', 'desc');
-
-                if ($idRolUsuario != 1) { // Si no es administrador
-                    $ventas = $ventas->where('ventas.idusuario', Auth::user()->id); // Filtrar solo las ventas del usuario autenticado
-                }
-
-                $ventas = $ventas->paginate(10);
-            } else {
-                $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
-                    ->select(
-                        'ventas.cliente',
-                        'ventas.id',
-                        'ventas.tipo_comprobante',
-                        'ventas.serie_comprobante',
-                        'ventas.num_comprobante',
-                        'ventas.fecha_hora',
-                        'ventas.impuesto',
-                        'ventas.total',
-                        'ventas.estado',
-                        'users.usuario'
-                    )
-                    ->where('ventas.' . $criterio, 'like', '%' . $buscar . '%')
-                    ->orderBy('ventas.id', 'desc');
-
-                if ($idRolUsuario != 1) { // Si no es administrador
-                    $ventas = $ventas->where('ventas.idusuario', Auth::user()->id); // Filtrar solo las ventas del usuario autenticado
-                }
-
-                $ventas = $ventas->paginate(10);
-            }
-        }
-
-        return [
-            'pagination' => [
-                'total' => $ventas->total(),
-                'current_page' => $ventas->currentPage(),
-                'per_page' => $ventas->perPage(),
-                'last_page' => $ventas->lastPage(),
-                'from' => $ventas->firstItem(),
-                'to' => $ventas->lastItem(),
-            ],
-            'ventas' => $ventas,
-            'usuario' => $usuario
-        ];
+{
+    if (!$request->ajax()) {
+        return redirect('/');
     }
+
+    $buscar = $request->buscar;
+
+    $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
+        ->join('personas', 'ventas.idcliente', '=', 'personas.id')
+        ->select(
+            'ventas.tipo_comprobante as tipo_comprobante',
+            'ventas.idcliente',
+            'ventas.id',
+            'ventas.tipo_comprobante',
+            'ventas.serie_comprobante',
+            'ventas.num_comprobante',
+            'ventas.fecha_hora',
+            'ventas.impuesto',
+            'ventas.total',
+            'ventas.estado',
+            'users.usuario',
+            'personas.nombre as razonSocial',
+            'personas.num_documento as documentoid'
+        )
+        ->orderBy('ventas.id', 'desc');
+
+    // Aplicar filtros según los criterios
+    if (!empty($buscar)) {
+        $ventas = $ventas->where(function ($query) use ($buscar) {
+            $query->where('ventas.tipo_comprobante', 'like', '%' . $buscar . '%')
+                  ->orWhere('ventas.num_comprobante', 'like', '%' . $buscar . '%')
+                  ->orWhere('ventas.fecha_hora', 'like', '%' . $buscar . '%')
+                  ->orWhere('users.usuario', 'like', '%' . $buscar . '%');
+        });
+    }
+
+    $ventas = $ventas->paginate(10);
+
+    return [
+        'pagination' => [
+            'total' => $ventas->total(),
+            'current_page' => $ventas->currentPage(),
+            'per_page' => $ventas->perPage(),
+            'last_page' => $ventas->lastPage(),
+            'from' => $ventas->firstItem(),
+            'to' => $ventas->lastItem(),
+        ],
+        'ventas' => $ventas
+    ];
+}
 
 
     public function ventaOffline(Request $request)
