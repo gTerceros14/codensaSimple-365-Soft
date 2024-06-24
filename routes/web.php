@@ -440,7 +440,7 @@ Route::group(['middleware' => ['auth']], function () {
         //RECIVO
         Route::post('/venta/emitirRecibo', 'VentaController@emitirRecibo');
         Route::get('/resivo/imprimirRollo/{id}', 'VentaController@imprimirResivoRollo');
-        Route::get('/resivo/imprimirCarta/{id}', 'VentaController@imprimirResivo');
+        Route::get('/resivo/imprimirCarta/{id}', 'VentaController@imprimirResivoCarta');
 
         //VARIABLES TEMPORALES
         Route::post('/variables/registrarVariable', 'VentasInstitucionalesController@registrarVariable');
