@@ -42,7 +42,7 @@
                                 <th class="d-none d-md-table-cell">Fecha y Hora</th>
                                 <th>Total</th>
                                 <th class="d-none d-md-table-cell">Estado</th>
-                                <th class="d-none d-md-table-cell">Recibo</th>
+                                <!--<th class="d-none d-md-table-cell">Recibo</th>-->
                             </tr>
                         </thead>
                         <tbody>
@@ -52,15 +52,22 @@
                                         class="btn btn-success btn-sm mr-1">
                                         <i class="icon-eye"></i>
                                     </button>
+                                    <!--
                                     <button type="button" @click="pdfVenta(venta.id)" class="btn btn-info btn-sm mr-1">
                                         <i class="icon-doc"></i>
                                     </button>
+                                    -->
+
                                     <template v-if="venta.estado == 'Registrado'">
                                         <button type="button" class="btn btn-danger btn-sm mr-1"
                                             @click="desactivarVenta(venta.id)">
                                             <i class="icon-trash"></i>
                                         </button>
                                     </template>
+                                    <button class="btn btn-primary" type="button"
+                                        @click="imprimirResivo(venta.id, venta.correo)">
+                                        <i class="icon-printer"></i>
+                                    </button>
                                     <template v-if="venta.idtipo_venta == 2 && venta.estado == 'Pendiente'">
                                         <button type="button" class="btn btn-primary btn-sm mr-1"
                                             @click="abrirModalCuotas(venta.id)">
@@ -76,12 +83,12 @@
                                 <td>{{ (venta.total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
                                 </td>
                                 <td class="d-none d-md-table-cell" v-text="venta.estado"></td>
-                                <td class="d-none d-md-table-cell">
+                                <!--<td class="d-none d-md-table-cell">
                                     <button class="btn btn-primary" type="button"
                                         @click="imprimirResivo(venta.id, venta.correo)">
                                         <i class="icon-printer"></i>
                                     </button>
-                                </td>
+                                </td>-->
                             </tr>
                         </tbody>
                     </table>
@@ -246,14 +253,18 @@
                                 <div class="form-group row border">
                                     <!-- Cliente Selection -->
                                     <div class="col-md-4">
-                                        <label class="font-weight-bold">Documento <span class="text-danger">*</span></label>
-                                        <input type="text" id="documento" class="form-control" v-model="documento" @keyup.enter="buscarClientePorDocumento" />
+                                        <label class="font-weight-bold">Documento <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" id="documento" class="form-control" v-model="documento"
+                                            @keyup.enter="buscarClientePorDocumento" />
                                     </div>
 
                                     <!-- Nombre Input -->
                                     <div class="col-md-4">
-                                        <label class="font-weight-bold">Cliente <span class="text-danger">*</span></label>
-                                        <input type="text" id="nombreCliente" class="form-control" v-model="nombreCliente" :readonly="!nombreClienteEditable" />
+                                        <label class="font-weight-bold">Cliente <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" id="nombreCliente" class="form-control"
+                                            v-model="nombreCliente" :readonly="!nombreClienteEditable" />
                                     </div>
 
                                     <!-- Hidden Inputs -->
@@ -575,8 +586,8 @@
                                                         <div class="font-weight-bold">Estado Actual:</div>
                                                         <div>
                                                             <span :class="'badge badge-' + badgeSeverity">{{
-                                                                estadoTransaccion.objeto.estadoActual
-                                                                }}</span>
+                    estadoTransaccion.objeto.estadoActual
+                }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -655,11 +666,11 @@
                                                                 <td v-text="articulo.nombre_categoria"></td>
                                                                 <td>
                                                                     {{
-                                                                    (
-                                                                    articulo.precio_venta *
-                                                                    parseFloat(monedaVenta[0])
-                                                                    ).toFixed(2)
-                                                                    }}
+                    (
+                        articulo.precio_venta *
+                        parseFloat(monedaVenta[0])
+                    ).toFixed(2)
+                }}
                                                                     {{ monedaVenta[1] }}
                                                                 </td>
                                                                 <td v-text="articulo.saldo_stock"></td>
@@ -971,10 +982,7 @@ export default {
         validarYAvanzar() {
             const errores = [];
 
-            if (this.step === 1) {
-                if (this.nombreCliente === '') errores.push('Necesita un nombre del Cliente');
-                if (this.tipo_comprobante === '0') errores.push('Seleccione un tipo de comprobante');
-            } else if (this.step === 2) {
+            if (this.step === 2) {
                 if (!this.idAlmacen) errores.push('Seleccione un almacén');
             }
 
