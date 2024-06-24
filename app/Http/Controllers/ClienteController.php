@@ -338,6 +338,7 @@ class ClienteController extends Controller
         $path = $request->file('select_users_file')->getRealPath();
         Excel::import(new ClienteImport, $path);
     }
+
     public function verificarExistencia(Request $request)
     {
         $documento = $request->query('documento');
@@ -349,4 +350,16 @@ class ClienteController extends Controller
             return response()->json(['existe' => false]);
         }
     }
+
+    public function buscarPorDocumento(Request $request) {
+        $documento = $request->query('documento');
+        $cliente = Persona::where('num_documento', $documento)->first();
+    
+        if ($cliente) {
+            return response()->json($cliente);
+        } else {
+            return response()->json(null, 404);
+        }
+    }
+    
 }
