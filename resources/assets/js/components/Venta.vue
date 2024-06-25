@@ -15,10 +15,18 @@
 
                 <div class="form-group row">
                     <div class="col-md-8">
-                <div class="input-group">
-                    <input type="search" v-model="buscar" @keyup="buscarVenta" class="form-control" placeholder="Texto a buscar">
-                </div>
-            </div>
+                        <div class="input-group">
+                            <select class="selectpicker show-tick" v-model="criterio">
+                                <option value="" disabled selected>Seleccione</option>
+                                <option value="tipo_comprobante">Tipo Comprobante</option>
+                                <option value="num_comprobante">Número Comprobante</option>
+                                <option value="fecha_hora">Fecha-Hora</option>
+                                <option value="usuario">Usuario</option>
+                            </select>
+                            <input type="search" v-model="buscar" @keyup="listarVenta(1, buscar, criterio)"
+                                class="form-control" placeholder="Texto a buscar">
+                        </div>
+                    </div>
                 </div>
 
 
@@ -273,12 +281,8 @@
                                     </div>
 
                                     <!-- Numero de Comprobante Input -->
-                                    <div class="col-md-4">
-                                        <label class="font-weight-bold">Numero de comprobante <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" id="num_comprobante" class="form-control"
+                                        <input type="hidden" id="num_comprobante" class="form-control"
                                             v-model="num_comprob" disabled />
-                                    </div>
                                 </div>
 
                             </div>
@@ -755,6 +759,7 @@ export default {
             idcliente: 0,
             usuarioAutenticado: null,
             puntoVentaAutenticado: null,
+            idsucursalAutenticado:  null,
             cliente: "",
             email: "",
             nombreCliente: "",
@@ -791,15 +796,12 @@ export default {
                 to: 0,
             },
             offset: 3,
-            criterio: '',
+            criterio: "num_comprobante",
             buscar: "",
-            criterioA: "",
+            criterioA: "nombre",
             buscarA: "",
             arrayArticulo: [],
             arraySeleccionado: [],
-            arraryVenta:[],
-            paginacion:[],
-            usuario: null,
             idarticulo: 0,
             codigo: "",
             articulo: "",
@@ -1457,6 +1459,44 @@ export default {
                     console.error("Error:", error);
                 });
         },
+
+        async obtenerDatosUsuario() {
+            try {
+                const response = await axios.get('/venta');
+                this.usuarioAutenticado = response.data.usuario.usuario;
+                this.usuario_autenticado = this.usuarioAutenticado;
+                this.idrol = response.data.usuario.idrol;
+                this.idsucursalAutenticado = response.data.usuario.idsucursal;
+                console.log("Obtener Datos Usuario: " + this.idsucursalAutenticado);
+                this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+
+        async obtenerDatosSesionYComprobante() {
+            try {
+                const idsucursal = this.idsucursalAutenticado;
+                console.log("El idsucursal es: " + idsucursal);
+                const response = await axios.get('/obtener-ultimo-comprobante', {
+                    params: {
+                        idsucursal: idsucursal
+                    }
+                });
+                const lastComprobante = response.data.last_comprobante;
+                this.last_comprobante = lastComprobante;
+                console.log("El ultimo comprobante es: " + this.last_comprobante);
+                this.nextNumber(lastComprobante);
+            } catch (error) {
+                console.error('Error al obtener el último comprobante:', error);
+            }
+        },
+
+        async ejecutarFlujoCompleto() {
+            await this.obtenerDatosUsuario();
+            await this.obtenerDatosSesionYComprobante();
+        },
+
         nextNumber() {
             if (!this.num_comprob || this.num_comprob === "") {
                 this.last_comprobante++;
@@ -1465,21 +1505,21 @@ export default {
             }
         },
 
-        listarVenta(page, buscar) {
-        let me = this;
-        var url = `/venta?page=${page}&buscar=${buscar}`;
-        axios.get(url)
-            .then(function (response) {
-                var respuesta = response.data;
-                me.arrayVenta = respuesta.ventas.data;
-                me.pagination = respuesta.pagination;
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-        },
-        buscarVenta() {
-            this.listarVenta(1, this.buscar);
+        listarVenta(page, buscar, criterio) {
+            let me = this;
+            var url =
+                "/venta?page=" + page + "&buscar=" + buscar + "&criterio=" + criterio;
+            axios
+                .get(url)
+                .then(function (response) {
+                    var respuesta = response.data;
+                    console.log(respuesta);
+                    me.arrayVenta = respuesta.ventas.data;
+                    me.pagination = respuesta.pagination;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
 
         selectCliente(numero) {
@@ -2039,6 +2079,7 @@ export default {
                         if (response.data.id > 0) {
                             // Restablecer valores después de una venta exitosa
                             me.listado = 1;
+                            me.ejecutarFlujoCompleto();
                             me.listarVenta(1, "", "num_comprob");
                             me.cerrarModal2();
                             me.cerrarModal3();
@@ -2068,10 +2109,12 @@ export default {
                             me.recibido = 0;
                         } else {
                             console.log(response);
+                            me.ejecutarFlujoCompleto();
                             // Manejo de errores
                         }
                     })
                     .catch((error) => {
+                        me.ejecutarFlujoCompleto();
                         console.log(error);
                     });
             } else {
@@ -2158,15 +2201,21 @@ export default {
         },
 
         mostrarDetalle() {
-            axios.get('/ruta-a-tu-endpoint-laravel-para-obtener-ultimo-comprobante')
-                .then(response => {
-                    const lastComprobante = response.data.last_comprobante;
-                    this.last_comprobante = lastComprobante;
-                    this.nextNumber();
-                })
-                .catch(error => {
-                    console.error('Error al obtener el último comprobante:', error);
-                });
+            /*const idsucursal = this.idsucursalAutenticado;
+            console.log("El idsucursal es: " + idsucursal);
+            axios.get('/obtener-ultimo-comprobante', {
+                params: {
+                    idsucursal: idsucursal
+                }
+            })
+            .then(response => {
+                const lastComprobante = response.data.last_comprobante;
+                this.last_comprobante = lastComprobante;
+                this.nextNumber(lastComprobante);
+            })
+            .catch(error => {
+                console.error('Error al obtener el último comprobante:', error);
+            });*/
             let me = this;
             me.selectAlmacen();
             me.listado = 0;
@@ -2391,25 +2440,14 @@ export default {
     },
     created() {
         this.listarPrecio();
-        axios
-            .get("/ruta-a-tu-endpoint-laravel-para-obtener-ultimo-comprobante")
-            .then((response) => {
-                const lastComprobante = response.data.last_comprobante;
-
-                this.last_comprobante = lastComprobante;
-
-                this.nextNumber();
-            })
-            .catch((error) => {
-                console.error("Error al obtener el último comprobante:", error);
-            });
     },
     mounted() {
         this.datosConfiguracion();
         this.selectAlmacen();
         this.listarVenta(1, this.buscar, this.criterio);
-        this.obtenerDatosUsuario();
+        //this.obtenerDatosUsuario();
         this.actualizarFechaHora();
+        this.ejecutarFlujoCompleto();
     },
 };
 </script>
