@@ -291,9 +291,13 @@
                                         <div class="col-md-6">
                                             <label class="font-weight-bold">Almacen <span
                                                     class="text-danger">*</span></label>
-                                            <v-select label="nombre_almacen" :options="arrayAlmacenes"
-                                                placeholder="Seleccione un almacen"
-                                                :onChange="getAlmacenProductos"></v-select>
+                                                    <v-select 
+                                                        label="nombre_almacen" 
+                                                        :options="arrayAlmacenes"
+                                                        placeholder="Seleccione un almacen"
+                                                        v-model="almacenSeleccionado"
+                                                        @change="getAlmacenProductos">
+                                                    </v-select>
                                         </div>
 
 
@@ -825,6 +829,8 @@ export default {
             criterioVenta: "ci",
             //almacenes
             arrayAlmacenes: [],
+            almacenSeleccionado: null,
+            almacenPredeterminadoId: null,
             idAlmacen: null,
             //-----PRECIOS- AUMENTE 3/OCTUBRE--------
             precioseleccionado: "",
@@ -1745,31 +1751,37 @@ export default {
                     console.log(error);
                 });
         },
-        obtenerDatosUsuario() {
-            axios
-                .get("/venta")
-                .then((response) => {
-                    this.usuarioAutenticado = response.data.usuario.usuario;
-                    this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-        },
-        selectAlmacen() {
+        
+         async selectAlmacen() {
             let me = this;
             let url = "/almacen/selectAlmacen";
-            axios
+            await axios
                 .get(url)
                 .then(function (response) {
                     let respuesta = response.data;
                     me.arrayAlmacenes = respuesta.almacenes;
                     console.log(me.arrayAlmacenes);
+                    me.obtenerAlmacenPredeterminado();
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
         },
+
+        async obtenerAlmacenPredeterminado() {
+            try {
+                const response = await axios.get('/api/configuracion/almacen-predeterminado');
+                this.almacenPredeterminadoId = response.data.almacen_predeterminado_id;
+                console.log("El almacen predeterminado es : " + this.almacenPredeterminadoId);
+
+                this.almacenSeleccionado = this.arrayAlmacenes.find(
+                    almacen => almacen.id === this.almacenPredeterminadoId
+                );
+            } catch (error) {
+                console.error('Error al obtener el almacén predeterminado:', error);
+            }
+        },
+
         getAlmacenProductos(almacen) {
             this.idAlmacen = almacen.id;
         },
