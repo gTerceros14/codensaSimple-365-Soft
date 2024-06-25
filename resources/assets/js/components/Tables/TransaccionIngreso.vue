@@ -1,4 +1,4 @@
-
+s
 <template>
     <div class="table-responsive">
         <TableBase :items="items" :rows="rows" :per-page="perPage" :fields="fields"
