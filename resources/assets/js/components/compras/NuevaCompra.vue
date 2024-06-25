@@ -21,14 +21,26 @@
                     <div class="card formulario-card">
                     <Card>
                         <template #title>
-                            <h5>Complete el Formulario</h5>
+                            <div style="padding-left: 1rem;">
+                                <h5>Complete el Formulario</h5>
+                            </div>
                         </template>
 
                         <template #content>
                             <div class="p-fluid p-formgrid p-grid">
                                 <div class="p-field p-col-12 p-md-3">
-                                    <label for="proveedor">Proveedor</label>
-                                    <Dropdown id="proveedor" class="p-inputtext-sm" v-model="form.proveedorSeleccionado" :options="proveedores" optionLabel="nombre" placeholder="Lista proveedores ..." />
+                                    <label for="autocomplete">Proveedor</label>
+                                    <!--<Dropdown id="proveedor" class="p-inputtext-sm" v-model="form.proveedorSeleccionado" :options="proveedores" optionLabel="nombre" placeholder="Lista proveedores ..." />-->
+                                    <AutoComplete
+                                        id="autocomplete"
+                                        class="p-inputtext-sm"
+                                        v-model="proveedorSeleccionado" 
+                                        :suggestions="arrayProveedor" 
+                                        field="nombre" 
+                                        @complete="selectProveedor" 
+                                        placeholder="Buscar Proveedores..." 
+                                        @change="getDatosProveedor">
+                                    </AutoComplete>
                                 </div>
                                 <div class="p-field p-col-12 p-md-3">
                                     <label for="tipoComprobante">Tipo Comprobante</label>
@@ -77,10 +89,10 @@
                         <div class="p-col-6">
                             <div class="card">
                                 <DataTable
-                                    :value="arrayArticuloSeleccionado"
+                                    :value="array_articulos_proveedor"
                                     selectionMode="multiple"
                                     dataKey="codigo"
-                                    :selection.sync="articulosSeleccionados"
+                                    :selection.sync="array_articulos_seleccionados"
                                     responsiveLayout="scroll"
                                     :paginator="true"
                                     :rows="5"
@@ -111,7 +123,7 @@
                         <div class="p-col-6">
                             <div class="card">
                                 <DataTable
-                                    :value="articulosSeleccionados"
+                                    :value="array_articulos_seleccionados"
                                     dataKey="codigo"
                                     responsiveLayout="scroll"
                                     :paginator="true"
@@ -120,7 +132,7 @@
                                     <template #header>
                                         <div class="tablas-articulos-header">
                                             <h5>Articulos seleccionados</h5>
-                                            <Button class="p-button-sm p-button-danger" label="Vaciar lista" icon="pi pi-trash" @click="actualizarLista"/>
+                                            <Button class="p-button-sm p-button-danger" label="Vaciar lista" icon="pi pi-trash" @click="vaciarListaSeleccionados"/>
                                         </div>
                                     </template>
 
@@ -184,7 +196,9 @@ import Dropdown from 'primevue/dropdown';
 import PickList from 'primevue/picklist';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import ColumnGroup from 'primevue/columngroup'; 
+import ColumnGroup from 'primevue/columngroup';
+import AutoComplete from 'primevue/autocomplete';
+
 
 export default {
     setup () {
@@ -221,9 +235,13 @@ export default {
 
             codigo: '',
             idproveedor: 6,
-            arrayArticuloSeleccionado: [],
-            articulosSeleccionados: [],
-            targetProducts: []
+
+            arrayProveedor: [],
+            proveedorSeleccionado: null,
+            loading: false,
+
+            array_articulos_proveedor: [],
+            array_articulos_seleccionados: [],
         }
     },
 
@@ -249,6 +267,7 @@ export default {
         DataTable,
         Column,
         ColumnGroup,
+        AutoComplete
     },
 
     computed: {
@@ -258,12 +277,12 @@ export default {
     },
 
     methods: {
-        actualizarLista() {
-            console.log('SELECCIONADOS: ',this.articulosSeleccionados)
+        vaciarListaSeleccionados() {
+            this.array_articulos_seleccionados.splice(0, this.array_articulos_seleccionados.length);
         },
 
         eliminarArticuloSeleccionado(articulo) {
-            this.articulosSeleccionados = this.articulosSeleccionados.filter(a => a.id !== articulo.id);
+            this.array_articulos_seleccionados = this.array_articulos_seleccionados.filter(a => a.id !== articulo.id);
         },
 
         nextStep() {
@@ -287,14 +306,49 @@ export default {
                     .get(url)
                     .then(function (response) {
                         let respuesta = response.data;
-                        me.arrayArticuloSeleccionado = respuesta.articulos.data;
-                        console.log(me.arrayArticuloSeleccionado);
+                        me.array_articulos_proveedor = respuesta.articulos.data;
                     })
                     .catch(function (error) {
                         console.log(error);
                     });
             }, 1000);
         },
+
+        selectProveedor(event) {
+            let search = event.query;
+            let me = this;
+
+            if (search.trim() === '') {
+                swal("Aviso", "Debe seleccionar un proveedor", "warning");
+                return;
+            }
+
+            this.loading = true;
+
+            let url = '/proveedor/selectProveedor?filtro=' + search;
+            axios.get(url).then(function (response) {
+                let respuesta = response.data;
+                me.arrayProveedor = respuesta.proveedores;
+                me.loading = false;
+            })
+            .catch(function (error) {
+                console.log(error);
+                me.loading = false;
+            });
+            },
+
+        getDatosProveedor(event) {
+            let val1 = event.value;
+            let me = this;
+
+            me.loading = true;
+
+            if (!val1.id && this.arrayPedidoSeleccionado) {
+                this.idproveedor = this.arrayPedidoSeleccionado.idproveedor;
+            } else {
+                me.idproveedor = val1.id;
+            }
+        }
 
     },
 
@@ -356,7 +410,7 @@ export default {
 }
 
 >>> .p-tabview-panels {
-    padding: 0.5rem 0;
+    padding: 1.5rem 0;
 }
 
 /* Card */
