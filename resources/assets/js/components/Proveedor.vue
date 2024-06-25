@@ -2,6 +2,7 @@
     <main class="main">
 
         <!-- Ejemplo de tabla Listado -->
+
         <div class="card">
             <div class="card-header">
                 <i class="fa fa-align-justify"></i> Proveedores
@@ -16,11 +17,13 @@
             <div class="card-body">
                 <div class="form-group row">
                     <div class="col-md-6">
-                    <div class="input-group">
-                        <input type="text" v-model="buscar" @input="buscarProveedores" class="form-control" placeholder="Texto a buscar">
-                        <button type="button" @click="listarPersona(1, buscar, criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                        <div class="input-group">
+                            <input type="text" v-model="buscar" @input="buscarProveedores" class="form-control"
+                                placeholder="Texto a buscar">
+                            <button type="button" @click="listarPersona(1, buscar, criterio)" class="btn btn-primary"><i
+                                    class="fa fa-search"></i> Buscar</button>
+                        </div>
                     </div>
-                </div>
                 </div>
                 <div class="table-responsive">
 
@@ -29,13 +32,13 @@
                             <tr>
                                 <th>Opciones</th>
                                 <th>Nombre_proveedor</th>
-                                <th>Tipo Documento</th>
+                                <th class="d-none d-md-table-cell">Tipo Documento</th>
                                 <th>NIT/CI</th>
                                 <!-- <th>Número</th> -->
-                                <th>Dirección</th>
+                                <th class="d-none d-md-table-cell">Dirección</th>
                                 <th>Teléfono</th>
-                                <th>Email</th>
-                                <th>Contacto</th>
+                                <th class="d-none d-md-table-cell">Email</th>
+                                <th class="d-none d-md-table-cell">Contacto</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,12 +50,14 @@
                                     </button>
                                 </td>
                                 <td v-text="persona.nombre"></td>
-                                <td v-text="getTipoDocumentoText(persona.tipo_documento)"></td>
+                                <td class="d-none d-md-table-cell"
+                                    v-text="getTipoDocumentoText(persona.tipo_documento)">
+                                </td>
                                 <td v-text="persona.num_documento"></td>
-                                <td v-text="persona.direccion"></td>
+                                <td class="d-none d-md-table-cell" v-text="persona.direccion"></td>
                                 <td v-text="persona.telefono"></td>
-                                <td v-text="persona.email"></td>
-                                <td v-text="persona.contacto"></td>
+                                <td class="d-none d-md-table-cell" v-text="persona.email"></td>
+                                <td class="d-none d-md-table-cell" v-text="persona.contacto"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -326,7 +331,7 @@ export default {
             // Llama a listarPersona cuando se modifica el valor de buscar
             this.listarPersona(1, this.buscar, this.criterio);
         },
-        
+
 
 
 
