@@ -18,17 +18,29 @@
                         <Button label="1" class="p-button-secondary p-button-rounded non-clickable" />
                     </template>
 
-                    <div class="fomulario-card">
+                    <div class="card formulario-card">
                     <Card>
                         <template #title>
-                            <h5>Complete el Formulario</h5>
+                            <div style="padding-left: 1rem;">
+                                <h5>Complete el Formulario</h5>
+                            </div>
                         </template>
 
                         <template #content>
                             <div class="p-fluid p-formgrid p-grid">
                                 <div class="p-field p-col-12 p-md-3">
-                                    <label for="proveedor">Proveedor</label>
-                                    <Dropdown id="proveedor" class="p-inputtext-sm" v-model="form.proveedorSeleccionado" :options="proveedores" optionLabel="nombre" placeholder="Lista proveedores ..." />
+                                    <label for="autocomplete">Proveedor</label>
+                                    <!--<Dropdown id="proveedor" class="p-inputtext-sm" v-model="form.proveedorSeleccionado" :options="proveedores" optionLabel="nombre" placeholder="Lista proveedores ..." />-->
+                                    <AutoComplete
+                                        id="autocomplete"
+                                        class="p-inputtext-sm"
+                                        v-model="proveedorSeleccionado" 
+                                        :suggestions="arrayProveedor" 
+                                        field="nombre" 
+                                        @complete="selectProveedor" 
+                                        placeholder="Buscar Proveedores..." 
+                                        @change="getDatosProveedor">
+                                    </AutoComplete>
                                 </div>
                                 <div class="p-field p-col-12 p-md-3">
                                     <label for="tipoComprobante">Tipo Comprobante</label>
@@ -45,52 +57,84 @@
                             </div>
                         </template>
 
-                        <!--<template #footer>
-                            <Button icon="pi pi-sync" label="Actualizar productos" class="p-button-success p-button-sm" />
-                        </template>-->
                     </Card>
                     </div>
 
-                    <div class="actualizador-buscador">
-                        <span class="p-input-icon-left">
-                            <i class="pi pi-search"/>
-                            <InputText style="width: 15rem;" placeholder="Buscar artículo ..." class="p-inputtext-sm" ></InputText>
-                        </span>
-                        <Button icon="pi pi-sync" label="Actualizar productos" class="p-button-success p-button-sm" style="width: 15rem;"/>
-                    </div>
+                    <div class="p-grid">
+                        <div class="p-col-6">
+                            <div class="card">
+                                <DataTable
+                                    :value="array_articulos_proveedor"
+                                    selectionMode="multiple"
+                                    dataKey="codigo"
+                                    :selection.sync="array_articulos_seleccionados"
+                                    responsiveLayout="scroll"
+                                    :paginator="true"
+                                    :rows="5"
+                                >
+                                    <template #header>
+                                        <div class="tablas-articulos-header">
+                                            <h5>Selecciona articulos</h5>
+                                            <span class="p-input-icon-left">
+                                                <i class="pi pi-search" />
+                                                <InputText class="p-inputtext-sm" placeholder="Buscador global" />
+                                            </span>
+                                        </div>
+                                    </template>
 
+                                    <Column selectionMode="multiple" ></Column>
+                                    <Column field="codigo" header="Codigo" :sortable="true" ></Column>
+                                    <Column field="nombre" header="Nombre" :sortable="true" ></Column>
+                                    <Column field="precio_costo_unid" header="Precio Unidad" :sortable="true" ></Column>
+                                    <Column field="precio_costo_paq" header="Precio Paquete" :sortable="true" ></Column>
 
-                    <PickList v-model="products" listStyle="height:342px" dataKey="id">
-                        <template #sourceheader>
-                            Artículos disponibles ({{ form.proveedorSeleccionado.nombre }})
-                        </template>
-                        <template #targetheader>
-                            Artículos seleccionados
-                        </template>
-                        <template #item="slotProps">
-                            <div class="product-item">
-                                <div class="image-container">
-                                    <img :src="'demo/images/product/' + slotProps.item.image" :alt="slotProps.item.name" />
-                                </div>
-                                <div class="product-list-detail">
-                                    <h5 class="mb-2">{{slotProps.item.name}}</h5>
-                                    <i class="pi pi-tag product-category-icon"></i>
-                                    <span class="product-category">{{slotProps.item.category}}</span>
-                                </div>
-                                <div class="product-list-action">
-                                    <h6 class="mb-2">${{slotProps.item.price}}</h6>
-                                    <span :class="'product-badge status-'+slotProps.item.inventoryStatus.toLowerCase()">{{slotProps.item.inventoryStatus}}</span>
-                                </div>
+                                    <template #empty>
+                                        Articulos no encontrados ...
+                                    </template>
+                                </DataTable>
                             </div>
-                        </template>
-                    </PickList>
+                        </div>
+
+                        <div class="p-col-6">
+                            <div class="card">
+                                <DataTable
+                                    :value="array_articulos_seleccionados"
+                                    dataKey="codigo"
+                                    responsiveLayout="scroll"
+                                    :paginator="true"
+                                    :rows="5"
+                                >
+                                    <template #header>
+                                        <div class="tablas-articulos-header">
+                                            <h5>Articulos seleccionados</h5>
+                                            <Button class="p-button-sm p-button-danger" label="Vaciar lista" icon="pi pi-trash" @click="vaciarListaSeleccionados"/>
+                                        </div>
+                                    </template>
+
+                                    <Column field="codigo" header="Codigo" :sortable="true" ></Column>
+                                    <Column field="nombre" header="Nombre" :sortable="true" ></Column>
+                                    <Column field="precio_costo_unid" header="Precio Unidad" :sortable="true" ></Column>
+                                    <Column field="precio_costo_paq" header="Precio Paquete" :sortable="true" ></Column>
+                                    <Column :headerStyle="{'min-width': '4rem', 'text-align': 'center'}" :bodyStyle="{'text-align': 'center', overflow: 'visible'}">
+                                        <template #body="slotProps">
+                                            <Button type="button" icon="pi pi-delete-left" class="p-button-danger p-button-sm" @click="eliminarArticuloSeleccionado(slotProps.data)"></Button>
+                                        </template>
+                                    </Column>
+
+                                    <template #empty>
+                                        Sin articulos seleccionados ...
+                                    </template>
+                                </DataTable>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="total-saldo-card">
-                    <Card>
-                        <template #content>
-                            <div class="saldo-total"><strong>TOTAL Bs. 0</strong></div>
-                        </template>
-                    </Card>
+                        <Card>
+                            <template #content>
+                                <div class="saldo-total"><strong>TOTAL Bs. 0</strong></div>
+                            </template>
+                        </Card>
                     </div>
                 </TabPanel>
 
@@ -124,7 +168,11 @@ import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import Card from 'primevue/card';
 import Dropdown from 'primevue/dropdown';
-import PickList from 'primevue/picklist';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup';
+import AutoComplete from 'primevue/autocomplete';
+
 
 export default {
     setup () {
@@ -154,10 +202,20 @@ export default {
                 {nombre: 'Sandy', code: 'JS'},
             ],
             lista_comprobantes: [
-                {nombre: 'Boleta', id: '1'},
+                {nombre: 'Recibo', id: '1'},
                 {nombre: 'Factura', id: '2'},
                 {nombre: 'Ticket', id: '3'},
             ],
+
+            codigo: '',
+            idproveedor: 6,
+
+            arrayProveedor: [],
+            proveedorSeleccionado: null,
+            loading: false,
+
+            array_articulos_proveedor: [],
+            array_articulos_seleccionados: [],
         }
     },
 
@@ -179,7 +237,10 @@ export default {
         TabPanel,
         Card,
         Dropdown,
-        PickList,
+        DataTable,
+        Column,
+        ColumnGroup,
+        AutoComplete
     },
 
     computed: {
@@ -189,6 +250,14 @@ export default {
     },
 
     methods: {
+        vaciarListaSeleccionados() {
+            this.array_articulos_seleccionados.splice(0, this.array_articulos_seleccionados.length);
+        },
+
+        eliminarArticuloSeleccionado(articulo) {
+            this.array_articulos_seleccionados = this.array_articulos_seleccionados.filter(a => a.id !== articulo.id);
+        },
+
         nextStep() {
             if (this.activeIndex < this.steps.length - 1) {
                 this.activeIndex++;
@@ -201,6 +270,59 @@ export default {
             }
         },
 
+        buscarArticulo() {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
+                let me = this;
+                var url = '/articulo/listarArticulo?buscar=' + me.codigo + '&criterio=' + 'codigo' + '&idProveedor=' + me.idproveedor
+                axios
+                    .get(url)
+                    .then(function (response) {
+                        let respuesta = response.data;
+                        me.array_articulos_proveedor = respuesta.articulos.data;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }, 1000);
+        },
+
+        selectProveedor(event) {
+            let search = event.query;
+            let me = this;
+
+            if (search.trim() === '') {
+                swal("Aviso", "Debe seleccionar un proveedor", "warning");
+                return;
+            }
+
+            this.loading = true;
+
+            let url = '/proveedor/selectProveedor?filtro=' + search;
+            axios.get(url).then(function (response) {
+                let respuesta = response.data;
+                me.arrayProveedor = respuesta.proveedores;
+                me.loading = false;
+            })
+            .catch(function (error) {
+                console.log(error);
+                me.loading = false;
+            });
+            },
+
+        getDatosProveedor(event) {
+            let val1 = event.value;
+            let me = this;
+
+            me.loading = true;
+
+            if (!val1.id && this.arrayPedidoSeleccionado) {
+                this.idproveedor = this.arrayPedidoSeleccionado.idproveedor;
+            } else {
+                me.idproveedor = val1.id;
+            }
+        }
+
     },
 
     watch: {
@@ -212,7 +334,7 @@ export default {
     },
 
     mounted() {
-
+        this.buscarArticulo();
     },
 
     beforeDestroy() {
@@ -261,20 +383,11 @@ export default {
 }
 
 >>> .p-tabview-panels {
-    padding: 0.5rem 0;
-}
-
-/* Buscador */
-.actualizador-buscador {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    align-items: center;
-    padding: 0.5rem 5.5rem;
+    padding: 1.5rem 0;
 }
 
 /* Card */
-.fomulario-card >>> .p-card {
+.formulario-card >>> .p-card {
     box-shadow: none !important;
 }
 
@@ -300,9 +413,16 @@ export default {
     justify-content: right;
 }
 
+/* Tablas Articulos */
+.tablas-articulos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 /* Grid */
 >>> .p-md-3 {
-    padding: 0 0.65rem 0 0.5rem !important;
+    padding: 0 1.5rem 0 1.5rem !important;
     margin-bottom: 0.5rem;
 }
 
