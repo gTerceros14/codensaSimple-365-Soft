@@ -102,6 +102,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/configuracion/editar', 'ConfiguracionTrabajoController@edit');
         Route::put('/configuracion/actualizar', 'ConfiguracionTrabajoController@update');
         Route::get('/configuracion', 'ConfiguracionTrabajoController@index');
+        Route::get('/configuracion/ruta-a-tu-endpoint-para-obtener-almacenes', 'ConfiguracionTrabajoController@listarAlmacen');
+        Route::get('/api/configuracion/almacen-predeterminado', 'ConfiguracionTrabajoController@obtenerAlmacenPredeterminado');
+
 
         Route::get('/backup', 'BackupDbController@createBackup');
         Route::get('/categoria', 'CategoriaController@index');
@@ -318,7 +321,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/medida/import_excel', 'MedidaController@importsaveExecelUser')->name('import_excel');
 
         //Obtener último numero de comprobante
-        Route::get('/ruta-a-tu-endpoint-laravel-para-obtener-ultimo-comprobante', 'VentaController@obtenerUltimoComprobante');
+        Route::get('/obtener-ultimo-comprobante', 'VentaController@obtenerUltimoComprobante');
 
         //Obtener último numero de codigoSucursal
         Route::get('/ruta-api-para-obtener-ultimo-codigo-sucursal', 'SucursalController@obtenerUltimoCodigoSucursal');
@@ -440,7 +443,7 @@ Route::group(['middleware' => ['auth']], function () {
         //RECIVO
         Route::post('/venta/emitirRecibo', 'VentaController@emitirRecibo');
         Route::get('/resivo/imprimirRollo/{id}', 'VentaController@imprimirResivoRollo');
-        Route::get('/resivo/imprimirCarta/{id}', 'VentaController@imprimirResivo');
+        Route::get('/resivo/imprimirCarta/{id}', 'VentaController@imprimirResivoCarta');
 
         //VARIABLES TEMPORALES
         Route::post('/variables/registrarVariable', 'VentasInstitucionalesController@registrarVariable');
