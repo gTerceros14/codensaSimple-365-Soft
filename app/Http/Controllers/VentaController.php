@@ -57,6 +57,7 @@ class VentaController extends Controller
     }
 
     $buscar = $request->buscar;
+    $usuario = \Auth::user();
 
     $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
         ->join('personas', 'ventas.idcliente', '=', 'personas.id')
@@ -99,7 +100,8 @@ class VentaController extends Controller
             'from' => $ventas->firstItem(),
             'to' => $ventas->lastItem(),
         ],
-        'ventas' => $ventas
+        'ventas' => $ventas,
+        'usuario' => $usuario
     ];
 }
 
@@ -1258,7 +1260,7 @@ class VentaController extends Controller
             ->orderBy('ventas.num_comprobante', 'desc')
             ->limit(1)
             ->first();
-    
+
         /*$ultimoComprobanteFueraLineas = DB::table('factura_fuera_lineas')
             ->select('numeroFactura')
             ->where('idsucursal', $idsucursal)
