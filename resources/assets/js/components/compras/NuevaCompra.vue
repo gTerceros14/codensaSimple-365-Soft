@@ -60,31 +60,6 @@
                     </Card>
                     </div>
 
-                    <!--<PickList v-model="products" listStyle="height:320px" dataKey="id">
-                        <template #sourceheader>
-                            Artículos disponibles ({{ form.proveedorSeleccionado.nombre }})
-                        </template>
-                        <template #targetheader>
-                            Artículos seleccionados
-                        </template>
-                        <template #item="slotProps">
-                            <div class="product-item">
-                                <div class="image-container">
-                                    <img :src="'demo/images/product/' + slotProps.item.image" :alt="slotProps.item.name" />
-                                </div>
-                                <div class="product-list-detail">
-                                    <h5 class="mb-2">{{slotProps.item.name}}</h5>
-                                    <i class="pi pi-tag product-category-icon"></i>
-                                    <span class="product-category">{{slotProps.item.category}}</span>
-                                </div>
-                                <div class="product-list-action">
-                                    <h6 class="mb-2">${{slotProps.item.price}}</h6>
-                                    <span :class="'product-badge status-'+slotProps.item.inventoryStatus.toLowerCase()">{{slotProps.item.inventoryStatus}}</span>
-                                </div>
-                            </div>
-                        </template>
-                    </PickList>-->
-
                     <div class="p-grid">
                         <div class="p-col-6">
                             <div class="card">
@@ -193,7 +168,6 @@ import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import Card from 'primevue/card';
 import Dropdown from 'primevue/dropdown';
-import PickList from 'primevue/picklist';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
@@ -263,7 +237,6 @@ export default {
         TabPanel,
         Card,
         Dropdown,
-        PickList,
         DataTable,
         Column,
         ColumnGroup,
