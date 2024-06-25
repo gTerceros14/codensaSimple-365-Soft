@@ -31,7 +31,6 @@ use SebastianBergmann\Environment\Console;
 use SimpleXMLElement;
 use SoapClient;
 use TheSeer\Tokenizer\Exception;
-use App\Helpers\CustomHelpers;
 use App\Medida;
 use App\Rol;
 use Illuminate\Support\Facades\File;
@@ -52,101 +51,58 @@ class VentaController extends Controller
         session_start();
     }
     public function index(Request $request)
-    {
-        if (!$request->ajax())
-            return redirect('/');
-
-        $buscar = $request->buscar;
-        $criterio = $request->criterio;
-        $usuario = \Auth::user();
-        $idRolUsuario = Auth::user()->idrol; // Obtener el rol del usuario autenticado
-
-        if ($buscar == '') {
-            $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
-                ->join('personas', 'ventas.idcliente', '=', 'personas.id')
-                ->select(
-                    'ventas.tipo_comprobante as tipo_comprobante',
-                    'ventas.idcliente',
-                    'ventas.id',
-                    'ventas.tipo_comprobante',
-                    'ventas.serie_comprobante',
-                    'ventas.num_comprobante',
-                    'ventas.fecha_hora',
-                    'ventas.impuesto',
-                    'ventas.total',
-                    'ventas.estado',
-                    'users.usuario',
-                    'personas.nombre as razonSocial',
-                    'personas.num_documento as documentoid',
-                )
-                ->orderBy('ventas.id', 'desc');
-
-            if ($idRolUsuario != 1) { // Si no es administrador
-                $ventas = $ventas->where('ventas.idusuario', Auth::user()->id); // Filtrar solo las ventas del usuario autenticado
-            }
-
-            $ventas = $ventas->paginate(10);
-        } else {
-            if ($criterio === 'usuario') { // Buscar por usuario
-                $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
-                    ->select(
-                        'ventas.idcliente',
-                        'ventas.id',
-                        'ventas.tipo_comprobante',
-                        'ventas.serie_comprobante',
-                        'ventas.num_comprobante',
-                        'ventas.fecha_hora',
-                        'ventas.impuesto',
-                        'ventas.total',
-                        'ventas.estado',
-                        'users.usuario'
-                    )
-                    ->where('users.usuario', 'like', '%' . $buscar . '%')
-                    ->orderBy('ventas.id', 'desc');
-
-                if ($idRolUsuario != 1) { // Si no es administrador
-                    $ventas = $ventas->where('ventas.idusuario', Auth::user()->id); // Filtrar solo las ventas del usuario autenticado
-                }
-
-                $ventas = $ventas->paginate(10);
-            } else {
-                $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
-                    ->select(
-                        'ventas.cliente',
-                        'ventas.id',
-                        'ventas.tipo_comprobante',
-                        'ventas.serie_comprobante',
-                        'ventas.num_comprobante',
-                        'ventas.fecha_hora',
-                        'ventas.impuesto',
-                        'ventas.total',
-                        'ventas.estado',
-                        'users.usuario'
-                    )
-                    ->where('ventas.' . $criterio, 'like', '%' . $buscar . '%')
-                    ->orderBy('ventas.id', 'desc');
-
-                if ($idRolUsuario != 1) { // Si no es administrador
-                    $ventas = $ventas->where('ventas.idusuario', Auth::user()->id); // Filtrar solo las ventas del usuario autenticado
-                }
-
-                $ventas = $ventas->paginate(10);
-            }
-        }
-
-        return [
-            'pagination' => [
-                'total' => $ventas->total(),
-                'current_page' => $ventas->currentPage(),
-                'per_page' => $ventas->perPage(),
-                'last_page' => $ventas->lastPage(),
-                'from' => $ventas->firstItem(),
-                'to' => $ventas->lastItem(),
-            ],
-            'ventas' => $ventas,
-            'usuario' => $usuario
-        ];
+{
+    if (!$request->ajax()) {
+        return redirect('/');
     }
+
+    $buscar = $request->buscar;
+
+    $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
+        ->join('personas', 'ventas.idcliente', '=', 'personas.id')
+        ->select(
+            'ventas.tipo_comprobante as tipo_comprobante',
+            'ventas.idcliente',
+            'ventas.id',
+            'ventas.tipo_comprobante',
+            'ventas.serie_comprobante',
+            'ventas.num_comprobante',
+            'ventas.fecha_hora',
+            'ventas.impuesto',
+            'ventas.total',
+            'ventas.estado',
+            'users.usuario',
+            'personas.nombre as razonSocial',
+            'personas.num_documento as documentoid'
+        )
+        ->orderBy('ventas.id', 'desc');
+
+    
+    if (!empty($buscar)) {
+        $ventas = $ventas->where(function ($query) use ($buscar) {
+            $query->where('ventas.num_comprobante', 'like', '%' . $buscar . '%')
+                  ->orWhere('personas.num_documento', 'like', '%' . $buscar . '%')
+                  ->orWhere('personas.nombre', 'like', '%' . $buscar . '%')
+                  ->orWhere('ventas.fecha_hora', 'like', '%' . $buscar . '%')
+                  ->orWhere('users.usuario', 'like', '%' . $buscar . '%');
+        });
+    }
+
+    $ventas = $ventas->paginate(10);
+
+    return [
+        'pagination' => [
+            'total' => $ventas->total(),
+            'current_page' => $ventas->currentPage(),
+            'per_page' => $ventas->perPage(),
+            'last_page' => $ventas->lastPage(),
+            'from' => $ventas->firstItem(),
+            'to' => $ventas->lastItem(),
+        ],
+        'ventas' => $ventas
+    ];
+}
+
 
 
     public function ventaOffline(Request $request)
@@ -962,87 +918,105 @@ class VentaController extends Controller
 
         return $ventaResivo;
     }
-    public function imprimirResivoRollo($id)
-    {
-        try {
-            $venta = Venta::with('detalles.producto')->find($id);
-            if (!$venta) {
-                return response()->json(['error' => 'No se encontró la venta'], 500);
-            }
-
-            $persona = Persona::find($venta->idcliente);
-            if (!$persona) {
-                return response()->json(['error' => 'No se encontró el cliente'], 500);
-            }
-
-            if ($venta->detalles->isNotEmpty()) {
-                // Lógica para generar el recibo
-                $pdf = new FPDF('P', 'mm', array(80, 250));
-                $pdf->SetAutoPageBreak(true, 10);
-                $pdf->SetMargins(10, 10);
-                $pdf->AddPage();
-
-                // Agregar encabezado y detalles del recibo
-                $pdf->SetFont('Arial', 'B', 8);
-                $pdf->Cell(0, 5, 'RECIBO #' . $id, 0, 1, 'C');
-                $pdf->SetFont('Arial', '', 6);
-
-                // fecha y hora
-                $pdf->Cell(0, 3, 'Fecha: ' . date('Y-m-d', strtotime($venta->created_at)), 0, 1);
-                $pdf->Cell(0, 3, 'Hora: ' . date('H:i:s', strtotime($venta->created_at)), 0, 1);
-
-
-                // Agregar detalles del cliente
-                $pdf->Cell(0, 3, 'Cliente: ' . $persona->nombre, 0, 1);
-                $pdf->Cell(0, 3, 'Documento: ' . $persona->num_documento, 0, 1);
-                $pdf->Cell(0, 3, 'Direccion: ' . $persona->direccion, 0, 1);
-                $pdf->Cell(0, 3, 'Telefono: ' . $persona->telefono, 0, 1);
-
-                // Agregar detalles de los productos comprados
-                $pdf->SetFont('Arial', 'B', 6);
-                $pdf->Cell(0, 3, 'DETALLE', 0, 1, 'C');
-                $pdf->SetFont('Arial', '', 6);
-
-                foreach ($venta->detalles as $detalle) {
-                    $precioVenta = $detalle->cantidad * $detalle->precio;
-                    $pdf->Cell(0, 3, 'Nombre del producto: ' . $detalle->producto->nombre, 0, 1);
-                    $pdf->Cell(0, 3, 'Cantidad: ' . $detalle->cantidad, 0, 1);
-                    $pdf->Cell(0, 3, 'Precio de venta: ' . number_format($precioVenta, 2), 0, 1);
-                }
-
-
-                // Tipo de pago
-                $tipoPago = $venta->tipoPago;
-                $nombreTipoPago = $tipoPago ? $tipoPago->nombre_tipo_pago : 'N/A';
-                $pdf->Cell(0, 5, 'Tipo de pago: ' . $nombreTipoPago, 0, 1);
-
-
-                // firma
-                $pdf->SetFont('Arial', 'B', 8);
-                $pdf->Cell(0, 10, '', 0, 1);
-                $pdf->Cell(0, 5, '__________________________', 0, 1, 'C');
-                $pdf->Cell(0, 5, 'codensa', 0, 1, 'C');
-
-
-                // Guardar el archivo PDF generado
-                $nombreLimpio = preg_replace('/[^A-Za-z0-9\-]/', '_', $persona->nombre);
-                $pdfPath = public_path('docs/recibo_rollo_' . $nombreLimpio . '_' . $id . '.pdf');
-                $pdf->Output($pdfPath, 'F');
-
-                // Descargar el archivo PDF generado
-                return response()->download($pdfPath);
-            } else {
-                // Manejar el caso cuando no hay detalles asociados a la venta
-                return response()->json(['error' => 'No hay detalles para esta venta'], 500);
-            }
-        } catch (\Exception $e) {
-            // Registrar el error en un archivo de log
-            \Log::error('Error al imprimir el recibo en rollo: ' . $e->getMessage());
-
-            // Retornar una respuesta de error
-            return response()->json(['error' => 'Ocurrió un error al imprimir el recibo en rollo'], 500);
+    public function imprimirResivoRollo($id){
+    try {
+        $venta = Venta::with('detalles.producto')->find($id);
+        if (!$venta) {
+            return response()->json(['error' => 'No se encontró la venta'], 404);
         }
+
+        $persona = Persona::find($venta->idcliente);
+        if (!$persona) {
+            return response()->json(['error' => 'No se encontró el cliente'], 404);
+        }
+
+        if ($venta->detalles->isNotEmpty()) {
+            // Configuración para recibo de rollo
+            $pdf = new FPDF('P', 'mm', array(80, 297)); // Ancho de 80mm, alto variable
+            $pdf->SetAutoPageBreak(true, 10);
+            $pdf->SetMargins(5, 10, 5);
+            $pdf->AddPage();
+
+            // Encabezado
+            $pdf->SetFont('Arial', 'B', 12);
+            $pdf->Cell(0, 10, 'RECIBO DE VENTA', 0, 1, 'C');
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell(0, 5, 'No. ' . $id, 0, 1, 'C');
+
+            // Información de la empresa (ajusta según tus necesidades)
+            $pdf->SetFont('Arial', 'B', 8);
+            $pdf->Cell(0, 5, 'TU EMPRESA S.A.', 0, 1, 'C');
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell(0, 5, 'Dirección de la Empresa', 0, 1, 'C');
+            $pdf->Cell(0, 5, 'Teléfono: 123-456-789', 0, 1, 'C');
+
+            $pdf->Ln(5);
+
+            // Fecha y hora
+            $pdf->Cell(0, 5, 'Fecha: ' . date('d/m/Y', strtotime($venta->created_at)), 0, 1);
+            $pdf->Cell(0, 5, 'Hora: ' . date('H:i:s', strtotime($venta->created_at)), 0, 1);
+
+            // Detalles del cliente
+            $pdf->Ln(2);
+            $pdf->Cell(0, 5, 'Cliente: ' . $persona->nombre, 0, 1);
+            $pdf->Cell(0, 5, 'Doc: ' . $persona->num_documento, 0, 1);
+
+            // Línea separadora
+            $pdf->Cell(0, 2, '', 'T', 1);
+
+            // Encabezados de la tabla
+            $pdf->SetFont('Arial', 'B', 8);
+            $pdf->Cell(40, 5, 'Producto', 0, 0);
+            $pdf->Cell(10, 5, 'Cant', 0, 0, 'R');
+            $pdf->Cell(20, 5, 'Precio', 0, 1, 'R');
+
+            $pdf->SetFont('Arial', '', 8);
+
+            // Detalles de los productos
+            $total = 0;
+            foreach ($venta->detalles as $detalle) {
+                $precioVenta = $detalle->cantidad * $detalle->precio;
+                $total += $precioVenta;
+
+                $pdf->Cell(40, 5, substr($detalle->producto->nombre, 0, 20), 0, 0);
+                $pdf->Cell(10, 5, $detalle->cantidad, 0, 0, 'R');
+                $pdf->Cell(20, 5, number_format($precioVenta, 2), 0, 1, 'R');
+            }
+
+            // Línea separadora
+            $pdf->Cell(0, 2, '', 'T', 1);
+
+            // Total
+            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->Cell(50, 6, 'TOTAL', 0, 0);
+            $pdf->Cell(20, 6, number_format($total, 2), 0, 1, 'R');
+
+            // Tipo de pago
+            $tipoPago = $venta->tipoPago;
+            $nombreTipoPago = $tipoPago ? $tipoPago->nombre_tipo_pago : 'N/A';
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell(0, 5, 'Tipo de pago: ' . $nombreTipoPago, 0, 1);
+
+            // Mensaje de agradecimiento
+            $pdf->Ln(5);
+            $pdf->SetFont('Arial', 'I', 8);
+            $pdf->Cell(0, 5, '¡Gracias por su compra!', 0, 1, 'C');
+
+            // Guardar el archivo PDF generado
+            $nombreLimpio = preg_replace('/[^A-Za-z0-9\-]/', '_', $persona->nombre);
+            $pdfPath = public_path('docs/recibo_rollo_' . $nombreLimpio . '_' . $id . '.pdf');
+            $pdf->Output($pdfPath, 'F');
+
+            // Descargar el archivo PDF generado
+            return response()->download($pdfPath);
+        } else {
+            return response()->json(['error' => 'No hay detalles para esta venta'], 404);
+        }
+    } catch (\Exception $e) {
+        \Log::error('Error al imprimir el recibo en rollo: ' . $e->getMessage());
+        return response()->json(['error' => 'Ocurrió un error al imprimir el recibo en rollo'], 500);
     }
+}
 
     public function imprimirResivoCarta($id)
     {
@@ -1074,42 +1048,57 @@ class VentaController extends Controller
                 $pdf->Cell(50, 6, 'Hora: ' . $hora, 0, 0, 'L');
                 $pdf->Cell(50, 6, 'Num Recibo: ' . $id, 0, 1, 'L');
 
-                $clienteInfo = 'Cliente: ' . $persona->nombre . '                 Documento: ' . $persona->num_documento . '              Direcion: ' . $persona->direccion . '              Telefono: ' . $persona->telefono;
+                $clienteInfo = 'Cliente: ' . $persona->nombre . '                 Documento: ' . $persona->num_documento ;
                 $pdf->Cell(0, 6, $clienteInfo, 0, 1, 'L');
 
 
-                $pdf->SetFont('Arial', 'B', 10);
-                $pdf->SetFillColor(230, 230, 230);
-                $pdf->Cell(0, 8, 'DETALLE', 0, 1, 'C', true);
-                $pdf->SetFont('Arial', '', 8);
-                foreach ($venta->detalles as $detalle) {
-                    $detalleInfo = '';
-                    $detalleInfo .= 'Nombre del producto: ' . $detalle->producto->nombre . ' ';
-                    $detalleInfo .= '                       Cantidad: ' . $detalle->cantidad . ' ';
-                    $detalleInfo .= '                       Precio unitario: ' . number_format($detalle->precio, 2) . ' ';
-                    $detalleInfo .= '                       Precio total: ' . number_format($detalle->cantidad * $detalle->precio, 2) . ' ';
-                    $pdf->Cell(0, 5, $detalleInfo, 0, 1, 'L');
-                }
+                // Tabla de productos
+            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->SetFillColor(230, 230, 230);
+            $pdf->Cell(90, 7, 'Producto', 1, 0, 'C', true);
+            $pdf->Cell(25, 7, 'Cantidad', 1, 0, 'C', true);
+            $pdf->Cell(35, 7, 'Precio Unit.', 1, 0, 'C', true);
+            $pdf->Cell(35, 7, 'Subtotal', 1, 1, 'C', true);
 
+            $pdf->SetFont('Arial', '', 9);
+            $total = 0;
+            foreach ($venta->detalles as $detalle) {
+                $subtotal = $detalle->cantidad * $detalle->precio;
+                $total += $subtotal;
+                $pdf->Cell(90, 6, $detalle->producto->nombre, 1, 0);
+                $pdf->Cell(25, 6, $detalle->cantidad, 1, 0, 'C');
+                $pdf->Cell(35, 6, number_format($detalle->precio, 2), 1, 0, 'R');
+                $pdf->Cell(35, 6, number_format($subtotal, 2), 1, 1, 'R');
+            }
+
+            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->Cell(150, 7, 'Total', 1, 0, 'R');
+            $pdf->Cell(35, 7, number_format($total, 2), 1, 1, 'R');
+
+            $pdf->Ln(5);
                 $pdf->SetFont('Arial', 'B', 8);
                 $pdf->Cell(0, 5, 'Forma de pago:', 0, 1);
                 $pdf->SetFont('Arial', '', 8);
                 $pdf->Cell(0, 5, $venta->tipoPago ? $venta->tipoPago->nombre_tipo_pago : 'N/A', 0, 1, '', true);
 
 
-                $pdf->SetFont('Arial', 'B', 8);
-                $pdf->Cell(0, 5, 'Fecha de pago:', 0, 1);
-                $pdf->SetFont('Arial', '', 8);
-                $pdf->Cell(0, 5, date('d/m/Y', strtotime($venta->created_at)), 0, 1, '', true);
+            //  $pdf->SetFont('Arial', 'B', 8);
+              //  $pdf->Cell(0, 5, 'Fecha de pago:', 0, 1);
+                //$pdf->SetFont('Arial', '', 8);
+                //$pdf->Cell(0, 5, date('d/m/Y', strtotime($venta->created_at)), 0, 1, '', true);
 
 
-                $pdf->SetFont('Arial', 'B', 10);
-                $pdf->Cell(0, 12, '', 0, 1);
+                 $pdf->SetFont('Arial', '', 10);
                 $anchoFirma = $pdf->GetPageWidth() / 2 - 20;
                 $pdf->Cell($anchoFirma, 6, '_________________________', 0, 0, 'C');
                 $pdf->Cell($anchoFirma, 6, '_________________________', 0, 1, 'C');
-                $pdf->Cell($anchoFirma, 6, 'Firma', 0, 0, 'C');
-                $pdf->Cell($anchoFirma, 6, 'Firma', 0, 1, 'C');
+                $pdf->Cell($anchoFirma, 6, 'Firma del Cliente', 0, 0, 'C');
+                $pdf->Cell($anchoFirma, 6, 'Firma Autorizada', 0, 1, 'C');
+                $pdf->Ln(10);
+
+            // Nota de agradecimiento
+            $pdf->SetFont('Arial', 'I', 10);
+            $pdf->Cell(0, 7, '¡Gracias por su compra!', 0, 1, 'C');
 
                 // Dibujar el margen 
                 $pdf->SetDrawColor(0, 0, 0);
@@ -1253,30 +1242,38 @@ class VentaController extends Controller
 
         return response()->json(['topProductos' => $topProductos]);
     }
-    public function obtenerUltimoComprobante(Request $request)
-    {
-        $ultimoComprobanteFacturas = DB::table('facturas')
+    public function obtenerUltimoComprobante(Request $request) {
+        $idsucursal = $request->idsucursal;
+    
+        /*$ultimoComprobanteFacturas = DB::table('facturas')
             ->select('numeroFactura')
+            ->where('idsucursal', $idsucursal)
             ->orderBy('numeroFactura', 'desc')
             ->limit(1)
-            ->first();
-        $ultimoComprobanteVentas = DB::table('ventas')
-            ->select('num_comprobante')
-            ->orderBy('num_comprobante', 'desc')
+            ->first();*/
+    
+        $ultimoComprobanteVentas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
+            ->select('ventas.num_comprobante')
+            ->where('users.idsucursal', $idsucursal)
+            ->orderBy('ventas.num_comprobante', 'desc')
             ->limit(1)
             ->first();
-        $ultimoComprobanteFueraLineas = DB::table('factura_fuera_lineas')
+    
+        /*$ultimoComprobanteFueraLineas = DB::table('factura_fuera_lineas')
             ->select('numeroFactura')
+            ->where('idsucursal', $idsucursal)
             ->orderBy('numeroFactura', 'desc')
             ->limit(1)
-            ->first();
-
-        $lastComprobanteFacturas = $ultimoComprobanteFacturas ? $ultimoComprobanteFacturas->numeroFactura : 0;
-        $lastComprobanteFueraLineas = $ultimoComprobanteFueraLineas ? $ultimoComprobanteFueraLineas->numeroFactura : 0;
+            ->first();*/
+    
+        //$lastComprobanteFacturas = $ultimoComprobanteFacturas ? $ultimoComprobanteFacturas->numeroFactura : 0;
+        //$lastComprobanteFueraLineas = $ultimoComprobanteFueraLineas ? $ultimoComprobanteFueraLineas->numeroFactura : 0;
         $lastComprobanteVentas = $ultimoComprobanteVentas ? $ultimoComprobanteVentas->num_comprobante : 0;
-        // Obtener el número mayor entre las dos tablas
-        $lastComprobante = max($lastComprobanteFacturas, $lastComprobanteFueraLineas, $lastComprobanteVentas);
-
+    
+        // Obtener el número mayor entre las tres tablas
+        $lastComprobante = $lastComprobanteVentas;
+    
         return response()->json(['last_comprobante' => $lastComprobante]);
     }
+    
 }

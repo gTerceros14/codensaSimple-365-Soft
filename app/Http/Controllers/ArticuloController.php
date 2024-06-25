@@ -266,38 +266,39 @@ class ArticuloController extends Controller
                 $articulosConSaldo[] = $articulo;
             }
         }*/
-        $articulosConSaldo = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
-                ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
-                ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
-                ->join('personas', 'proveedores.id', '=', 'personas.id')
-                ->join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
-                ->select(
-                    'articulos.id',
-                    'articulos.nombre',
-                    'articulos.precio_uno',
-                    'articulos.precio_dos',
-                    'articulos.precio_tres',
-                    'articulos.precio_cuatro',
-                    'articulos.fotografia',
-                    'articulos.unidad_envase',
-                    'almacens.nombre_almacen',
-                    'inventarios.cantidad',
-                    'articulos.codigo',
-                    'articulos.precio_venta',
-                    'articulos.condicion',
-                    'categorias.nombre as nombre_categoria',
-                    DB::raw('SUM(inventarios.saldo_stock) as saldo_stock')
-                )
-                ->where('inventarios.fecha_vencimiento','>',$fechaActual)
-                ->where('inventarios.idalmacen', '=', $idAlmacen)
-                ->where('inventarios.saldo_stock','>','0')
-                ->groupBy('articulos.nombre', 'almacens.nombre_almacen', 'articulos.unidad_envase',
-                            'inventarios.cantidad','articulos.codigo','articulos.precio_venta',
-                            'articulos.condicion','categorias.nombre','articulos.id','articulos.precio_uno',
-                            'articulos.precio_dos','articulos.precio_tres','articulos.precio_cuatro',
-                            'articulos.fotografia',)
-                ->orderBy('articulos.nombre')
-                ->orderBy('almacens.nombre_almacen');
+        $subquery = DB::table('inventarios')
+            ->join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
+            ->select('inventarios.idarticulo', 'inventarios.idalmacen', DB::raw('SUM(inventarios.saldo_stock) as saldo_stock'))
+            ->where('inventarios.fecha_vencimiento', '>', $fechaActual)
+            ->where('inventarios.idalmacen', '=', $idAlmacen)
+            ->where('inventarios.saldo_stock', '>', 0)
+            ->groupBy('inventarios.idarticulo', 'inventarios.idalmacen');
+
+        $articulosConSaldo = DB::table(DB::raw("({$subquery->toSql()}) as inventarios"))
+            ->mergeBindings($subquery)
+            ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
+            ->join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
+            ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
+            ->join('personas', 'proveedores.id', '=', 'personas.id')
+            ->join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
+            ->select(
+                'articulos.id',
+                'articulos.nombre',
+                'articulos.precio_uno',
+                'articulos.precio_dos',
+                'articulos.precio_tres',
+                'articulos.precio_cuatro',
+                'articulos.fotografia',
+                'articulos.unidad_envase',
+                'almacens.nombre_almacen',
+                'inventarios.saldo_stock',
+                'articulos.codigo',
+                'articulos.precio_venta',
+                'articulos.condicion',
+                'categorias.nombre as nombre_categoria'
+            )
+            ->orderBy('articulos.nombre')
+            ->orderBy('almacens.nombre_almacen');
         if ($buscar != '') {
             $articulosConSaldo->where('articulos.' . $criterio, 'like', '%' . $buscar . '%');
         }

@@ -35,9 +35,9 @@
                 <th>Nombre del Almacén</th>
                 <th>Dirección (Ubicación)</th>
                 <th>Encargado</th>
-                <th>Teléfono</th>
-                <th>Sucursal</th>
-                <th>Observación</th>
+                <th class="d-none d-md-table-cell">Teléfono</th>
+                <th class="d-none d-md-table-cell">Sucursal</th>
+                <th class="d-none d-md-table-cell">Observación</th>
               </tr>
             </thead>
             <tbody>
@@ -53,9 +53,9 @@
                 <td>{{ almacen.ubicacion }}</td>
                 <td>{{ almacen.encargados_nombres }}</td>
 
-                <td>{{ almacen.telefono }}</td>
-                <td>{{ almacen.nombre_sucursal }}</td>
-                <td>{{ almacen.observacion }}</td>
+                <td class="d-none d-md-table-cell">{{ almacen.telefono }}</td>
+                <td class="d-none d-md-table-cell">{{ almacen.nombre_sucursal }}</td>
+                <td class="d-none d-md-table-cell">{{ almacen.observacion }}</td>
 
                 <!-- Asegúrate de que los campos existan y tengan valores -->
               </tr>

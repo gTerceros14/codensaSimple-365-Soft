@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Almacen;
 use Illuminate\Http\Request;
 use App\ConfiguracionTrabajo;
 use Illuminate\Support\Facades\DB;
@@ -118,6 +119,7 @@ class ConfiguracionTrabajoController extends Controller
             Log::info($configuracionTrabajo);
 
             $configuracionTrabajo->gestion = $request->selectedYear;
+            $configuracionTrabajo->almacenPredeterminado = $request->almacenPredeterminado;
             $configuracionTrabajo->codigoProductos = $request->codigoProducto;
             $configuracionTrabajo->maximoDescuento = $request->maximoDescuento;
             $configuracionTrabajo->valuacionInventario = $request->valuacionInventario;
@@ -173,5 +175,23 @@ class ConfiguracionTrabajoController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function listarAlmacen()
+    {
+        $almacenes = Almacen::all();
+        
+        return response()->json($almacenes);
+    }
+
+    public function obtenerAlmacenPredeterminado()
+    {
+        $configuracion = ConfiguracionTrabajo::first();
+        //dd($configuracion->almacenPredeterminado);
+        if ($configuracion) {
+            return response()->json(['almacen_predeterminado_id' => $configuracion->almacenPredeterminado]);
+        } else {
+            return response()->json(['almacen_predeterminado_id' => null], 404);
+        }
     }
 }

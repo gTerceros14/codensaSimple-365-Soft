@@ -15,18 +15,10 @@
 
                 <div class="form-group row">
                     <div class="col-md-8">
-                        <div class="input-group">
-                            <select class="selectpicker show-tick" v-model="criterio">
-                                <option value="" disabled selected>Seleccione</option>
-                                <option value="tipo_comprobante">Tipo Comprobante</option>
-                                <option value="num_comprobante">Número Comprobante</option>
-                                <option value="fecha_hora">Fecha-Hora</option>
-                                <option value="usuario">Usuario</option>
-                            </select>
-                            <input type="search" v-model="buscar" @keyup="listarVenta(1, buscar, criterio)"
-                                class="form-control" placeholder="Texto a buscar">
-                        </div>
-                    </div>
+                <div class="input-group">
+                    <input type="search" v-model="buscar" @keyup="buscarVenta" class="form-control" placeholder="Texto a buscar">
+                </div>
+            </div>
                 </div>
 
 
@@ -299,9 +291,13 @@
                                         <div class="col-md-6">
                                             <label class="font-weight-bold">Almacen <span
                                                     class="text-danger">*</span></label>
-                                            <v-select label="nombre_almacen" :options="arrayAlmacenes"
-                                                placeholder="Seleccione un almacen"
-                                                :onChange="getAlmacenProductos"></v-select>
+                                                    <v-select 
+                                                        label="nombre_almacen" 
+                                                        :options="arrayAlmacenes"
+                                                        placeholder="Seleccione un almacen"
+                                                        v-model="almacenSeleccionado"
+                                                        @change="getAlmacenProductos">
+                                                    </v-select>
                                         </div>
 
 
@@ -795,12 +791,15 @@ export default {
                 to: 0,
             },
             offset: 3,
-            criterio: "num_comprobante",
+            criterio: '',
             buscar: "",
-            criterioA: "nombre",
+            criterioA: "",
             buscarA: "",
             arrayArticulo: [],
             arraySeleccionado: [],
+            arraryVenta:[],
+            paginacion:[],
+            usuario: null,
             idarticulo: 0,
             codigo: "",
             articulo: "",
@@ -830,6 +829,8 @@ export default {
             criterioVenta: "ci",
             //almacenes
             arrayAlmacenes: [],
+            almacenSeleccionado: null,
+            almacenPredeterminadoId: null,
             idAlmacen: null,
             //-----PRECIOS- AUMENTE 3/OCTUBRE--------
             precioseleccionado: "",
@@ -1464,21 +1465,21 @@ export default {
             }
         },
 
-        listarVenta(page, buscar, criterio) {
-            let me = this;
-            var url =
-                "/venta?page=" + page + "&buscar=" + buscar + "&criterio=" + criterio;
-            axios
-                .get(url)
-                .then(function (response) {
-                    var respuesta = response.data;
-                    console.log(respuesta);
-                    me.arrayVenta = respuesta.ventas.data;
-                    me.pagination = respuesta.pagination;
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
+        listarVenta(page, buscar) {
+        let me = this;
+        var url = `/venta?page=${page}&buscar=${buscar}`;
+        axios.get(url)
+            .then(function (response) {
+                var respuesta = response.data;
+                me.arrayVenta = respuesta.ventas.data;
+                me.pagination = respuesta.pagination;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+        buscarVenta() {
+            this.listarVenta(1, this.buscar);
         },
 
         selectCliente(numero) {
@@ -1750,31 +1751,37 @@ export default {
                     console.log(error);
                 });
         },
-        obtenerDatosUsuario() {
-            axios
-                .get("/venta")
-                .then((response) => {
-                    this.usuarioAutenticado = response.data.usuario.usuario;
-                    this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-        },
-        selectAlmacen() {
+        
+         async selectAlmacen() {
             let me = this;
             let url = "/almacen/selectAlmacen";
-            axios
+            await axios
                 .get(url)
                 .then(function (response) {
                     let respuesta = response.data;
                     me.arrayAlmacenes = respuesta.almacenes;
                     console.log(me.arrayAlmacenes);
+                    me.obtenerAlmacenPredeterminado();
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
         },
+
+        async obtenerAlmacenPredeterminado() {
+            try {
+                const response = await axios.get('/api/configuracion/almacen-predeterminado');
+                this.almacenPredeterminadoId = response.data.almacen_predeterminado_id;
+                console.log("El almacen predeterminado es : " + this.almacenPredeterminadoId);
+
+                this.almacenSeleccionado = this.arrayAlmacenes.find(
+                    almacen => almacen.id === this.almacenPredeterminadoId
+                );
+            } catch (error) {
+                console.error('Error al obtener el almacén predeterminado:', error);
+            }
+        },
+
         getAlmacenProductos(almacen) {
             this.idAlmacen = almacen.id;
         },
