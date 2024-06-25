@@ -18,7 +18,7 @@
                         <Button label="1" class="p-button-secondary p-button-rounded non-clickable" />
                     </template>
 
-                    <div class="fomulario-card">
+                    <div class="card formulario-card">
                     <Card>
                         <template #title>
                             <h5>Complete el Formulario</h5>
@@ -45,22 +45,10 @@
                             </div>
                         </template>
 
-                        <!--<template #footer>
-                            <Button icon="pi pi-sync" label="Actualizar productos" class="p-button-success p-button-sm" />
-                        </template>-->
                     </Card>
                     </div>
 
-                    <div class="actualizador-buscador">
-                        <span class="p-input-icon-left">
-                            <i class="pi pi-search"/>
-                            <InputText style="width: 15rem;" placeholder="Buscar artículo ..." class="p-inputtext-sm" ></InputText>
-                        </span>
-                        <Button icon="pi pi-sync" label="Actualizar productos" class="p-button-success p-button-sm" style="width: 15rem;"/>
-                    </div>
-
-
-                    <PickList v-model="products" listStyle="height:342px" dataKey="id">
+                    <!--<PickList v-model="products" listStyle="height:320px" dataKey="id">
                         <template #sourceheader>
                             Artículos disponibles ({{ form.proveedorSeleccionado.nombre }})
                         </template>
@@ -83,14 +71,83 @@
                                 </div>
                             </div>
                         </template>
-                    </PickList>
+                    </PickList>-->
+
+                    <div class="p-grid">
+                        <div class="p-col-6">
+                            <div class="card">
+                                <DataTable
+                                    :value="arrayArticuloSeleccionado"
+                                    selectionMode="multiple"
+                                    dataKey="codigo"
+                                    :selection.sync="articulosSeleccionados"
+                                    responsiveLayout="scroll"
+                                    :paginator="true"
+                                    :rows="5"
+                                >
+                                    <template #header>
+                                        <div class="tablas-articulos-header">
+                                            <h5>Selecciona articulos</h5>
+                                            <span class="p-input-icon-left">
+                                                <i class="pi pi-search" />
+                                                <InputText class="p-inputtext-sm" placeholder="Buscador global" />
+                                            </span>
+                                        </div>
+                                    </template>
+
+                                    <Column selectionMode="multiple" ></Column>
+                                    <Column field="codigo" header="Codigo" :sortable="true" ></Column>
+                                    <Column field="nombre" header="Nombre" :sortable="true" ></Column>
+                                    <Column field="precio_costo_unid" header="Precio Unidad" :sortable="true" ></Column>
+                                    <Column field="precio_costo_paq" header="Precio Paquete" :sortable="true" ></Column>
+
+                                    <template #empty>
+                                        Articulos no encontrados ...
+                                    </template>
+                                </DataTable>
+                            </div>
+                        </div>
+
+                        <div class="p-col-6">
+                            <div class="card">
+                                <DataTable
+                                    :value="articulosSeleccionados"
+                                    dataKey="codigo"
+                                    responsiveLayout="scroll"
+                                    :paginator="true"
+                                    :rows="5"
+                                >
+                                    <template #header>
+                                        <div class="tablas-articulos-header">
+                                            <h5>Articulos seleccionados</h5>
+                                            <Button class="p-button-sm p-button-danger" label="Vaciar lista" icon="pi pi-trash" @click="actualizarLista"/>
+                                        </div>
+                                    </template>
+
+                                    <Column field="codigo" header="Codigo" :sortable="true" ></Column>
+                                    <Column field="nombre" header="Nombre" :sortable="true" ></Column>
+                                    <Column field="precio_costo_unid" header="Precio Unidad" :sortable="true" ></Column>
+                                    <Column field="precio_costo_paq" header="Precio Paquete" :sortable="true" ></Column>
+                                    <Column :headerStyle="{'min-width': '4rem', 'text-align': 'center'}" :bodyStyle="{'text-align': 'center', overflow: 'visible'}">
+                                        <template #body="slotProps">
+                                            <Button type="button" icon="pi pi-delete-left" class="p-button-danger p-button-sm" @click="eliminarArticuloSeleccionado(slotProps.data)"></Button>
+                                        </template>
+                                    </Column>
+
+                                    <template #empty>
+                                        Sin articulos seleccionados ...
+                                    </template>
+                                </DataTable>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="total-saldo-card">
-                    <Card>
-                        <template #content>
-                            <div class="saldo-total"><strong>TOTAL Bs. 0</strong></div>
-                        </template>
-                    </Card>
+                        <Card>
+                            <template #content>
+                                <div class="saldo-total"><strong>TOTAL Bs. 0</strong></div>
+                            </template>
+                        </Card>
                     </div>
                 </TabPanel>
 
@@ -125,6 +182,9 @@ import TabPanel from 'primevue/tabpanel';
 import Card from 'primevue/card';
 import Dropdown from 'primevue/dropdown';
 import PickList from 'primevue/picklist';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup'; 
 
 export default {
     setup () {
@@ -154,10 +214,16 @@ export default {
                 {nombre: 'Sandy', code: 'JS'},
             ],
             lista_comprobantes: [
-                {nombre: 'Boleta', id: '1'},
+                {nombre: 'Recibo', id: '1'},
                 {nombre: 'Factura', id: '2'},
                 {nombre: 'Ticket', id: '3'},
             ],
+
+            codigo: '',
+            idproveedor: 6,
+            arrayArticuloSeleccionado: [],
+            articulosSeleccionados: [],
+            targetProducts: []
         }
     },
 
@@ -180,6 +246,9 @@ export default {
         Card,
         Dropdown,
         PickList,
+        DataTable,
+        Column,
+        ColumnGroup,
     },
 
     computed: {
@@ -189,6 +258,14 @@ export default {
     },
 
     methods: {
+        actualizarLista() {
+            console.log('SELECCIONADOS: ',this.articulosSeleccionados)
+        },
+
+        eliminarArticuloSeleccionado(articulo) {
+            this.articulosSeleccionados = this.articulosSeleccionados.filter(a => a.id !== articulo.id);
+        },
+
         nextStep() {
             if (this.activeIndex < this.steps.length - 1) {
                 this.activeIndex++;
@@ -199,6 +276,24 @@ export default {
             if (this.activeIndex > 0) {
                 this.activeIndex--;
             }
+        },
+
+        buscarArticulo() {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
+                let me = this;
+                var url = '/articulo/listarArticulo?buscar=' + me.codigo + '&criterio=' + 'codigo' + '&idProveedor=' + me.idproveedor
+                axios
+                    .get(url)
+                    .then(function (response) {
+                        let respuesta = response.data;
+                        me.arrayArticuloSeleccionado = respuesta.articulos.data;
+                        console.log(me.arrayArticuloSeleccionado);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }, 1000);
         },
 
     },
@@ -212,7 +307,7 @@ export default {
     },
 
     mounted() {
-
+        this.buscarArticulo();
     },
 
     beforeDestroy() {
@@ -264,17 +359,8 @@ export default {
     padding: 0.5rem 0;
 }
 
-/* Buscador */
-.actualizador-buscador {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    align-items: center;
-    padding: 0.5rem 5.5rem;
-}
-
 /* Card */
-.fomulario-card >>> .p-card {
+.formulario-card >>> .p-card {
     box-shadow: none !important;
 }
 
@@ -300,9 +386,16 @@ export default {
     justify-content: right;
 }
 
+/* Tablas Articulos */
+.tablas-articulos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 /* Grid */
 >>> .p-md-3 {
-    padding: 0 0.65rem 0 0.5rem !important;
+    padding: 0 1.5rem 0 1.5rem !important;
     margin-bottom: 0.5rem;
 }
 
