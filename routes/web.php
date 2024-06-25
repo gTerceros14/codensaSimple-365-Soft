@@ -102,6 +102,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/configuracion/editar', 'ConfiguracionTrabajoController@edit');
         Route::put('/configuracion/actualizar', 'ConfiguracionTrabajoController@update');
         Route::get('/configuracion', 'ConfiguracionTrabajoController@index');
+        Route::get('/configuracion/ruta-a-tu-endpoint-para-obtener-almacenes', 'ConfiguracionTrabajoController@listarAlmacen');
+        Route::get('/api/configuracion/almacen-predeterminado', 'ConfiguracionTrabajoController@obtenerAlmacenPredeterminado');
+
 
         Route::get('/backup', 'BackupDbController@createBackup');
         Route::get('/categoria', 'CategoriaController@index');
