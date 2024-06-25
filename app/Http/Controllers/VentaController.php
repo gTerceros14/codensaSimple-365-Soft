@@ -77,11 +77,12 @@ class VentaController extends Controller
         )
         ->orderBy('ventas.id', 'desc');
 
-    // Aplicar filtros según los criterios
+    
     if (!empty($buscar)) {
         $ventas = $ventas->where(function ($query) use ($buscar) {
-            $query->where('ventas.tipo_comprobante', 'like', '%' . $buscar . '%')
-                  ->orWhere('ventas.num_comprobante', 'like', '%' . $buscar . '%')
+            $query->where('ventas.num_comprobante', 'like', '%' . $buscar . '%')
+                  ->orWhere('personas.num_documento', 'like', '%' . $buscar . '%')
+                  ->orWhere('personas.nombre', 'like', '%' . $buscar . '%')
                   ->orWhere('ventas.fecha_hora', 'like', '%' . $buscar . '%')
                   ->orWhere('users.usuario', 'like', '%' . $buscar . '%');
         });
@@ -101,6 +102,7 @@ class VentaController extends Controller
         'ventas' => $ventas
     ];
 }
+
 
 
     public function ventaOffline(Request $request)
