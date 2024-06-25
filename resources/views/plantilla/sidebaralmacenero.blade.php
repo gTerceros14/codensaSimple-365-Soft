@@ -1,6 +1,7 @@
 <div class="sidebar">
             <nav class="sidebar-nav">
                 <ul class="nav">
+                    <button class="sidebar-minimizer brand-minimizer" type="button" style="background-color: #D00000"></button>
                     <li @click="menu=0" class="nav-item">
                         <a class="nav-link active" href="#"><i class="icon-speedometer"></i> Escritorio</a>
                     </li>

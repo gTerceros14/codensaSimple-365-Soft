@@ -30,16 +30,17 @@
                             <div class="p-fluid p-formgrid p-grid">
                                 <div class="p-field p-col-12 p-md-3">
                                     <label for="autocomplete">Proveedor</label>
-                                    <!--<Dropdown id="proveedor" class="p-inputtext-sm" v-model="form.proveedorSeleccionado" :options="proveedores" optionLabel="nombre" placeholder="Lista proveedores ..." />-->
                                     <AutoComplete
                                         id="autocomplete"
                                         class="p-inputtext-sm"
-                                        v-model="proveedorSeleccionado" 
-                                        :suggestions="arrayProveedor" 
+                                        forceSelection
+                                        :dropdown="true"
+                                        v-model="form.proveedorSeleccionado" 
+                                        :suggestions="array_proveedores" 
                                         field="nombre" 
-                                        @complete="selectProveedor" 
+                                        @complete="selectProveedor($event)" 
                                         placeholder="Buscar Proveedores..." 
-                                        @change="getDatosProveedor">
+                                    >
                                     </AutoComplete>
                                 </div>
                                 <div class="p-field p-col-12 p-md-3">
@@ -77,7 +78,7 @@
                                             <h5>Selecciona articulos</h5>
                                             <span class="p-input-icon-left">
                                                 <i class="pi pi-search" />
-                                                <InputText class="p-inputtext-sm" placeholder="Buscador global" />
+                                                <InputText v-model="buscardorArticulos" class="p-inputtext-sm" placeholder="Buscador global" />
                                             </span>
                                         </div>
                                     </template>
@@ -186,7 +187,7 @@ export default {
 
             activeIndex: 0,
             form: {
-                proveedorSeleccionado: '',
+                proveedorSeleccionado: null, 
                 tipo_comprobante: '',
                 serie_comprobante: '',
                 num_comprobante: ''
@@ -194,12 +195,6 @@ export default {
             steps: [
                 { label: 'Paso 1' },
                 { label: 'Paso 2' },
-            ],
-            proveedores: [
-                {nombre: 'Valentin', code: 'VL'},
-                {nombre: 'German', code: 'GT'},
-                {nombre: 'Armin', code: 'AG'},
-                {nombre: 'Sandy', code: 'JS'},
             ],
             lista_comprobantes: [
                 {nombre: 'Recibo', id: '1'},
@@ -210,8 +205,8 @@ export default {
             codigo: '',
             idproveedor: 6,
 
-            arrayProveedor: [],
-            proveedorSeleccionado: null,
+            buscardorArticulos: null,
+            array_proveedores: [],
             loading: false,
 
             array_articulos_proveedor: [],
@@ -270,7 +265,7 @@ export default {
             }
         },
 
-        buscarArticulo() {
+        /*buscarArticulo() {
             clearTimeout(this.timer);
             this.timer = setTimeout(() => {
                 let me = this;
@@ -285,48 +280,70 @@ export default {
                         console.log(error);
                     });
             }, 1000);
+        },*/
+
+        listarArticulo(buscar, criterio) {
+            let me = this;
+            var url = '/articulo/listarArticulo?buscar=' + buscar + '&criterio=' + 'nombre' + '&idProveedor=' + this.idproveedor;
+            axios.get(url).then(function (response) {
+                    var respuesta = response.data;
+                    me.array_articulos_proveedor = respuesta.articulos.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
 
         selectProveedor(event) {
-            let search = event.query;
             let me = this;
 
-            if (search.trim() === '') {
-                swal("Aviso", "Debe seleccionar un proveedor", "warning");
-                return;
+            if (!event.query.trim().length) {
+                var url = `/proveedor?page=${1}&buscar=${''}&criterio=${'todos'}&por_pagina=${3}`;
+                axios.get(url).then(function (response) {
+                        var respuesta = response.data;
+                        me.array_proveedores = respuesta.personas.data;
+                        me.loading = false;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        me.loading = false;
+                    });
             }
+            else {
+                this.loading = true;
 
-            this.loading = true;
-
-            let url = '/proveedor/selectProveedor?filtro=' + search;
-            axios.get(url).then(function (response) {
-                let respuesta = response.data;
-                me.arrayProveedor = respuesta.proveedores;
-                me.loading = false;
-            })
-            .catch(function (error) {
-                console.log(error);
-                me.loading = false;
-            });
-            },
-
-        getDatosProveedor(event) {
-            let val1 = event.value;
-            let me = this;
-
-            me.loading = true;
-
-            if (!val1.id && this.arrayPedidoSeleccionado) {
-                this.idproveedor = this.arrayPedidoSeleccionado.idproveedor;
-            } else {
-                me.idproveedor = val1.id;
+                var url = `/proveedor?page=${1}&buscar=${me.form.proveedorSeleccionado}&criterio=${'todos'}&por_pagina=${3}`;
+                axios.get(url).then(function (response) {
+                        var respuesta = response.data;
+                        me.array_proveedores = respuesta.personas.data;
+                        me.loading = false;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        me.loading = false;
+                    });
+                }
             }
-        }
 
     },
 
     watch: {
+        'form.proveedorSeleccionado.id': {
+            handler(newVal) {
+                if (newVal) {
+                    console.log('PROVEEDOR:', newVal);
+                    this.idproveedor = newVal;
+                    this.listarArticulo('', 'nombre');
+                }
+            }
+        },
 
+        buscardorArticulos(newVal) {
+            if (newVal) {
+                console.log('NEWVAL: ',newVal)
+                this.listarArticulo(this.buscardorArticulos, 'nombre');
+            }
+        }
     },
 
     created() {
@@ -334,7 +351,7 @@ export default {
     },
 
     mounted() {
-        this.buscarArticulo();
+        //this.buscarArticulo();
     },
 
     beforeDestroy() {
@@ -411,6 +428,10 @@ export default {
     padding: 0 0 0 0;
     display: flex;
     justify-content: right;
+}
+
+>>> .p-button.p-button-icon-only {
+    padding: 0.4rem 0;
 }
 
 /* Tablas Articulos */

@@ -19,7 +19,7 @@ class CreateConfiguracionesTrabajo extends Migration
             $table->string('gestion', 5)->unique();
 
             $table->string('codigoProductos', 100);
-            $table->integer('almacenPredeterminado', 10)->nullable();
+            $table->integer('almacenPredeterminado')->nullable();
             $table->decimal('maximoDescuento', 6)->nullable();
             $table->string('valuacionInventario', 100);
             $table->boolean('backupAutomatico')->default(0);
