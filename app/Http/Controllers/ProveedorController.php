@@ -22,6 +22,13 @@ class ProveedorController extends Controller
         }
     
         $buscar = $request->buscar;
+        $por_pagina = $request->por_pagina;
+
+        if ($por_pagina == null) {
+            $paginacion = 10;
+        } else {
+            $paginacion = $por_pagina;
+        }
     
         $personas = Proveedor::join('personas', 'proveedores.id', '=', 'personas.id')
             ->select(
@@ -42,7 +49,7 @@ class ProveedorController extends Controller
             })
             ->distinct()
             ->orderBy('personas.id', 'desc')
-            ->paginate(10);
+            ->paginate($paginacion);
         
         return [
             'pagination' => [
