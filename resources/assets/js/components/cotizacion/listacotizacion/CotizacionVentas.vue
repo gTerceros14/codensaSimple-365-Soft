@@ -1,10 +1,5 @@
 <template>
     <main class="main">
-        <ol class="breadcrumb bg-light rounded px-3 shadow-sm">
-            <li class="breadcrumb-item"><a class="text-primary text-decoration-none" href="/">Escritorio</a></li>
-            <li class="breadcrumb-item active text-primary" aria-current="page">Ventas</li>
-            <li class="breadcrumb-item active text-primary" aria-current="page">{{showRegistrarVenta?"Ventas":"Preventa "}}</li>
-        </ol>
         <!-- <div class="m-2 p-2"></div> -->
         <div class="container-fluid">
             <!-- Ejemplo de tabla Listado -->
@@ -12,11 +7,12 @@
                 <!-- <div class="card-header" v-if="listado==1" > -->
                 <div class="card-header">
                     <i class="fa fa-align-justify"></i> {{ titulo }}
-                    <button v-if="listado==1" type="button" @click="mostrarDetalle('venta','cotizacion')" class="btn btn-secondary">
+                    <button v-if="listado == 1" type="button" @click="mostrarDetalle('venta', 'cotizacion')"
+                        class="btn btn-secondary">
                         <i class="icon-plus"></i>&nbsp;Nuevo
                     </button>
                 </div>
- 
+
                 <!-- <div class="card-header" v-if="listado!=1 ">
                     <i class="icon-basket"></i><label v-text="titulocard"></label>
                 </div> -->
@@ -63,9 +59,13 @@
                                 <tbody>
                                     <tr v-for="venta in arrayVenta" :key="venta.id">
                                         <td v-text="venta.id"></td>
-                                        
-                                        <td>{{ new Intl.DateTimeFormat('es-ES').format(new Date(venta.fecha_hora)) }}</td>
-                                        <td>{{ new Date(venta.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</td>
+
+                                        <td>{{ new Intl.DateTimeFormat('es-ES').format(new Date(venta.fecha_hora)) }}
+                                        </td>
+                                        <td>{{ new Date(venta.fecha_hora).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            }) }}</td>
                                         <td v-text="venta.nombre"></td>
                                         <td v-text="venta.num_documento"></td>
                                         <td v-text="venta.impuesto"></td>
@@ -73,7 +73,8 @@
                                         <td v-text="venta.total"></td>
                                         <td v-text="venta.usuario"></td>
 
-                                        <td>{{ Math.floor((new Date(venta.validez) - new Date()) / (1000 * 60 * 60 * 24))+1 }} dias</td>
+                                        <td>{{ Math.floor((new Date(venta.validez) - new Date()) / (1000 * 60 * 60 *
+                24)) + 1 }} dias</td>
 
                                         <!-- <td>{{ new Date(venta.validez).toLocaleString() }} {{ new Date(venta.fecha_hora).toLocaleString() }} </td> -->
 
@@ -89,12 +90,14 @@
                                                     class="btn btn-outline-success btn-sm rounded">
                                                     <i class="fa fa-eye fa-sm"></i>
                                                 </button>
-                                                <button type="button" @click="pdfVenta(venta.id)" class="btn  btn-sm rounded">
+                                                <button type="button" @click="pdfVenta(venta.id)"
+                                                    class="btn  btn-sm rounded">
                                                     <i class="icon-doc fa-lg" style="color: skyblue;"></i>
 
                                                 </button>
-                                                 
-                                                <button type="button" @click="abrirVenta(venta.id)" class="btn btn-sm rounded">
+
+                                                <button type="button" @click="abrirVenta(venta.id)"
+                                                    class="btn btn-sm rounded">
                                                     <i class="icon-basket fa-lg" style="color: green;"></i>
 
                                                 </button>
@@ -102,18 +105,20 @@
                                                     <i class="icon-pencil fa-lg" style="color: orange;"></i>
 
                                                 </button> -->
-                                                <button type="button" @click="mostrarDetalle('venta', 'editar', venta)" 
-                                                class="btn btn-outline-warning btn-sm rounded">
-                                                <i class="fa fa-pencil fa-sm"></i>
-                                            </button>
+                                                <button type="button" @click="mostrarDetalle('venta', 'editar', venta)"
+                                                    class="btn btn-outline-warning btn-sm rounded">
+                                                    <i class="fa fa-pencil fa-sm"></i>
+                                                </button>
                                                 <template v-if="venta.condicion">
-                                                    <button type="button" class="btn btn-sm rounded" @click="desactivarCotizacion(venta.id)">
-                                                    <i class="icon-trash fa-lg" style="color: red;"></i>
+                                                    <button type="button" class="btn btn-sm rounded"
+                                                        @click="desactivarCotizacion(venta.id)">
+                                                        <i class="icon-trash fa-lg" style="color: red;"></i>
 
                                                     </button>
                                                 </template>
                                                 <template v-else>
-                                                    <button type="button" class="btn btn-sm rounded" @click="activarCotizacion(venta.id)">
+                                                    <button type="button" class="btn btn-sm rounded"
+                                                        @click="activarCotizacion(venta.id)">
                                                         <i class="icon-check"></i>
                                                     </button>
                                                 </template>
@@ -150,15 +155,11 @@
                         <div class="form-group row border">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="" class="font-weight-bold">Cliente <span class="text-danger">*</span></label>
-                                    <v-select 
-                                        :on-search="selectCliente" 
-                                        label="num_documento" 
-                                        :options="arrayCliente" 
-                                        placeholder="Num de documento..." 
-                                        :onChange="getDatosCliente"
-                                        v-model="clienteSeleccionado"
-                                        >
+                                    <label for="" class="font-weight-bold">Cliente <span
+                                            class="text-danger">*</span></label>
+                                    <v-select :on-search="selectCliente" label="num_documento" :options="arrayCliente"
+                                        placeholder="Num de documento..." :onChange="getDatosCliente"
+                                        v-model="clienteSeleccionado">
                                     </v-select>
                                 </div>
                             </div>
@@ -177,16 +178,18 @@
                             </div>
                             <div class="col-md-3">
                                 <label for="">Celular</label>
-                                <input type="text" class="form-control" v-model="telefono"
-                                    ref="nombreRef" readonly>
+                                <input type="text" class="form-control" v-model="telefono" ref="nombreRef" readonly>
                             </div>
 
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="" class="font-weight-bold">Almacen <span class="text-danger">*</span></label>
-                                    <select class="form-control" v-model="AlmacenSeleccionado" @change="getDatosAlmacen">
+                                    <label for="" class="font-weight-bold">Almacen <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-control" v-model="AlmacenSeleccionado"
+                                        @change="getDatosAlmacen">
                                         <option value="0" disabled>Seleccione</option>
-                                        <option v-for="opcion in arrayAlmacenes" :key="opcion.id" :value="opcion.id">{{ opcion.nombre_almacen }}</option>
+                                        <option v-for="opcion in arrayAlmacenes" :key="opcion.id" :value="opcion.id">{{
+                opcion.nombre_almacen }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -194,9 +197,9 @@
                             <div class="col-md-2">
                                 <label for="">Impuesto(*)</label>
                                 <input type="text" class="form-control" v-model="impuesto" ref="impuestoRef">
-                                <label for=""  class="small-text">Shift + Q</label>
+                                <label for="" class="small-text">Shift + Q</label>
                             </div>
-                           
+
 
                         </div>
                         <div class="form-group row border">
@@ -217,7 +220,8 @@
                                 <div class="form-group">
                                     <div class="form-inline">
                                         <button @click="abrirModal()" class="btn btn-primary">Buscar</button>
-                                        <input type="text" class="form-control" v-model="codigo" ref="articuloRef" @keyup="buscarArticulo()" placeholder="Codigo del artículo">                   
+                                        <input type="text" class="form-control" v-model="codigo" ref="articuloRef"
+                                            @keyup="buscarArticulo()" placeholder="Codigo del artículo">
                                         <!-- <input type="text" id="nombre_producto" readonly class="form-control"
                                             v-model="articulo"> -->
                                         <label for="">Shift + R</label>
@@ -226,56 +230,67 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="card-body" v-if="nombre_articulo !== ''">
-                                    <h3>{{nombre_articulo }}</h3>
+                                    <h3>{{ nombre_articulo }}</h3>
                                 </div>
                             </div>
 
                             <div class="col-md-2">
-                                <img
-                                    v-if="arrayArticuloSeleccionado.length > 0 && arrayArticuloSeleccionado[0].fotografia"
+                                <img v-if="arrayArticuloSeleccionado.length > 0 && arrayArticuloSeleccionado[0].fotografia"
                                     :src="'img/articulo/' + arrayArticuloSeleccionado[0].fotografia + '?t=' + new Date().getTime()"
-                                    width="50" height="50" ref="imagen" class="card-img"/>
-                                <img v-else src="https://www.bicifan.uy/wp-content/uploads/2016/09/producto-sin-imagen.png"  alt="Imagen del Card" class="card-img">
+                                    width="50" height="50" ref="imagen" class="card-img" />
+                                <img v-else
+                                    src="https://www.bicifan.uy/wp-content/uploads/2016/09/producto-sin-imagen.png"
+                                    alt="Imagen del Card" class="card-img">
                             </div>
 
                             <div class="col-md-1">
                                 <div class="form-group">
                                     <label>Total Uni/Stock</label>
-                                    <input type="text" id="stock" style="color: red;" class="form-control" v-model="saldo_stock" readonly>
+                                    <input type="text" id="stock" style="color: red;" class="form-control"
+                                        v-model="saldo_stock" readonly>
                                 </div>
                             </div>
 
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Precios(*)</label>
-                                    <select class="form-control" v-model="precioseleccionado" @change="mostrarSeleccion">
-        
-                                        <option :value="precio_uno" v-if="arrayPrecios[0]">{{ arrayPrecios[0].nombre_precio }}</option>
-                                        <option :value="precio_dos" v-if="arrayPrecios[1]">{{arrayPrecios[1].nombre_precio}}</option>
-                                        <option :value="precio_tres" v-if="arrayPrecios[2]">{{arrayPrecios[2].nombre_precio}}</option>
-                                        <option :value="precio_cuatro" v-if="arrayPrecios[3]">{{arrayPrecios[3].nombre_precio}}</option>
+                                    <select class="form-control" v-model="precioseleccionado"
+                                        @change="mostrarSeleccion">
+
+                                        <option :value="precio_uno" v-if="arrayPrecios[0]">{{
+                arrayPrecios[0].nombre_precio }}</option>
+                                        <option :value="precio_dos" v-if="arrayPrecios[1]">
+                                            {{ arrayPrecios[1].nombre_precio }}</option>
+                                        <option :value="precio_tres" v-if="arrayPrecios[2]">
+                                            {{ arrayPrecios[2].nombre_precio }}</option>
+                                        <option :value="precio_cuatro" v-if="arrayPrecios[3]">
+                                            {{ arrayPrecios[3].nombre_precio }}</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label>Precio Unitario<span style="color: red;" v-show="precio==0">*</span></label>
-                                    <input disabled type="number" value="0" step="any" class="form-control" v-model="precioseleccionado" ref="precioRef">
+                                    <label>Precio Unitario<span style="color: red;"
+                                            v-show="precio == 0">*</span></label>
+                                    <input disabled type="number" value="0" step="any" class="form-control"
+                                        v-model="precioseleccionado" ref="precioRef">
                                     <label for="" class="small-text">Shift + T</label>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label>Cantidad <span style="color: red;" v-show="cantidad==0">*</span></label>
-                                    <input type="number" value="0" class="form-control" v-model="cantidad" ref="cantidadRef">
+                                    <label>Cantidad <span style="color: red;" v-show="cantidad == 0">*</span></label>
+                                    <input type="number" value="0" class="form-control" v-model="cantidad"
+                                        ref="cantidadRef">
                                     <label for="" class="small-text">Shift + Y</label>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Descuento</label>
-                                    <input type="number" value="0" class="form-control" v-model="descuento" ref="descuentoRef">
+                                    <input type="number" value="0" class="form-control" v-model="descuento"
+                                        ref="descuentoRef">
                                     <label for="" class="small-text">Shift + U</label>
                                 </div>
                             </div>
@@ -283,7 +298,8 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Prec.Total</label>
-                                    <input type="number" value="0" class="form-control" v-model="prectotal" ref="descuentoRef">
+                                    <input type="number" value="0" class="form-control" v-model="prectotal"
+                                        ref="descuentoRef">
                                     <label for="" class="small-text">Shift + U</label>
                                 </div>
                             </div>
@@ -305,11 +321,11 @@
                             </div> -->
                         </div>
                         <!--######################################-LISTADO CUANDO yA SE AGREGO CON LA "CANTIDAD" ##################-->
-                        <div class="form-group row border"> 
+                        <div class="form-group row border">
                             <div class="table-responsive col-md-12">
                                 <h6 class="text-center" style="font-weight: normal;"> DETALLE DE LA COTIZACIÒN5</h6>
                                 <table class="table table-bordered table-striped table-sm">
-                                    
+
                                     <thead>
                                         <tr>
                                             <th>Opciones</th>
@@ -327,7 +343,8 @@
                                     <tbody v-if="arrayDetalle.length">
                                         <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
                                             <td>
-                                                <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
+                                                <button @click="eliminarDetalle(index)" type="button"
+                                                    class="btn btn-danger btn-sm">
                                                     <i class="icon-close"></i>
                                                 </button>
                                             </td>
@@ -375,39 +392,43 @@
                         <div class="form-group row">
                             <div class="col-md-2">
                                 <label for="">Dias de validez</label>
-                                <input type="number" class="form-control" v-model="dias_validez" >
+                                <input type="number" class="form-control" v-model="dias_validez">
                             </div>
                             <div class="col-md-2">
                                 <label for="">Tiempo de entrega</label>
-                                <input type="text" class="form-control" v-model="tiempo_entrega" >
+                                <input type="text" class="form-control" v-model="tiempo_entrega">
                             </div>
                             <div class="col-md-2">
                                 <label for="">Lugar de entrega</label>
-                                <input type="text" class="form-control" v-model="lugar_entrega" >
+                                <input type="text" class="form-control" v-model="lugar_entrega">
                             </div>
                             <div class="col-md-2">
                                 <label for="">Forma de pago</label>
-                                <input type="text" class="form-control" v-model="forma_pago" >
+                                <input type="text" class="form-control" v-model="forma_pago">
                             </div>
                             <div class="col-md-2">
                                 <label for="">Nota</label>
-                                <input type="text" class="form-control" v-model="nota" >
+                                <input type="text" class="form-control" v-model="nota">
                             </div>
                             <div class="col-md-1.5">
                                 <label for="my-selector">Imprimir:</label>
                                 <select class="form-control" id="my-selector" v-model="imprimir">
-                                <option value="">Ninguno</option>
-                                <option v-for="option in options_print" :value="option.value" :key="option.value">{{ option.label }}</option>
+                                    <option value="">Ninguno</option>
+                                    <option v-for="option in options_print" :value="option.value" :key="option.value">{{
+                option.label }}</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="form-group row">
                             <div class="col-md-12 text-right">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                                <button type="button" @click="ocultarDetalle()"
+                                    class="btn btn-secondary">Cerrar</button>
                                 <!-- <button v-if="titulocard=='REGISTRAR COTIZACIÒN'" type="button" class="btn btn-primary" @click="registrarCotizacion()">Registrar Cotización</button> -->
-                                <button  v-if="idcotizacionv!=''" type="button" class="btn btn-primary" @click="editarCotizacion()">Editar Cotización</button>
-                                <button v-else type="button" class="btn btn-primary" @click="registrarCotizacion()">Registrar Cotización</button>
+                                <button v-if="idcotizacionv != ''" type="button" class="btn btn-primary"
+                                    @click="editarCotizacion()">Editar Cotización</button>
+                                <button v-else type="button" class="btn btn-primary"
+                                    @click="registrarCotizacion()">Registrar Cotización</button>
 
                             </div>
                         </div>
@@ -421,7 +442,8 @@
                     <div class="card-body">
                         <div class="form-group row">
                             <div class="col-md-12">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                                <button type="button" @click="ocultarDetalle()"
+                                    class="btn btn-secondary">Cerrar</button>
                                 <button type="button" class="btn btn-primary" @click="registrarVenta()">Registrar
                                     Venta</button>
                             </div>
@@ -514,14 +536,14 @@
             <!-- /.modal-dialog -->
         </div>
         <!--Fin del modal-->
-        <detallecotizacionventa v-if="showModalDetalle" @cerrar="cerrarModalDetalles" 
-            @abrirVenta="abrirFormularioCotizacion" 
-            :arrayCotizacionSeleccionado="arrayCotizacionSeleccionado" 
-            :arrayCotizacionVentDet = "arrayCotizacionVentDet">
+        <detallecotizacionventa v-if="showModalDetalle" @cerrar="cerrarModalDetalles"
+            @abrirVenta="abrirFormularioCotizacion" :arrayCotizacionSeleccionado="arrayCotizacionSeleccionado"
+            :arrayCotizacionVentDet="arrayCotizacionVentDet">
         </detallecotizacionventa>
-        <registrarventa v-if="showRegistrarVenta" :arrayDetalleCotizacion="arrayDetallesAComprar" :arrayCotizacionSeleccionado="arrayCotizacionSeleccionado" @cerrar="cerrarFormularioVenta">
+        <registrarventa v-if="showRegistrarVenta" :arrayDetalleCotizacion="arrayDetallesAComprar"
+            :arrayCotizacionSeleccionado="arrayCotizacionSeleccionado" @cerrar="cerrarFormularioVenta">
         </registrarventa>
-        
+
         <!-- <div v-if="showRegistrarCompra" class="mx-3">
             <registrarcompra @editarEstadoPedido="editarPedidoComprado"  @cerrar="cerrarFormularioCompra" 
                 :arrayDetallePedido="arrayDetallesAComprar" :arrayPedidoSeleccionado="arrayPedidoSeleccionado" @listarArticuloProveedor="listarArticuloProveedor" @abrirModalArticulos="abrirModalArticulos" 
@@ -537,49 +559,49 @@ export default {
     data() {
         return {
             //-----
-            showRegistrarVenta:false,
-            titulo:'Cotizacion de Venta',
-            telefono:'',
-            AlmacenSeleccionado:1,
+            showRegistrarVenta: false,
+            titulo: 'Cotizacion de Venta',
+            telefono: '',
+            AlmacenSeleccionado: 1,
             idalmacen: 1,
             arrayAlmacenes: [],
             arrayArticuloSeleccionado: [],//ALA,ACENAR LO SELECCIONADO
-            nombre_articulo:'',
-            saldo_stock:'',
+            nombre_articulo: '',
+            saldo_stock: '',
             // precio_costo_unid:'',
             // precio_costo_paq:'',
             unidad_envase: '',
             prectotal: '',
-            estado_cotizacion:'En espera',
+            estado_cotizacion: 'En espera',
             clienteSeleccionado: '',
             idcotizacionv: '',
-            arrayCotizacionSeleccionado:{},
-            arrayCotizacionVentDet:[],
-            showModalDetalle:false,
+            arrayCotizacionSeleccionado: {},
+            arrayCotizacionVentDet: [],
+            showModalDetalle: false,
             //-----PRECIOS- AUMENTE 3/OCTUBRE--------
-             precioseleccionado :'',
+            precioseleccionado: '',
             //precio : '',
-            arrayPrecios :[],
-            nombre_precio :'',
+            arrayPrecios: [],
+            nombre_precio: '',
             precio_uno: '',
-            precio_dos : '',
-            precio_tres : '',
-            precio_cuatro : '',
+            precio_dos: '',
+            precio_tres: '',
+            precio_cuatro: '',
             //------
-            
-            idcotizacion:0,
+
+            idcotizacion: 0,
             actualizarIva: '',
 
             rolUsuario: '',
 
-            titulocard:'',
-            dias_validez:1,
+            titulocard: '',
+            dias_validez: 1,
 
-            tiempo_entrega:"Inmediata",
-            lugar_entrega:"Deposito",
+            tiempo_entrega: "Inmediata",
+            lugar_entrega: "Deposito",
             forma_pago: '',
             //forma_pago:"Al contado",
-            nota:"",
+            nota: "",
             options_print: [
 
                 { value: "opcion1", label: "Cotizaciòn A" },
@@ -590,7 +612,7 @@ export default {
             venta_id: 0,
             //idcliente: '',
             idcliente: 0,
-            nitcliente:"",
+            nitcliente: "",
             cliente: '',
             tipo_comprobante: 'BOLETA',
             serie_comprobante: '',
@@ -635,10 +657,10 @@ export default {
     watch: {
         // Observa cambios en cantidad y precio para calcular el valor total
         cantidad() {
-        this.calcularPrecioTotal();
+            this.calcularPrecioTotal();
         },
         precioseleccionado() {
-        this.calcularPrecioTotal();
+            this.calcularPrecioTotal();
         },
     },
     components: {
@@ -685,34 +707,34 @@ export default {
     methods: {
 
         logout() {
-        axios.post('/logout')
-            .then(response => {
-                window.location = '/'; // Redirigir al usuario a la página de inicio después del cierre de sesión
-            })
-            .catch(error => {
-                console.error('Hubo un error al cerrar la sesión', error);
-            });
-    },
+            axios.post('/logout')
+                .then(response => {
+                    window.location = '/'; // Redirigir al usuario a la página de inicio después del cierre de sesión
+                })
+                .catch(error => {
+                    console.error('Hubo un error al cerrar la sesión', error);
+                });
+        },
 
         calcularPrecioTotal() {
             // Calcula el valor total multiplicando cantidad por precio
             this.prectotal = this.cantidad * this.precioseleccionado;
-            console.log("CALCULADO",this.prectotal);
+            console.log("CALCULADO", this.prectotal);
         },
-        abrirFormularioCotizacion(dato){
-            this.showRegistrarVenta=true;
-            this.listado=10;
+        abrirFormularioCotizacion(dato) {
+            this.showRegistrarVenta = true;
+            this.listado = 10;
             let idalmacen = dato.cotizacion.idalmacen;
-            let arrayConIdsAlmacen= dato.detalles.map(objeto => {
-             return { ...objeto, idalmacen:idalmacen };
-             });
-             this.arrayDetallesAComprar=arrayConIdsAlmacen;
-            this.arrayCotizacionSeleccionado=dato.cotizacion;
+            let arrayConIdsAlmacen = dato.detalles.map(objeto => {
+                return { ...objeto, idalmacen: idalmacen };
+            });
+            this.arrayDetallesAComprar = arrayConIdsAlmacen;
+            this.arrayCotizacionSeleccionado = dato.cotizacion;
             console.log("datos ", dato);
-            
-            console.log("vue ",this.showRegistrarVenta)
-            console.log("cotizACION ",this.arrayCotizacionSeleccionado)
-            console.log("detalles" , this.arrayDetallesAComprar)
+
+            console.log("vue ", this.showRegistrarVenta)
+            console.log("cotizACION ", this.arrayCotizacionSeleccionado)
+            console.log("detalles", this.arrayDetallesAComprar)
             this.cerrarModalDetalles();
         },
         datosConfiguracion() {
@@ -725,9 +747,9 @@ export default {
                 console.log(me.actualizarIva);
 
             })
-            .catch(function (error) {
-                console.log(error);
-            });
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
         recuperarIdRol() {
             this.rolUsuario = window.userData.rol;
@@ -790,18 +812,18 @@ export default {
                     me.codigo = '';
                     me.descuento = 0;
                     me.arrayDetalle = [];
-           
-                    window.open('/venta/pdf/'+ response.data.id);
-                }else{
-                    if(response.data.valorMaximo){
+
+                    window.open('/venta/pdf/' + response.data.id);
+                } else {
+                    if (response.data.valorMaximo) {
                         //alert('El valor de descuento no puede exceder el '+ response.data.valorMaximo);
                         swal(
                             'Aviso',
-                            'El valor de descuento no puede exceder el '+ response.data.valorMaximo+ ' %',
+                            'El valor de descuento no puede exceder el ' + response.data.valorMaximo + ' %',
                             'warning'
                         )
                         return;
-                    }else{
+                    } else {
                         //alert(response.data.caja_validado); 
                         swal(
                             'Aviso',
@@ -821,26 +843,26 @@ export default {
 
         eliminarCotizacion(id) {
             axios.put('/cotizacionventa/eliminar', { id: id })
-            .then(response => {
-                // Manejar la respuesta exitosa aquí, si es necesario
-                console.log(response.data);
-            })
-            .catch(error => {
-                // Manejar el error aquí, si es necesario
-                console.error(error);
-            });
+                .then(response => {
+                    // Manejar la respuesta exitosa aquí, si es necesario
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    // Manejar el error aquí, si es necesario
+                    console.error(error);
+                });
         },
-        abrirVenta(id){
+        abrirVenta(id) {
 
 
             let me = this;
-            me.idcotizacion=id;
+            me.idcotizacion = id;
             console.log("==============");
             console.log(me.idcotizacion);
             console.log("==============");
 
-            me.listado=3
-            me.titulocard="REGISTRAR VENTA";;
+            me.listado = 3
+            me.titulocard = "REGISTRAR VENTA";;
 
             //Obtener datos del ingreso
             var arrayVentaT = [];
@@ -850,19 +872,19 @@ export default {
                 var respuesta = response.data;
                 arrayVentaT = respuesta.cotizacion;
                 console.log("Cliente");
-            
+
                 console.info(arrayVentaT[0]['nombre']);
                 console.log("Cliente");
-                
+
                 me.cliente = arrayVentaT[0]['nombre'];
-                me.idcliente=arrayVentaT[0]['idcliente'];
-                me.arrayCliente=[
-                        {
-                            'id':me.idcliente,
-                            'nombre':me.cliente,
-                        }           
+                me.idcliente = arrayVentaT[0]['idcliente'];
+                me.arrayCliente = [
+                    {
+                        'id': me.idcliente,
+                        'nombre': me.cliente,
+                    }
                 ];
-                
+
                 console.log(me.arrayCliente);
                 console.log("XD");
                 me.impuesto = arrayVentaT[0]['impuesto'];
@@ -967,37 +989,37 @@ export default {
                 }
             })
         },
-        atajoButton: function(event) {
+        atajoButton: function (event) {
             //console.log(event.keyCode);
             //console.log(event.ctrlKey);
-            if(event.shiftKey && event.keyCode === 81) {
+            if (event.shiftKey && event.keyCode === 81) {
                 event.preventDefault();
                 this.$refs.impuestoRef.focus();
             }
-            if(event.shiftKey && event.keyCode === 87) {
+            if (event.shiftKey && event.keyCode === 87) {
                 event.preventDefault();
                 this.$refs.serieComprobanteRef.focus();
             }
-            if(event.shiftKey && event.keyCode === 69) {
+            if (event.shiftKey && event.keyCode === 69) {
                 event.preventDefault();
                 this.$refs.numeroComprobanteRef.focus();
             }
-            if(event.shiftKey && event.keyCode === 82) {
+            if (event.shiftKey && event.keyCode === 82) {
                 event.preventDefault();
                 this.$refs.articuloRef.focus();
             }
-            if(event.shiftKey && event.keyCode === 84) {
+            if (event.shiftKey && event.keyCode === 84) {
                 event.preventDefault();
                 this.$refs.precioRef.focus();
-            }  
-            if(event.shiftKey && event.keyCode === 89) {
+            }
+            if (event.shiftKey && event.keyCode === 89) {
                 event.preventDefault();
                 this.$refs.cantidadRef.focus();
             }
-            if(event.shiftKey && event.keyCode === 85) {
+            if (event.shiftKey && event.keyCode === 85) {
                 event.preventDefault();
                 this.$refs.descuentoRef.focus();
-            }       
+            }
         },
         listarCotizacion(page, buscar, criterio) {
             let me = this;
@@ -1017,7 +1039,7 @@ export default {
             let me = this;
             var url = '/cliente/selectClientePorNumero?numero=' + numero;
             axios.get(url).then(function (response) {
-                let respuesta  = response.data;
+                let respuesta = response.data;
                 q: numero;
                 me.arrayCliente = respuesta.clientes;
                 console.log(me.arrayCliente);
@@ -1035,7 +1057,7 @@ export default {
                 let respuesta = response.data;
                 q: search
                 me.arrayCliente = respuesta.clientes;
-                console.log("CLIENTE!!",me.arrayCliente);
+                console.log("CLIENTE!!", me.arrayCliente);
                 loading(false)
             })
                 .catch(function (error) {
@@ -1050,10 +1072,10 @@ export default {
             if (val1 && val1.id) {
                 me.idcliente = val1.id;
                 me.clienteSeleccionado = val1.nombre;
-                me.nitcliente=val1.num_documento;
+                me.nitcliente = val1.num_documento;
                 console.log(val1.num_documento);
-                me.telefono= val1.telefono;
-                console.log("Telefono",val1.telefono);
+                me.telefono = val1.telefono;
+                console.log("Telefono", val1.telefono);
             }
             //-----
             // me.nitcliente=val1.num_documento;
@@ -1117,10 +1139,10 @@ export default {
             console.log(me.AlmacenSeleccionado);
             console.log('TODO', me.arrayDetalle);
             console.log("----------Almacen seleccionado!!----------");
-            if (me.arrayArticuloSeleccionado.length == 0 || me.cantidad == 0 ) {
+            if (me.arrayArticuloSeleccionado.length == 0 || me.cantidad == 0) {
                 console.log("Seleccione un producto o verifique la cantidad");
-                
-            }else {
+
+            } else {
                 if (me.encuentra(me.idarticulo)) {
                     swal({
                         type: 'error',
@@ -1139,11 +1161,11 @@ export default {
                             idarticulo: me.arrayArticuloSeleccionado[0].idarticulo,
                             codigo: me.arrayArticuloSeleccionado[0].codigo,
                             nombre_articulo: me.arrayArticuloSeleccionado[0].nombre_articulo,
-                            precioseleccionado : me.precioseleccionado,
-                            cantidad : me.cantidad,
-                            descuento : me.descuento,
-                            unidad_envase : me.arrayArticuloSeleccionado[0].unidad_envase,
-                            prectotal : me.prectotal,
+                            precioseleccionado: me.precioseleccionado,
+                            cantidad: me.cantidad,
+                            descuento: me.descuento,
+                            unidad_envase: me.arrayArticuloSeleccionado[0].unidad_envase,
+                            prectotal: me.prectotal,
                             // precio : me.arrayArticuloSeleccionado[0].precio,
                             // cantidad: me.cantidad,
                             // total: me.Sumatotal,
@@ -1179,30 +1201,30 @@ export default {
                 })
             } else {
                 console.log("==========Agregando A los inpuT como precio-==============");
-                    console.log(data);
-                    console.log("=============hasta aqui=================");
-                    me.arrayArticuloSeleccionado = [{
-                        idarticulo:data['id'],
-                        codigo: data['codigo'],
-                        saldo_stock: data['saldo_stock'],
-                        nombre_articulo: data['nombre'],
-                        unidad_envase: data['unidad_envase'],
-                        // precio_costo_paq: data['precio_costo_paq'],
-                        // precio_costo_unid: data['precio_costo_unid'],
-                        fotografia: data['fotografia'],
-                        precio_uno : data['precio_uno'],
-                        precio_dos : data['precio_dos'],
-                        precio_tres : data['precio_tres'],
-                        precio_cuatro : data['precio_cuatro']
-                    }]
-                    me.codigo = me.arrayArticuloSeleccionado[0].codigo;
-                    me.saldo_stock = me.arrayArticuloSeleccionado[0].saldo_stock;
-                    me.nombre_articulo = me.arrayArticuloSeleccionado[0].nombre_articulo;
-                    me.unidad_envase = me.arrayArticuloSeleccionado[0].unidad_envase;
-                    me.precio_uno = me.arrayArticuloSeleccionado[0]['precio_uno'];
-                    me.precio_dos = me.arrayArticuloSeleccionado[0]['precio_dos'];
-                    me.precio_tres = me.arrayArticuloSeleccionado[0]['precio_tres'];
-                    me.precio_cuatro = me.arrayArticuloSeleccionado[0]['precio_cuatro'];
+                console.log(data);
+                console.log("=============hasta aqui=================");
+                me.arrayArticuloSeleccionado = [{
+                    idarticulo: data['id'],
+                    codigo: data['codigo'],
+                    saldo_stock: data['saldo_stock'],
+                    nombre_articulo: data['nombre'],
+                    unidad_envase: data['unidad_envase'],
+                    // precio_costo_paq: data['precio_costo_paq'],
+                    // precio_costo_unid: data['precio_costo_unid'],
+                    fotografia: data['fotografia'],
+                    precio_uno: data['precio_uno'],
+                    precio_dos: data['precio_dos'],
+                    precio_tres: data['precio_tres'],
+                    precio_cuatro: data['precio_cuatro']
+                }]
+                me.codigo = me.arrayArticuloSeleccionado[0].codigo;
+                me.saldo_stock = me.arrayArticuloSeleccionado[0].saldo_stock;
+                me.nombre_articulo = me.arrayArticuloSeleccionado[0].nombre_articulo;
+                me.unidad_envase = me.arrayArticuloSeleccionado[0].unidad_envase;
+                me.precio_uno = me.arrayArticuloSeleccionado[0]['precio_uno'];
+                me.precio_dos = me.arrayArticuloSeleccionado[0]['precio_dos'];
+                me.precio_tres = me.arrayArticuloSeleccionado[0]['precio_tres'];
+                me.precio_cuatro = me.arrayArticuloSeleccionado[0]['precio_cuatro'];
                 // me.arrayDetalle.push({
                 //     idarticulo: data['id'],
                 //     articulo: data['nombre'],
@@ -1220,7 +1242,7 @@ export default {
                 var respuesta = response.data;
                 console.log("LLEGA!!", respuesta);
                 me.arrayArticulo = respuesta.articulos;
-                console.log("LLEGACOTIZACIONVENTA!!",me.arrayArticulo);
+                console.log("LLEGACOTIZACIONVENTA!!", me.arrayArticulo);
             })
                 .catch(function (error) {
                     console.log(error);
@@ -1228,21 +1250,21 @@ export default {
         },
 
         imprimirTicket(id) {
-            axios.get('/cotizacionventa/imprimir/'+id, { responseType: 'blob' })
-                .then(function(response) {
-                //window.location.href = "docs/ticket.pdf";  esto sirve para ver lo que se va a imprimir
-                //const fileURL = 'docs/ticket.pdf';         pero si esta comentado, no aparece, se imprime automaticamente
-                //window.open(fileURL, '_blank');            bueno, eso suponemos. Att: los practicantes
-                console.log("Se generó el Ticket correctamente");
+            axios.get('/cotizacionventa/imprimir/' + id, { responseType: 'blob' })
+                .then(function (response) {
+                    //window.location.href = "docs/ticket.pdf";  esto sirve para ver lo que se va a imprimir
+                    //const fileURL = 'docs/ticket.pdf';         pero si esta comentado, no aparece, se imprime automaticamente
+                    //window.open(fileURL, '_blank');            bueno, eso suponemos. Att: los practicantes
+                    console.log("Se generó el Ticket correctamente");
                 })
-                .catch(function(error) {
-                console.log(error);
+                .catch(function (error) {
+                    console.log(error);
                 });
-            },
+        },
 
         registrarCotizacion() {
 
-            
+
             if (this.validarCotizacion()) {
                 console.log("Rellene todos los campos");
                 return;
@@ -1260,12 +1282,12 @@ export default {
                 'impuesto': this.impuesto,
                 'total': this.prectotal,
                 'estado': this.estado_cotizacion,
-                'n_validez':this.dias_validez,
-                'tiempo_entrega':this.tiempo_entrega,
-                'lugar_entrega':this.lugar_entrega,
-                'forma_pago':this.forma_pago,
-                'nota':this.nota,
-                'idalmacen':this.idalmacen,
+                'n_validez': this.dias_validez,
+                'tiempo_entrega': this.tiempo_entrega,
+                'lugar_entrega': this.lugar_entrega,
+                'forma_pago': this.forma_pago,
+                'nota': this.nota,
+                'idalmacen': this.idalmacen,
                 'data': this.arrayDetalle
 
             }).then(function (response) {
@@ -1274,9 +1296,9 @@ export default {
                 //console.log(response.data.id);
                 if (response.data.id > 0) {
                     console.log("cotizacionREgistraado" + me.listado);
-                    
+
                     me.listado = 1;
-                    me.listarCotizacion(1,'','');
+                    me.listarCotizacion(1, '', '');
                     me.idproveedor = 0;
                     me.impuesto = 0.18;
                     me.total = 0.0;
@@ -1289,16 +1311,16 @@ export default {
                     me.descuento = 0;
                     me.arrayDetalle = [];
                     // window.open('/cotizacionventa/pdf/'+ response.data.id);
-                }else{
-                    if(response.data.valorMaximo){
+                } else {
+                    if (response.data.valorMaximo) {
                         //alert('El valor de descuento no puede exceder el '+ response.data.valorMaximo);
                         swal(
                             'Aviso',
-                            'El valor de descuento no puede exceder el '+ response.data.valorMaximo,
+                            'El valor de descuento no puede exceder el ' + response.data.valorMaximo,
                             'warning'
                         )
                         return;
-                    }else{
+                    } else {
                         //alert(response.data.caja_validado); 
                         swal(
                             'Aviso',
@@ -1308,12 +1330,13 @@ export default {
                         return;
                     }
                     //console.log(response.data.valorMaximo)
-                }  
+                }
 
             }).catch(function (error) {
                 console.log(error);
             });
-            this.logout(); },
+            this.logout();
+        },
         validarCotizacion() {
             let me = this;
             me.errorVenta = 0;
@@ -1359,64 +1382,62 @@ export default {
             return me.errorVenta;
         },
         //---MODAL--
-        mostrarDetalle(modelo, accion, data = []) 
-        {
+        mostrarDetalle(modelo, accion, data = []) {
             let me = this;
             switch (modelo) {
                 case "venta":
-                {
-                    switch (accion) 
                     {
-                        case 'cotizacion':
-                            {
-                                me.listado = 0;
-                                me.titulo="Registar nuevo pedido";
+                        switch (accion) {
+                            case 'cotizacion':
+                                {
+                                    me.listado = 0;
+                                    me.titulo = "Registar nuevo pedido";
 
-                                //me.idproveedor = 0;
-                                //me.idproveedor = '';
-                                me.fechaPedido = '';
-                                me.fechaEntrega = '';
-                                me.idalmacen = 1;
-                                me.observacion ='';
-                                me.forma_pago ='';
-                                me.arrayDetalle = [];
-                                me.proveedorSeleccionado='';
-                                //this.inicializarFechas();
-                                break;
-                            }                      
-                        case 'editar':
-                            {
-                                console.log("DATOS RECUPERADO!!:",data);
-                                me.listado = 0;//abrir el Template de editar
-                                me.titulo="Editar Cotizacion Venta";
-                                me.idcotizacionv = data['id'];
-                                me.clienteSeleccionado = data['nombre'];
-                                me.nitcliente = data['num_documento'];
-                                me.telefono = data['telefono'];
-                                me.idcliente = data['idcliente'];
-                                console.log('IDCLIENTE',me.idcliente);
+                                    //me.idproveedor = 0;
+                                    //me.idproveedor = '';
+                                    me.fechaPedido = '';
+                                    me.fechaEntrega = '';
+                                    me.idalmacen = 1;
+                                    me.observacion = '';
+                                    me.forma_pago = '';
+                                    me.arrayDetalle = [];
+                                    me.proveedorSeleccionado = '';
+                                    //this.inicializarFechas();
+                                    break;
+                                }
+                            case 'editar':
+                                {
+                                    console.log("DATOS RECUPERADO!!:", data);
+                                    me.listado = 0;//abrir el Template de editar
+                                    me.titulo = "Editar Cotizacion Venta";
+                                    me.idcotizacionv = data['id'];
+                                    me.clienteSeleccionado = data['nombre'];
+                                    me.nitcliente = data['num_documento'];
+                                    me.telefono = data['telefono'];
+                                    me.idcliente = data['idcliente'];
+                                    console.log('IDCLIENTE', me.idcliente);
 
-                                me.dias_validez = data['plazo_entrega'];
-                                me.tiempo_entrega = data['tiempo_entrega'];
-                                me.lugar_entrega =data['lugar_entrega'];
-                                me.forma_pago =data['forma_pago'];
-                                me.nota =data['nota'];
-                                me.prectotal =data['total'];
+                                    me.dias_validez = data['plazo_entrega'];
+                                    me.tiempo_entrega = data['tiempo_entrega'];
+                                    me.lugar_entrega = data['lugar_entrega'];
+                                    me.forma_pago = data['forma_pago'];
+                                    me.nota = data['nota'];
+                                    me.prectotal = data['total'];
 
-                                //me.label = data['nombre_proveedor'];
-                                //selectProveedor(search, loading);
-                                me.verCotizacionDet(data);
-                                break;
-                            }
+                                    //me.label = data['nombre_proveedor'];
+                                    //selectProveedor(search, loading);
+                                    me.verCotizacionDet(data);
+                                    break;
+                                }
+                        }
                     }
-                }
             }
         },
         getDatosAlmacen() {
             let me = this;
-            if (me.AlmacenSeleccionado !== '') { 
+            if (me.AlmacenSeleccionado !== '') {
                 me.loading = true;
-                me.idalmacen = Number(me.AlmacenSeleccionado); 
+                me.idalmacen = Number(me.AlmacenSeleccionado);
                 console.log('IDalmacen: ' + me.idalmacen);
             }
         },
@@ -1437,7 +1458,7 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.arrayPrecios = respuesta.precio.data;
-                console.log('PRECIOS',me.arrayPrecios);
+                console.log('PRECIOS', me.arrayPrecios);
                 //me.precioCount = me.arrayBuscador.length;
             }).catch(function (error) {
                 console.log(error);
@@ -1446,8 +1467,8 @@ export default {
         mostrarSeleccion() {
             console.log('Precio seleccionado:', this.precioseleccionado);
         },
-        verCotizacionDet(data){
-            let idcotizacionv = data.id; 
+        verCotizacionDet(data) {
+            let idcotizacionv = data.id;
             let me = this;
 
             me.arrayCotizacionSeleccionado = data;//--para enviar a oTro Vuejs
@@ -1458,32 +1479,32 @@ export default {
             var url = '/cotizacionventa/obtenerDetalles?idcotizacion=' + idcotizacionv;
             axios.get(url)
                 .then(function (response) {
-                var respuesta = response.data;
-                //console.log("RESPONSE!!#",respuesta);
-                me.arrayCotizacionVentDet = respuesta.detalles; // Para enViar a regis◘4rar a otro Vuejs
-                console.log("2_RECUPERA DATO EDI◘4AR!!", me.arrayCotizacionVentDet);
-                me.arrayDetalle=respuesta.detalles;
-                console.log("3_RECUPERA DATO EDI◘4AR!!", me.arrayDetalle);
-                
+                    var respuesta = response.data;
+                    //console.log("RESPONSE!!#",respuesta);
+                    me.arrayCotizacionVentDet = respuesta.detalles; // Para enViar a regis◘4rar a otro Vuejs
+                    console.log("2_RECUPERA DATO EDI◘4AR!!", me.arrayCotizacionVentDet);
+                    me.arrayDetalle = respuesta.detalles;
+                    console.log("3_RECUPERA DATO EDI◘4AR!!", me.arrayDetalle);
+
                 })
                 .catch(function (error) {
-                console.log(error);
-            });
+                    console.log(error);
+                });
         },
         //----------para enViar a otro Vuejs----
-        abrirModalDetalles(venta){
-            this.showModalDetalle=true;
+        abrirModalDetalles(venta) {
+            this.showModalDetalle = true;
             this.verCotizacionDet(venta);
         },
-        cerrarFormularioVenta(){
-            this.showRegistrarVenta=false;
-            this.listado=1;
+        cerrarFormularioVenta() {
+            this.showRegistrarVenta = false;
+            this.listado = 1;
         },
-        cerrarModalDetalles(){
-            this.showModalDetalle=false;
+        cerrarModalDetalles() {
+            this.showModalDetalle = false;
         },
         //------------hasta aqui------------------
-        editarCotizacion(){
+        editarCotizacion() {
 
             let me = this;
             if (me.arrayDetalle.length === 0) {
@@ -1509,16 +1530,16 @@ export default {
                 'impuesto': me.impuesto,
                 'total': me.prectotal,
                 'estado': 'VENDIDO',
-                'n_validez':me.dias_validez,
-                'tiempo_entrega':me.tiempo_entrega,
-                'lugar_entrega':me.lugar_entrega,
-                'forma_pago':me.forma_pago,
-                'nota':me.nota,
+                'n_validez': me.dias_validez,
+                'tiempo_entrega': me.tiempo_entrega,
+                'lugar_entrega': me.lugar_entrega,
+                'forma_pago': me.forma_pago,
+                'nota': me.nota,
                 'data': me.arrayDetalle
 
             }).then(function (response) {
                 me.listado = 1;
-                me.listarCotizacion(1,"", "");
+                me.listarCotizacion(1, "", "");
             }).catch(function (error) {
                 console.log('ERROR AL EDITAR', error);
             });
@@ -1549,10 +1570,10 @@ export default {
         // },
         ocultarDetalle() {
             this.listado = 1;
-            this.num_comprobante='';
-            this.cliente='';
-            this.arrayArticulo=[];
-            this.serie_comprobante='';
+            this.num_comprobante = '';
+            this.cliente = '';
+            this.arrayArticulo = [];
+            this.serie_comprobante = '';
             this.idcotizacionv = '';
             this.logout();
         },
@@ -1568,12 +1589,12 @@ export default {
                 arrayVentaT = respuesta.cotizacion;
                 console.log(me.arrayCliente);
                 me.cliente = arrayVentaT[0]['nombre'];
-                me.idcliente=arrayVentaT[0]['idcliente'];
-                me.arrayCliente=[
-                        {
-                            'id':me.idcliente,
-                            'nombre':me.cliente,
-                        }           
+                me.idcliente = arrayVentaT[0]['idcliente'];
+                me.arrayCliente = [
+                    {
+                        'id': me.idcliente,
+                        'nombre': me.cliente,
+                    }
 
                 ];
 
@@ -1636,14 +1657,14 @@ export default {
         //             console.log(error);
         //         });
         // },
-        
+
         cerrarModal() {
             this.modal = 0;
             this.tituloModal = '';
-  
+
         },
         abrirModal() {
-            this.listarArticulo("","");
+            this.listarArticulo("", "");
             this.arrayArticulo = [];
             this.modal = 1;
             this.tituloModal = 'Seleccione los articulos que desee';
@@ -1702,48 +1723,50 @@ export default {
     }
 }
 </script>
-<style>    
-    .fit-content {
+<style>
+.fit-content {
     width: 1%;
     white-space: nowrap;
-    }
+}
 
-    .modal-content {
-        width: 100% !important;
-        position: absolute !important;
-    }
+.modal-content {
+    width: 100% !important;
+    position: absolute !important;
+}
 
-    .mostrar {
-        display: list-item !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        background-color: #3c29297a !important;
-    }
+.mostrar {
+    display: list-item !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    background-color: #3c29297a !important;
+}
 
-    .div-error {
-        display: flex;
-        justify-content: center;
-    }
+.div-error {
+    display: flex;
+    justify-content: center;
+}
 
-    .text-error {
-        color: red !important;
-        font-weight: bold;
-    }
-    .small-text {
-        font-size: 12px;
-        white-space: nowrap;
-        color: darkgrey;
-        }
+.text-error {
+    color: red !important;
+    font-weight: bold;
+}
 
-    @media (min-width: 600px) {
-        .btnagregar {
-            margin-top: 2rem;
-        }
+.small-text {
+    font-size: 12px;
+    white-space: nowrap;
+    color: darkgrey;
+}
+
+@media (min-width: 600px) {
+    .btnagregar {
+        margin-top: 2rem;
     }
-    .card-img {
-        width: 120px;
-        height: auto;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-    }
-    </style>
+}
+
+.card-img {
+    width: 120px;
+    height: auto;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+</style>
