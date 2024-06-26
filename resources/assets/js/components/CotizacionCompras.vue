@@ -1,20 +1,14 @@
 <template>
-    
-    <main class="main">
 
-        <!-- Breadcrumb -->
-        <ol class="breadcrumb bg-light rounded px-3 shadow-sm">
-            <li class="breadcrumb-item"><a class="text-primary text-decoration-none" href="/">Escritorio</a></li>
-            <li class="breadcrumb-item active text-primary" aria-current="page">Compras</li>
-            <li class="breadcrumb-item active text-primary" aria-current="page">{{showRegistrarCompra?"Ingresos":"Pedidos a proveedores"}}</li>
-        </ol>
+    <main class="main">
         <div class="container-fluid">
             <!-- Ejemplo de tabla Listado -->
             <!-- <div :class="{ 'card': listado === 1 }"> -->
             <div class="card" v-if="!showRegistrarCompra">
-                <div class="card-header" >
+                <div class="card-header">
                     <i class="fa fa-align-justify"></i>{{ titulo }}
-                    <button v-if="listado==1" type="button" @click="mostrarDetalle('pedido', 'registrar')" class="btn btn-secondary">
+                    <button v-if="listado == 1" type="button" @click="mostrarDetalle('pedido', 'registrar')"
+                        class="btn btn-secondary">
                         <i class="icon-plus"></i>&nbsp;Nuevo
                     </button>
 
@@ -35,20 +29,23 @@
 
                                     </select>
                                     <div class="input-group mb-3 border border-gray shadow-lg">
-                                        
+
                                         <div class="input-group-prepend flex items-center mt-1 ml-2">
-                                            <span class="input-group-text bg-transparent border-0"><i class="fa fa-search"></i></span>
+                                            <span class="input-group-text bg-transparent border-0"><i
+                                                    class="fa fa-search"></i></span>
                                         </div>
-                                        <input type="text" class="form-control border-0" placeholder="Buscar" aria-label="Buscar">
+                                        <input type="text" class="form-control border-0" placeholder="Buscar"
+                                            aria-label="Buscar">
                                     </div>
-                                    
+
                                 </div>
 
                             </div>
                             <div class="d-flex align-items-center">
                                 <small class="text-muted">Mostrar:&nbsp;</small>
 
-                                <select class="custom-select bg-light"  v-model="itemsPerPage" @change="cambiarNumeroElementos">
+                                <select class="custom-select bg-light" v-model="itemsPerPage"
+                                    @change="cambiarNumeroElementos">
                                     <option value="5">5</option>
 
                                     <option value="10">10</option>
@@ -60,7 +57,7 @@
 
 
                         </div>
-                        
+
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-sm">
                                 <thead>
@@ -79,40 +76,45 @@
                                 <tbody>
                                     <tr v-for="pedprov in arrayPedidoProv" :key="pedprov.id">
                                         <td v-text="pedprov.id"></td>
-                                        <td>{{ new Intl.DateTimeFormat('es-ES').format(new Date(pedprov.fecha_pedido)) }}</td>
-                                        <td>{{ new Date(pedprov.fecha_pedido).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</td>
+                                        <td>{{ new Intl.DateTimeFormat('es-ES').format(new Date(pedprov.fecha_pedido))
+                                            }}</td>
+                                        <td>{{ new Date(pedprov.fecha_pedido).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            }) }}</td>
 
                                         <td v-text="pedprov.nombre_proveedor"></td>
                                         <td v-text="pedprov.nombre_almacen"></td>
-                                        <td >
-                                    {{(pedprov.total  *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
-                                        
+                                        <td>
+                                            {{ (pedprov.total * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                monedaPrincipal[1] }}
+
                                         </td>
                                         <!-- <td>{{ Math.floor((new Date(pedprov.fecha_entrega) - new Date()) / (1000 * 60 * 60 * 24))+1 }} dias</td> -->
-                                        <td>{{ new Intl.DateTimeFormat('es-ES').format(new Date(pedprov.fecha_entrega)) }}</td>
+                                        <td>{{ new Intl.DateTimeFormat('es-ES').format(new Date(pedprov.fecha_entrega))
+                                            }}</td>
 
 
-                                        <td >
-                                            <i class="fa fa-circle" :style="{ color: getColorForEstado(pedprov.estado,pedprov.fecha_entrega) }"></i>&nbsp;
-                                            {{new Date(pedprov.fecha_entrega) < new Date() ? 'Caducada' : pedprov.estado }}
-                                        </td>
-                                        
+                                        <td>
+                                            <i class="fa fa-circle"
+                                                :style="{ color: getColorForEstado(pedprov.estado, pedprov.fecha_entrega) }"></i>&nbsp;
+                                            {{ new Date(pedprov.fecha_entrega) < new Date() ? 'Caducada' :
+                pedprov.estado }} </td>
+
                                         <td>
                                             <button type="button" @click="abrirModalDetalles(pedprov)"
-                                                    class="btn btn-outline-success btn-sm rounded">
+                                                class="btn btn-outline-success btn-sm rounded">
                                                 <i class="fa fa-eye fa-sm"></i>
                                             </button>
-                                            <button type="button" @click="mostrarDetalle('pedido', 'editar', pedprov)" 
-                                                class="btn btn-outline-info btn-sm rounded"
-                                                >
+                                            <button type="button" @click="mostrarDetalle('pedido', 'editar', pedprov)"
+                                                class="btn btn-outline-info btn-sm rounded">
                                                 <i class="fa fa-print fa-sm"></i>
                                             </button>
-                                            <button type="button" @click="mostrarDetalle('pedido', 'editar', pedprov)" 
-                                                class="btn btn-outline-warning btn-sm rounded"
-                                                >
+                                            <button type="button" @click="mostrarDetalle('pedido', 'editar', pedprov)"
+                                                class="btn btn-outline-warning btn-sm rounded">
                                                 <i class="fa fa-pencil fa-sm"></i>
                                             </button>
-                                            <button type="button" @click="eliminarPedido(pedprov.id)" 
+                                            <button type="button" @click="eliminarPedido(pedprov.id)"
                                                 class="btn btn-outline-danger btn-sm rounded ">
                                                 <i class="fa fa-trash fa-sm"></i>
                                             </button>
@@ -167,54 +169,56 @@
                 </div>
                 <!--Fin Listado HASTA QUI-->
                 <!-- Detalle-->
-                <div v-else-if="listado == 0" >
-                        <div class="card-body form-group row pb-0">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="" class="font-weight-bold">Proveedor <span class="text-danger">*</span></label>
+                <div v-else-if="listado == 0">
+                    <div class="card-body form-group row pb-0">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="" class="font-weight-bold">Proveedor <span
+                                        class="text-danger">*</span></label>
 
-                                    <v-select 
-                                        :on-search="selectProveedor" 
-                                        label="nombre" 
-                                        :options="arrayProveedor"
-                                        placeholder="Buscar Proveedores..." 
-                                        :onChange="getDatosProveedor"
-                                        v-model="proveedorSeleccionado"
-                                        >
-                                    </v-select>
-                                    <p v-if="!proveedorSeleccionado" class="card-text"><small class="text-danger">Seleccione un proveedor para agregar productos al pedido</small></p>
+                                <v-select :on-search="selectProveedor" label="nombre" :options="arrayProveedor"
+                                    placeholder="Buscar Proveedores..." :onChange="getDatosProveedor"
+                                    v-model="proveedorSeleccionado">
+                                </v-select>
+                                <p v-if="!proveedorSeleccionado" class="card-text"><small class="text-danger">Seleccione
+                                        un proveedor para agregar productos al pedido</small></p>
 
-                                    
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="" class="font-weight-bold">Almacen <span class="text-danger">*</span></label>
-                                    <select class="form-control" v-model="AlmacenSeleccionado" @change="getDatosAlmacen">
-                                        <option value="0" disabled>Seleccione</option>
-                                        <option v-for="opcion in arrayAlmacenes" :key="opcion.id" :value="opcion.id">{{ opcion.nombre_almacen }}</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label for="" class="font-weight-bold">Unidad <span class="text-danger">*</span></label>
-                                    <select class="form-control" v-model="tipopedido">
-                                        <option value="0" disabled>Seleccione</option>
-                                        <option v-for="tipopedido in arrayTipPedi" :key="tipopedido" :value="tipopedido" v-text="tipopedido"></option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <label for="" class="font-weight-bold">Fecha pedido <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" v-model="fechaPedido">
-                            </div>
-                            <div class="col-md-2">
-                                <label for="" class="font-weight-bold">Fecha entrega <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" v-model="fechaEntrega">
-                            </div>
 
-                            <!-- <div class="col-md-12">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="" class="font-weight-bold">Almacen <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-control" v-model="AlmacenSeleccionado" @change="getDatosAlmacen">
+                                    <option value="0" disabled>Seleccione</option>
+                                    <option v-for="opcion in arrayAlmacenes" :key="opcion.id" :value="opcion.id">{{
+                opcion.nombre_almacen }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="" class="font-weight-bold">Unidad <span class="text-danger">*</span></label>
+                                <select class="form-control" v-model="tipopedido">
+                                    <option value="0" disabled>Seleccione</option>
+                                    <option v-for="tipopedido in arrayTipPedi" :key="tipopedido" :value="tipopedido"
+                                        v-text="tipopedido"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="" class="font-weight-bold">Fecha pedido <span
+                                    class="text-danger">*</span></label>
+                            <input type="date" class="form-control" v-model="fechaPedido">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="" class="font-weight-bold">Fecha entrega <span
+                                    class="text-danger">*</span></label>
+                            <input type="date" class="form-control" v-model="fechaEntrega">
+                        </div>
+
+                        <!-- <div class="col-md-12">
                                 <div v-show="errorIngreso" class="form-group row div-error">
                                     <div class="text-center text-error">
                                         <div v-for="error in errorMostrarMsjIngreso" :key="error" v-text="error">
@@ -223,55 +227,56 @@
                                     </div>
                                 </div>
                             </div> -->
-                        </div>
-                        <hr/>
+                    </div>
+                    <hr />
                     <div class="card-body">
                         <div class="form-group row">
                             <div class="col-md-3">
                                 <div class="form-group" v-if="proveedorSeleccionado">
-                                    <label  class="font-weight-bold">Seleccione producto
+                                    <label class="font-weight-bold">Seleccione producto
                                         <span class="text-danger">*</span>
                                     </label>
                                     <div class="form-inline">
-                                        <input type="text" class="form-control" v-model="codigo" @keyup="buscarArticulo()"
-                                            placeholder="Codigo producto" ref="articuloRef" >
-                                        <button @click="abrirModal()" class="btn btn-primary" >...</button>
+                                        <input type="text" class="form-control" v-model="codigo"
+                                            @keyup="buscarArticulo()" placeholder="Codigo producto" ref="articuloRef">
+                                        <button @click="abrirModal()" class="btn btn-primary">...</button>
                                     </div>
-                                    
+
                                 </div>
                                 <div class="form-group" v-else>
-                                    <label  class="font-weight-bold">Seleccione producto
+                                    <label class="font-weight-bold">Seleccione producto
                                         <span class="text-danger">*</span>
                                     </label>
                                     <div class="form-inline">
-                                        <input type="text" class="form-control" v-model="codigo" @keyup="buscarArticulo()"
-                                            placeholder="Codigo producto" ref="articuloRef" disabled>
+                                        <input type="text" class="form-control" v-model="codigo"
+                                            @keyup="buscarArticulo()" placeholder="Codigo producto" ref="articuloRef"
+                                            disabled>
                                         <button @click="abrirModal()" class="btn btn-primary" disabled>...</button>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="card-body" v-if="arrayArticuloSeleccionado.length>0">
-                                        <h3>
-                                            {{ arrayArticuloSeleccionado[0].nombre }}
-                                            <small class="text-muted">803</small>
-                                        </h3>
-                                        <p>
-                                            {{ arrayArticuloSeleccionado[0].descripcion }}
-                                        </p>
+                                <div class="card-body" v-if="arrayArticuloSeleccionado.length > 0">
+                                    <h3>
+                                        {{ arrayArticuloSeleccionado[0].nombre }}
+                                        <small class="text-muted">803</small>
+                                    </h3>
+                                    <p>
+                                        {{ arrayArticuloSeleccionado[0].descripcion }}
+                                    </p>
                                 </div>
                             </div>
-                            <div class="col-md-2" v-if="arrayArticuloSeleccionado.length > 0" >
-                                <img
-                                    v-if="arrayArticuloSeleccionado.length > 0 && arrayArticuloSeleccionado[0].fotografia"
+                            <div class="col-md-2" v-if="arrayArticuloSeleccionado.length > 0">
+                                <img v-if="arrayArticuloSeleccionado.length > 0 && arrayArticuloSeleccionado[0].fotografia"
                                     :src="'img/articulo/' + arrayArticuloSeleccionado[0].fotografia + '?t=' + new Date().getTime()"
-                                    width="50" height="50" ref="imagen" class="card-img"/>
-                                    <div v-else style="height:100px" class="bg-light p-3 d-flex justify-content-center align-items-center">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <i class="fa fa-camera" aria-hidden="true"></i>
-                                            <span class="mr-2 text-center">Producto sin imagen</span>
-                                        </div>
+                                    width="50" height="50" ref="imagen" class="card-img" />
+                                <div v-else style="height:100px"
+                                    class="bg-light p-3 d-flex justify-content-center align-items-center">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <i class="fa fa-camera" aria-hidden="true"></i>
+                                        <span class="mr-2 text-center">Producto sin imagen</span>
                                     </div>
+                                </div>
 
 
                             </div>
@@ -279,8 +284,9 @@
                                 <div class="form-group">
                                     <label>Costo Paquete:</label>
                                     <p class="h5">
-                                    {{(precio_costo_paq *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
-                                        
+                                        {{ (precio_costo_paq * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                monedaPrincipal[1] }}
+
                                     </p>
                                     <!-- <label for="">Shift + T</label> -->
                                 </div>
@@ -289,7 +295,8 @@
                                 <div class="form-group">
                                     <label>Costo unitario:</label>
                                     <p class="h5">
-                                    {{(precio *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                        {{ (precio * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1]
+                                        }}
 
                                     </p>
                                     <!-- <label for="">Shift + T</label> -->
@@ -302,18 +309,20 @@
 
                                     <!-- <label for="">Shift + T</label> -->
                                 </div>
-                            </div>   
+                            </div>
                         </div>
-                        <hr/>
+                        <hr />
                         <div class="form-group row" v-if="arrayArticuloSeleccionado.length > 0">
                             <div class="col-md-2">
-                           
+
                                 <div class="input-group mb-2 align-items-center">
 
                                     <div class="input-group-append">
                                         <small class="font-weight-bold">{{ tipopedido }}:&nbsp</small>
                                     </div>
-                                    <input type="number" id="cantidad" class="form-control font-weight-bold  form-control-lg" v-model="cantidad" aria-describedby="basic-addon2">
+                                    <input type="number" id="cantidad"
+                                        class="form-control font-weight-bold  form-control-lg" v-model="cantidad"
+                                        aria-describedby="basic-addon2">
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -321,10 +330,12 @@
                                     <div class="input-group-append">
                                         <small class="font-weight-bold">Precio total:&nbsp</small>
                                     </div>
-                                   
-                                    <input type="number"   step="any" class="form-control font-weight-bold  form-control-lg" :value="(Sumatotal*parseFloat(monedaPrincipal[0])).toFixed(2)" readonly>
+
+                                    <input type="number" step="any"
+                                        class="form-control font-weight-bold  form-control-lg"
+                                        :value="(Sumatotal * parseFloat(monedaPrincipal[0])).toFixed(2)" readonly>
                                     <p class="h5">
-                                     {{ monedaPrincipal[1] }}
+                                        {{ monedaPrincipal[1] }}
 
                                     </p>
                                 </div>
@@ -334,12 +345,13 @@
                                     <button @click="agregarDetalle()" class="btn btn-outline-success btn-block ">
                                         <i class="fa fa-plus"></i> Añadir item
                                     </button>
-                                    
+
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <button @click="eliminarArticuloSeleccionado()" class="btn btn-outline-danger btn-block ">
+                                    <button @click="eliminarArticuloSeleccionado()"
+                                        class="btn btn-outline-danger btn-block ">
                                         <i class="fa fa-plus"></i> Eliminar item
                                     </button>
                                 </div>
@@ -347,7 +359,7 @@
 
 
                         </div>
-                    
+
 
                         <!--listado para mostrar lo Añadido de item-->
                         <div class="form-group row ">
@@ -381,25 +393,29 @@
                                             <td>
                                                 {{ detalle.codigo }}
                                             </td>
-                                            <td>    
+                                            <td>
                                                 {{ detalle.articulo }}
                                             </td>
                                             <td>
-                                                
-                                    {{(detalle.precio  *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+
+                                                {{ (detalle.precio * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                monedaPrincipal[1] }}
 
                                             </td>
                                             <td>
                                                 {{ detalle.unidad_x_paquete }}
                                             </td>
                                             <td>
-                                                <input v-if="tipopedido=='Unidades'" v-model="detalle.cantidad" type="number" value="2"
-                                                    class="form-control">
-                                                <input v-else type="number" :value="(detalle.cantidad / detalle.unidad_x_paquete).toFixed(2)" class="form-control" disabled>
+                                                <input v-if="tipopedido == 'Unidades'" v-model="detalle.cantidad"
+                                                    type="number" value="2" class="form-control">
+                                                <input v-else type="number"
+                                                    :value="(detalle.cantidad / detalle.unidad_x_paquete).toFixed(2)"
+                                                    class="form-control" disabled>
 
                                             </td>
                                             <td>
-                                    {{((detalle.cantidad * detalle.precio)  *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
+                                                {{ ((detalle.cantidad * detalle.precio)
+                * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
 
 
                                             </td>
@@ -409,10 +425,11 @@
                                             <td colspan="6">
                                                 <h6 class="text-right font-weight-bold ">Total</h6>
                                             </td>
-                                            <td >
+                                            <td>
                                                 <h6 class="font-weight-bold ">
-                                    {{(Totales  *parseFloat(monedaPrincipal[0])).toFixed(2)}} {{ monedaPrincipal[1] }}
-                                                    
+                                                    {{ (Totales * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{
+                monedaPrincipal[1] }}
+
                                                 </h6>
                                             </td>
                                         </tr>
@@ -431,13 +448,14 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label><span style="font-weight: bold;">FORMA DE PAGO</span></label>
-                                    <input type="text" value="0" class="form-control" v-model="forma_pago" placeholder="Ej. Al contado">
+                                    <input type="text" value="0" class="form-control" v-model="forma_pago"
+                                        placeholder="Ej. Al contado">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label><span style="font-weight: bold;">OBSERVACION</span></label>
-                                    <input type="text" value="0" class="form-control" v-model="observacion" >
+                                    <input type="text" value="0" class="form-control" v-model="observacion">
                                 </div>
                             </div>
 
@@ -446,17 +464,21 @@
                                     <label style="font-weight: bold;">IMPRIMIR</label>
                                     <select class="form-control" v-model="imprimir">
                                         <option value="0" disabled>Seleccione</option>
-                                        <option v-for="imprimir in arrayImprimir" :key="imprimir" :value="imprimir" v-text="imprimir"></option>
+                                        <option v-for="imprimir in arrayImprimir" :key="imprimir" :value="imprimir"
+                                            v-text="imprimir"></option>
                                     </select>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group row">
                             <div class="col-md-12">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
-                                <button v-if="idpedido!=null" type="button" class="btn btn-primary" @click="editarPedidoProv()">Editar
+                                <button type="button" @click="ocultarDetalle()"
+                                    class="btn btn-secondary">Cerrar</button>
+                                <button v-if="idpedido != null" type="button" class="btn btn-primary"
+                                    @click="editarPedidoProv()">Editar
                                     Pedido</button>
-                                <button v-else type="button" class="btn btn-primary" @click="registrarPedido()">Registrar
+                                <button v-else type="button" class="btn btn-primary"
+                                    @click="registrarPedido()">Registrar
                                     Pedido</button>
                             </div>
                         </div>
@@ -544,7 +566,8 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-md-12">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                                <button type="button" @click="ocultarDetalle()"
+                                    class="btn btn-secondary">Cerrar</button>
                             </div>
                         </div>
                     </div>
@@ -630,13 +653,20 @@
             </div>
             <!-- /.modal-dialog -->
         </div>
-        <detallepedidosproveedor v-if="showModalDetalle" @cerrar="cerrarModalDetalles" @abrirCompra="abrirFormularioCompra" :arrayPedidoSeleccionado="arrayPedidoSeleccionado" :arrayPedidoProvDet="arrayPedidoProvDet" :monedaPrincipal="monedaPrincipal"></detallepedidosproveedor>
+        <detallepedidosproveedor v-if="showModalDetalle" @cerrar="cerrarModalDetalles"
+            @abrirCompra="abrirFormularioCompra" :arrayPedidoSeleccionado="arrayPedidoSeleccionado"
+            :arrayPedidoProvDet="arrayPedidoProvDet" :monedaPrincipal="monedaPrincipal"></detallepedidosproveedor>
         <div v-if="showRegistrarCompra" class="mx-3">
-            <registrarcompra @editarEstadoPedido="editarPedidoComprado"   @cerrar="cerrarFormularioCompra" :arrayDetallePedido="arrayDetallesAComprar" :arrayPedidoSeleccionado="arrayPedidoSeleccionado" @listarArticuloProveedor="listarArticuloProveedor" @abrirModalArticulos="abrirModalArticulos" :arrayArticuloSeleccionado="arrayArticuloSeleccionadoModal" :monedaCompra="monedaPrincipal"></registrarcompra>
+            <registrarcompra @editarEstadoPedido="editarPedidoComprado" @cerrar="cerrarFormularioCompra"
+                :arrayDetallePedido="arrayDetallesAComprar" :arrayPedidoSeleccionado="arrayPedidoSeleccionado"
+                @listarArticuloProveedor="listarArticuloProveedor" @abrirModalArticulos="abrirModalArticulos"
+                :arrayArticuloSeleccionado="arrayArticuloSeleccionadoModal" :monedaCompra="monedaPrincipal">
+            </registrarcompra>
 
         </div>
         <div v-if="showModalArticulos">
-            <modalagregarproductos @cerrar="cerrarModalArticulos" @agregarArticulo="agregarArticuloSeleccionado" :idproveedor="idproveedor"></modalagregarproductos>
+            <modalagregarproductos @cerrar="cerrarModalArticulos" @agregarArticulo="agregarArticuloSeleccionado"
+                :idproveedor="idproveedor"></modalagregarproductos>
         </div>
 
     </main>
@@ -647,18 +677,18 @@ import vSelect from 'vue-select';
 export default {
     data() {
         return {
-            monedaPrincipal:[],
+            monedaPrincipal: [],
 
-            titulo:'Pedidos a proveedor',
-            estadoPedido:'En espera',
-            showModalArticulos:false,
-            arrayDetallesAComprar:[],
-            showModalDetalle:false,
-            showRegistrarCompra:false,
+            titulo: 'Pedidos a proveedor',
+            estadoPedido: 'En espera',
+            showModalArticulos: false,
+            arrayDetallesAComprar: [],
+            showModalDetalle: false,
+            showRegistrarCompra: false,
             itemsPerPage: 10,
             ingreso_id: 0,
             idproveedor: 0,
-            idpedido:null,
+            idpedido: null,
             proveedor: '',
             nombre: '',
             tipo_comprobante: 'BOLETA',
@@ -668,7 +698,7 @@ export default {
             total: 0.0,
             totalImpuesto: 0.0,
             totalParcial: 0.0,
-            arrayPedidoProv:[],
+            arrayPedidoProv: [],
             arrayProveedor: [],
             arrayDetalle: [],
             listado: 1,
@@ -697,29 +727,29 @@ export default {
             cantidad: 0,
             fechaEntrega: '',
             fechaPedido: '',
-            AlmacenSeleccionado:1,
+            AlmacenSeleccionado: 1,
             idalmacen: 1,
             arrayAlmacenes: [],
-            tipopedido : 'Unidades',
-            arrayTipPedi : ['Unidades', 'Paquetes'],
+            tipopedido: 'Unidades',
+            arrayTipPedi: ['Unidades', 'Paquetes'],
             articulo: '',
             arrayArticuloSeleccionado: [],
             precio_costo_paq: 0,
-            fotografia : '',
+            fotografia: '',
             Sumatotal: 0,
             unidad_x_paquete: 0,
             forma_pago: '',
             observacion: '',
             imprimir: 'Orden de pedido',
-            arrayImprimir: ['Orden de pedido','Ninguno'],
-            Totales : 0,
-            arrayPedPrvDet:[],
-            idtraspaso:0,
-            arrayPedidoProvDet:[],
-            arrayPedidoSeleccionado:{},
-            proveedorSeleccionado:'',
-            arrayArticuloSeleccionadoModal:{}
-            
+            arrayImprimir: ['Orden de pedido', 'Ninguno'],
+            Totales: 0,
+            arrayPedPrvDet: [],
+            idtraspaso: 0,
+            arrayPedidoProvDet: [],
+            arrayPedidoSeleccionado: {},
+            proveedorSeleccionado: '',
+            arrayArticuloSeleccionadoModal: {}
+
         }
     },
     components: {
@@ -762,71 +792,71 @@ export default {
         }
     },
     watch: {
-        cantidad: function() {
+        cantidad: function () {
             this.calculoTotal();
         },
-        tipopedido: function() {
+        tipopedido: function () {
             this.calculoTotal();
         },
         arrayDetalle: {
-        deep: true,
-        handler: function(newVal) {
-            this.Totales = newVal.reduce((acc, detalle) => {
-                return acc + (detalle.cantidad * detalle.precio);
-            }, 0);
-        }
+            deep: true,
+            handler: function (newVal) {
+                this.Totales = newVal.reduce((acc, detalle) => {
+                    return acc + (detalle.cantidad * detalle.precio);
+                }, 0);
+            }
         }
     },
     methods: {
-        abrirFormularioCompra(dato){
-            this.showRegistrarCompra=true;
-            this.listado=10;
+        abrirFormularioCompra(dato) {
+            this.showRegistrarCompra = true;
+            this.listado = 10;
             let idalmacen = dato.pedido.idalmacen;
-            let arrayConIdsAlmacen= dato.detalles.map(objeto => {
-            return { ...objeto, idalmacen:idalmacen };
+            let arrayConIdsAlmacen = dato.detalles.map(objeto => {
+                return { ...objeto, idalmacen: idalmacen };
             });
-            this.arrayDetallesAComprar=arrayConIdsAlmacen;
-            this.arrayPedidoSeleccionado=dato.pedido;
+            this.arrayDetallesAComprar = arrayConIdsAlmacen;
+            this.arrayPedidoSeleccionado = dato.pedido;
 
             this.cerrarModalDetalles();
         },
-        cerrarFormularioCompra(){
-            this.showRegistrarCompra=false;
-            this.listado=1;
+        cerrarFormularioCompra() {
+            this.showRegistrarCompra = false;
+            this.listado = 1;
         },
-        abrirModalDetalles(pedprov){
-            this.showModalDetalle=true;
+        abrirModalDetalles(pedprov) {
+            this.showModalDetalle = true;
             this.verPedidoDet(pedprov);
         },
-        cerrarModalDetalles(){
-            this.showModalDetalle=false;
+        cerrarModalDetalles() {
+            this.showModalDetalle = false;
         },
         cambiarNumeroElementos() {
             this.listarPedidoProv(1, this.buscar, this.criterio);
         },
-    getColorForEstado(estado, fechaEntrega) {
-    const fechaEntregaCaducada = new Date(fechaEntrega) < new Date();
+        getColorForEstado(estado, fechaEntrega) {
+            const fechaEntregaCaducada = new Date(fechaEntrega) < new Date();
 
-    if (fechaEntregaCaducada) {
-        return '#ff0000'; // Rojo para indicar que la fecha de entrega ha caducado
-    }
-    switch(estado) {
-      case 'Pago pendiente':
-        return '#b3b9fe'; 
-      case 'Procesando':
-        return '#c6e0c7'; 
-      case 'Completado':
-        return '#5ebf5f'; 
-      case 'Cancelado':
-        return '#d76868'; 
-      case 'Reintegrado':
-        return '#7ac1cb';       
-      case 'Caducado':
-        return '#ce4444'; 
-      default:
-        return '#f9dda6'; 
-    }
-  },
+            if (fechaEntregaCaducada) {
+                return '#ff0000'; // Rojo para indicar que la fecha de entrega ha caducado
+            }
+            switch (estado) {
+                case 'Pago pendiente':
+                    return '#b3b9fe';
+                case 'Procesando':
+                    return '#c6e0c7';
+                case 'Completado':
+                    return '#5ebf5f';
+                case 'Cancelado':
+                    return '#d76868';
+                case 'Reintegrado':
+                    return '#7ac1cb';
+                case 'Caducado':
+                    return '#ce4444';
+                default:
+                    return '#f9dda6';
+            }
+        },
         atajoButton: function (event) {
             if (event.shiftKey && event.keyCode === 81) {
                 event.preventDefault();
@@ -855,7 +885,7 @@ export default {
         },
         listarPedidoProv(page, buscar, criterio) {
             let me = this;
-            var url = '/pedidoProveedor?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio+ '&per_page=' + this.itemsPerPage;
+            var url = '/pedidoProveedor?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio + '&per_page=' + this.itemsPerPage;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.arrayPedidoProv = respuesta.pedidoprov.data;
@@ -896,7 +926,7 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.arrayArticulo = respuesta.articulos;
-                me.arrayArticuloSeleccionado=respuesta.articulos;
+                me.arrayArticuloSeleccionado = respuesta.articulos;
 
                 if (me.arrayArticulo.length > 0) {
                     me.articulo = me.arrayArticulo[0]['nombre'];
@@ -934,42 +964,42 @@ export default {
             let me = this;
             if (me.arrayArticuloSeleccionado.length == 0 || me.cantidad == 0) {
                 console.log("Seleccione un producto o verifique la cantidad");
-                
-            }else {
-                if(me.encuentra(me.idarticulo)) {
+
+            } else {
+                if (me.encuentra(me.idarticulo)) {
                     swal({
                         type: 'error',
                         title: 'Error...',
                         text: 'Este Artículo ya se encuentra agregado!',
                     })
-                }else{
-                    if (me.tipopedido=="Paquetes"){
-                        me.cantidad=me.arrayArticuloSeleccionado[0].unidad_x_paquete*me.cantidad;
+                } else {
+                    if (me.tipopedido == "Paquetes") {
+                        me.cantidad = me.arrayArticuloSeleccionado[0].unidad_x_paquete * me.cantidad;
                     }
                     me.arrayDetalle.push({
-                                idarticulo: me.arrayArticuloSeleccionado[0].idarticulo,
-                                codigo: me.arrayArticuloSeleccionado[0].codigo,
-                                articulo: me.arrayArticuloSeleccionado[0].nombre,
-                                unidad_x_paquete: me.arrayArticuloSeleccionado[0].unidad_x_paquete,
-                                precio : me.arrayArticuloSeleccionado[0].precio,
-                                cantidad: me.cantidad,
-                                total: me.Sumatotal,
+                        idarticulo: me.arrayArticuloSeleccionado[0].idarticulo,
+                        codigo: me.arrayArticuloSeleccionado[0].codigo,
+                        articulo: me.arrayArticuloSeleccionado[0].nombre,
+                        unidad_x_paquete: me.arrayArticuloSeleccionado[0].unidad_x_paquete,
+                        precio: me.arrayArticuloSeleccionado[0].precio,
+                        cantidad: me.cantidad,
+                        total: me.Sumatotal,
                     });
                 }
                 me.eliminarArticuloSeleccionado();
             }
         },
-        eliminarArticuloSeleccionado(){
+        eliminarArticuloSeleccionado() {
             let me = this;
 
             me.arrayArticuloSeleccionado = [];
-                me.idarticulo ='' ;
-                me.codigo = '';
-                me.articulo = '';
-                me.precio = 0;
-                me.precio_costo_paq= 0;
-                me.unidad_x_paquete = 0;
-                me.cantidad = 0;
+            me.idarticulo = '';
+            me.codigo = '';
+            me.articulo = '';
+            me.precio = 0;
+            me.precio_costo_paq = 0;
+            me.unidad_x_paquete = 0;
+            me.cantidad = 0;
 
         },
         agregarDetalleModal(data = []) {
@@ -981,44 +1011,44 @@ export default {
                     text: 'Este Artículo ya se encuentra agregado!',
                 })
             } else {
-                    me.arrayArticuloSeleccionado = [{
-                        idarticulo: data['id'],
-                        nombre: data['articulo'],
-                        descripcion:data['descripcion'],
-                        fotografia: data['fotografia'],
-                        precio: data['precio'],
-                        precio_costo_paq: data['precio_costo_paq'],
-                        codigo: data['codigo'],
-                        unidad_x_paquete: data['unidad_x_paquete'],
-                    }]
-                    me.codigo = me.arrayArticuloSeleccionado[0].codigo;
-                    me.articulo = data['nombre'];
-                    me.precio = me.arrayArticuloSeleccionado[0].precio;
-                    me.precio_costo_paq = me.arrayArticuloSeleccionado[0].precio_costo_paq;
-                    me.unidad_x_paquete = me.arrayArticuloSeleccionado[0].unidad_x_paquete;
-                    me.modal=0;
+                me.arrayArticuloSeleccionado = [{
+                    idarticulo: data['id'],
+                    nombre: data['articulo'],
+                    descripcion: data['descripcion'],
+                    fotografia: data['fotografia'],
+                    precio: data['precio'],
+                    precio_costo_paq: data['precio_costo_paq'],
+                    codigo: data['codigo'],
+                    unidad_x_paquete: data['unidad_x_paquete'],
+                }]
+                me.codigo = me.arrayArticuloSeleccionado[0].codigo;
+                me.articulo = data['nombre'];
+                me.precio = me.arrayArticuloSeleccionado[0].precio;
+                me.precio_costo_paq = me.arrayArticuloSeleccionado[0].precio_costo_paq;
+                me.unidad_x_paquete = me.arrayArticuloSeleccionado[0].unidad_x_paquete;
+                me.modal = 0;
             }
         },
-        listarArticulo (page){
-            let me=this;
-            var url= '/articulo/listarArticuloPedido?page=' + page + '&buscar='+ me.buscar + '&criterio='+ me.criterio + '&idProveedor=' +  me.idproveedor;
+        listarArticulo(page) {
+            let me = this;
+            var url = '/articulo/listarArticuloPedido?page=' + page + '&buscar=' + me.buscar + '&criterio=' + me.criterio + '&idProveedor=' + me.idproveedor;
             axios.get(url).then(function (response) {
-                var respuesta= response.data;
+                var respuesta = response.data;
                 me.arrayArticulo = respuesta.articulos.data;
-                me.pagination= respuesta.pagination;
+                me.pagination = respuesta.pagination;
             })
-            .catch(function (error) {
-                console.log(error);
-            });
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
         editarPedidoProv() {
             let me = this;
             if (me.arrayDetalle.length === 0) {
                 return;
             }
-            let horaActual = new Date().toLocaleTimeString('es-ES', {hour12: false});
-            me.fechaEntrega=me.fechaEntrega+" "+horaActual
-            me.fechaPedido=me.fechaPedido+" "+horaActual
+            let horaActual = new Date().toLocaleTimeString('es-ES', { hour12: false });
+            me.fechaEntrega = me.fechaEntrega + " " + horaActual
+            me.fechaPedido = me.fechaPedido + " " + horaActual
             axios.put(`/editar/pedidoprovee`, {
                 'idpedido': me.idpedido, // Agrega el idpedido al cuerpo del request
                 'idproveedor': me.idproveedor,
@@ -1029,7 +1059,7 @@ export default {
                 'observacion': me.observacion,
                 'total': me.Totales,
                 'data': me.arrayDetalle,
-                'estado':me.estadoPedido
+                'estado': me.estadoPedido
             }).then(function (response) {
                 me.listado = 1;
                 me.listarPedidoProv(1, "", "");
@@ -1039,22 +1069,22 @@ export default {
         },
         editarPedidoComprado(data) {
             let me = this;
-            const detalles=data.detalles;
-            const pedido=data.pedido;
-            let horaActual = new Date().toLocaleTimeString('es-ES', {hour12: false});
-            let fechaEntrega=pedido.fechaEntrega+" "+horaActual
-            let fechaPedido=pedido.fechaPedido+" "+horaActual
+            const detalles = data.detalles;
+            const pedido = data.pedido;
+            let horaActual = new Date().toLocaleTimeString('es-ES', { hour12: false });
+            let fechaEntrega = pedido.fechaEntrega + " " + horaActual
+            let fechaPedido = pedido.fechaPedido + " " + horaActual
             axios.put(`/editar/pedidoprovee`, {
                 'idpedido': pedido.id, // Agrega el idpedido al cuerpo del request
                 'idproveedor': pedido.idproveedor,
                 'idalmacen': pedido.idalmacen,
                 'fecha_pedido': pedido.fecha_pedido,
-                'fecha_entrega':pedido.fecha_entrega,
+                'fecha_entrega': pedido.fecha_entrega,
                 'forma_pago': pedido.forma_pago,
                 'observacion': "",
                 'total': pedido.total,
                 'data': detalles,
-                'estado':"Completado"
+                'estado': "Completado"
             }).then(function (response) {
                 me.listado = 1;
                 me.listarPedidoProv(1, "", "");
@@ -1062,17 +1092,17 @@ export default {
                 console.log('ERROR AL EDITAR', error);
             });
         },
-        
+
         registrarPedido() {
             let me = this;
             if (me.arrayDetalle.length === 0) {
-                    return;
-                }
+                return;
+            }
 
 
-            let horaActual = new Date().toLocaleTimeString('es-ES', {hour12: false});
-            me.fechaEntrega=me.fechaEntrega+" "+horaActual
-            me.fechaPedido=me.fechaPedido+" "+horaActual
+            let horaActual = new Date().toLocaleTimeString('es-ES', { hour12: false });
+            me.fechaEntrega = me.fechaEntrega + " " + horaActual
+            me.fechaPedido = me.fechaPedido + " " + horaActual
 
             axios.post('/registrar/pedidoprovee', {
                 'idproveedor': me.idproveedor,
@@ -1085,7 +1115,7 @@ export default {
                 'data': me.arrayDetalle
 
             }).then(function (response) {
-                me.listado=1;
+                me.listado = 1;
                 me.listarPedidoProv(1, "", "");
             }).catch(function (error) {
                 console.log(error);
@@ -1094,14 +1124,14 @@ export default {
         eliminarPedido(idPedido) {
             axios.delete('/pedido/proveedor', { data: { id: idPedido } })
                 .then(response => {
-                console.log(response.data.message);
+                    console.log(response.data.message);
                 })
                 .catch(error => {
-                console.error('Error al eliminar el pedido:', error);
+                    console.error('Error al eliminar el pedido:', error);
                 });
             this.listarPedidoProv(1, "", "");
 
-            },
+        },
         validarIngreso() {
             this.errorIngreso = 0;
             this.errorMostrarMsjIngreso = [];
@@ -1116,85 +1146,83 @@ export default {
 
             return this.errorIngreso;
         },
-        mostrarDetalle(modelo, accion, data = []) 
-        {
+        mostrarDetalle(modelo, accion, data = []) {
             let me = this;
             switch (modelo) {
                 case "pedido":
-                {
-                    switch (accion) 
                     {
-                        case 'registrar':
-                            {
-                                me.listado = 0;
-                                me.titulo="Registar nuevo pedido";
+                        switch (accion) {
+                            case 'registrar':
+                                {
+                                    me.listado = 0;
+                                    me.titulo = "Registar nuevo pedido";
 
-                                me.idproveedor = 0;
-                                me.idproveedor = '';
-                                me.fechaPedido = '';
-                                me.fechaEntrega = '';
-                                me.idalmacen = 1;
-                                me.observacion ='';
-                                me.forma_pago ='';
-                                me.arrayDetalle = [];
-                                me.proveedorSeleccionado='';
-                                this.inicializarFechas();
-                                break;
-                            }                      
-                        case 'editar':
-                            {
-                                me.titulo="Editar pedido a proveedor";
-                                me.idpedido=data['id'];
-                                me.listado = 0;
-                                me.fechaPedido = new Date(data['fecha_pedido']).toISOString().split('T')[0];
-                                me.fechaEntrega = new Date(data['fecha_entrega']).toISOString().split('T')[0];
-                                me.Totales=data['total'];
-                                me.AlmacenSeleccionado = data['idalmacen'];
-                                me.proveedorSeleccionado = data['nombre_proveedor'];
-                                me.idproveedor =data['idproveedor'];
-                                me.forma_pago=data['forma_pago'];
-                                me.estadoPedido=data['estado']
-                                //me.label = data['nombre_proveedor'];
-                                //selectProveedor(search, loading);
-                                me.verPedidoDet(data)
-                                break;
-                            }
+                                    me.idproveedor = 0;
+                                    me.idproveedor = '';
+                                    me.fechaPedido = '';
+                                    me.fechaEntrega = '';
+                                    me.idalmacen = 1;
+                                    me.observacion = '';
+                                    me.forma_pago = '';
+                                    me.arrayDetalle = [];
+                                    me.proveedorSeleccionado = '';
+                                    this.inicializarFechas();
+                                    break;
+                                }
+                            case 'editar':
+                                {
+                                    me.titulo = "Editar pedido a proveedor";
+                                    me.idpedido = data['id'];
+                                    me.listado = 0;
+                                    me.fechaPedido = new Date(data['fecha_pedido']).toISOString().split('T')[0];
+                                    me.fechaEntrega = new Date(data['fecha_entrega']).toISOString().split('T')[0];
+                                    me.Totales = data['total'];
+                                    me.AlmacenSeleccionado = data['idalmacen'];
+                                    me.proveedorSeleccionado = data['nombre_proveedor'];
+                                    me.idproveedor = data['idproveedor'];
+                                    me.forma_pago = data['forma_pago'];
+                                    me.estadoPedido = data['estado']
+                                    //me.label = data['nombre_proveedor'];
+                                    //selectProveedor(search, loading);
+                                    me.verPedidoDet(data)
+                                    break;
+                                }
+                        }
                     }
-                }
             }
         },
         ocultarDetalle() {
             this.listado = 1;
-            this.idpedido=null;
-            this.proveedorSeleccionado="";
-            this.titulo="Pedidos a proveedor"
+            this.idpedido = null;
+            this.proveedorSeleccionado = "";
+            this.titulo = "Pedidos a proveedor"
             this.idproveedor = 0;
             this.fechaPedido = '';
             this.fechaEntrega = '';
             this.idalmacen = 1;
-            this.observacion ='';
-            this.forma_pago ='';
+            this.observacion = '';
+            this.forma_pago = '';
             this.arrayDetalle = [];
-        },       
+        },
 
         verPedidoDet(data) {
-                let idpedido = data.id; 
-                let me = this;
+            let idpedido = data.id;
+            let me = this;
 
-                me.arrayPedidoSeleccionado=data;
+            me.arrayPedidoSeleccionado = data;
 
-                var url = '/pedido/obtPediPrv?idpedido=' + idpedido;
-                axios.get(url)
-                    .then(function (response) {
+            var url = '/pedido/obtPediPrv?idpedido=' + idpedido;
+            axios.get(url)
+                .then(function (response) {
                     var respuesta = response.data;
                     me.arrayPedidoProvDet = respuesta.pedidoprov; // Corrección aquí
-                    me.arrayDetalle=respuesta.pedidoprov;
-                    
-                    })
-                    .catch(function (error) {
+                    me.arrayDetalle = respuesta.pedidoprov;
+
+                })
+                .catch(function (error) {
                     console.log(error);
                 });
-                
+
         },
         cerrarModal() {
             this.modal = 0;
@@ -1259,9 +1287,9 @@ export default {
         },
         getDatosAlmacen() {
             let me = this;
-            if (me.AlmacenSeleccionado !== '') { 
+            if (me.AlmacenSeleccionado !== '') {
                 me.loading = true;
-                me.idalmacen = Number(me.AlmacenSeleccionado); 
+                me.idalmacen = Number(me.AlmacenSeleccionado);
                 console.log('IDalmacen: ' + me.idalmacen);
             }
         },
@@ -1277,26 +1305,26 @@ export default {
             this.fechaEntrega = fechaEntregaFormateada;
 
         },
-        cambiarTipoUnidad(){
-            if (this.tipopedido=="Unidades"){
+        cambiarTipoUnidad() {
+            if (this.tipopedido == "Unidades") {
                 //this.Sumatotal = 0;
-            }else{
-                this.tipopedido=="Paquetes";
+            } else {
+                this.tipopedido == "Paquetes";
                 //this.Sumatotal = 0;
             }
         },
-        calculoTotal(){
-            if (this.tipopedido=="Unidades"){
-                this.Sumatotal= this.cantidad * this.precio;
+        calculoTotal() {
+            if (this.tipopedido == "Unidades") {
+                this.Sumatotal = this.cantidad * this.precio;
 
-            }else{
-                this.tipopedido=="Paquetes";
-                this.Sumatotal= this.cantidad * this.precio_costo_paq;
-            }  
+            } else {
+                this.tipopedido == "Paquetes";
+                this.Sumatotal = this.cantidad * this.precio_costo_paq;
+            }
         },
         // necesario para el componente registrar compra
         cerrarModalArticulos() {
-            this.showModalArticulos=false;
+            this.showModalArticulos = false;
         },
         encuentra(id) {
             var sw = 0;
@@ -1316,24 +1344,24 @@ export default {
                     text: 'Este Artículo ya se encuentra agregado!',
                 })
             } else {
-                me.arrayArticuloSeleccionadoModal={
-                    codigo:data['codigo'],
-                    descripcion:data['descripcion'],
-                    fotografia:data['fotografia'],
-                    id:data['id'],
-                    nombre:data['nombre'],
-                    precio_costo_unid:data['precio_costo_unid'],
-                    unidad_envase:data['unidad_envase']
+                me.arrayArticuloSeleccionadoModal = {
+                    codigo: data['codigo'],
+                    descripcion: data['descripcion'],
+                    fotografia: data['fotografia'],
+                    id: data['id'],
+                    nombre: data['nombre'],
+                    precio_costo_unid: data['precio_costo_unid'],
+                    unidad_envase: data['unidad_envase']
 
                 }
-                me.codigo=me.arrayArticuloSeleccionado.codigo;
-                this.showModalArticulos=false;
+                me.codigo = me.arrayArticuloSeleccionado.codigo;
+                this.showModalArticulos = false;
             }
         },
         abrirModalArticulos() {
-            this.listarArticulo("","");
+            this.listarArticulo("", "");
             this.arrayArticulo = [];
-            this.showModalArticulos=true;
+            this.showModalArticulos = true;
             this.tituloModal = 'Seleccione los articulos que desee';
 
         },
@@ -1348,8 +1376,8 @@ export default {
                     console.log(error);
                 });
         },
-        listarArticuloProveedor(dato){
-            this.idproveedor=dato.idproveedor;
+        listarArticuloProveedor(dato) {
+            this.idproveedor = dato.idproveedor;
         },
         datosConfiguracion() {
             let me = this;
@@ -1358,7 +1386,7 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
 
-                me.monedaPrincipal=[respuesta.configuracionTrabajo.valor_moneda_compra,respuesta.configuracionTrabajo.simbolo_moneda_compra]
+                me.monedaPrincipal = [respuesta.configuracionTrabajo.valor_moneda_compra, respuesta.configuracionTrabajo.simbolo_moneda_compra]
                 console.log("MostrarCostos: " + me.mostrarCostos);
                 console.log("ProveedorEstado: " + me.mostrarProveedores);
                 console.log("MostrarSaldosStock: " + me.mostrarSaldosStock);
@@ -1378,38 +1406,39 @@ export default {
     }
 }
 </script>
-<style>    
-    .modal-content {
-        width: 100% !important;
-        position: absolute !important;
-    }
+<style>
+.modal-content {
+    width: 100% !important;
+    position: absolute !important;
+}
 
-    .mostrar {
-        display: list-item !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        background-color: #3c29297a !important;
-    }
+.mostrar {
+    display: list-item !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    background-color: #3c29297a !important;
+}
 
-    .div-error {
-        display: flex;
-        justify-content: center;
-    }
+.div-error {
+    display: flex;
+    justify-content: center;
+}
 
-    .text-error {
-        color: red !important;
-        font-weight: bold;
-    }
+.text-error {
+    color: red !important;
+    font-weight: bold;
+}
 
-    @media (min-width: 600px) {
-        .btnagregar {
-            margin-top: 2rem;
-        }
+@media (min-width: 600px) {
+    .btnagregar {
+        margin-top: 2rem;
     }
-    .card-img {
-        width: 120px;
-        height: auto;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-    }
+}
+
+.card-img {
+    width: 120px;
+    height: auto;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
 </style>

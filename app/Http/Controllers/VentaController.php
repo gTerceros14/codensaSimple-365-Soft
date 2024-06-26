@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use NumberFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
@@ -50,7 +50,7 @@ class VentaController extends Controller
     {
         session_start();
     }
-    public function index(Request $request)
+public function index(Request $request)
 {
     if (!$request->ajax()) {
         return redirect('/');
@@ -59,7 +59,7 @@ class VentaController extends Controller
     $buscar = $request->buscar;
     $usuario = \Auth::user();
 
-    $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
+    $query = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
         ->join('personas', 'ventas.idcliente', '=', 'personas.id')
         ->select(
             'ventas.tipo_comprobante as tipo_comprobante',
@@ -78,18 +78,22 @@ class VentaController extends Controller
         )
         ->orderBy('ventas.id', 'desc');
 
-    
+    // Filtrar por usuario si no es administrador
+    if ($usuario->idrol != 1) { // Asumiendo que el rol 1 es el de administrador
+        $query->where('ventas.idusuario', $usuario->id);
+    }
+
     if (!empty($buscar)) {
-        $ventas = $ventas->where(function ($query) use ($buscar) {
-            $query->where('ventas.num_comprobante', 'like', '%' . $buscar . '%')
-                  ->orWhere('personas.num_documento', 'like', '%' . $buscar . '%')
-                  ->orWhere('personas.nombre', 'like', '%' . $buscar . '%')
-                  ->orWhere('ventas.fecha_hora', 'like', '%' . $buscar . '%')
-                  ->orWhere('users.usuario', 'like', '%' . $buscar . '%');
+        $query->where(function ($q) use ($buscar) {
+            $q->where('ventas.num_comprobante', 'like', '%' . $buscar . '%')
+              ->orWhere('personas.num_documento', 'like', '%' . $buscar . '%')
+              ->orWhere('personas.nombre', 'like', '%' . $buscar . '%')
+              ->orWhere('ventas.fecha_hora', 'like', '%' . $buscar . '%')
+              ->orWhere('users.usuario', 'like', '%' . $buscar . '%');
         });
     }
 
-    $ventas = $ventas->paginate(10);
+    $ventas = $query->paginate(10);
 
     return [
         'pagination' => [
@@ -582,13 +586,32 @@ class VentaController extends Controller
 
 
 
-    public function desactivar(Request $request)
+  public function desactivar(Request $request)
     {
-        if (!$request->ajax())
+        if (!$request->ajax()) {
             return redirect('/');
+        }
+
+        // Obtener el rol del usuario autenticado
+        $rolUsuario = Auth::user()->idrol;
+
+        // Verificar si el usuario es administrador
+        if ($rolUsuario !== 1) {
+            return response()->json([
+                'error' => 'Sólo los administradores pueden anular ventas.'
+            ], 403);
+        }
+
+        // Buscar la venta a anular
         $venta = Venta::findOrFail($request->id);
+
+        // Anular la venta
         $venta->estado = 'Anulado';
         $venta->save();
+
+        return response()->json([
+            'mensaje' => 'Venta anulada correctamente.'
+        ]);
     }
 
 
@@ -920,16 +943,22 @@ class VentaController extends Controller
 
         return $ventaResivo;
     }
-    public function imprimirResivoRollo($id){
+    
+public function imprimirResivoRollo($id) {
     try {
         $venta = Venta::with('detalles.producto')->find($id);
         if (!$venta) {
-            return response()->json(['error' => 'No se encontró la venta'], 404);
+            return response()->json(['error' => 'NO SE ENCONTRÓ LA VENTA'], 404);
         }
 
         $persona = Persona::find($venta->idcliente);
         if (!$persona) {
-            return response()->json(['error' => 'No se encontró el cliente'], 404);
+            return response()->json(['error' => 'NO SE ENCONTRÓ EL CLIENTE'], 404);
+        }
+
+        $empresa = Empresa::first();
+        if (!$empresa) {
+            return response()->json(['error' => 'NO SE ENCONTRÓ LA EMPRESA'], 404);
         }
 
         if ($venta->detalles->isNotEmpty()) {
@@ -939,40 +968,45 @@ class VentaController extends Controller
             $pdf->SetMargins(5, 10, 5);
             $pdf->AddPage();
 
-            // Encabezado
-            $pdf->SetFont('Arial', 'B', 12);
-            $pdf->Cell(0, 10, 'RECIBO DE VENTA', 0, 1, 'C');
-            $pdf->SetFont('Arial', '', 8);
-            $pdf->Cell(0, 5, 'No. ' . $id, 0, 1, 'C');
+            // Establecer fuente monoespaciada
+            $pdf->SetFont('Courier', 'B', 12);
 
-            // Información de la empresa (ajusta según tus necesidades)
-            $pdf->SetFont('Arial', 'B', 8);
-            $pdf->Cell(0, 5, 'TU EMPRESA S.A.', 0, 1, 'C');
-            $pdf->SetFont('Arial', '', 8);
-            $pdf->Cell(0, 5, 'Dirección de la Empresa', 0, 1, 'C');
-            $pdf->Cell(0, 5, 'Teléfono: 123-456-789', 0, 1, 'C');
+            // Encabezado
+            $pdf->Cell(0, 10, strtoupper('RECIBO DE VENTA'), 0, 1, 'C');
+            $pdf->SetFont('Courier', '', 8);
+            $pdf->Cell(0, 5, strtoupper('No. ' . $id), 0, 1, 'C');
+
+            // Información de la empresa
+            $pdf->SetFont('Courier', 'B', 8);
+            $pdf->Cell(0, 5, strtoupper($empresa->nombre), 0, 1, 'C');
+            $pdf->SetFont('Courier', '', 8);
+            $pdf->Cell(0, 5, strtoupper($empresa->direccion), 0, 1, 'C');
+            $pdf->Cell(0, 5, strtoupper('TELÉFONO: ' . $empresa->telefono), 0, 1, 'C');
+            $pdf->Cell(0, 5, strtoupper('EMAIL: ' . $empresa->email), 0, 1, 'C');
+            $pdf->Cell(0, 5, strtoupper('NIT: ' . $empresa->nit), 0, 1, 'C');
+            $pdf->Cell(0, 5, strtoupper('LICENCIA: ' . $empresa->licencia), 0, 1, 'C');
 
             $pdf->Ln(5);
 
             // Fecha y hora
-            $pdf->Cell(0, 5, 'Fecha: ' . date('d/m/Y', strtotime($venta->created_at)), 0, 1);
-            $pdf->Cell(0, 5, 'Hora: ' . date('H:i:s', strtotime($venta->created_at)), 0, 1);
+            $pdf->Cell(0, 5, strtoupper('FECHA: ' . date('d/m/Y', strtotime($venta->created_at))), 0, 1);
+            $pdf->Cell(0, 5, strtoupper('HORA: ' . date('H:i:s', strtotime($venta->created_at))), 0, 1);
 
             // Detalles del cliente
             $pdf->Ln(2);
-            $pdf->Cell(0, 5, 'Cliente: ' . $persona->nombre, 0, 1);
-            $pdf->Cell(0, 5, 'Doc: ' . $persona->num_documento, 0, 1);
+            $pdf->Cell(0, 5, strtoupper('CLIENTE: ' . $persona->nombre), 0, 1);
+            $pdf->Cell(0, 5, strtoupper('DOC: ' . $persona->num_documento), 0, 1);
 
             // Línea separadora
             $pdf->Cell(0, 2, '', 'T', 1);
 
             // Encabezados de la tabla
-            $pdf->SetFont('Arial', 'B', 8);
-            $pdf->Cell(40, 5, 'Producto', 0, 0);
-            $pdf->Cell(10, 5, 'Cant', 0, 0, 'R');
-            $pdf->Cell(20, 5, 'Precio', 0, 1, 'R');
+            $pdf->SetFont('Courier', 'B', 8);
+            $pdf->Cell(40, 5, strtoupper('PRODUCTO'), 0, 0);
+            $pdf->Cell(10, 5, strtoupper('CANT'), 0, 0, 'R');
+            $pdf->Cell(20, 5, strtoupper('PRECIO'), 0, 1, 'R');
 
-            $pdf->SetFont('Arial', '', 8);
+            $pdf->SetFont('Courier', '', 8);
 
             // Detalles de los productos
             $total = 0;
@@ -980,7 +1014,7 @@ class VentaController extends Controller
                 $precioVenta = $detalle->cantidad * $detalle->precio;
                 $total += $precioVenta;
 
-                $pdf->Cell(40, 5, substr($detalle->producto->nombre, 0, 20), 0, 0);
+                $pdf->Cell(40, 5, strtoupper(substr($detalle->producto->nombre, 0, 20)), 0, 0);
                 $pdf->Cell(10, 5, $detalle->cantidad, 0, 0, 'R');
                 $pdf->Cell(20, 5, number_format($precioVenta, 2), 0, 1, 'R');
             }
@@ -989,20 +1023,26 @@ class VentaController extends Controller
             $pdf->Cell(0, 2, '', 'T', 1);
 
             // Total
-            $pdf->SetFont('Arial', 'B', 10);
-            $pdf->Cell(50, 6, 'TOTAL', 0, 0);
+            $pdf->SetFont('Courier', 'B', 10);
+            $pdf->Cell(50, 6, strtoupper('TOTAL'), 0, 0);
             $pdf->Cell(20, 6, number_format($total, 2), 0, 1, 'R');
+
+            // Total en texto
+            $formatter = new NumberFormatter("es", NumberFormatter::SPELLOUT);
+            $totalTexto = strtoupper($formatter->format($total)) . ' BOLIVIANOS';
+            $pdf->SetFont('Courier', 'B', 8);
+            $pdf->Cell(0, 5, 'SON: ' . $totalTexto, 0, 1);
 
             // Tipo de pago
             $tipoPago = $venta->tipoPago;
             $nombreTipoPago = $tipoPago ? $tipoPago->nombre_tipo_pago : 'N/A';
-            $pdf->SetFont('Arial', '', 8);
-            $pdf->Cell(0, 5, 'Tipo de pago: ' . $nombreTipoPago, 0, 1);
+            $pdf->SetFont('Courier', '', 8);
+            $pdf->Cell(0, 5, strtoupper('TIPO DE PAGO: ' . $nombreTipoPago), 0, 1);
 
             // Mensaje de agradecimiento
             $pdf->Ln(5);
-            $pdf->SetFont('Arial', 'I', 8);
-            $pdf->Cell(0, 5, '¡Gracias por su compra!', 0, 1, 'C');
+            $pdf->SetFont('Courier', 'I', 8);
+            $pdf->Cell(0, 5, strtoupper('¡GRACIAS POR SU COMPRA!'), 0, 1, 'C');
 
             // Guardar el archivo PDF generado
             $nombreLimpio = preg_replace('/[^A-Za-z0-9\-]/', '_', $persona->nombre);
@@ -1012,13 +1052,16 @@ class VentaController extends Controller
             // Descargar el archivo PDF generado
             return response()->download($pdfPath);
         } else {
-            return response()->json(['error' => 'No hay detalles para esta venta'], 404);
+            return response()->json(['error' => 'NO HAY DETALLES PARA ESTA VENTA'], 404);
         }
     } catch (\Exception $e) {
         \Log::error('Error al imprimir el recibo en rollo: ' . $e->getMessage());
-        return response()->json(['error' => 'Ocurrió un error al imprimir el recibo en rollo'], 500);
+        return response()->json(['error' => 'OCURRIÓ UN ERROR AL IMPRIMIR EL RECIBO EN ROLLO'], 500);
     }
 }
+
+
+
 
     public function imprimirResivoCarta($id)
     {
@@ -1039,7 +1082,7 @@ class VentaController extends Controller
                 $pdf->SetAutoPageBreak(true, 20);
                 $pdf->AddPage();
 
-                $pdf->SetFont('Arial', 'B', 14);
+                $pdf->SetFont('Helvetica', 'B', 14);
                 $pdf->Cell(0, 10, 'RECIBO DE PAGO', 0, 1, 'C');
                 $pdf->SetFont('Arial', '', 10);
 
@@ -1055,14 +1098,14 @@ class VentaController extends Controller
 
 
                 // Tabla de productos
-            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->SetFont('Helvetica', 'B', 10);
             $pdf->SetFillColor(230, 230, 230);
             $pdf->Cell(90, 7, 'Producto', 1, 0, 'C', true);
             $pdf->Cell(25, 7, 'Cantidad', 1, 0, 'C', true);
             $pdf->Cell(35, 7, 'Precio Unit.', 1, 0, 'C', true);
             $pdf->Cell(35, 7, 'Subtotal', 1, 1, 'C', true);
 
-            $pdf->SetFont('Arial', '', 9);
+            $pdf->SetFont('Helvetica', '', 9);
             $total = 0;
             foreach ($venta->detalles as $detalle) {
                 $subtotal = $detalle->cantidad * $detalle->precio;
