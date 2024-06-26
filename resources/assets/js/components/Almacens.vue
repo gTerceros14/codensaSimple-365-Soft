@@ -382,6 +382,8 @@ export default {
         .then(function (response) {
           me.cerrarModal();
           me.listarAlmacenes(1, "", "nombre_almacen");
+          me.usuariosSeleccionados = [];
+          me.arrayUsuario = [];
         })
         .catch(function (error) {
           console.log(error);

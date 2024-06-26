@@ -490,7 +490,8 @@ class ArticuloController extends Controller
 
             $articulo->stock = $request->stock;
             $articulo->descripcion = $request->descripcion;
-            //$articulo->fecha_vencimiento = $request->fecha_vencimiento;
+            $articulo->vencimiento = $request->fechaVencimientoSeleccion; 
+            $articulo->unidad_envase = $request->unidad_envase;
             $articulo->idproveedor = $request->idproveedor;
             $articulo->idmedida = $request->idmedida;
             //$articulo->condicion = '1';
