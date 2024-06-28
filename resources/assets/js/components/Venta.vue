@@ -2,6 +2,7 @@
     <main class="main">
         <!-- Breadcrumb -->
 
+
         <div class="card">
             <template>
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -270,7 +271,7 @@
                                         v-model="puntoVentaAutenticado" readonly />
                                     <input type="hidden" id="email" class="form-control" v-model="email" readonly />
 
-                                    <!-- Tipo de Comprobante Selection 
+                                    <!-- Tipo de Comprobante Selection -->
                                     <div class="col-md-4">
                                         <label class="font-weight-bold">Tipo de comprobante <span
                                                 class="text-danger">*</span></label>
@@ -279,7 +280,7 @@
 
                                             <option value="RESIVO">RECIBO</option>
                                         </select>
-                                    </div>-->
+                                    </div>
 
                                     <!-- Numero de Comprobante Input -->
                                     <input type="hidden" id="num_comprobante" class="form-control" v-model="num_comprob"
@@ -289,76 +290,108 @@
                             </div>
 
                             <div v-show="step === 2" class="step-content">
-                                <!-- Producto Selection -->
-                                <div class="p-grid p-fluid p-m-3">
-                                <div class="p-col-12 p-md-6">
-                                    <label class="p-text-bold">Almacén <span class="p-error">*</span></label>
-                                    <Dropdown 
-                                        :options="arrayAlmacenes" 
-                                        optionLabel="nombre_almacen" 
-                                        optionValue="id" 
-                                        placeholder="Seleccione un almacén" 
-                                        v-model="selectedAlmacen" 
-                                        @change="getAlmacenProductos" 
-                                        />                               
-                                </div>
 
-                                <div class="p-col-12 p-md-6">
-                                    <label class="p-text-bold">Buscar artículo</label>
-                                    <div class="p-inputgroup">
-                                    <InputText :disabled="!selectedAlmacen" v-model="codigo" placeholder="Código del artículo" @keyup.enter="buscarArticulo" />
-                                    <Button :disabled="!selectedAlmacen" icon="pi pi-search" @click="abrirModal" />
+                                <!-- Producto Selection -->
+                                <div class="p-fluid p-grid">
+                                    <div class="p-col-12 p-md-6">
+                                        <label class="font-weight-bold">Almacen <span
+                                                class="text-danger">*</span></label>
+                                        <Dropdown :options="arrayAlmacenes" optionLabel="nombre_almacen"
+                                            optionValue="id" placeholder="Seleccione un almacén"
+                                            v-model="selectedAlmacen" @change="getAlmacenProductos" />
+                                    </div>
+
+                                    <div class="p-col-12 p-md-6">
+                                        <label class="font-weight-bold">Buscar articulo</label>
+                                        <div class="p-inputgroup">
+                                            <InputText :disabled="!selectedAlmacen" v-model="codigo"
+                                                placeholder="Codigo del articulo" @keyup="buscarArticulo()" />
+                                            <Button :disabled="!selectedAlmacen" label="..." @click="abrirModal" />
+                                        </div>
                                     </div>
                                 </div>
-                                </div>
 
-                                <!-- Articulo Details -->
-                                <template>
-                                    <div v-if="arraySeleccionado && arraySeleccionado.id" class="product-card-container">
-                                        <Card class="product-card">
-                                            <template #header>
-                                                <div class="header-content">
-                                                    <Dropdown 
-                                                    v-model="unidadPaquete" 
-                                                    :options="tipoVentaOptions" 
-                                                    optionLabel="label" 
-                                                    optionValue="value" 
-                                                    class="type-sale-dropdown" 
-                                                    />                                                    
-                                                    <span :class="stockClass">{{ stockLabel }}</span>
-                                                </div>
-                                            </template>
-
-                                            <template #content>
-                                                <img v-if="arraySeleccionado.fotografia" :src="'img/articulo/' + arraySeleccionado.fotografia + '?t=' + new Date().getTime()" class="product-image" />
-                                                <img v-else src="img/productoSinImagen.png" alt="Imagen del producto" class="product-image" />
-                                                <h4>{{ arraySeleccionado.nombre }}</h4>
-                                                <p>{{ arraySeleccionado.descripcion }}</p>
-
-                                                <div class="product-quantity">
-                                                    <Button icon="pi pi-minus" class="p-button-secondary small-button" @click="cantidad = Math.max(1, cantidad - 1)" />
-                                                    <InputNumber v-model="cantidad" :min="1" class="quantity-input" />
-                                                    <Button icon="pi pi-plus" class="p-button-secondary small-button" @click="cantidad++" />
-                                                </div>
-
-                                                <div class="product-price-buttons-container">
-                                                    <div class="product-price">
-                                                        <h4 v-if="arrayPromocion && arrayPromocion.id">
-                                                            <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
-                                                            <b v-else>{{ (calcularPrecioConDescuento(resultadoMultiplicacion, arrayPromocion.porcentaje) * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}</b>
-                                                            <s>{{ calcularPrecioConDescuento(resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}</s>
-                                                        </h4>
-                                                        <h4 v-else>
-                                                            <b>{{ calcularPrecioConDescuento(resultadoMultiplicacion * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}</b>
-                                                        </h4>
+                                <template v-if="arraySeleccionado && arraySeleccionado.id">
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-body d-flex flex-wrap">
+                                                <!-- Left side -->
+                                                <div class="flex-shrink-0" style="flex-basis: 200px;">
+                                                    <h3 style="margin:0px">{{ arraySeleccionado.nombre }}</h3>
+                                                    <span class="badge bg-primary">Medida: {{ arraySeleccionado.medida
+                                                        }}</span>
+                                                    <span class="badge bg-primary">Línea: {{
+                                    arraySeleccionado.nombre_categoria }}</span>
+                                                    <img v-if="arraySeleccionado.fotografia"
+                                                        :src="'img/articulo/' + arraySeleccionado.fotografia + '?t=' + new Date().getTime()"
+                                                        width="150" height="150" ref="imagen" class="card-img my-3" />
+                                                    <img v-else src="img/productoSinImagen.png" alt="Imagen del Card"
+                                                        width="150" height="150" class="card-img my-3" />
+                                                    <div class="alert" :class="{
+                                    'alert-success': calcularStockDisponible > 0,
+                                    'alert-warning': calcularStockDisponible <= 0
+                                }" role="alert">
+                                                        <p style="margin:0px">Stock disponible</p>
+                                                        <b>{{ calcularStockDisponible }} Unidades</b>
                                                     </div>
-                                                    <div class="product-buttons">
-                                                        <Button icon="pi pi-shopping-cart" class="p-button-success small-button" @click="agregarDetalle" />
-                                                        <Button icon="pi pi-times" class="p-button-danger small-button" @click="eliminarSeleccionado" />
-                                                    </div>  
                                                 </div>
-                                            </template>
-                                        </Card>
+                                                <!-- Right side -->
+                                                <div class="flex-grow-1 ms-3" style="flex-basis: 300px;">
+                                                    <div class="form-group">
+                                                        <label class="font-weight-bold">Tipo de venta <span
+                                                                class="text-danger">*</span></label>
+                                                        <select class="form-select" v-model="unidadPaquete"
+                                                            aria-label="Default select example">
+                                                            <option :value="arraySeleccionado.unidad_envase">Por paquete
+                                                            </option>
+                                                            <option value="1">Por unidad</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group mt-3">
+                                                        <label class="font-weight-bold">Cantidad <span
+                                                                class="text-danger">*</span></label>
+                                                        <div class="input-group">
+                                                            <button class="btn btn-outline-secondary" type="button"
+                                                                @click="cantidad = Math.max(1, cantidad - 1)">-</button>
+                                                            <input type="number" id="cantidad" min="1"
+                                                                class="form-control text-center" v-model="cantidad" />
+                                                            <button class="btn btn-outline-secondary" type="button"
+                                                                @click="cantidad++">+</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group mt-3">
+                                                        <h3 v-if="arrayPromocion && arrayPromocion.id"
+                                                            style="display:flex;align-items:center;margin:0px;">
+                                                            <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
+                                                            <b v-else>{{
+                                    (calcularPrecioConDescuento(resultadoMultiplicacion,
+                                        arrayPromocion.porcentaje) *
+                                        parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                    monedaVenta[1] }}</b>
+                                                            <s style="font-size:15px" class="lead">{{
+                                    calcularPrecioConDescuento(resultadoMultiplicacion *
+                                        parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                    monedaVenta[1] }}</s>
+                                                        </h3>
+                                                        <h3 v-else style="display:flex;align-items:center;margin:0px;">
+                                                            <b>{{ calcularPrecioConDescuento(resultadoMultiplicacion *
+                                    parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                    monedaVenta[1] }}</b>
+                                                        </h3>
+                                                    </div>
+                                                    <div class="form-group d-flex mt-3">
+                                                        <button @click="agregarDetalle()"
+                                                            class="btn btn-success flex-fill me-2">
+                                                            <i class="icon-plus"></i> Agregar
+                                                        </button>
+                                                        <button @click="eliminarSeleccionado()"
+                                                            class="btn btn-danger flex-fill">
+                                                            <i class="icon-minus"></i> Eliminar
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </template>
 
@@ -367,10 +400,13 @@
                                         <DataTable :value="arrayDetalle" class="p-datatable-sm p-datatable-gridlines">
                                             <Column field="opciones" header="Opciones" style="width: 10%">
                                                 <template v-slot:body="slotProps">
-                                                    <button v-if="slotProps.data.medida != 'KIT'" @click="eliminarDetalle(slotProps.data.id)" type="button" class="btn btn-danger btn-sm">
+                                                    <button v-if="slotProps.data.medida != 'KIT'"
+                                                        @click="eliminarDetalle(slotProps.data.id)" type="button"
+                                                        class="btn btn-danger btn-sm">
                                                         <i class="icon-close"></i>
                                                     </button>
-                                                    <button v-else @click="eliminarKit(slotProps.data.idkit)" type="button" class="btn btn-danger btn-sm">
+                                                    <button v-else @click="eliminarKit(slotProps.data.idkit)"
+                                                        type="button" class="btn btn-danger btn-sm">
                                                         <i class="icon-close"></i>
                                                     </button>
                                                 </template>
@@ -378,20 +414,33 @@
                                             <Column field="articulo" header="Artículo" style="width: 30%" />
                                             <Column field="precioUnidad" header="Precio Unidad" style="width: 15%">
                                                 <template v-slot:body="slotProps">
-                                                    {{ (slotProps.data.precioseleccionado * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                                                    {{ (slotProps.data.precioseleccionado *
+                                    parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
                                                 </template>
                                             </Column>
                                             <Column field="unidades" header="Unidades" style="width: 15%">
                                                 <template v-slot:body="slotProps">
-                                                    <input type="number" v-model="slotProps.data.cantidad" min="1" @input="actualizarDetalle(slotProps.data.id)" class="form-control text-center" style="border: none; outline: none; width: 60px;" />
+                                                    <input type="number" v-model="slotProps.data.cantidad" min="1"
+                                                        @input="actualizarDetalle(slotProps.data.id)"
+                                                        class="form-control text-center"
+                                                        style="border: none; outline: none; width: 60px;" />
                                                 </template>
                                             </Column>
                                             <Column field="total" header="Total" style="width: 20%">
                                                 <template v-slot:body="slotProps">
-                                                    {{ (slotProps.data.precioseleccionado * slotProps.data.cantidad * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                                                    {{ (slotProps.data.precioseleccionado * slotProps.data.cantidad *
+                                    parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
                                                 </template>
                                             </Column>
                                         </DataTable>
+                                    </div>
+                                </div>
+
+                                <div class="p-grid">
+                                    <div class="p-col-12 p-md-8"></div>
+                                    <div class="p-col-12 p-md-4" style="text-align: right;">
+                                        <h3>Total Neto: {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                    monedaVenta[1] }}</h3>
                                     </div>
                                 </div>
                             </div>
@@ -409,16 +458,6 @@
                                                 <i class="fa fa-qrcode mr-2" aria-hidden="true"></i>
                                                 QR
                                             </button>
-
-                                            <div class="col-md-4">
-                                                <label class="font-weight-bold">Tipo de comprobante <span
-                                                        class="text-danger">*</span></label>
-                                                <select class="form-control" v-model="tipo_comprobante"
-                                                    ref="tipoComprobanteRef">
-
-                                                    <option value="RESIVO">RECIBO</option>
-                                                </select>
-                                            </div>
                                         </div>
                                     </div><br>
                                     <div v-if="opcionPago === 'efectivo'">
@@ -571,7 +610,9 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>Opciones</th>
+                                                                <th>Código</th>
                                                                 <th>Nombre</th>
+                                                                <th>Categoría</th>
                                                                 <th>Precio Venta</th>
                                                                 <th>Stock</th>
                                                                 <th>Estado</th>
@@ -586,7 +627,9 @@
                                                                         <i class="icon-check"></i>
                                                                     </button>
                                                                 </td>
+                                                                <td v-text="articulo.codigo"></td>
                                                                 <td v-text="articulo.nombre"></td>
+                                                                <td v-text="articulo.nombre_categoria"></td>
                                                                 <td>
                                                                     {{
                                                                     (
@@ -652,19 +695,10 @@ import InputNumber from 'primevue/inputnumber';
 import InputText from 'primevue/inputtext';
 import vSelect from "vue-select";
 import { TileSpinner } from "vue-spinners";
-import Card from 'primevue/card';
-
-
 export default {
     data() {
         return {
             selectedAlmacen: null,
-            tipoVentaOptions: [
-                { label: 'Por paquete', value: 'Paquetes' },
-                { label: 'Por unidad', value: 'Unidades' }
-            ],
-
-            unidadPaquete: "Unidades",
 
             step: 1,
             modal2: false,
@@ -840,11 +874,6 @@ export default {
             this.mostrarCampoCorreo =
                 newDocumento === "99002" || newDocumento === "99003";
         },
-
-        unidadPaquete(newVal) {
-      console.log(`Tipo de unidad seleccionado: ${newVal}`);
-      this.tipoUnidadSeleccionada = newVal; // Actualiza el tipoUnidadSeleccionada
-    },
     },
     components: {
         TileSpinner,
@@ -855,35 +884,18 @@ export default {
         InputNumber,
         DataTable,
         Column,
-        Card,
+        Button,
     },
     computed: {
-        stockClass() {
-        const stock = this.arraySeleccionado.saldo_stock / this.unidadPaquete - this.cantidad;
-        return {
-            'p-alert-success': stock > this.arraySeleccionado.stock / this.unidadPaquete,
-            'p-alert-warning': stock <= this.arraySeleccionado.stock / this.unidadPaquete,
-            'p-alert-danger': stock <= 0
-        };
-    },
-
-    stockLabel() {
-      return this.arraySeleccionado.saldo_stock > 0 ? `In Stock: ${this.arraySeleccionado.saldo_stock}` : 'Out of Stock';
-    },
-
-    stockDisponible() {
-      return this.arraySeleccionado.saldo_stock / this.unidadPaquete - this.cantidad;
-    },
+        calcularStockDisponible() {
+            return this.unidadPaquete == 1
+                ? this.arraySeleccionado.saldo_stock - this.cantidad
+                : this.arraySeleccionado.saldo_stock / this.arraySeleccionado.unidad_envase - this.cantidad;
+        },
 
         resultadoMultiplicacion() {
             if (this.arraySeleccionado) {
-                if ( this.tipoUnidadSeleccionada=="Paquetes"){
-
-                    return this.cantidad * (this.arraySeleccionado.precio_costo_unid*this.arraySeleccionado.unidad_paquete);
-                }else{
-                    return this.cantidad * this.arraySeleccionado.precio_costo_unid;
-            }
-                //return this.precioseleccionado * this.unidadPaquete * this.cantidad;
+                return this.precioseleccionado * this.unidadPaquete * this.cantidad;
             }
         },
 
@@ -2561,38 +2573,8 @@ body {
 .card-body {
     background-color: #ffffff;
     padding: 20px;
-    border-radius: 5px;
+    border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.step-content {
-    padding: 20px;
-    background-color: #f8f9fa;
-}
-
-.p-card-body {
-  background-color: #ffffff;
-  border-radius: 5px;
-}
-
-.p-alert {
-  margin-top: 10px;
-  text-align: center;
-}
-
-.p-alert-success {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.p-alert-warning {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.p-alert-danger {
-  background-color: #f8d7da;
-  color: #721c24;
 }
 
 /* Form styles */
@@ -2637,7 +2619,7 @@ input[readonly] {
 }
 
 .table thead th {
-    background-color: #102841;
+    background-color: #343a40;
     color: #ffffff;
 }
 
@@ -2658,15 +2640,7 @@ input[readonly] {
 
 /* Button styles */
 .btnagregar {
-    margin-left: 5px;
-}
-
-.table-responsive {
-    margin-top: 20px;
-}
-
-.table th, .table td {
-    vertical-align: middle;
+    margin-top: 25px;
 }
 
 .btn-primary {
@@ -2694,7 +2668,6 @@ input[readonly] {
 .alert {
     text-align: center;
     font-weight: bold;
-    margin-top: 10px;
 }
 
 .alert-success {
@@ -2840,95 +2813,14 @@ input:required {
     font-size: 16px;
 }
 
-.product-card-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 65vh;
-  padding: 0;
+.card-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
 }
 
-.product-card {
-  width: 350px;
-  padding: 10px;
-  text-align: center;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.type-sale-dropdown {
-  width: 70px;
-  font-size: 10px;
-}
-
-.p-alert-success {
-  color: green;
-}
-
-.p-alert-warning {
-  color: orange;
-}
-
-.p-alert-danger {
-  color: red;
-}
-
-.product-image {
-  display: block;
-  margin: 0 auto 5px;
-  width: 90px;
-  height: 90px;
-}
-
-
-.product-detail {
-  background-color: #dce4f7;
-  padding: 2px;
-  border-radius: 3px;
-  margin: 2px 0;
-}
-
-.product-price-buttons-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 25px;
-}
-
-.product-price {
-  font-size: 10px;
-}
-
-.product-buttons {
-  display: flex;
-}
-
-.product-quantity {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 6px;
-}
-
-.quantity-input {
-  font-size: 10px;
-}
-
-.small-button {
-  font-size: 10px;
-  padding: 5px 7px;
-  margin: 0 7px;
-}
-
-h4 {
-  font-size: 14px;
-}
-
-p {
-  font-size: 12px;
+.card-img {
+    max-width: 100%;
+    height: auto;
 }
 </style>
