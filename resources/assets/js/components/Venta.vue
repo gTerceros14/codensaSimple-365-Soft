@@ -3,30 +3,28 @@
         <!-- Breadcrumb -->
 
         <div class="card">
-            <div class="card-header">
-                <i class="fa fa-align-justify"></i> Ventas
-                <button type="button" @click="abrirTipoVenta()" class="btn btn-primary btn-lg">
-                    <i class="icon-plus"></i> Nuevo
-                </button>
-            </div>
+            <template>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fa fa-align-justify"></i> Ventas
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-40">
+                            <div class="input-group">
+                                <input type="search" v-model="buscar" @keyup="buscarVenta" class="form-control"
+                                    placeholder="Texto a buscar">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <Button type="button" @click="abrirTipoVenta" label="Nuevo" icon="pi pi-plus"
+                            class="p-button-sm p-button-primary" />
+                    </div>
+                </div>
+            </template>
             <!-- Listado-->
             <template v-if="listado == 1">
 
-                <div class="form-group row">
-                    <div class="col-md-8">
-                        <div class="input-group">
-                            <select class="selectpicker show-tick" v-model="criterio">
-                                <option value="" disabled selected>Seleccione</option>
-                                <option value="tipo_comprobante">Tipo Comprobante</option>
-                                <option value="num_comprobante">Número Comprobante</option>
-                                <option value="fecha_hora">Fecha-Hora</option>
-                                <option value="usuario">Usuario</option>
-                            </select>
-                            <input type="search" v-model="buscar" @keyup="listarVenta(1, buscar, criterio)"
-                                class="form-control" placeholder="Texto a buscar">
-                        </div>
-                    </div>
-                </div>
 
 
                 <div class="table-responsive">
@@ -41,32 +39,38 @@
                                 <th class="d-none d-md-table-cell">Fecha y Hora</th>
                                 <th>Total</th>
                                 <th class="d-none d-md-table-cell">Estado</th>
-                                <th class="d-none d-md-table-cell">Recibo</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="venta in arrayVenta" :key="venta.id">
-                                <td class="d-flex align-items-center">
-                                    <button type="button" @click="verVenta(venta.id)"
-                                        class="btn btn-success btn-sm mr-1">
-                                        <i class="icon-eye"></i>
-                                    </button>
-                                    <button type="button" @click="pdfVenta(venta.id)" class="btn btn-info btn-sm mr-1">
-                                        <i class="icon-doc"></i>
-                                    </button>
-                                    <template v-if="venta.estado == 'Registrado'">
-                                        <button type="button" class="btn btn-danger btn-sm mr-1"
-                                            @click="desactivarVenta(venta.id)">
-                                            <i class="icon-trash"></i>
-                                        </button>
-                                    </template>
-                                    <template v-if="venta.idtipo_venta == 2 && venta.estado == 'Pendiente'">
-                                        <button type="button" class="btn btn-primary btn-sm mr-1"
-                                            @click="abrirModalCuotas(venta.id)">
-                                            <i class="icon-plus"></i>
-                                        </button>
-                                    </template>
-                                </td>
+                                <template>
+                                    <td class="d-flex align-items-center">
+                                        <Button type="button" icon="pi pi-eye"
+                                            class="p-button-success p-button-sm p-mr-1" @click="verVenta(venta.id)" />
+                                        <!--
+                                             <Button
+                                               type="button"
+                                               icon="pi pi-file"
+                                               class="p-button-info p-button-sm p-mr-1"
+                                               @click="pdfVenta(venta.id)"
+                                             />
+                                             -->
+                                        <template v-if="venta.estado == 'Registrado' && idrol !== 2">
+                                            <Button type="button" icon="pi pi-trash" class="p-button-danger p-button-sm"
+                                                @click="desactivarVenta(venta.id)" />
+                                        </template>
+
+                                        <Button type="button" icon="pi pi-print" class="p-button-primary p-button-sm"
+                                            @click="imprimirResivo(venta.id, venta.correo)" />
+
+                                        <template v-if="venta.idtipo_venta == 2 && venta.estado == 'Pendiente'">
+                                            <Button type="button" icon="pi pi-plus"
+                                                class="p-button-primary p-button-sm p-mr-1"
+                                                @click="abrirModalCuotas(venta.id)" />
+                                        </template>
+                                    </td>
+                                </template>
+
                                 <td v-text="venta.usuario"></td>
                                 <td v-text="venta.razonSocial"></td>
                                 <td class="d-none d-md-table-cell" v-text="venta.documentoid"></td>
@@ -75,12 +79,6 @@
                                 <td>{{ (venta.total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
                                 </td>
                                 <td class="d-none d-md-table-cell" v-text="venta.estado"></td>
-                                <td class="d-none d-md-table-cell">
-                                    <button class="btn btn-primary" type="button"
-                                        @click="imprimirResivo(venta.id, venta.correo)">
-                                        <i class="icon-printer"></i>
-                                    </button>
-                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -150,18 +148,18 @@
                                             <td v-text="detalle.articulo"></td>
                                             <td>
                                                 {{
-                    (detalle.precio * parseFloat(monedaVenta[0])).toFixed(2)
-                }}
+                                    (detalle.precio * parseFloat(monedaVenta[0])).toFixed(2)
+                                }}
                                                 {{ monedaVenta[1] }}
                                             </td>
                                             <td v-text="detalle.cantidad"></td>
                                             <td>
                                                 {{
-                    (
-                        (detalle.precio * detalle.cantidad) *
-                        parseFloat(monedaVenta[0])
-                    ).toFixed(2)
-                }}
+                                    (
+                                        (detalle.precio * detalle.cantidad) *
+                                        parseFloat(monedaVenta[0])
+                                    ).toFixed(2)
+                                }}
                                                 {{ monedaVenta[1] }}
                                             </td>
                                         </tr>
@@ -245,14 +243,18 @@
                                 <div class="form-group row border">
                                     <!-- Cliente Selection -->
                                     <div class="col-md-4">
-                                        <label class="font-weight-bold">Documento <span class="text-danger">*</span></label>
-                                        <input type="text" id="documento" class="form-control" v-model="documento" @keyup.enter="buscarClientePorDocumento" />
+                                        <label class="font-weight-bold">Documento <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" id="documento" class="form-control" v-model="documento"
+                                            @keyup.enter="buscarClientePorDocumento" />
                                     </div>
 
                                     <!-- Nombre Input -->
                                     <div class="col-md-4">
-                                        <label class="font-weight-bold">Cliente <span class="text-danger">*</span></label>
-                                        <input type="text" id="nombreCliente" class="form-control" v-model="nombreCliente" :readonly="!nombreClienteEditable" />
+                                        <label class="font-weight-bold">Cliente <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" id="nombreCliente" class="form-control"
+                                            v-model="nombreCliente" :readonly="!nombreClienteEditable" />
                                     </div>
 
                                     <!-- Hidden Inputs -->
@@ -280,12 +282,8 @@
                                     </div>-->
 
                                     <!-- Numero de Comprobante Input -->
-                                    <div class="col-md-4">
-                                        <label class="font-weight-bold">Numero de comprobante <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" id="num_comprobante" class="form-control"
-                                            v-model="num_comprob" disabled />
-                                    </div>
+                                    <input type="hidden" id="num_comprobante" class="form-control" v-model="num_comprob"
+                                        disabled />
                                 </div>
 
                             </div>
@@ -431,7 +429,8 @@
                                                         <form>
                                                             <div class="form-group">
                                                                 <label for="montoEfectivo"><i
-                                                                        class="fa fa-money mr-2"></i> Monto
+                                                                        class="fa fa-money mr-2"></i>
+                                                                    Monto
                                                                     Recibido:</label>
                                                                 <div class="input-group mb-3">
                                                                     <div class="input-group-prepend">
@@ -445,7 +444,8 @@
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="cambioRecibir"><i
-                                                                        class="fa fa-exchange mr-2"></i> Cambio a
+                                                                        class="fa fa-exchange mr-2"></i>
+                                                                    Cambio a
                                                                     Entregar:</label>
                                                                 <input type="text" class="form-control"
                                                                     id="cambioRecibir"
@@ -466,17 +466,17 @@
                                                         <div class="d-flex justify-content-between mb-2">
                                                             <span><i class="fa fa-dollar mr-2"></i> Monto Total:</span>
                                                             <span class="font-weight-bold">{{ (calcularTotal *
-                    parseFloat(monedaVenta[0])).toFixed(2)
+                                    parseFloat(monedaVenta[0])).toFixed(2)
                                                                 }}
                                                                 {{
-                    monedaVenta[1] }}</span>
+                                    monedaVenta[1] }}</span>
                                                         </div>
                                                         <div class="d-flex justify-content-between">
                                                             <span><i class="fa fa-money mr-2"></i> Total a Pagar:</span>
                                                             <span class="font-weight-bold h5">{{ (calcularTotal *
-                    parseFloat(monedaVenta[0])).toFixed(2)
+                                    parseFloat(monedaVenta[0])).toFixed(2)
                                                                 }} {{
-                    monedaVenta[1] }}</span>
+                                    monedaVenta[1] }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -497,7 +497,7 @@
                                                     <div class="form-group">
                                                         <label for="montoEfectivo">Monto:</label>
                                                         <span class="font-weight-bold">{{ montoEfectivo =
-                (calcularTotal).toFixed(2) }}</span>
+                                (calcularTotal).toFixed(2) }}</span>
                                                     </div>
                                                     <button class="btn btn-primary mb-2" @click="generarQr">Generar
                                                         QR</button>
@@ -513,8 +513,8 @@
                                                         <div class="font-weight-bold">Estado Actual:</div>
                                                         <div>
                                                             <span :class="'badge badge-' + badgeSeverity">{{
-                                                                estadoTransaccion.objeto.estadoActual
-                                                                }}</span>
+                                    estadoTransaccion.objeto.estadoActual
+                                }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -643,15 +643,15 @@
 </template>
 
 <script>
+import 'primeicons/primeicons.css';
+import Button from 'primevue/button';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import Dropdown from 'primevue/dropdown';
+import InputNumber from 'primevue/inputnumber';
+import InputText from 'primevue/inputtext';
 import vSelect from "vue-select";
 import { TileSpinner } from "vue-spinners";
-
-import Dropdown from 'primevue/dropdown';
-import InputText from 'primevue/inputtext';
-import Button from 'primevue/button';
-import InputNumber from 'primevue/inputnumber';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
 import Card from 'primevue/card';
 
 
@@ -702,6 +702,10 @@ export default {
 
             arrayPromocion: [],
             unidadPaquete: 1,
+            tipoVentaOptions: [
+                { label: 'Por paquete', value: 1 },
+                { label: 'Por unidad', value: 0 }
+            ],
 
             monedaVenta: [],
             permitirDevolucion: "",
@@ -710,6 +714,7 @@ export default {
             idcliente: 0,
             usuarioAutenticado: null,
             puntoVentaAutenticado: null,
+            idsucursalAutenticado: null,
             cliente: "",
             email: "",
             nombreCliente: "",
@@ -746,12 +751,13 @@ export default {
                 to: 0,
             },
             offset: 3,
-            criterio: "num_comprobante",
+            criterio: "",
             buscar: "",
-            criterioA: "nombre",
+            criterioA: "",
             buscarA: "",
             arrayArticulo: [],
             arraySeleccionado: [],
+
             idarticulo: 0,
             codigo: "",
             articulo: "",
@@ -781,6 +787,8 @@ export default {
             criterioVenta: "ci",
             //almacenes
             arrayAlmacenes: [],
+            almacenSeleccionado: null,
+            almacenPredeterminadoId: null,
             idAlmacen: null,
             //-----PRECIOS- AUMENTE 3/OCTUBRE--------
             precioseleccionado: "",
@@ -821,6 +829,7 @@ export default {
             },
         };
     },
+
     watch: {
         codigo(newValue) {
             if (newValue) {
@@ -954,7 +963,10 @@ export default {
     },
 
     methods: {
-       
+        buscarVenta() {
+            this.listarVenta(1, this.buscar);
+        },
+
         validarYAvanzar() {
             const errores = [];
 
@@ -1378,28 +1390,20 @@ export default {
             );
         },
         calcularPrecioConDescuento(precioOriginal, porcentajeDescuento) {
-
-            const descuento =
-                this.precioseleccionado * (this.descuentoProducto / 100);
+            const descuento = this.precioseleccionado * (this.descuentoProducto / 100);
             const precioConDescuento = this.precioseleccionado - descuento;
-            const precioFinal =
-                precioConDescuento * this.unidadPaquete * this.cantidad;
+            const precioFinal = precioConDescuento * this.unidadPaquete * this.cantidad;
             return precioFinal;
         },
         calcularDiasRestantes(fechaFinal) {
             const fechaActual = new Date();
             const fechaObjetivo = new Date(fechaFinal);
             const diferenciaEnMilisegundos = fechaObjetivo - fechaActual;
-            const diasRestantes = Math.ceil(
-                diferenciaEnMilisegundos / (1000 * 60 * 60 * 24)
-            );
+            const diasRestantes = Math.ceil(diferenciaEnMilisegundos / (1000 * 60 * 60 * 24));
             return diasRestantes;
         },
         actualizarDetalle(index) {
-            this.arrayDetalle[index].total = (
-                this.arrayDetalle[index].precioseleccionado *
-                this.arrayDetalle[index].cantidad
-            ).toFixed(2);
+            this.arrayDetalle[index].total = (this.arrayDetalle[index].precioseleccionado * this.arrayDetalle[index].cantidad).toFixed(2);
         },
         actualizarDetalleDescuento(index) {
             this.calcularTotal(index);
@@ -1443,6 +1447,44 @@ export default {
                     console.error("Error:", error);
                 });
         },
+
+        async obtenerDatosUsuario() {
+            try {
+                const response = await axios.get('/venta');
+                this.usuarioAutenticado = response.data.usuario.usuario;
+                this.usuario_autenticado = this.usuarioAutenticado;
+                this.idrol = response.data.usuario.idrol;
+                this.idsucursalAutenticado = response.data.usuario.idsucursal;
+                console.log("Obtener Datos Usuario: " + this.idsucursalAutenticado);
+                this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+
+        async obtenerDatosSesionYComprobante() {
+            try {
+                const idsucursal = this.idsucursalAutenticado;
+                console.log("El idsucursal es: " + idsucursal);
+                const response = await axios.get('/obtener-ultimo-comprobante', {
+                    params: {
+                        idsucursal: idsucursal
+                    }
+                });
+                const lastComprobante = response.data.last_comprobante;
+                this.last_comprobante = lastComprobante;
+                console.log("El ultimo comprobante es: " + this.last_comprobante);
+                this.nextNumber(lastComprobante);
+            } catch (error) {
+                console.error('Error al obtener el último comprobante:', error);
+            }
+        },
+
+        async ejecutarFlujoCompleto() {
+            await this.obtenerDatosUsuario();
+            await this.obtenerDatosSesionYComprobante();
+        },
+
         nextNumber() {
             if (!this.num_comprob || this.num_comprob === "") {
                 this.last_comprobante++;
@@ -1553,8 +1595,7 @@ export default {
             clearTimeout(this.timer);
             this.timer = setTimeout(() => {
                 let me = this;
-                var url = "/articulo/buscarArticuloVenta?filtro=" + me.codigo;
-
+                var url = "/articulo/buscarArticuloVenta?filtro=" + me.codigo + "&idalmacen="+me.selectedAlmacen;
                 axios
                     .get(url)
                     .then(function (response) {
@@ -1596,11 +1637,9 @@ export default {
                     indicesEliminar.push(i);
                 }
             }
-
             indicesEliminar.forEach((index) => {
                 this.arrayProductos.splice(index, 1);
             });
-
             for (let i = indicesEliminar.length - 1; i >= 0; i--) {
                 this.arrayDetalle.splice(indicesEliminar[i], 1);
             }
@@ -1610,12 +1649,7 @@ export default {
             let actividadEconomica = 461021;
             let numeroSerie = null;
             let numeroImei = null;
-            let descuento = (
-                this.precioseleccionado *
-                this.cantidad *
-                (this.descuentoProducto / 100)
-            ).toFixed(2);
-
+            let descuento = (this.precioseleccionado * this.cantidad * (this.descuentoProducto / 100)).toFixed(2);
             if (this.encuentra(this.arraySeleccionado.id)) {
                 swal({
                     type: "error",
@@ -1623,11 +1657,7 @@ export default {
                     text: "Este Artículo ya se encuentra agregado!",
                 });
             } else {
-                if (
-                    this.saldosNegativos === 0 &&
-                    this.arraySeleccionado.saldo_stock <
-                    this.cantidad * this.unidadPaquete
-                ) {
+                if (this.saldosNegativos === 0 && this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete) {
                     swal({
                         type: "error",
                         title: "Error...",
@@ -1635,12 +1665,7 @@ export default {
                     });
                     return;
                 }
-
-                const precioArticulo =
-                    this.calcularPrecioConDescuento(
-                        this.resultadoMultiplicacion,
-                        this.arrayPromocion ? this.arrayPromocion.porcentaje : 0
-                    ) * this.monedaVenta[0];
+                const precioArticulo = this.calcularPrecioConDescuento(this.resultadoMultiplicacion, this.arrayPromocion ? this.arrayPromocion.porcentaje : 0) * this.monedaVenta[0];
                 console.log("Este es el precio del articulo: ", precioArticulo);
                 this.arrayDetalle.push({
                     idkit: -1,
@@ -1651,7 +1676,6 @@ export default {
                     cantidad: this.cantidad * this.unidadPaquete,
                     cantidad_paquetes: this.arraySeleccionado.unidad_envase,
                     precio: precioArticulo,
-                    //descuento: this.arrayPromocion && this.arrayPromocion.porcentaje !== undefined ? this.arrayPromocion.porcentaje : 0,
                     descuento: this.descuentoProducto,
                     stock: this.arraySeleccionado.saldo_stock,
                     precioseleccionado: this.precioseleccionado,
@@ -1665,7 +1689,6 @@ export default {
                     cantidad: this.cantidad * this.unidadPaquete,
                     unidadMedida: this.arraySeleccionado.codigoClasificador,
                     precioUnitario: parseFloat(this.precioseleccionado).toFixed(2),
-                    //montoDescuento: this.arrayPromocion && this.arrayPromocion.porcentaje ? ((this.arrayPromocion.porcentaje / this.resultadoMultiplicacion) * 100).toFixed(2) : 0,
                     montoDescuento: descuento,
                     subTotal: precioArticulo.toFixed(2),
                     numeroSerie: numeroSerie,
@@ -1737,31 +1760,37 @@ export default {
                     console.log(error);
                 });
         },
-        obtenerDatosUsuario() {
-            axios
-                .get("/venta")
-                .then((response) => {
-                    this.usuarioAutenticado = response.data.usuario.usuario;
-                    this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-        },
-        selectAlmacen() {
+
+        async selectAlmacen() {
             let me = this;
             let url = "/almacen/selectAlmacen";
-            axios
+            await axios
                 .get(url)
                 .then(function (response) {
                     let respuesta = response.data;
                     me.arrayAlmacenes = respuesta.almacenes;
                     console.log(me.arrayAlmacenes);
+                    me.obtenerAlmacenPredeterminado();
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
         },
+
+        async obtenerAlmacenPredeterminado() {
+            try {
+                const response = await axios.get('/api/configuracion/almacen-predeterminado');
+                this.almacenPredeterminadoId = response.data.almacen_predeterminado_id;
+                console.log("El almacen predeterminado es : " + this.almacenPredeterminadoId);
+
+                this.almacenSeleccionado = this.arrayAlmacenes.find(
+                    almacen => almacen.id === this.almacenPredeterminadoId
+                );
+            } catch (error) {
+                console.error('Error al obtener el almacén predeterminado:', error);
+            }
+        },
+
         getAlmacenProductos(event) {
             this.idAlmacen = event.value;
         },
@@ -2019,6 +2048,7 @@ export default {
                         if (response.data.id > 0) {
                             // Restablecer valores después de una venta exitosa
                             me.listado = 1;
+                            me.ejecutarFlujoCompleto();
                             me.listarVenta(1, "", "num_comprob");
                             me.cerrarModal2();
                             me.cerrarModal3();
@@ -2048,10 +2078,12 @@ export default {
                             me.recibido = 0;
                         } else {
                             console.log(response);
+                            me.ejecutarFlujoCompleto();
                             // Manejo de errores
                         }
                     })
                     .catch((error) => {
+                        me.ejecutarFlujoCompleto();
                         console.log(error);
                     });
             } else {
@@ -2138,15 +2170,21 @@ export default {
         },
 
         mostrarDetalle() {
-            axios.get('/ruta-a-tu-endpoint-laravel-para-obtener-ultimo-comprobante')
-                .then(response => {
-                    const lastComprobante = response.data.last_comprobante;
-                    this.last_comprobante = lastComprobante;
-                    this.nextNumber();
-                })
-                .catch(error => {
-                    console.error('Error al obtener el último comprobante:', error);
-                });
+            /*const idsucursal = this.idsucursalAutenticado;
+            console.log("El idsucursal es: " + idsucursal);
+            axios.get('/obtener-ultimo-comprobante', {
+                params: {
+                    idsucursal: idsucursal
+                }
+            })
+            .then(response => {
+                const lastComprobante = response.data.last_comprobante;
+                this.last_comprobante = lastComprobante;
+                this.nextNumber(lastComprobante);
+            })
+            .catch(error => {
+                console.error('Error al obtener el último comprobante:', error);
+            });*/
             let me = this;
             me.selectAlmacen();
             me.listado = 0;
@@ -2228,7 +2266,6 @@ export default {
         abrirModal() {
             this.scrollToTop();
             this.listarArticulo("", "nombre");
-
             this.selectAlmacen();
             this.arrayArticulo = [];
             this.modal = 1;
@@ -2371,29 +2408,44 @@ export default {
     },
     created() {
         this.listarPrecio();
-        axios
-            .get("/ruta-a-tu-endpoint-laravel-para-obtener-ultimo-comprobante")
-            .then((response) => {
-                const lastComprobante = response.data.last_comprobante;
-
-                this.last_comprobante = lastComprobante;
-
-                this.nextNumber();
-            })
-            .catch((error) => {
-                console.error("Error al obtener el último comprobante:", error);
-            });
     },
     mounted() {
         this.datosConfiguracion();
         this.selectAlmacen();
         this.listarVenta(1, this.buscar, this.criterio);
-        this.obtenerDatosUsuario();
+        //this.obtenerDatosUsuario();
         this.actualizarFechaHora();
+        this.ejecutarFlujoCompleto();
     },
 };
 </script>
 <style scoped>
+.d-flex {
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.p-button-lg {
+    font-size: 1.25rem;
+    padding: 0.75rem 1.5rem;
+}
+
+.d-flex {
+    display: flex;
+    align-items: center;
+}
+
+.p-mr-1 {
+    margin-right: 0.25rem;
+}
+
 /* Estilos para los iconos (ajusta según tus necesidades) */
 .fa-check-circle {
     margin-left: 5px;

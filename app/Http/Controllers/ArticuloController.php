@@ -266,38 +266,39 @@ class ArticuloController extends Controller
                 $articulosConSaldo[] = $articulo;
             }
         }*/
-        $articulosConSaldo = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
-                ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
-                ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
-                ->join('personas', 'proveedores.id', '=', 'personas.id')
-                ->join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
-                ->select(
-                    'articulos.id',
-                    'articulos.nombre',
-                    'articulos.precio_uno',
-                    'articulos.precio_dos',
-                    'articulos.precio_tres',
-                    'articulos.precio_cuatro',
-                    'articulos.fotografia',
-                    'articulos.unidad_envase',
-                    'almacens.nombre_almacen',
-                    'inventarios.cantidad',
-                    'articulos.codigo',
-                    'articulos.precio_venta',
-                    'articulos.condicion',
-                    'categorias.nombre as nombre_categoria',
-                    DB::raw('SUM(inventarios.saldo_stock) as saldo_stock')
-                )
-                ->where('inventarios.fecha_vencimiento','>',$fechaActual)
-                ->where('inventarios.idalmacen', '=', $idAlmacen)
-                ->where('inventarios.saldo_stock','>','0')
-                ->groupBy('articulos.nombre', 'almacens.nombre_almacen', 'articulos.unidad_envase',
-                            'inventarios.cantidad','articulos.codigo','articulos.precio_venta',
-                            'articulos.condicion','categorias.nombre','articulos.id','articulos.precio_uno',
-                            'articulos.precio_dos','articulos.precio_tres','articulos.precio_cuatro',
-                            'articulos.fotografia',)
-                ->orderBy('articulos.nombre')
-                ->orderBy('almacens.nombre_almacen');
+        $subquery = DB::table('inventarios')
+            ->join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
+            ->select('inventarios.idarticulo', 'inventarios.idalmacen', DB::raw('SUM(inventarios.saldo_stock) as saldo_stock'))
+            ->where('inventarios.fecha_vencimiento', '>', $fechaActual)
+            ->where('inventarios.idalmacen', '=', $idAlmacen)
+            ->where('inventarios.saldo_stock', '>', 0)
+            ->groupBy('inventarios.idarticulo', 'inventarios.idalmacen');
+
+        $articulosConSaldo = DB::table(DB::raw("({$subquery->toSql()}) as inventarios"))
+            ->mergeBindings($subquery)
+            ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
+            ->join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
+            ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
+            ->join('personas', 'proveedores.id', '=', 'personas.id')
+            ->join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
+            ->select(
+                'articulos.id',
+                'articulos.nombre',
+                'articulos.precio_uno',
+                'articulos.precio_dos',
+                'articulos.precio_tres',
+                'articulos.precio_cuatro',
+                'articulos.fotografia',
+                'articulos.unidad_envase',
+                'almacens.nombre_almacen',
+                'inventarios.saldo_stock',
+                'articulos.codigo',
+                'articulos.precio_venta',
+                'articulos.condicion',
+                'categorias.nombre as nombre_categoria'
+            )
+            ->orderBy('articulos.nombre')
+            ->orderBy('almacens.nombre_almacen');
         if ($buscar != '') {
             $articulosConSaldo->where('articulos.' . $criterio, 'like', '%' . $buscar . '%');
         }
@@ -339,7 +340,7 @@ class ArticuloController extends Controller
             return redirect('/');
 
         $filtro = $request->filtro;
-
+        $idAlmacen = $request->idalmacen;
         $articulos = Articulo::join('medidas', 'articulos.idmedida', '=', 'medidas.id')
             ->join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
             ->join('inventarios', 'inventarios.idarticulo', '=', 'articulos.id')
@@ -365,15 +366,16 @@ class ArticuloController extends Controller
                 'categorias.nombre as nombre_categoria',
                 'unidad_envase',
                 'inventarios.fecha_vencimiento',
-                DB::raw('(SELECT SUM(inventarios.saldo_stock) FROM inventarios WHERE inventarios.idarticulo = articulos.id AND inventarios.fecha_vencimiento > NOW()) as saldo_stock')
+                DB::raw('(SELECT SUM(inventarios.saldo_stock) FROM inventarios WHERE inventarios.idarticulo = articulos.id AND inventarios.fecha_vencimiento > NOW() AND inventarios.idalmacen = ?) as saldo_stock')
 
             )
             ->where('articulos.codigo', '=', $filtro)
+            ->where('inventarios.idalmacen', '=', $idAlmacen)
             // ->where('inventarios.saldo_stock', '>', 0)
             ->whereDate('inventarios.fecha_vencimiento', '>', now()) // Filtrar los lotes no vencidos
             ->orderBy('inventarios.fecha_vencimiento', 'asc')
+            ->addBinding($idAlmacen, 'select')
             ->orderBy('articulos.nombre', 'asc')->take(1)->get();
-
         Log::info('ARTICULO:', [
             'DATA' => $articulos,
         ]);
@@ -489,7 +491,8 @@ class ArticuloController extends Controller
 
             $articulo->stock = $request->stock;
             $articulo->descripcion = $request->descripcion;
-            //$articulo->fecha_vencimiento = $request->fecha_vencimiento;
+            $articulo->vencimiento = $request->fechaVencimientoSeleccion; 
+            $articulo->unidad_envase = $request->unidad_envase;
             $articulo->idproveedor = $request->idproveedor;
             $articulo->idmedida = $request->idmedida;
             //$articulo->condicion = '1';

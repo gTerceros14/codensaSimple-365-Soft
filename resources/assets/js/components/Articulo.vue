@@ -1546,12 +1546,13 @@ export default {
             if (this.tipoAccion == 2 && validacionExitosa) {
                 // Actualización del artículo
                 try {
+                    this.datosFormulario.fotografia = this.fotografia;
                     await this.actualizarArticulo(this.datosFormulario);
                     console.log("Actualización de artículo exitosa");
                 } catch (error) {
                     console.error("Error al actualizar el artículo: ", error);
                 }
-            } else if (this.tipoAccion != 2 && validacionExitosa || validacionInventarioExitosa) {
+            } else if (validacionExitosa || validacionInventarioExitosa) {
                 // Registro del artículo
                 this.datosFormulario.fotografia = this.fotografia;
                 if (this.tipo_stock == "paquetes") {

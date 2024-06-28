@@ -1,75 +1,55 @@
 <template>
     <main class="main">
-        <!-- Breadcrumb -->
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
-        </ol>
-        <div class="container-fluid">
-        
-            <!-- Ejemplo de tabla Listado -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Usuarios
-                    <button type="button" @click="abrirModal('persona', 'registrar')" class="btn btn-secondary">
-                        <i class="icon-plus"></i>&nbsp;Nuevo
-                    </button>
-                    <button type="button" @click="cargarReporteUsuariosExcel()" class="btn btn-info">
-                        <i class="icon-doc"></i>&nbsp;Reporte
-                    </button>
-                </div>
-                <div class="card-body">
-                    <div class="form-group row">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <select class="form-control col-md-3" v-model="criterio">
-                                    <option value="nombre">Nombre</option>
-                                    <option value="num_documento">Documento</option>
-                                    <option value="email">Email</option>
-                                    <option value="telefono">Teléfono</option>
-                                    <option value="nombre">Sucursal</option>
-                                </select>
-                                <input type="text" v-model="buscar" @keyup="listarPersona(1, buscar, criterio)"
-                                    class="form-control" placeholder="Texto a buscar">
-                                <!--button type="submit" @click="listarPersona(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button-->
-                            </div>
+
+        <!-- Ejemplo de tabla Listado -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Usuarios
+                <button type="button" @click="abrirModal('persona', 'registrar')" class="btn btn-secondary">
+                    <i class="icon-plus"></i>&nbsp;Nuevo
+                </button>
+                <button type="button" @click="cargarReporteUsuariosExcel()" class="btn btn-info">
+                    <i class="icon-doc"></i>&nbsp;Reporte
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <select class="form-control col-md-3" v-model="criterio">
+                                <option value="nombre">Nombre</option>
+                                <option value="num_documento">Documento</option>
+                                <option value="email">Email</option>
+                                <option value="telefono">Teléfono</option>
+                                <option value="nombre">Sucursal</option>
+                            </select>
+                            <input type="text" v-model="buscar" @keyup="listarPersona(1, buscar, criterio)"
+                                class="form-control" placeholder="Texto a buscar">
+                            <!--button type="submit" @click="listarPersona(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button-->
                         </div>
                     </div>
+                </div>
                 <div class="table-responsive">
 
                     <table class="table table-bordered table-striped table-sm">
                         <thead>
                             <tr>
-                                <th>Foto</th>
+                                <th>Opciones</th>
+                                <th class="d-none d-md-table-cell">Foto</th>
                                 <th>Nombre</th>
-                                <th>Tipo Documento</th>
-                                <th>Número</th>
-                                <th>Dirección</th>
-                                <th>Teléfono</th>
-                                <th>Email</th>
-                                <th>Usuario</th>
+                                <th class="d-none d-md-table-cell">Tipo Documento</th>
+                                <th class="d-none d-md-table-cell">Número</th>
+                                <th class="d-none d-md-table-cell">Dirección</th>
+                                <th class="d-none d-md-table-cell">Teléfono</th>
+                                <th class="d-none d-md-table-cell">Email</th>
+                                <th class="d-none d-md-table-cell">Usuario</th>
                                 <th>Rol</th>
                                 <th>Sucursal</th>
-                                <th>Opciones</th>
+
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="persona in arrayPersona" :key="persona.id">
-                                <td class="text-center">
-                                    <img :src="'img/usuarios/' + persona.fotografia + '?t=' + new Date().getTime()" width="50" height="50"
-                                        v-if="persona.fotografia" ref="imagen">
-                                    <!--img :src="'img/usuarios/' + persona.fotografia" width="50" height="50"
-                                        v-if="persona.fotografia" ref="imagen"-->
-                                    <img :src="'img/usuarios/' + 'defecto.jpg'" width="50" height="50" v-else ref="imagen">
-                                </td>
-                                <td v-text="persona.nombre"></td>
-                                <td v-text="persona.tipo_documento"></td>
-                                <td v-text="persona.num_documento"></td>
-                                <td v-text="persona.direccion"></td>
-                                <td v-text="persona.telefono"></td>
-                                <td v-text="persona.email"></td>
-                                <td v-text="persona.usuario"></td>
-                                <td v-text="persona.rol"></td>
-                                <td v-text="persona.sucursal"></td>
                                 <td>
                                     <button type="button" @click="abrirModal('persona', 'actualizar', persona)"
                                         class="btn btn-warning btn-sm">
@@ -88,136 +68,162 @@
                                         </button>
                                     </template>
                                 </td>
+                                <td class="d-none d-md-table-cell">
+                                    <img :src="'img/usuarios/' + persona.fotografia + '?t=' + new Date().getTime()"
+                                        width="50" height="50" v-if="persona.fotografia" ref="imagen">
+                                    <!--img :src="'img/usuarios/' + persona.fotografia" width="50" height="50"
+                                        v-if="persona.fotografia" ref="imagen"-->
+                                    <img :src="'img/usuarios/' + 'defecto.jpg'" width="50" height="50" v-else
+                                        ref="imagen">
+                                </td>
+                                <td v-text="persona.nombre"></td>
+                                <td class="d-none d-md-table-cell" v-text="persona.tipo_documento"></td>
+                                <td class="d-none d-md-table-cell" v-text="persona.num_documento"></td>
+                                <td class="d-none d-md-table-cell" v-text="persona.direccion"></td>
+                                <td class="d-none d-md-table-cell" v-text="persona.telefono"></td>
+                                <td class="d-none d-md-table-cell" v-text="persona.email"></td>
+                                <td class="d-none d-md-table-cell" v-text="persona.usuario"></td>
+                                <td v-text="persona.rol"></td>
+                                <td v-text="persona.sucursal"></td>
+
                             </tr>
                         </tbody>
                     </table>
-                    </div>
-                    <nav>
-                        <ul class="pagination">
-                            <li class="page-item" v-if="pagination.current_page > 1">
-                                <a class="page-link" href="#"
-                                    @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
-                            </li>
-                            <li class="page-item" v-for="page in pagesNumber" :key="page"
-                                :class="[page == isActived ? 'active' : '']">
-                                <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                    v-text="page"></a>
-                            </li>
-                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                <a class="page-link" href="#"
-                                    @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
-                            </li>
-                        </ul>
-                    </nav>
                 </div>
+                <nav>
+                    <ul class="pagination">
+                        <li class="page-item" v-if="pagination.current_page > 1">
+                            <a class="page-link" href="#"
+                                @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
+                        </li>
+                        <li class="page-item" v-for="page in pagesNumber" :key="page"
+                            :class="[page == isActived ? 'active' : '']">
+                            <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
+                                v-text="page"></a>
+                        </li>
+                        <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                            <a class="page-link" href="#"
+                                @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-            <!-- Fin ejemplo de tabla Listado -->
         </div>
+        <!-- Fin ejemplo de tabla Listado -->
         <!--Inicio del modal agregar/actualizar-->
         <div class="modal " tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
-     style="display: none;" aria-hidden="true">
-    <div class="modal-dialog modal-primary modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" v-text="tituloModal"></h4>
-                <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <!-- Columna izquierda -->
-                            <div class="form-group">
-                                <label class="form-control-label" for="text-input">Nombre(*)</label>
-                                <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de la persona">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-control-label" for="text-input">Tipo documento</label>
-                                <select v-model="tipo_documento" class="form-control">
+            style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-primary modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" v-text="tituloModal"></h4>
+                        <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <!-- Columna izquierda -->
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="text-input">Nombre(*)</label>
+                                        <input type="text" v-model="nombre" class="form-control"
+                                            placeholder="Nombre de la persona">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="text-input">Tipo documento</label>
+                                        <select v-model="tipo_documento" class="form-control">
                                             <option value="" disabled>Selecciona una tipo de documento</option>
                                             <option value="1">CI - CEDULA DE IDENTIDAD</option>
                                             <option value="2">CEX - CEDULA DE IDENTIDAD DE EXTRANJERO</option>
                                             <option value="5">NIT - NÚMERO DE IDENTIFICACIÓN TRIBUTARIA</option>
                                             <option value="3">PAS - PASAPORTE</option>
-                                            <option value="4">OD - OTRO DOCUMENTO DE IDENTIDAD</option>   
-                                        </select> 
+                                            <option value="4">OD - OTRO DOCUMENTO DE IDENTIDAD</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="email-input">Teléfono</label>
+                                        <input type="email" v-model="telefono" class="form-control"
+                                            placeholder="Teléfono">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="email-input">Rol</label>
+                                        <select v-model="idrol" class="form-control">
+                                            <option value="0" disabled>Seleccione</option>
+                                            <option v-for="role in arrayRol" :key="role.id" :value="role.id"
+                                                v-text="role.nombre"></option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="email-input">Usuario</label>
+                                        <input type="text" v-model="usuario" class="form-control"
+                                            placeholder="Nombre del usuario">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- Columna derecha -->
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="email-input">Dirección</label>
+                                        <input type="email" v-model="direccion" class="form-control"
+                                            placeholder="Dirección">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="email-input">Número documento</label>
+                                        <input type="email" v-model="num_documento" class="form-control"
+                                            placeholder="Número de documento">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="email-input">Email</label>
+                                        <input type="email" v-model="email" class="form-control" placeholder="Email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="email-input">Sucursal</label>
+                                        <select v-model="idsucursal" class="form-control">
+                                            <option value="0" disabled>Seleccione</option>
+                                            <option v-for="sucursal in arraySucursal" :key="sucursal.id"
+                                                :value="sucursal.id" v-text="sucursal.nombre"></option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="email-input">Clave</label>
+                                        <input type="password" v-model="password" class="form-control"
+                                            placeholder="Clave del usuario">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-control-label" for="email-input">Teléfono</label>
-                                <input type="email" v-model="telefono" class="form-control" placeholder="Teléfono">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-control-label" for="email-input">Rol</label>
-                                <select v-model="idrol" class="form-control">
-                                    <option value="0" disabled>Seleccione</option>
-                                    <option v-for="role in arrayRol" :key="role.id" :value="role.id"
-                                        v-text="role.nombre"></option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-control-label" for="email-input">Usuario</label>
-                                <input type="text" v-model="usuario" class="form-control" placeholder="Nombre del usuario">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- Columna derecha -->
-                            <div class="form-group">
-                                <label class="form-control-label" for="email-input">Dirección</label>
-                                <input type="email" v-model="direccion" class="form-control" placeholder="Dirección">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-control-label" for="email-input">Número documento</label>
-                                <input type="email" v-model="num_documento" class="form-control" placeholder="Número de documento">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-control-label" for="email-input">Email</label>
-                                <input type="email" v-model="email" class="form-control" placeholder="Email">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-control-label" for="email-input">Sucursal</label>
-                                <select v-model="idsucursal" class="form-control">
-                                    <option value="0" disabled>Seleccione</option>
-                                    <option v-for="sucursal in arraySucursal" :key="sucursal.id" :value="sucursal.id"
-                                        v-text="sucursal.nombre"></option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-control-label" for="email-input">Clave</label>
-                                <input type="password" v-model="password" class="form-control" placeholder="Clave del usuario">
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label class="form-control-label" for="email-input">Fotografia</label>
-                        <div class="row">
-                            <div class="col-md-5">
-                                <input type="file" @change="obtenerFotografia" class="form-control" placeholder="fotografia usuario" ref="fotografiaInput">
+                            <div class="form-group">
+                                <label class="form-control-label" for="email-input">Fotografia</label>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <input type="file" @change="obtenerFotografia" class="form-control"
+                                            placeholder="fotografia usuario" ref="fotografiaInput">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <figure>
+                                            <img :src="imagen" width="50" height="50" alt="Foto usuario">
+                                        </figure>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <figure>
-                                    <img :src="imagen" width="50" height="50" alt="Foto usuario">
-                                </figure>
+                            <div v-show="errorPersona" class="form-group div-error">
+                                <div class="text-center text-error">
+                                    <div v-for="error in errorMostrarMsjPersona" :key="error" v-text="error"></div>
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
-                    <div v-show="errorPersona" class="form-group div-error">
-                        <div class="text-center text-error">
-                            <div v-for="error in errorMostrarMsjPersona" :key="error" v-text="error"></div>
-                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
+                        <button type="button" v-if="tipoAccion == 1" class="btn btn-primary"
+                            @click="registrarPersona()">Guardar</button>
+                        <button type="button" v-if="tipoAccion == 2" class="btn btn-primary"
+                            @click="actualizarPersona()">Actualizar</button>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                <button type="button" v-if="tipoAccion == 1" class="btn btn-primary" @click="registrarPersona()">Guardar</button>
-                <button type="button" v-if="tipoAccion == 2" class="btn btn-primary" @click="actualizarPersona()">Actualizar</button>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
         <!--Fin del modal-->
     </main>
@@ -319,7 +325,7 @@ export default {
                     console.log(error);
                 });
         },
-        
+
         selectSucursal() {
             let me = this;
             var url = '/sucursal/selectSucursal';
@@ -345,11 +351,11 @@ export default {
             let file = event.target.files[0];
 
             let fileType = file.type;
-                // Validar si el archivo es una imagen en formato PNG o JPG
-                if (fileType !== 'image/png' && fileType !== 'image/jpeg') {
-                    alert('Por favor, seleccione una imagen en formato PNG o JPG.');
-                    return;
-                }
+            // Validar si el archivo es una imagen en formato PNG o JPG
+            if (fileType !== 'image/png' && fileType !== 'image/jpeg') {
+                alert('Por favor, seleccione una imagen en formato PNG o JPG.');
+                return;
+            }
             this.fotografia = file;
             this.mostrarFoto(file);
 
@@ -595,8 +601,7 @@ export default {
                 }
             })
         },
-        cargarReporteUsuariosExcel()
-        {
+        cargarReporteUsuariosExcel() {
             window.open('/user/listarReporteUsuariosExcel', '_blank');
         }
     },
@@ -605,25 +610,26 @@ export default {
     }
 }
 </script>
-<style>    .modal-content {
-        width: 100% !important;
-        position: absolute !important;
-    }
+<style>
+.modal-content {
+    width: 100% !important;
+    position: absolute !important;
+}
 
-    .mostrar {
-        display: list-item !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        background-color: #3c29297a !important;
-    }
+.mostrar {
+    display: list-item !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    background-color: #3c29297a !important;
+}
 
-    .div-error {
-        display: flex;
-        justify-content: center;
-    }
+.div-error {
+    display: flex;
+    justify-content: center;
+}
 
-    .text-error {
-        color: red !important;
-        font-weight: bold;
-    }
+.text-error {
+    color: red !important;
+    font-weight: bold;
+}
 </style>

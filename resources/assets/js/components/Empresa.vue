@@ -17,14 +17,14 @@
                 <div class="form-group row">
                     <label class="col-md-3 form-control-label font-weight-bold" for="text-input">&nbsp; Logo de la
                         Empresa:</label>
-
                     <div class="col-md-4">
                         <div class="row">
                             <figure class="col-md-4">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3bz1rSR914Qj3-mmNDyf-MhhLkdq3GzsVNKUZYXTJaQ&s"
-                                    width="129" height="129" alt="Foto usuario">
+                                <img :src="logoUrl" width="129" height="129" alt="Logo empresa">
                             </figure>
-
+                            <div v-if="!estadoInputs" class="col-md-8">
+                                <input type="file" @change="onLogoChange" accept="image/*" class="form-control-file">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -45,8 +45,8 @@
                     <label class="col-md-3 form-control-label font-weight-bold" for="email-input">&nbsp; Dirección de la
                         Empresa</label>
                     <div v-if="!estadoInputs" class="col-md-4 mx-2">
-                        <input type="text" v-model="direccion" maxlength="50" class="form-control" placeholder="Ingrese la direccion"
-                            :readonly="this.estadoInputs">
+                        <input type="text" v-model="direccion" maxlength="50" class="form-control"
+                            placeholder="Ingrese la direccion" :readonly="this.estadoInputs">
                     </div>
                     <div v-else class="col-md-4 mx-2">
                         {{ direccion }}
@@ -96,7 +96,8 @@
 
 
                 <div v-if="!estadoInputs" class="form-group-row justify-content-center text-center mt-3 mb-3">
-                    <button type="button" class="btn btn-danger" @click="estadoCampos(); datosEmpresa()">Cancelar</button>
+                    <button type="button" class="btn btn-danger"
+                        @click="estadoCampos(); datosEmpresa()">Cancelar</button>
 
                     <button type="button" class="btn btn-success" @click="actualizarEmpresa()">Guardar cambios</button>
                 </div>
@@ -106,7 +107,7 @@
         </div>
     </main>
 </template>
- 
+
 <script>
 export default {
     data() {
@@ -119,32 +120,35 @@ export default {
             nit: '',
             licencia: '',
             estadoInputs: true,
+            logo: null,
+            logoUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3bz1rSR914Qj3-mmNDyf-MhhLkdq3GzsVNKUZYXTJaQ&s', // Default image
+
         }
     },
     methods: {
         validarCorreoElectronico(correo) {
-  const regexCorreoElectronico = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regexCorreoElectronico.test(correo);
-},
-        validarCampos(){
-            if (this.telefono.length>8){
+            const regexCorreoElectronico = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regexCorreoElectronico.test(correo);
+        },
+        validarCampos() {
+            if (this.telefono.length > 8) {
                 this.toastError("El número de telefono no debe contener mas de 8 digitos")
                 return false;
             }
-            if(!this.validarCorreoElectronico(this.email)){
+            if (!this.validarCorreoElectronico(this.email)) {
                 this.toastError("Ingrese un correo electronico valido")
                 return false;
             }
             return true
-            
-  
+
+
 
         },
         estadoCampos() {
             this.estadoInputs = !this.estadoInputs;
         },
         datosEmpresa() {
-           
+
             let me = this;
             var url = '/empresa';
 
@@ -163,52 +167,82 @@ export default {
                     console.log(error);
                 });
         },
+        onLogoChange(e) {
+            const file = e.target.files[0];
+            this.logo = file;
+            this.logoUrl = URL.createObjectURL(file);
+        },
         actualizarEmpresa() {
-            if (!this.validarCampos()){
+            if (!this.validarCampos()) {
                 return;
             }
-            axios.put('/empresa/actualizar', {
-                'nombre': this.nombre,
-                'direccion': this.direccion,
-                'telefono': this.telefono,
-                'email': this.email,
-                'nit': this.nit,
-                'licencia': this.licencia,
-                'id': this.empresa_id
-            }).then((response) => {
-                this.toastSuccess("Datos actualizados correctamente")
-                this.estadoCampos();
 
+            let formData = new FormData();
+            formData.append('nombre', this.nombre);
+            formData.append('direccion', this.direccion);
+            formData.append('telefono', this.telefono);
+            formData.append('email', this.email);
+            formData.append('nit', this.nit);
+            formData.append('licencia', this.licencia);
+            formData.append('id', this.empresa_id);
+            if (this.logo) {
+                formData.append('logo', this.logo);
+            }
+
+            axios.post('/empresa/actualizar', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then((response) => {
+                this.toastSuccess("Datos actualizados correctamente");
+                this.estadoCampos();
+                this.datosEmpresa(); // Refresh data to get the new logo URL
             }).catch((error) => {
                 console.error("Ocurrio un error al actualizar: ", error);
-                this.toastError("Hubo un error al actualizar los datos de la empresa")
-
+                this.toastError("Hubo un error al actualizar los datos de la empresa");
             });
-
-
-
         },
-        toastSuccess(mensaje){
+        datosEmpresa() {
+            let me = this;
+            var url = '/empresa';
+
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+
+                me.empresa_id = respuesta.empresa.id;
+                me.nombre = respuesta.empresa.nombre;
+                me.direccion = respuesta.empresa.direccion;
+                me.telefono = respuesta.empresa.telefono;
+                me.email = respuesta.empresa.email;
+                me.nit = respuesta.empresa.nit;
+                me.licencia = respuesta.empresa.licencia;
+                me.logoUrl = respuesta.empresa.logo || me.logoUrl; // Use the logo from the server if available
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+        toastSuccess(mensaje) {
             this.$toasted.show(`
     <div style="height: 60px;font-size:16px;">
         <br>
-        `+mensaje+`.<br>
+        `+ mensaje + `.<br>
     </div>`, {
-                    type: "success",
-                    position: "bottom-right",
-                    duration: 4000
-                });
+                type: "success",
+                position: "bottom-right",
+                duration: 4000
+            });
         },
-        toastError(mensaje){
+        toastError(mensaje) {
             this.$toasted.show(`
     <div style="height: 60px;font-size:16px;">
         <br>
-        `+mensaje+`<br>
+        `+ mensaje + `<br>
     </div>`, {
-                    type: "error",
-                    position: "bottom-right",
-                    duration: 4000
-                });
+                type: "error",
+                position: "bottom-right",
+                duration: 4000
+            });
         }
     },
     mounted() {
@@ -216,16 +250,16 @@ export default {
     }
 }
 </script>
-<style>    .modal-content {
-        width: 100% !important;
-        position: absolute !important;
-    }
+<style>
+.modal-content {
+    width: 100% !important;
+    position: absolute !important;
+}
 
-    .mostrar {
-        display: list-item !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        background-color: #3c29297a !important;
-    }
-
+.mostrar {
+    display: list-item !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    background-color: #3c29297a !important;
+}
 </style>

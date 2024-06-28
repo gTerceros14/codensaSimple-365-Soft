@@ -1,6 +1,7 @@
 <div class="sidebar">
     <nav class="sidebar-nav">
         <ul class="nav">
+            <button class="sidebar-minimizer brand-minimizer" type="button" style="background-color: #D00000"></button>
             <li @click="menu=5" class="nav-item">
                 <a class="nav-link active" href="#"><i class="fa fa-dashboard"></i> Escritorio</a>
             </li>
@@ -12,13 +13,13 @@
             <li class="nav-item nav-dropdown">
                 <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-briefcase"></i> Empresa</a>
                 <ul class="nav-dropdown-items">
-                    <li @click="menu=13" class="nav-item">
-    <a class="nav-link" href="#"><i class="fas fa-building"></i> Empresa</a>
-</li>
+                <li @click="menu=13" class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-building"></i> Empresa</a>
+                </li>
 
-<li @click="menu=14" class="nav-item">
-            <a class="nav-link" href="#"><i class="fa fa-building"></i> Sucursales</a>
-          </li>
+                <li @click="menu=14" class="nav-item">
+                    <a class="nav-link" href="#"><i class="fa fa-building"></i> Sucursales</a>
+                </li>
                     <!--<li @click="menu=41" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Puntos de
                             Venta</a>
@@ -140,6 +141,9 @@
                     <li @click="menu=27" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Medidas</a>
                     </li>
+                    <li @click="menu=71" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Medidas</a>
+                    </li>
                 </ul>
             </li>
 
@@ -238,5 +242,5 @@
             -->
         </ul>
     </nav>
-    <button class="sidebar-minimizer brand-minimizer" type="button"></button>
+    
 </div>

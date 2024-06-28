@@ -17,6 +17,26 @@ class MedidaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function index2(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+        
+        if ($buscar==''){
+            $medidas = Medida::orderBy('id', 'asc');
+        }
+        else{
+            $medidas = Medida::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc');
+        }
+        $medidas=$medidas->get();
+
+        return [
+            
+            'medidas' => $medidas
+        ];
+    }
     public function index(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
