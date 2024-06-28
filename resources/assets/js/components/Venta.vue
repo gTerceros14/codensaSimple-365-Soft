@@ -693,8 +693,6 @@ import DataTable from 'primevue/datatable';
 import Dropdown from 'primevue/dropdown';
 import InputNumber from 'primevue/inputnumber';
 import InputText from 'primevue/inputtext';
-import 'primevue/resources/primevue.min.css';
-import 'primevue/resources/themes/saga-blue/theme.css'; // or other theme
 import vSelect from "vue-select";
 import { TileSpinner } from "vue-spinners";
 export default {
