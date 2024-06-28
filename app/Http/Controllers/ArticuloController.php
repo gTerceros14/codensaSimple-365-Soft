@@ -340,7 +340,7 @@ class ArticuloController extends Controller
             return redirect('/');
 
         $filtro = $request->filtro;
-
+        $idAlmacen = $request->idalmacen;
         $articulos = Articulo::join('medidas', 'articulos.idmedida', '=', 'medidas.id')
             ->join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
             ->join('inventarios', 'inventarios.idarticulo', '=', 'articulos.id')
@@ -366,15 +366,16 @@ class ArticuloController extends Controller
                 'categorias.nombre as nombre_categoria',
                 'unidad_envase',
                 'inventarios.fecha_vencimiento',
-                DB::raw('(SELECT SUM(inventarios.saldo_stock) FROM inventarios WHERE inventarios.idarticulo = articulos.id AND inventarios.fecha_vencimiento > NOW()) as saldo_stock')
+                DB::raw('(SELECT SUM(inventarios.saldo_stock) FROM inventarios WHERE inventarios.idarticulo = articulos.id AND inventarios.fecha_vencimiento > NOW() AND inventarios.idalmacen = ?) as saldo_stock')
 
             )
             ->where('articulos.codigo', '=', $filtro)
+            ->where('inventarios.idalmacen', '=', $idAlmacen)
             // ->where('inventarios.saldo_stock', '>', 0)
             ->whereDate('inventarios.fecha_vencimiento', '>', now()) // Filtrar los lotes no vencidos
             ->orderBy('inventarios.fecha_vencimiento', 'asc')
+            ->addBinding($idAlmacen, 'select')
             ->orderBy('articulos.nombre', 'asc')->take(1)->get();
-
         Log::info('ARTICULO:', [
             'DATA' => $articulos,
         ]);

@@ -241,7 +241,9 @@
 <template v-if="menu==70">
     <nuevacompra></nuevacompra>
 </template>
-
+<template v-if="menu==71">
+    <nuevavista1></nuevavista1>
+</template>
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
     <venta></venta>
