@@ -1609,7 +1609,7 @@ export default {
             clearTimeout(this.timer);
             this.timer = setTimeout(() => {
                 let me = this;
-                var url = "/articulo/buscarArticuloVenta?filtro=" + me.codigo;
+                var url = "/articulo/buscarArticuloVenta?filtro=" + me.codigo + "&idalmacen="+me.selectedAlmacen;
                 axios
                     .get(url)
                     .then(function (response) {
