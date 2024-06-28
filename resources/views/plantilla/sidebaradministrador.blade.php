@@ -141,6 +141,9 @@
                     <li @click="menu=27" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Medidas</a>
                     </li>
+                    <li @click="menu=71" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Medidas</a>
+                    </li>
                 </ul>
             </li>
 

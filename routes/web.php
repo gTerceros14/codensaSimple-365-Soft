@@ -311,6 +311,7 @@ Route::group(['middleware' => ['auth']], function () {
 
         //MEDIDAS
         Route::get('/medida', 'MedidaController@index');
+        Route::get('/medida2', 'MedidaController@index2');
         Route::post('/medida/registrar', 'MedidaController@store');
         Route::put('/medida/actualizar', 'MedidaController@update');
         Route::put('/medida/desactivar', 'MedidaController@desactivar');
