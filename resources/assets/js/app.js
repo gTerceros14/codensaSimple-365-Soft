@@ -12,9 +12,9 @@ import Toasted from "vue-toasted";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 
 
-/*import 'bootstrap-icons/font/bootstrap-icons.css'
+import 'bootstrap-icons/font/bootstrap-icons.css'
 import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";*/
+import "bootstrap-vue/dist/bootstrap-vue.css";
 
 import 'primeflex/primeflex.css';
 import 'primevue/resources/themes/lara-light-blue/theme.css';
@@ -83,7 +83,7 @@ Vue.component("proveedor", require("./components/Proveedor.vue"));
 Vue.component("rol", require("./components/Rol.vue"));
 Vue.component("user", require("./components/User.vue"));
 Vue.component("venta", require("./components/Venta.vue"));
-
+Vue.component("nuevavista1",require("./components/NuevaVista1.vue"));
 Vue.component(
   "registrarventa",
   require("./components/ventas/RegistrarVentas.vue")
