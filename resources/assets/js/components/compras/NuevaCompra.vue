@@ -30,18 +30,20 @@
                             <div class="p-fluid p-formgrid p-grid">
                                 <div class="p-field p-col-12 p-md-3">
                                     <label for="autocomplete">Proveedor</label>
-                                    <AutoComplete
-                                        id="autocomplete"
-                                        class="p-inputtext-sm"
-                                        forceSelection
-                                        :dropdown="true"
-                                        v-model="form.proveedorSeleccionado" 
-                                        :suggestions="array_proveedores" 
-                                        field="nombre" 
-                                        @complete="selectProveedor($event)" 
-                                        placeholder="Buscar Proveedores..." 
-                                    >
-                                    </AutoComplete>
+                                    <div class="autocomplete-flecha">
+                                        <AutoComplete
+                                            id="autocomplete"
+                                            class="p-inputtext-sm"
+                                            forceSelection
+                                            :dropdown="true"
+                                            v-model="form.proveedorSeleccionado" 
+                                            :suggestions="array_proveedores" 
+                                            field="nombre" 
+                                            @complete="selectProveedor($event)" 
+                                            placeholder="Buscar Proveedores..." 
+                                        >
+                                        </AutoComplete>
+                                    </div>
                                 </div>
                                 <div class="p-field p-col-12 p-md-3">
                                     <label for="tipoComprobante">Tipo Comprobante</label>
@@ -65,6 +67,7 @@
                         <div class="p-col-6">
                             <div class="card">
                                 <DataTable
+                                    ref="dt-articulos"
                                     :value="array_articulos_proveedor"
                                     selectionMode="multiple"
                                     dataKey="codigo"
@@ -99,6 +102,7 @@
                         <div class="p-col-6">
                             <div class="card">
                                 <DataTable
+                                    ref="dt-seleccionados"
                                     :value="array_articulos_seleccionados"
                                     dataKey="codigo"
                                     responsiveLayout="scroll"
@@ -130,13 +134,59 @@
                         </div>
                     </div>
 
-                    <div class="total-saldo-card">
+                    <!--<div class="total-saldo-card">
                         <Card>
                             <template #content>
                                 <div class="saldo-total"><strong>TOTAL Bs. 0</strong></div>
                             </template>
                         </Card>
+                    </div>-->
+
+                    <div class="card">
+                        <DataTable
+                            ref="dt-lista-completo"
+                            :value="array_articulos_seleccionados"
+                            dataKey="id"
+                            :paginator="false"
+                        >
+                            <Column field="codigo" header="Codigo" :sortable="true"></Column>
+                            <Column header="Image">
+                                <template #body>
+                                    <img src="img/producto-imagen-default.jpg" alt="Articulo sin foto" class="product-image" />
+                                </template>
+                            </Column>
+                            <Column field="nombre" header="Nombre" :sortable="true"></Column>
+                            <Column field="nombre_proveedor" header="Proveedor" :sortable="true"></Column>
+                            <Column field="precio_costo_paq" header="Costo Paquete" :sortable="true"></Column>
+                            <Column field="precio_costo_unid" header="Costo Unidad" :sortable="true"></Column>
+                            <Column field="unidad_envase" header="U / Paquete" :sortable="true"></Column>
+                            <Column header="Fecha Vencimiento" :headerStyle="{'width': '150px'}" :bodyStyle="{'width': '150px'}">
+                            <template #body>
+                                <div class="p-inputgroup">
+                                <Calendar v-model="value" :style="{width: '100%'}"/>
+                                </div>
+                            </template>
+                            </Column> 
+                            <Column header="Unidades" :sortable="true">
+                                <template #body>
+                                    <InputNumber
+                                        id="horizontal"
+                                        v-model="unidades_articulo"
+                                        showButtons
+                                        buttonLayout="horizontal"
+                                        :step="1"
+                                        :min="1"
+                                        decrementButtonClass="p-button-danger"
+                                        incrementButtonClass="p-button-success"
+                                        incrementButtonIcon="pi pi-plus"
+                                        decrementButtonIcon="pi pi-minus"
+                                    />
+                                </template>
+                            </Column>
+                            
+                        </DataTable>
                     </div>
+                    <Calendar v-model="value" :touchUI="true"  />
                 </TabPanel>
 
                 <TabPanel :disabled="activeIndex !== 1">
@@ -149,10 +199,10 @@
 
             </TabView>
 
-            <div class="flechas-buttons">
+            <!--<div class="flechas-buttons">
                 <Button class="p-button-sm p-button-secondary" label="Anterior" @click="prevStep" :disabled="activeIndex === 0" style="margin-right: 30px;"/>
                 <Button class="p-button-sm p-button-secondary" label="Siguiente" @click="nextStep" :disabled="activeIndex === steps.length - 1" />
-            </div>
+            </div>-->
 
         </Panel>
     </main>
@@ -173,6 +223,8 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
 import AutoComplete from 'primevue/autocomplete';
+import InputNumber from 'primevue/inputnumber';
+import Calendar from 'primevue/calendar';
 
 
 export default {
@@ -211,6 +263,12 @@ export default {
 
             array_articulos_proveedor: [],
             array_articulos_seleccionados: [],
+
+            unidades_articulo: 1,
+            fechaVencimiento: null,
+            minDate: null,
+
+            value: null
         }
     },
 
@@ -235,7 +293,9 @@ export default {
         DataTable,
         Column,
         ColumnGroup,
-        AutoComplete
+        AutoComplete,
+        InputNumber,
+        Calendar,
     },
 
     computed: {
@@ -264,23 +324,6 @@ export default {
                 this.activeIndex--;
             }
         },
-
-        /*buscarArticulo() {
-            clearTimeout(this.timer);
-            this.timer = setTimeout(() => {
-                let me = this;
-                var url = '/articulo/listarArticulo?buscar=' + me.codigo + '&criterio=' + 'codigo' + '&idProveedor=' + me.idproveedor
-                axios
-                    .get(url)
-                    .then(function (response) {
-                        let respuesta = response.data;
-                        me.array_articulos_proveedor = respuesta.articulos.data;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            }, 1000);
-        },*/
 
         listarArticulo(buscar, criterio) {
             let me = this;
@@ -331,7 +374,6 @@ export default {
         'form.proveedorSeleccionado.id': {
             handler(newVal) {
                 if (newVal) {
-                    console.log('PROVEEDOR:', newVal);
                     this.idproveedor = newVal;
                     this.listarArticulo('', 'nombre');
                 }
@@ -340,13 +382,13 @@ export default {
 
         buscardorArticulos(newVal) {
             if (newVal) {
-                console.log('NEWVAL: ',newVal)
                 this.listarArticulo(this.buscardorArticulos, 'nombre');
             }
         }
     },
 
     created() {
+        this.minDate = new Date();
 
     },
 
@@ -361,6 +403,9 @@ export default {
 </script>
 
 <style scoped>
+.p-inputgroup {
+    width: 100%;
+}
 /* Panel */
 >>> .p-panel-header {
     padding: 0.75rem;
@@ -430,7 +475,7 @@ export default {
     justify-content: right;
 }
 
->>> .p-button.p-button-icon-only {
+.autocomplete-flecha >>> .p-button.p-button-icon-only {
     padding: 0.4rem 0;
 }
 
@@ -458,5 +503,12 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+/* Tabla Lista Completa */
+.product-image {
+    border-radius: 10px;
+    width: 100px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 </style>
