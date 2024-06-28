@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Exception;
 use App\Empresa;
 
@@ -21,15 +22,7 @@ class EmpresaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
-        if (!$request->ajax())
-            return redirect('/');
-
-        $empresa = Empresa::first();
-
-        return ['empresa' => $empresa];
-    }
+  
 
     /**
      * Show the form for creating a new resource.
@@ -98,15 +91,42 @@ class EmpresaController extends Controller
             $empresa->nit = $request->nit;
             $empresa->licencia = $request->licencia;
 
+            if ($request->hasFile('logo')) {
+                // Delete old logo if exists
+                if ($empresa->logo) {
+                    Storage::delete('public/logos/' . $empresa->logo);
+                }
+
+                // Store new logo
+                $logoName = time() . '.' . $request->file('logo')->getClientOriginalExtension();
+                $request->file('logo')->storeAs('public/logos', $logoName);
+                $empresa->logo = $logoName;
+            }
+
             $empresa->save();
 
             DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Empresa actualizada correctamente']);
         } catch (Exception $e) {
             DB::rollBack();
-            throw $e;
+            return response()->json(['success' => false, 'message' => 'Error al actualizar la empresa: ' . $e->getMessage()], 500);
         }
     }
 
+    public function index(Request $request)
+    {
+        if (!$request->ajax())
+            return redirect('/');
+
+        $empresa = Empresa::first();
+        
+        if ($empresa && $empresa->logo) {
+            $empresa->logo = asset('storage/logos/' . $empresa->logo);
+        }
+
+        return ['empresa' => $empresa];
+    }
 
     /**
      * Remove the specified resource from storage.
