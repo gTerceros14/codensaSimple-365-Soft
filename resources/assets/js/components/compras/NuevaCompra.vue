@@ -166,15 +166,15 @@
                                     <img src="img/producto-imagen-default.jpg" alt="Articulo sin foto" class="product-image" />
                                 </template>
                             </Column>
-                            <Column field="nombre" header="Nombre" :sortable="true" :styles="{width:'35%'}"></Column>
+                            <Column field="nombre" header="Nombre" :sortable="true" :styles="{width:'15%'}"></Column>
                             <Column field="nombre_proveedor" header="Proveedor" :styles="{width:'10%'}"></Column>
-                            <Column field="unidad_envase" header="Unidades por Paquete" :sortable="true" :styles="{width:'10%'}"></Column>
-                            <Column field="precio_costo_paq" header="Costo Paquete" :sortable="true" :styles="{width:'10%'}" :bodyStyle="{'text-align':'center'}">
+                            <Column field="unidad_envase" header="Unidades por Paquete" :sortable="true" :styles="{width:'10%'}" :bodyStyle="{'text-align':'center'}"></Column>
+                            <Column field="precio_costo_paq" header="Costo Paquete" :sortable="true" :styles="{width:'20%'}" :bodyStyle="{'text-align':'center'}">
                                 <template #editor="slotProps">
                                     <InputText v-model="slotProps.data[slotProps.column.field]" class="p-inputtext-sm"/>
                                 </template>
                             </Column>
-                            <Column field="precio_costo_unid" header="Costo Unidad" :sortable="true" :styles="{width:'10%'}" :bodyStyle="{'text-align':'center'}">
+                            <Column field="precio_costo_unid" header="Costo Unidad" :sortable="true" :styles="{width:'20%'}" :bodyStyle="{'text-align':'center'}">
                                 <template #editor="slotProps">
                                     <InputText v-model="slotProps.data[slotProps.column.field]" class="p-inputtext-sm"/>
                                 </template>
@@ -182,10 +182,14 @@
 
                             <Column :rowEditor="true" :styles="{width:'10%', 'min-width':'8rem'}" :bodyStyle="{'text-align':'center'}"></Column>
                             <Column :headerStyle="{'width': '5%','min-width':'8rem'}" :bodyStyle="{'text-align': 'center', overflow: 'visible'}">
-                                <template #body>
-                                    <Button type="button" icon="pi pi-delete-left" class="p-button-danger p-button-sm" ></Button>
+                                <template #body="slotProps">
+                                    <Button type="button" icon="pi pi-delete-left" class="p-button-danger p-button-sm" @click="eliminarArticuloListaCompleta(slotProps.data)"></Button>
                                 </template>
                             </Column>
+
+                            <template #empty>
+                                Datos del articulo no encontrados ...
+                            </template>
 
                             <template #expansion="slotProps">
                                 <div class="orders-subtable">
@@ -211,11 +215,12 @@
                                                         mode="decimal"
                                                         :step="1"
                                                         showButtons
-                                                        :min="1"
+                                                        :min="0"
                                                         decrementButtonClass="p-button-danger p-button-sm"
                                                         incrementButtonClass="p-button-sm"
                                                         incrementButtonIcon="pi pi-plus"
                                                         decrementButtonIcon="pi pi-minus"
+                                                        @update="updateSubtotal(slotProps.data)"
                                                     />
                                                 </div>
                                             </template>
@@ -239,24 +244,30 @@
                                                         incrementButtonClass="p-button-sm"
                                                         incrementButtonIcon="pi pi-plus"
                                                         decrementButtonIcon="pi pi-minus"
+                                                        @update="updateSubtotal(slotProps.data)"
                                                     />
                                                 </div>
                                             </template>
                                         </Column>
                                         <Column field="descuento" header="Descuento" :styles="{width:'15%'}">
                                             <template #body="slotProps">
-                                                <InputNumber v-model="slotProps.data.descuento" prefix="% "/>
+                                                <InputNumber v-model="slotProps.data.descuento" prefix="% " mode="decimal" :maxFractionDigits="2" :max="100" :min="0" @update="updateSubtotal(slotProps.data)"/>
                                             </template>
                                         </Column>
-                                        <Column field="subtotal" header="Subtotal" :styles="{width:'15%'}">
-                                            <!--<template #body="slotProps">
-                                                <InputNumber disabled v-model="slotProps.data.subtotal" mode="decimal" :useGrouping="false" />
-                                            </template>-->
+                                        <Column header="Subtotal" :styles="{width:'15%'}">
+                                            <template #body="slotProps">
+                                                <InputNumber disabled :value="calculateSubtotal(slotProps.data)" mode="decimal" />
+                                            </template>
                                         </Column>
+
+                                        <template #empty>
+                                            Datos del articulo no encontrados ...
+                                        </template>
                                     </DataTable>
                                 </div>
                             </template>
                         </DataTable>
+                        <Button class="p-button-sm p-button-help" icon="pi pi-sync" label="Actualizar" @click="mostrarListaCompleta"></Button>
                     </div>
                 </TabPanel>
 
@@ -323,8 +334,7 @@ export default {
             ],
             lista_comprobantes: [
                 {nombre: 'Recibo', id: '1'},
-                {nombre: 'Factura', id: '2'},
-                {nombre: 'Ticket', id: '3'},
+                {nombre: 'Nota de Ingreso', id: '2'},
             ],
 
             codigo: '',
@@ -380,19 +390,60 @@ export default {
     },
 
     methods: {
+        mostrarListaCompleta() {
+            console.log('LISTA COMPLETO: ', this.array_articulos_completo);
+        },
+
+        /*updateSubtotal(articulo) {
+            const cantidad = articulo.unidades;
+            const bonificacion = articulo.bonificacion;
+            const precio = articulo.esPaquetesCantidad ? articulo.precio_costo_paq : articulo.precio_costo_unid;
+            articulo.subtotal = cantidad * precio;
+            const unidadesBonificacion = articulo.esPaquetesBonificacion ? bonificacion * articulo.unidad_envase : bonificacion;
+            articulo.unidadesTotales = (articulo.esPaquetesCantidad ? cantidad * articulo.unidad_envase : cantidad) + unidadesBonificacion;
+        },*/
+
+        updateSubtotal(articulo) {
+            const cantidad = articulo.unidades;
+            const bonificacion = articulo.bonificacion;
+            const precio = articulo.esPaquetesCantidad ? articulo.precio_costo_paq : articulo.precio_costo_unid;
+            const descuento = (articulo.descuento / 100);
+            const precioDescontado = precio * (1 - descuento);
+            articulo.subtotal = cantidad * precioDescontado;
+            const unidadesBonificacion = articulo.esPaquetesBonificacion ? bonificacion * articulo.unidad_envase : bonificacion;
+            articulo.unidadesTotales = (articulo.esPaquetesCantidad ? cantidad * articulo.unidad_envase : cantidad) + unidadesBonificacion;
+        },
+
+        /*calculateSubtotal(articulo) {
+            const cantidad = articulo.unidades;
+            const precio = articulo.esPaquetesCantidad ? articulo.precio_costo_paq : articulo.precio_costo_unid;
+            return cantidad * precio;
+        },*/
+
+        calculateSubtotal(articulo) {
+            const cantidad = articulo.unidades;
+            const precio = articulo.esPaquetesCantidad ? articulo.precio_costo_paq : articulo.precio_costo_unid;
+            const descuento = (articulo.descuento / 100);
+            const precioDescontado = precio * (1 - descuento);
+            return cantidad * precioDescontado;
+        },
+
         toggleUnidadesPaquetesCantidad(articulo) {
             articulo.esPaquetesCantidad = !articulo.esPaquetesCantidad;
+            this.updateSubtotal(articulo);
         },
 
         toggleUnidadesPaquetesBonificacion(articulo) {
-            articulo.esPaquetesBonificacion = !articulo.esPaquetesBonificacion
+            articulo.esPaquetesBonificacion = !articulo.esPaquetesBonificacion;
+            this.updateSubtotal(articulo);
         },
 
         actualizarLista() {
             this.array_articulos_completo = this.array_articulos_seleccionados.map(articulo => ({
                 ...articulo,
+                unidadesTotales: 0,
                 vencimiento: null,
-                unidades: 1,
+                unidades: 0,
                 bonificacion: 0,
                 descuento: 0,
                 subtotal: 0,
@@ -422,6 +473,10 @@ export default {
 
         vaciarListaSeleccionados() {
             this.array_articulos_seleccionados.splice(0, this.array_articulos_seleccionados.length);
+        },
+
+        eliminarArticuloListaCompleta(articulo) {
+            this.array_articulos_completo = this.array_articulos_completo.filter(a => a.id !== articulo.id);
         },
 
         eliminarArticuloSeleccionado(articulo) {
