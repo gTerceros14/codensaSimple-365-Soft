@@ -95,7 +95,7 @@ Route::group(['middleware' => ['auth']], function () {
         // Route::put('/empresa/desactivar', 'EmpresaController@desactivar');
         // Route::put('/empresa/activar', 'EmpresaController@activar');
         Route::get('/empresa/selectEmpresa', 'EmpresaController@selectEmpresa');
-
+        Route::post('/empresa/actualizar', 'EmpresaController@update');
         //Rutas de configuracion de trabajo
         // Route::get('/configuracion/saldos-negativos', 'ConfiguracionTrabajoController@obtenerSaldosNegativos');
         Route::get('/configuracion/iva', 'ConfiguracionTrabajoController@obtenerIva');
