@@ -50,6 +50,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/proveedor/selectProveedor', 'ProveedorController@selectProveedor');
 
         Route::get('/ingreso', 'IngresoController@index');
+        Route::post('/ingreso/registrarIngreso', 'IngresoController@registrarIngreso');
         Route::post('/ingreso/registrar', 'IngresoController@store');
         Route::put('/ingreso/desactivar', 'IngresoController@desactivar');
         Route::get('/ingreso/obtenerCabecera', 'IngresoController@obtenerCabecera');
@@ -95,7 +96,7 @@ Route::group(['middleware' => ['auth']], function () {
         // Route::put('/empresa/desactivar', 'EmpresaController@desactivar');
         // Route::put('/empresa/activar', 'EmpresaController@activar');
         Route::get('/empresa/selectEmpresa', 'EmpresaController@selectEmpresa');
-
+        Route::post('/empresa/actualizar', 'EmpresaController@update');
         //Rutas de configuracion de trabajo
         // Route::get('/configuracion/saldos-negativos', 'ConfiguracionTrabajoController@obtenerSaldosNegativos');
         Route::get('/configuracion/iva', 'ConfiguracionTrabajoController@obtenerIva');
@@ -225,6 +226,7 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/ingreso', 'IngresoController@index');
         Route::post('/ingreso/registrar', 'IngresoController@store');
+        Route::post('/ingreso/registrarIngreso', 'IngresoController@registrarIngreso');
         Route::put('/ingreso/desactivar', 'IngresoController@desactivar');
         Route::get('/ingreso/obtenerCabecera', 'IngresoController@obtenerCabecera');
         Route::get('/ingreso/obtenerDetalles', 'IngresoController@obtenerDetalles');
@@ -366,6 +368,7 @@ Route::group(['middleware' => ['auth']], function () {
         //inventarios
         //Route::get('/inventarios', 'InventarioController@index');
         Route::post('/inventarios/registrar', 'InventarioController@store');
+        Route::post('/inventarios/registrarInventario', 'InventarioController@registrarInventario');
 
         Route::get('/inventarios/productosporvencer', 'InventarioController@productosPorVencer');
         Route::get('/inventarios/productosvencidos', 'InventarioController@productosVencidos');

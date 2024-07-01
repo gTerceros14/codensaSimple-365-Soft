@@ -968,43 +968,53 @@ public function imprimirResivoRollo($id) {
             $pdf->SetMargins(5, 10, 5);
             $pdf->AddPage();
 
+            if ($empresa->logo) {
+                $logoPath = storage_path('app/public/logos/' . $empresa->logo);
+                if (file_exists($logoPath)) {
+                    $logoWidth = 30; // Ancho del logo en mm
+                    $xPosition = (80 - $logoWidth) / 2; // Calcular posición X para centrar
+                    $pdf->Image($logoPath, $xPosition, 2, $logoWidth); // Ajusta las coordenadas y el tamaño según sea necesario
+                    $pdf->Ln(20); // Mueve la posición hacia abajo después de insertar la imagen
+                }
+            }
+
             // Establecer fuente monoespaciada
             $pdf->SetFont('Courier', 'B', 12);
 
             // Encabezado
-            $pdf->Cell(0, 10, strtoupper('RECIBO DE VENTA'), 0, 1, 'C');
+            $pdf->Cell(0, 10, utf8_decode(strtoupper('RECIBO DE VENTA')), 0, 1, 'C');
             $pdf->SetFont('Courier', '', 8);
-            $pdf->Cell(0, 5, strtoupper('No. ' . $id), 0, 1, 'C');
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('No. ' . $id)), 0, 1, 'C');
 
             // Información de la empresa
             $pdf->SetFont('Courier', 'B', 8);
-            $pdf->Cell(0, 5, strtoupper($empresa->nombre), 0, 1, 'C');
+            $pdf->Cell(0, 5, utf8_decode(strtoupper($empresa->nombre)), 0, 1, 'C');
             $pdf->SetFont('Courier', '', 8);
-            $pdf->Cell(0, 5, strtoupper($empresa->direccion), 0, 1, 'C');
-            $pdf->Cell(0, 5, strtoupper('TELÉFONO: ' . $empresa->telefono), 0, 1, 'C');
-            $pdf->Cell(0, 5, strtoupper('EMAIL: ' . $empresa->email), 0, 1, 'C');
-            $pdf->Cell(0, 5, strtoupper('NIT: ' . $empresa->nit), 0, 1, 'C');
-            $pdf->Cell(0, 5, strtoupper('LICENCIA: ' . $empresa->licencia), 0, 1, 'C');
+            $pdf->Cell(0, 5, utf8_decode(strtoupper($empresa->direccion)), 0, 1, 'C');
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('TELÉFONO: ' . $empresa->telefono)), 0, 1, 'C');
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('EMAIL: ' . $empresa->email)), 0, 1, 'C');
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('NIT: ' . $empresa->nit)), 0, 1, 'C');
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('LICENCIA: ' . $empresa->licencia)), 0, 1, 'C');
 
             $pdf->Ln(5);
 
             // Fecha y hora
-            $pdf->Cell(0, 5, strtoupper('FECHA: ' . date('d/m/Y', strtotime($venta->created_at))), 0, 1);
-            $pdf->Cell(0, 5, strtoupper('HORA: ' . date('H:i:s', strtotime($venta->created_at))), 0, 1);
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('FECHA: ' . date('d/m/Y', strtotime($venta->created_at)))), 0, 1);
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('HORA: ' . date('H:i:s', strtotime($venta->created_at)))), 0, 1);
 
             // Detalles del cliente
             $pdf->Ln(2);
-            $pdf->Cell(0, 5, strtoupper('CLIENTE: ' . $persona->nombre), 0, 1);
-            $pdf->Cell(0, 5, strtoupper('DOC: ' . $persona->num_documento), 0, 1);
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('CLIENTE: ' . $persona->nombre)), 0, 1);
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('DOC: ' . $persona->num_documento)), 0, 1);
 
             // Línea separadora
             $pdf->Cell(0, 2, '', 'T', 1);
 
             // Encabezados de la tabla
             $pdf->SetFont('Courier', 'B', 8);
-            $pdf->Cell(40, 5, strtoupper('PRODUCTO'), 0, 0);
-            $pdf->Cell(10, 5, strtoupper('CANT'), 0, 0, 'R');
-            $pdf->Cell(20, 5, strtoupper('PRECIO'), 0, 1, 'R');
+            $pdf->Cell(40, 5, utf8_decode(strtoupper('PRODUCTO')), 0, 0);
+            $pdf->Cell(10, 5, utf8_decode(strtoupper('CANT')), 0, 0, 'R');
+            $pdf->Cell(20, 5, utf8_decode(strtoupper('PRECIO')), 0, 1, 'R');
 
             $pdf->SetFont('Courier', '', 8);
 
@@ -1014,9 +1024,9 @@ public function imprimirResivoRollo($id) {
                 $precioVenta = $detalle->cantidad * $detalle->precio;
                 $total += $precioVenta;
 
-                $pdf->Cell(40, 5, strtoupper(substr($detalle->producto->nombre, 0, 20)), 0, 0);
-                $pdf->Cell(10, 5, $detalle->cantidad, 0, 0, 'R');
-                $pdf->Cell(20, 5, number_format($precioVenta, 2), 0, 1, 'R');
+                $pdf->Cell(40, 5, utf8_decode(strtoupper(substr($detalle->producto->nombre, 0, 20))), 0, 0);
+                $pdf->Cell(10, 5, utf8_decode($detalle->cantidad), 0, 0, 'R');
+                $pdf->Cell(20, 5, utf8_decode(number_format($precioVenta, 2)), 0, 1, 'R');
             }
 
             // Línea separadora
@@ -1024,25 +1034,24 @@ public function imprimirResivoRollo($id) {
 
             // Total
             $pdf->SetFont('Courier', 'B', 10);
-            $pdf->Cell(50, 6, strtoupper('TOTAL'), 0, 0);
-            $pdf->Cell(20, 6, number_format($total, 2), 0, 1, 'R');
+            $pdf->Cell(50, 6, utf8_decode(strtoupper('TOTAL')), 0, 0);
+            $pdf->Cell(20, 6, utf8_decode(number_format($total, 2)), 0, 1, 'R');
 
-            // Total en texto
-            $formatter = new NumberFormatter("es", NumberFormatter::SPELLOUT);
+             $formatter = new NumberFormatter("es", NumberFormatter::SPELLOUT);
             $totalTexto = strtoupper($formatter->format($total)) . ' BOLIVIANOS';
             $pdf->SetFont('Courier', 'B', 8);
             $pdf->Cell(0, 5, 'SON: ' . $totalTexto, 0, 1);
-
+            
             // Tipo de pago
             $tipoPago = $venta->tipoPago;
             $nombreTipoPago = $tipoPago ? $tipoPago->nombre_tipo_pago : 'N/A';
             $pdf->SetFont('Courier', '', 8);
-            $pdf->Cell(0, 5, strtoupper('TIPO DE PAGO: ' . $nombreTipoPago), 0, 1);
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('TIPO DE PAGO: ' . $nombreTipoPago)), 0, 1);
 
             // Mensaje de agradecimiento
             $pdf->Ln(5);
             $pdf->SetFont('Courier', 'I', 8);
-            $pdf->Cell(0, 5, strtoupper('¡GRACIAS POR SU COMPRA!'), 0, 1, 'C');
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('¡GRACIAS POR SU COMPRA!')), 0, 1, 'C');
 
             // Guardar el archivo PDF generado
             $nombreLimpio = preg_replace('/[^A-Za-z0-9\-]/', '_', $persona->nombre);
@@ -1063,113 +1072,133 @@ public function imprimirResivoRollo($id) {
 
 
 
-    public function imprimirResivoCarta($id)
-    {
-        try {
-            $venta = Venta::with('detalles.producto')->find($id);
-            if (!$venta) {
-                return response()->json(['error' => 'No se encontró la venta'], 500);
+public function imprimirResivoCarta($id) {
+    try {
+        $venta = Venta::with('detalles.producto')->find($id);
+        if (!$venta) {
+            return response()->json(['error' => 'NO SE ENCONTRÓ LA VENTA'], 500);
+        }
+
+        $persona = Persona::find($venta->idcliente);
+        if (!$persona) {
+            return response()->json(['error' => 'NO SE ENCONTRÓ EL CLIENTE'], 500);
+        }
+
+        $empresa = Empresa::first();
+        if (!$empresa) {
+            return response()->json(['error' => 'NO SE ENCONTRÓ LA EMPRESA'], 404);
+        }
+
+        if ($venta->detalles->isNotEmpty()) {
+            $pdf = new FPDF('P', 'mm', 'Letter');
+            $pdf->SetMargins(20, 10, 20);
+            $pdf->SetAutoPageBreak(true, 20);
+            $pdf->AddPage();
+
+            // Logos a los costados
+            $logoPathLeft = storage_path('app/public/logos/' . $empresa->logo);
+            $logoPathRight = storage_path('app/public/logos/' . $empresa->logo); // Puedes definir un logo diferente si lo necesitas
+            $logoWidth = 40; // Ancho del logo en mm
+
+        
+
+            // Logo derecho
+            if (file_exists($logoPathRight)) {
+                $pdf->Image($logoPathRight, 160, 10, $logoWidth); // Logo a la derecha
             }
 
-            $persona = Persona::find($venta->idcliente);
-            if (!$persona) {
-                return response()->json(['error' => 'No se encontró el cliente'], 500);
-            }
+            // Título RECIBO DE PAGO
+            $pdf->SetFont('Courier', 'B', 14);
+            $pdf->Cell(0, 10, 'RECIBO DE PAGO', 0, 1, 'C');
+            $pdf->SetFont('Courier', '', 10);
 
-            if ($venta->detalles->isNotEmpty()) {
-                $pdf = new FPDF('P', 'mm', 'Letter');
-                $pdf->SetMargins(20, 20, 20);
-                $pdf->SetAutoPageBreak(true, 20);
-                $pdf->AddPage();
+            // Información de la empresa
+            $pdf->SetFont('Courier', 'B', 8);
+            $pdf->Cell(0, 5, utf8_decode(strtoupper($empresa->nombre)), 0, 1, 'C');
+            $pdf->SetFont('Courier', '', 8);
+            $pdf->Cell(0, 5, utf8_decode(strtoupper($empresa->direccion)), 0, 1, 'C');
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('TELÉFONO: ' . $empresa->telefono)), 0, 1, 'C');
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('EMAIL: ' . $empresa->email)), 0, 1, 'C');
+            $pdf->Cell(0, 5, utf8_decode(strtoupper('NIT: ' . $empresa->nit)), 0, 1, 'C');
+            $pdf->Ln(5);
 
-                $pdf->SetFont('Helvetica', 'B', 14);
-                $pdf->Cell(0, 10, 'RECIBO DE PAGO', 0, 1, 'C');
-                $pdf->SetFont('Arial', '', 10);
+            $fecha = date('d/m/Y', strtotime($venta->created_at));
+            $hora = date('H:i:s', strtotime($venta->created_at));
+            $pdf->Cell(50, 6, utf8_decode('FECHA: ' . strtoupper($fecha)), 0, 0, 'L');
+            $pdf->Cell(50, 6, utf8_decode('HORA: ' . strtoupper($hora)), 0, 0, 'L');
+            $pdf->Cell(50, 6, utf8_decode('NUM RECIBO: ' . strtoupper($id)), 0, 1, 'L');
 
+            $clienteInfo = utf8_decode('CLIENTE: ' . strtoupper($persona->nombre) . '                 DOCUMENTO: ' . strtoupper($persona->num_documento));
+            $pdf->Cell(0, 6, $clienteInfo, 0, 1, 'L');
 
-                $fecha = date('d/m/Y', strtotime($venta->created_at));
-                $hora = date('H:i:s', strtotime($venta->created_at));
-                $pdf->Cell(50, 6, 'Fecha: ' . $fecha, 0, 0, 'L');
-                $pdf->Cell(50, 6, 'Hora: ' . $hora, 0, 0, 'L');
-                $pdf->Cell(50, 6, 'Num Recibo: ' . $id, 0, 1, 'L');
-
-                $clienteInfo = 'Cliente: ' . $persona->nombre . '                 Documento: ' . $persona->num_documento ;
-                $pdf->Cell(0, 6, $clienteInfo, 0, 1, 'L');
-
-
-                // Tabla de productos
-            $pdf->SetFont('Helvetica', 'B', 10);
+            // Tabla de productos
+            $pdf->SetFont('Courier', 'B', 10);
             $pdf->SetFillColor(230, 230, 230);
-            $pdf->Cell(90, 7, 'Producto', 1, 0, 'C', true);
-            $pdf->Cell(25, 7, 'Cantidad', 1, 0, 'C', true);
-            $pdf->Cell(35, 7, 'Precio Unit.', 1, 0, 'C', true);
-            $pdf->Cell(35, 7, 'Subtotal', 1, 1, 'C', true);
+            $pdf->Cell(90, 7, utf8_decode('PRODUCTO'), 1, 0, 'C', true);
+            $pdf->Cell(25, 7, utf8_decode('CANTIDAD'), 1, 0, 'C', true);
+            $pdf->Cell(35, 7, utf8_decode('PRECIO UNIT.'), 1, 0, 'C', true);
+            $pdf->Cell(35, 7, utf8_decode('SUBTOTAL'), 1, 1, 'C', true);
 
-            $pdf->SetFont('Helvetica', '', 9);
+            $pdf->SetFont('Courier', '', 9);
             $total = 0;
             foreach ($venta->detalles as $detalle) {
                 $subtotal = $detalle->cantidad * $detalle->precio;
                 $total += $subtotal;
-                $pdf->Cell(90, 6, $detalle->producto->nombre, 1, 0);
-                $pdf->Cell(25, 6, $detalle->cantidad, 1, 0, 'C');
-                $pdf->Cell(35, 6, number_format($detalle->precio, 2), 1, 0, 'R');
-                $pdf->Cell(35, 6, number_format($subtotal, 2), 1, 1, 'R');
+                $pdf->Cell(90, 6, utf8_decode(strtoupper($detalle->producto->nombre)), 1, 0);
+                $pdf->Cell(25, 6, utf8_decode(strtoupper($detalle->cantidad)), 1, 0, 'C');
+                $pdf->Cell(35, 6, utf8_decode(strtoupper(number_format($detalle->precio, 2))), 1, 0, 'R');
+                $pdf->Cell(35, 6, utf8_decode(strtoupper(number_format($subtotal, 2))), 1, 1, 'R');
             }
 
-            $pdf->SetFont('Arial', 'B', 10);
-            $pdf->Cell(150, 7, 'Total', 1, 0, 'R');
-            $pdf->Cell(35, 7, number_format($total, 2), 1, 1, 'R');
+            $pdf->SetFont('Courier', 'B', 10);
+            $pdf->Cell(150, 7, utf8_decode('TOTAL'), 1, 0, 'R');
+            $pdf->Cell(35, 7, utf8_decode(strtoupper(number_format($total, 2))), 1, 1, 'R');
 
+            $formatter = new NumberFormatter("es", NumberFormatter::SPELLOUT);
+            $totalTexto = strtoupper($formatter->format($total)) . ' BOLIVIANOS';
+            $pdf->SetFont('Courier', 'B', 8);
+            $pdf->Cell(0, 5, 'SON: ' . $totalTexto, 0, 1);
+            
             $pdf->Ln(5);
-                $pdf->SetFont('Arial', 'B', 8);
-                $pdf->Cell(0, 5, 'Forma de pago:', 0, 1);
-                $pdf->SetFont('Arial', '', 8);
-                $pdf->Cell(0, 5, $venta->tipoPago ? $venta->tipoPago->nombre_tipo_pago : 'N/A', 0, 1, '', true);
+            $pdf->SetFont('Courier', 'B', 8);
+            $pdf->Cell(0, 5, utf8_decode('FORMA DE PAGO:'), 0, 1);
+            $pdf->SetFont('Courier', '', 8);
+            $pdf->Cell(0, 5, utf8_decode(strtoupper($venta->tipoPago ? $venta->tipoPago->nombre_tipo_pago : 'N/A')), 0, 1, '', true);
 
-
-            //  $pdf->SetFont('Arial', 'B', 8);
-              //  $pdf->Cell(0, 5, 'Fecha de pago:', 0, 1);
-                //$pdf->SetFont('Arial', '', 8);
-                //$pdf->Cell(0, 5, date('d/m/Y', strtotime($venta->created_at)), 0, 1, '', true);
-
-
-                 $pdf->SetFont('Arial', '', 10);
-                $anchoFirma = $pdf->GetPageWidth() / 2 - 20;
-                $pdf->Cell($anchoFirma, 6, '_________________________', 0, 0, 'C');
-                $pdf->Cell($anchoFirma, 6, '_________________________', 0, 1, 'C');
-                $pdf->Cell($anchoFirma, 6, 'Firma del Cliente', 0, 0, 'C');
-                $pdf->Cell($anchoFirma, 6, 'Firma Autorizada', 0, 1, 'C');
-                $pdf->Ln(10);
+            // Firma
+            $pdf->SetFont('Courier', '', 10);
+            $anchoFirma = $pdf->GetPageWidth() / 2 - 20;
+            $pdf->Cell($anchoFirma, 6, '_________________________', 0, 0, 'C');
+            $pdf->Cell($anchoFirma, 6, '_________________________', 0, 1, 'C');
+            $pdf->Cell($anchoFirma, 6, 'FIRMA DEL CLIENTE', 0, 0, 'C');
+            $pdf->Cell($anchoFirma, 6, 'FIRMA AUTORIZADA', 0, 1, 'C');
+            $pdf->Ln(10);
 
             // Nota de agradecimiento
-            $pdf->SetFont('Arial', 'I', 10);
-            $pdf->Cell(0, 7, '¡Gracias por su compra!', 0, 1, 'C');
+            $pdf->SetFont('Courier', 'I', 10);
+            $pdf->Cell(0, 7, utf8_decode('¡GRACIAS POR SU COMPRA!'), 0, 1, 'C');
 
-                // Dibujar el margen 
-                $pdf->SetDrawColor(0, 0, 0);
-                $pdf->SetLineWidth(1);
-                $margenVertical = 10;
-                $margenHorizontal = 10;
-                $pdf->Rect($margenHorizontal, $margenVertical, $pdf->GetPageWidth() - ($margenHorizontal * 2), $pdf->GetY() + $margenVertical);
+            // Dibujar el margen
+            $pdf->SetDrawColor(0, 0, 0);
+            $pdf->SetLineWidth(1);
+            $margenVertical = 10;
+            $margenHorizontal = 10;
+            $pdf->Rect($margenHorizontal, $margenVertical, $pdf->GetPageWidth() - ($margenHorizontal * 2), $pdf->GetY() + $margenVertical);
 
+            $nombreLimpio = preg_replace('/[^A-Za-z0-9\-]/', '_', $persona->nombre);
+            $pdfPath = public_path('docs/recibo_carta_' . $nombreLimpio . '_' . $id . '.pdf');
+            $pdf->Output($pdfPath, 'F');
 
-                $nombreLimpio = preg_replace('/[^A-Za-z0-9\-]/', '_', $persona->nombre);
-                $pdfPath = public_path('docs/recibo_carta_' . $nombreLimpio . '_' . $id . '.pdf');
-                $pdf->Output($pdfPath, 'F');
-
-
-                return response()->download($pdfPath);
-            } else {
-
-                return response()->json(['error' => 'No hay detalles para esta venta'], 500);
-            }
-        } catch (\Exception $e) {
-
-            \Log::error('Error al imprimir el recibo en carta: ' . $e->getMessage());
-
-            return response()->json(['error' => 'Ocurrió un error al imprimir el recibo en carta'], 500);
+            return response()->download($pdfPath);
+        } else {
+            return response()->json(['error' => 'NO HAY DETALLES PARA ESTA VENTA'], 500);
         }
+    } catch (\Exception $e) {
+        \Log::error('Error al imprimir el recibo en carta: ' . $e->getMessage());
+        return response()->json(['error' => 'OCURRIÓ UN ERROR AL IMPRIMIR EL RECIBO EN CARTA'], 500);
     }
+}
+
 
     public function selectRoles(Request $request)
     {

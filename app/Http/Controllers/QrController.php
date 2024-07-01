@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use App\Qr;
+use Carbon\Carbon;
+
 
 
 class QrController extends Controller
@@ -71,7 +73,7 @@ class QrController extends Controller
             'detalleGlosa' => 'detalle',
             'monto' => $request->input('monto'),
             'moneda' => 'BOB',
-            'fechaVencimiento' => '04/06/2025',
+            'fechaVencimiento' => Carbon::now()->addWeek()->format('d/m/Y'), // Sumar 1 semana a la fecha actual
             'tipoSolicitud' => 'API',
             'unicoUso' => true
         ]);
