@@ -16,13 +16,16 @@
             <TabView ref="tabview" :activeIndex="activeIndex">
                 <TabPanel :disabled="activeIndex !== 0">
                     <template #header>
-                        <Button label="1" class="p-button-secondary p-button-rounded non-clickable" />
+                        <div class="imagen-tabla-vacia">
+                            <Button id="primerPaso" type="button" label="PASO 1" icon="pi pi-bookmark" class="p-button-secondary p-button-rounded non-clickable" />
+                            <label for="primerPaso">Selección de Productos</label>
+                        </div>
                     </template>
 
                     <div class="card formulario-card">
                     <Card>
                         <template #title>
-                            <div style="padding-left: 1rem;">
+                            <div style="padding-left: 1rem; padding-top: 0.5rem;">
                                 <h5>Complete el Formulario</h5>
                             </div>
                         </template>
@@ -41,14 +44,17 @@
                                             :suggestions="array_proveedores" 
                                             field="nombre" 
                                             @complete="selectProveedor($event)" 
-                                            placeholder="Buscar Proveedores..." 
+                                            placeholder="Buscar Proveedores..."
+                                            :class="{'p-invalid': submitted && v$.form.proveedorSeleccionado.$invalid}"
                                         >
                                         </AutoComplete>
                                     </div>
+                                    <small class="p-error" v-if="(submitted && v$.form.proveedorSeleccionado.required.$invalid)"><strong>Proveedor es obligatorio.</strong></small>
                                 </div>
                                 <div class="p-field p-col-12 p-md-3">
                                     <label for="tipoComprobante">Tipo Comprobante</label>
-                                    <Dropdown id="tipoComprobante" class="p-inputtext-sm" v-model="form.tipo_comprobante" :options="lista_comprobantes" optionLabel="nombre" placeholder="Lista comprobantes ..." />
+                                    <Dropdown id="tipoComprobante" class="p-inputtext-sm" v-model="form.tipo_comprobante" :options="lista_comprobantes" optionLabel="nombre" placeholder="Lista comprobantes ..." :class="{'p-invalid': submitted && v$.form.tipo_comprobante.$invalid}"/>
+                                    <small class="p-error" v-if="(submitted && v$.form.tipo_comprobante.required.$invalid)"><strong>Comprobante es obligatorio.</strong></small>
                                 </div>
                                 <div class="p-field p-col-12 p-md-3">
                                     <label for="serieComprobante">Serie Comprobante</label>
@@ -65,7 +71,7 @@
                     </div>
 
                     <div class="p-grid">
-                        <div class="p-col-6">
+                        <div class="p-col-12 p-md-6">
                             <div class="card">
                                 <DataTable
                                     ref="dt-articulos"
@@ -75,14 +81,15 @@
                                     :selection.sync="array_articulos_seleccionados"
                                     responsiveLayout="scroll"
                                     :paginator="true"
-                                    :rows="5"
+                                    :rows="4"
+                                    tableStyle="height:345px"
                                 >
                                     <template #header>
                                         <div class="tablas-articulos-header">
-                                            <h5>Selecciona articulos</h5>
+                                            <h5>Selecciona artículos</h5>
                                             <span class="p-input-icon-left">
                                                 <i class="pi pi-search" />
-                                                <InputText v-model="buscadorArticulos" class="p-inputtext-sm" placeholder="Buscador global" />
+                                                <InputText style="width: 11rem;" v-model="buscadorArticulos" class="p-inputtext-sm" placeholder="Buscador global" />
                                             </span>
                                         </div>
                                     </template>
@@ -94,13 +101,18 @@
                                     <Column field="precio_costo_paq" header="Precio Paquete" :sortable="true" ></Column>
 
                                     <template #empty>
-                                        Articulos no encontrados ...
+                                        <div class="imagen-tabla-vacia">
+                                            <img src="img/agregar-carrito.png" alt="Articulo sin foto" class="product-image" />
+                                        </div>
+                                        <div style="padding-top: 15px; display: flex; justify-content: center;">
+                                            <h5>Agregue artículos ...</h5>
+                                        </div>
                                     </template>
                                 </DataTable>
                             </div>
                         </div>
 
-                        <div class="p-col-6">
+                        <div class="p-col-12 p-md-6">
                             <div class="card">
                                 <DataTable
                                     ref="dt-seleccionados"
@@ -108,19 +120,33 @@
                                     dataKey="codigo"
                                     responsiveLayout="scroll"
                                     :paginator="true"
-                                    :rows="5"
+                                    :rows="4"
+                                    tableStyle="height:345px"
+                                    editMode="row"
+                                    :editingRows.sync="editingRows"
+                                    @row-edit-save="onRowEditSave"
                                 >
                                     <template #header>
                                         <div class="tablas-articulos-header">
-                                            <h5>Articulos seleccionados</h5>
-                                            <Button class="p-button-sm p-button-danger" label="Vaciar lista" icon="pi pi-trash" @click="vaciarListaSeleccionados"/>
+                                            <h5>Artículos seleccionados</h5>
+                                            <Button type="button" class="p-button-sm p-button-danger" label="Vaciar lista" icon="pi pi-trash" @click="vaciarListaSeleccionados"/>
                                         </div>
                                     </template>
 
                                     <Column field="codigo" header="Codigo" :sortable="true" ></Column>
                                     <Column field="nombre" header="Nombre" :sortable="true" ></Column>
-                                    <Column field="precio_costo_unid" header="Precio Unidad" :sortable="true" ></Column>
-                                    <Column field="precio_costo_paq" header="Precio Paquete" :sortable="true" ></Column>
+                                    <Column field="precio_costo_unid" header="Precio Unidad" :sortable="true" >
+                                        <template #editor="slotProps">
+                                            <InputNumber v-model="slotProps.data[slotProps.column.field]" mode="decimal" :maxFractionDigits="2" inputStyle="width:5rem;" class="p-inputtext-sm"/>
+                                        </template>
+                                    </Column>
+                                    <Column field="precio_costo_paq" header="Precio Paquete" :sortable="true" >
+                                        <template #editor="slotProps">
+                                            <InputNumber v-model="slotProps.data[slotProps.column.field]" mode="decimal" :maxFractionDigits="2" inputStyle="width: 5rem;" class="p-inputtext-sm"/>
+                                        </template>
+                                    </Column>
+                                    <Column :rowEditor="true" :styles="{width:'10%', 'min-width':'8rem'}" :bodyStyle="{'text-align':'center'}"></Column>
+
                                     <Column :headerStyle="{'min-width': '4rem', 'text-align': 'center'}" :bodyStyle="{'text-align': 'center', overflow: 'visible'}">
                                         <template #body="slotProps">
                                             <Button type="button" icon="pi pi-delete-left" class="p-button-danger p-button-sm" @click="eliminarArticuloSeleccionado(slotProps.data)"></Button>
@@ -128,59 +154,53 @@
                                     </Column>
 
                                     <template #empty>
-                                        Sin articulos seleccionados ...
+                                        <div class="imagen-tabla-vacia">
+                                            <img src="img/venta-express.png" alt="Articulo sin foto" class="product-image" />
+                                        </div>
+                                        <div style="padding-top: 15px; display: flex; justify-content: center;">
+                                            <h5>Sin artículos seleccionados ...</h5>
+                                        </div>
                                     </template>
                                 </DataTable>
                             </div>
                         </div>
                     </div>
+                </TabPanel>
 
-                    <!--<div class="total-saldo-card">
-                        <Card>
-                            <template #content>
-                                <div class="saldo-total"><strong>TOTAL Bs. 0</strong></div>
-                            </template>
-                        </Card>
-                    </div>-->
-
-                    <Button class="p-button-success p-button-sm" icon="pi pi-sync" label="Actualizar lista" @click="actualizarLista"></Button>
+                <TabPanel :disabled="activeIndex !== 1">
+                    <template #header>
+                        <div class="imagen-tabla-vacia">
+                            <Button id="segundoPaso" type="button" label="PASO 2" icon="pi pi-bookmark" class="p-button-secondary p-button-rounded non-clickable" />
+                            <label for="segundoPaso">Configuración y Pago</label>
+                        </div>
+                    </template>
 
                     <div class="card">
                         <DataTable
                             ref="dt-lista-completo"
                             :value="array_articulos_completo"
                             dataKey="id"
-                            :paginator="false"
+                            :paginator="true"
+                            :rows="3"
                             :expandedRows.sync="expandedRows"
                             @row-expand="onRowExpand"
                             @row-collapse="onRowCollapse"
                             responsiveLayout="scroll"
-                            editMode="row"
-                            :editingRows.sync="editingRows"
-                            @row-edit-save="onRowEditSave"
+                            tableStyle="height:400px"
                         >
-                            <Column :expander="true" :headerStyle="{'width': '3%'}" />
+                            <Column :expander="true" :headerStyle="{'width': '5%'}" />
                             <Column field="codigo" header="Codigo" :sortable="true" :styles="{width:'5%'}"></Column>
-                            <Column header="Image" :styles="{width:'7%'}">
+                            <Column header="Image" :styles="{width:'5%'}">
                                 <template #body>
                                     <img src="img/producto-imagen-default.jpg" alt="Articulo sin foto" class="product-image" />
                                 </template>
                             </Column>
-                            <Column field="nombre" header="Nombre" :sortable="true" :styles="{width:'15%'}"></Column>
-                            <Column field="nombre_proveedor" header="Proveedor" :styles="{width:'10%'}"></Column>
-                            <Column field="unidad_envase" header="Unidades por Paquete" :sortable="true" :styles="{width:'10%'}" :bodyStyle="{'text-align':'center'}"></Column>
-                            <Column field="precio_costo_paq" header="Costo Paquete" :sortable="true" :styles="{width:'20%'}" :bodyStyle="{'text-align':'center'}">
-                                <template #editor="slotProps">
-                                    <InputText v-model="slotProps.data[slotProps.column.field]" class="p-inputtext-sm"/>
-                                </template>
-                            </Column>
-                            <Column field="precio_costo_unid" header="Costo Unidad" :sortable="true" :styles="{width:'20%'}" :bodyStyle="{'text-align':'center'}">
-                                <template #editor="slotProps">
-                                    <InputText v-model="slotProps.data[slotProps.column.field]" class="p-inputtext-sm"/>
-                                </template>
-                            </Column>
+                            <Column field="nombre" header="Nombre" :sortable="true" :styles="{width:'25%'}"></Column>
+                            <Column field="nombre_proveedor" header="Proveedor" :sortable="true" :styles="{width:'15%'}"></Column>
+                            <Column field="unidad_envase" header="Unidades por Paquete" :sortable="true" :styles="{width:'10%'}" ></Column>
+                            <Column field="precio_costo_unid" header="Costo Unidad" :sortable="true" :styles="{width:'15%'}" ></Column>
+                            <Column field="precio_costo_paq" header="Costo Paquete" :sortable="true" :styles="{width:'15%'}" ></Column>
 
-                            <Column :rowEditor="true" :styles="{width:'10%', 'min-width':'8rem'}" :bodyStyle="{'text-align':'center'}"></Column>
                             <Column :headerStyle="{'width': '5%','min-width':'8rem'}" :bodyStyle="{'text-align': 'center', overflow: 'visible'}">
                                 <template #body="slotProps">
                                     <Button type="button" icon="pi pi-delete-left" class="p-button-danger p-button-sm" @click="eliminarArticuloListaCompleta(slotProps.data)"></Button>
@@ -188,7 +208,12 @@
                             </Column>
 
                             <template #empty>
-                                Datos del articulo no encontrados ...
+                                <div class="imagen-tabla-vacia">
+                                    <img src="img/carrito-de-compras-final.png" alt="Articulo sin foto" class="product-image" />
+                                </div>
+                                <div style="padding-top: 15px; display: flex; justify-content: center;">
+                                    <h5>Sin artículos seleccionados ...</h5>
+                                </div>
                             </template>
 
                             <template #expansion="slotProps">
@@ -197,14 +222,15 @@
                                     <DataTable :value="[slotProps.data]" responsiveLayout="scroll">
                                         <Column header="Fecha Vencimiento" :styles="{width:'15%'}">
                                             <template #body="slotProps">
-                                                <Calendar v-model="slotProps.data.vencimiento" :touchUI="true" dateFormat="dd.mm.yy" :minDate="minDate"/>
+                                                <Calendar v-model="slotProps.data.vencimiento" :touchUI="true" dateFormat="yy.mm.dd" :minDate="minDate"/>
                                             </template>
                                         </Column>
                                         <Column field="nombre_categoria" header="Categoria" :styles="{width:'15%'}"></Column>
                                         <Column :header="slotProps.data.esPaquetesCantidad ? ' Cantidad en: Paquetes' : 'Cantidad en: Unidades'" :styles="{width:'20%'}">
                                             <template #body="slotProps">
                                                 <div class="p-inputgroup">
-                                                    <Button 
+                                                    <Button
+                                                        type="button"
                                                         :label="slotProps.data.esPaquetesCantidad ? 'Paquetes' : 'Unidades'"
                                                         @click="toggleUnidadesPaquetesCantidad(slotProps.data)"
                                                         icon="pi pi-bell"
@@ -220,7 +246,7 @@
                                                         incrementButtonClass="p-button-sm"
                                                         incrementButtonIcon="pi pi-plus"
                                                         decrementButtonIcon="pi pi-minus"
-                                                        @update="updateSubtotal(slotProps.data)"
+                                                        @input="updateSubtotal(slotProps.data)"
                                                     />
                                                 </div>
                                             </template>
@@ -228,7 +254,8 @@
                                         <Column :header="slotProps.data.esPaquetesBonificacion ? 'Bonificacion en: Paquetes' : 'Bonificacion en: Unidades'" :styles="{width:'20%'}">
                                             <template #body="slotProps">
                                                 <div class="p-inputgroup">
-                                                    <Button 
+                                                    <Button
+                                                        type="button"
                                                         :label="slotProps.data.esPaquetesBonificacion ? 'Paquetes' : 'Unidades'"
                                                         @click="toggleUnidadesPaquetesBonificacion(slotProps.data)"
                                                         icon="pi pi-bell"
@@ -244,14 +271,14 @@
                                                         incrementButtonClass="p-button-sm"
                                                         incrementButtonIcon="pi pi-plus"
                                                         decrementButtonIcon="pi pi-minus"
-                                                        @update="updateSubtotal(slotProps.data)"
+                                                        @input="updateUnidadesTotales(slotProps.data)"
                                                     />
                                                 </div>
                                             </template>
                                         </Column>
                                         <Column field="descuento" header="Descuento" :styles="{width:'15%'}">
                                             <template #body="slotProps">
-                                                <InputNumber v-model="slotProps.data.descuento" prefix="% " mode="decimal" :maxFractionDigits="2" :max="100" :min="0" @update="updateSubtotal(slotProps.data)"/>
+                                                <InputNumber v-model="slotProps.data.descuento" prefix="% " mode="decimal" :maxFractionDigits="2" :max="100" :min="0" @input="updateSubtotal(slotProps.data)"/>
                                             </template>
                                         </Column>
                                         <Column header="Subtotal" :styles="{width:'15%'}">
@@ -267,24 +294,54 @@
                                 </div>
                             </template>
                         </DataTable>
-                        <Button class="p-button-sm p-button-help" icon="pi pi-sync" label="Actualizar" @click="mostrarListaCompleta"></Button>
                     </div>
-                </TabPanel>
 
-                <TabPanel :disabled="activeIndex !== 1">
-                    <template #header>
-                        <Button  label="2" class="p-button-secondary p-button-rounded non-clickable" />
-                    </template>
+                    <div class="total-saldo-card">
+                        <Card>
+                            <template #content>
+                                <div class="saldo-total"><strong>TOTAL Bs. {{ saldoTotalCompra }}</strong></div>
+                            </template>
+                        </Card>
+                    </div>
 
-                    <InputText placeholder="Email" v-model="form.email" />
+                    <div class="card">
+                        <div class="p-fluid p-formgrid p-grid">
+                            <div class="p-field p-col-12 p-md-3">
+                                <label for="nombreUsuario">Nombre Usuario</label>
+                                <div class="p-inputgroup">
+                                    <span class="p-inputgroup-addon">
+                                        <i class="pi pi-user"></i>
+                                    </span>    
+                                    <InputText id="nombreUsuario" placeholder="Nombre usuario actual ..." v-model="nombreUsuario" disabled class="p-inputtext-sm"/>
+                                </div>
+                            </div>
+
+                            <div class="p-field p-col-12 p-md-3">
+                                <label for="tipoCompra">Tipo de Compra</label>
+                                <Dropdown id="tipoCompra" v-model="tipoCompra" :options="lista_tipo_compra" optionLabel="nombre" placeholder="Tipo de compra ..." class="p-inputtext-sm" :class="{'p-invalid': submitted && v$.tipoCompra.$invalid}"/>
+                                <small class="p-error" v-if="(submitted && v$.tipoCompra.required.$invalid)"><strong>Tipo de Compra es obligatorio.</strong></small>
+                            </div>
+
+                            <div class="p-field p-col-12 p-md-3">
+                                <label for="arrayAlmacenes">Almacén</label>
+                                <Dropdown id="arrayAlmacenes" v-model="almacenSeleccionado" :options="array_almacenes" optionLabel="nombre_almacen" placeholder="Lista almacenes ..." class="p-inputtext-sm" :class="{'p-invalid': submitted && v$.almacenSeleccionado.$invalid}"/>
+                                <small class="p-error" v-if="(submitted && v$.almacenSeleccionado.required.$invalid)"><strong>Almacén de destino es obligatorio.</strong></small>
+                            </div>
+
+                            <div class="p-field p-col-12 p-md-3">
+                                <label for="botonComprar" style="padding-bottom: 17px;"></label>
+                                <Button id="botonComprar" icon="pi pi-check-square" label="Registrar Compra" class="p-button-success p-button-sm" @click="registrarCompra" :disabled="verificarCompraContado"/>
+                            </div>
+                        </div>
+                    </div>
                 </TabPanel>
 
             </TabView>
 
-            <!--<div class="flechas-buttons">
-                <Button class="p-button-sm p-button-secondary" label="Anterior" @click="prevStep" :disabled="activeIndex === 0" style="margin-right: 30px;"/>
-                <Button class="p-button-sm p-button-secondary" label="Siguiente" @click="nextStep" :disabled="activeIndex === steps.length - 1" />
-            </div>-->
+            <div class="flechas-buttons">
+                <Button class="p-button-sm p-button-secondary" icon="pi pi-chevron-left" label="Anterior" @click="prevStep" :disabled="activeIndex === 0" style="margin-right: 30px;"/>
+                <Button class="p-button-sm p-button-secondary" icon="pi pi-chevron-right" label="Siguiente" iconPos="right" @click="nextStep" :disabled="activeIndex === steps.length - 1" />
+            </div>
 
         </Panel>
     </main>
@@ -292,7 +349,7 @@
 
 <script>
 import useVuelidate from '@vuelidate/core';
-import { email, maxLength, minLength, numeric, required } from '@vuelidate/validators';
+import { required } from '@vuelidate/validators';
 
 import Button from 'primevue/button';
 import Panel from 'primevue/panel';
@@ -322,6 +379,7 @@ export default {
         return {
 
             activeIndex: 0,
+            submitted: false,
             form: {
                 proveedorSeleccionado: null, 
                 tipo_comprobante: '',
@@ -333,8 +391,8 @@ export default {
                 { label: 'Paso 2' },
             ],
             lista_comprobantes: [
-                {nombre: 'Recibo', id: '1'},
-                {nombre: 'Nota de Ingreso', id: '2'},
+                {nombre: 'Recibo', id: 1},
+                {nombre: 'Nota de Ingreso', id: 2},
             ],
 
             codigo: '',
@@ -352,16 +410,38 @@ export default {
 
             expandedRows: [],
             editingRows: [],
+
+            tipoCompra: null,
+            lista_tipo_compra: [
+                {nombre: 'Contado', id: 1},
+                {nombre: 'Couotas', id: 2},
+            ],
+            array_almacenes: [],
+            almacenSeleccionado: null,
+            total: null,
+            nombreUsuario: null,
+            usuario_actual_id: null,
+            saldoTotalCompra: 0,
         }
     },
 
     validations() {
         return {
             form: {
-                proveedor: {
+                proveedorSeleccionado: {
+                    required,
+                },
+                tipo_comprobante: {
                     required,
                 }
-            }
+            },
+
+            tipoCompra: {
+                required
+            },
+            almacenSeleccionado: {
+                required
+            },
         }
     },
 
@@ -387,38 +467,36 @@ export default {
         isMobile() {
             return window.innerWidth <= 576;
         },
+
+        verificarCompraContado() {
+            return this.tipoCompra ? this.tipoCompra.id == 2: false;
+        },
     },
 
     methods: {
-        mostrarListaCompleta() {
-            console.log('LISTA COMPLETO: ', this.array_articulos_completo);
-        },
 
-        /*updateSubtotal(articulo) {
-            const cantidad = articulo.unidades;
-            const bonificacion = articulo.bonificacion;
-            const precio = articulo.esPaquetesCantidad ? articulo.precio_costo_paq : articulo.precio_costo_unid;
-            articulo.subtotal = cantidad * precio;
-            const unidadesBonificacion = articulo.esPaquetesBonificacion ? bonificacion * articulo.unidad_envase : bonificacion;
-            articulo.unidadesTotales = (articulo.esPaquetesCantidad ? cantidad * articulo.unidad_envase : cantidad) + unidadesBonificacion;
-        },*/
+        calcularSaldoTotalCompra() {
+            this.saldoTotalCompra = (this.array_articulos_completo.reduce((total, articulo) => {
+                return total + (articulo.subtotal || 0);
+            }, 0)).toFixed(2);
+        },
 
         updateSubtotal(articulo) {
             const cantidad = articulo.unidades;
-            const bonificacion = articulo.bonificacion;
             const precio = articulo.esPaquetesCantidad ? articulo.precio_costo_paq : articulo.precio_costo_unid;
             const descuento = (articulo.descuento / 100);
             const precioDescontado = precio * (1 - descuento);
             articulo.subtotal = cantidad * precioDescontado;
+            this.updateUnidadesTotales(articulo);
+            this.$forceUpdate();
+        },
+
+        updateUnidadesTotales(articulo) {
+            const cantidad = articulo.unidades;
+            const bonificacion = articulo.bonificacion;
             const unidadesBonificacion = articulo.esPaquetesBonificacion ? bonificacion * articulo.unidad_envase : bonificacion;
             articulo.unidadesTotales = (articulo.esPaquetesCantidad ? cantidad * articulo.unidad_envase : cantidad) + unidadesBonificacion;
         },
-
-        /*calculateSubtotal(articulo) {
-            const cantidad = articulo.unidades;
-            const precio = articulo.esPaquetesCantidad ? articulo.precio_costo_paq : articulo.precio_costo_unid;
-            return cantidad * precio;
-        },*/
 
         calculateSubtotal(articulo) {
             const cantidad = articulo.unidades;
@@ -435,7 +513,64 @@ export default {
 
         toggleUnidadesPaquetesBonificacion(articulo) {
             articulo.esPaquetesBonificacion = !articulo.esPaquetesBonificacion;
-            this.updateSubtotal(articulo);
+            this.updateUnidadesTotales(articulo);
+        },
+
+        async registrarCompra() {
+
+            this.submitted = true;
+            const result = await this.validarPaginaActual();
+
+            if (this.array_articulos_completo.length == 0) {
+                this.$toast.add({severity:'warn', summary: 'Sin artículos', detail: 'Lista de articulos vacía', life: 3000});
+                return;
+            }
+
+            else if (!result) {
+                return;
+            }
+
+            try {
+                this.isLoading = true;
+
+                const compraResponse = await axios.post('/ingreso/registrarIngreso', {
+                    form: this.form,
+                    usuario_actual_id: this.usuario_actual_id,
+                    saldoTotalCompra: this.saldoTotalCompra,
+                    tipoCompra: this.tipoCompra,
+                    almacenSeleccionado: this.almacenSeleccionado,
+                    array_articulos_completo: this.array_articulos_completo
+                });
+
+                if (compraResponse.data.status === 'success') {
+                    const inventarios = this.prepararDatosInventario();
+                    const inventarioResponse = await axios.post('/inventarios/registrarInventario', {
+                        inventarios: inventarios
+                    });
+
+                    if (inventarioResponse.data.status === 'success') {
+                        this.$toast.add({severity:'success', summary: 'Éxito', detail: 'Compra registrada e inventario actualizado', life: 3000});
+                    }
+                }
+            } catch (error) {
+                let errorMessage = 'Error al registrar la compra y actualizar el inventario';
+                if (error.response && error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+                this.$toast.add({severity:'error', summary: 'Error', detail: errorMessage, life: 3000});
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+
+        prepararDatosInventario() {
+            return this.array_articulos_completo.map(articulo => ({
+                idalmacen: this.almacenSeleccionado.id,
+                idarticulo: articulo.id,
+                fecha_vencimiento: articulo.vencimiento || '2099-01-01',
+                cantidad: articulo.unidadesTotales
+            }));
         },
 
         actualizarLista() {
@@ -449,26 +584,23 @@ export default {
                 subtotal: 0,
                 esPaquetesCantidad: false,
                 esPaquetesBonificacion: false,
-            }));
-            console.log('ARRAY COMPLETO:', this.array_articulos_completo);
+            }))
         },
 
         onRowEditSave(event) {
-            console.log('EDITINGROWS antes: ', this.editingRows)
             let { newData, index } = event;
-
-            this.array_articulos_completo[index] = newData;
-            console.log('EDITINGROWS despues: ', this.editingRows)
+            this.$set(this.array_articulos_seleccionados, index, newData);
         },
 
         onRowExpand(event) {
-            console.log('EXPANDEDROWS: ',this.expandedRows)
-            this.$toast.add({severity: 'info', summary: 'Product Expanded', detail: event.data.name, life: 3000});
+            this.$nextTick(() => {
+                this.updateSubtotal(event.data);
+            });
+            this.$toast.add({severity: 'info', summary: 'Información adicional', detail: event.data.name, life: 3000});
         },
 
         onRowCollapse(event) {
-            console.log('EXPANDEDROWS: ',this.expandedRows)
-            this.$toast.add({severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000});
+            this.$toast.add({severity: 'success', summary: 'Información comprimida', detail: event.data.name, life: 3000});
         },
 
         vaciarListaSeleccionados() {
@@ -483,13 +615,39 @@ export default {
             this.array_articulos_seleccionados = this.array_articulos_seleccionados.filter(a => a.id !== articulo.id);
         },
 
-        nextStep() {
-            if (this.activeIndex < this.steps.length - 1) {
-                this.activeIndex++;
+        async validarPaginaActual() {
+
+            if (this.activeIndex === 0) {
+                this.v$.form.$touch();
+                return !this.v$.form.$invalid;
+            } else if (this.activeIndex === 1) {
+                this.v$.tipoCompra.$touch();
+                this.v$.almacenSeleccionado.$touch();
+                return !(this.v$.tipoCompra.$invalid || this.v$.almacenSeleccionado.$invalid);
             }
         },
 
+        async nextStep() {
+            this.submitted = true;
+            const result = await this.validarPaginaActual();
+
+            if (!result) {
+                return;
+            }
+
+            if (this.activeIndex < this.steps.length - 1) {
+                this.activeIndex++;
+
+                this.actualizarLista();
+            }
+            /*if (result) {
+                this.activeIndex += 1;
+                this.actualizarLista();
+            }*/
+        },
+
         prevStep() {
+            //this.activeIndex -= 1;
             if (this.activeIndex > 0) {
                 this.activeIndex--;
             }
@@ -500,11 +658,54 @@ export default {
             var url = '/articulo/listarArticulo?buscar=' + buscar + '&criterio=' + 'nombre' + '&idProveedor=' + this.idproveedor;
             axios.get(url).then(function (response) {
                     var respuesta = response.data;
-                    me.array_articulos_proveedor = respuesta.articulos.data;
+                    //me.array_articulos_proveedor = respuesta.articulos.data;
+                    me.array_articulos_proveedor = respuesta.articulos.data.map(articulo => ({
+                        ...articulo,
+                        precio_costo_unid: Number(articulo.precio_costo_unid),
+                        precio_costo_paq: Number(articulo.precio_costo_paq),
+                    }));
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
+        },
+
+        listarDatosUsuario() {
+            axios.get('/user-info')
+                .then(response => {
+                    const userData = response.data.user;
+                    this.usuario_actual_id = userData.iduse;
+                    this.extraerDatosUsuario(this.usuario_actual_id);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        },
+
+        extraerDatosUsuario(id_persona) {
+            let me = this;
+            var url = '/user/editarpersona?id=' + id_persona;
+
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+
+                me.nombreUsuario = respuesta.persona.nombre;
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        selectAlmacen() {
+            let me = this;
+            var url = '/almacen/selectAlmacen';
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.array_almacenes = respuesta.almacenes;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
         },
 
         selectProveedor(event) {
@@ -554,7 +755,14 @@ export default {
             if (newVal) {
                 this.listarArticulo(this.buscadorArticulos, 'nombre');
             }
-        }
+        },
+
+        array_articulos_completo: {
+            handler() {
+                this.calcularSaldoTotalCompra();
+            },
+            deep: true
+        },
     },
 
     created() {
@@ -562,7 +770,8 @@ export default {
     },
 
     mounted() {
-        //this.buscarArticulo();
+        this.selectAlmacen();
+        this.listarDatosUsuario();
     },
 
     beforeDestroy() {
@@ -602,8 +811,8 @@ export default {
     color: #5b5656 !important;
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
-    padding-left: 23.3vw;
-    padding-right: 23.3vw;
+    padding-left: 18vw;
+    padding-right: 18vw;
 }
 
 .non-clickable {
@@ -611,7 +820,7 @@ export default {
 }
 
 >>> .p-tabview-panels {
-    padding: 1.5rem 0;
+    padding: 1.5rem 0 0 0;
 }
 
 /* Card */
@@ -622,9 +831,7 @@ export default {
 .total-saldo-card >>> .p-card {
     box-shadow: none !important;
     background: #bcffbf;
-    margin-top: 1.5rem;
-    margin-left: 5.5rem;
-    margin-right: 5.5rem;
+    margin-bottom: 1.5rem;
 }
 
 >>> .p-card-content {
@@ -632,7 +839,7 @@ export default {
 }
 
 >>> .p-card-body {
-    padding: 0.5rem 0 0 0;
+    padding: 0 0 0 0;
 }
 
 >>> .p-card-footer {
@@ -693,4 +900,18 @@ export default {
         padding: 0.5rem 0.5rem 0.5rem 3.2em;
     }
 }
+
+/* Tabla vacia */
+.imagen-tabla-vacia {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.imagen-tabla-vacia img {
+    box-shadow: none;
+    width: 125px;
+}
+
 </style>

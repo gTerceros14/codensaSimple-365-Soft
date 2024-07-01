@@ -73,6 +73,67 @@ class InventarioController extends Controller
     //         'inventarios' => $inventarios
     //     ];
     // }
+
+public function registrarInventario(Request $request)
+{
+    if (!$request->has('inventarios')) {
+        return response()->json(['error' => 'No se enviaron inventarios'], 400);
+    }
+
+    DB::beginTransaction();
+    try {
+        $inventarios = $request->input('inventarios');
+        
+        foreach ($inventarios as $inventario) {
+            $articulo = Articulo::find($inventario['idarticulo']);
+            
+            if (!$articulo) {
+                Log::warning("Artículo no encontrado: " . $inventario['idarticulo']);
+                continue;
+            }
+
+            $fechaVencimiento = isset($inventario['fecha_vencimiento']) 
+                ? date('Y-m-d', strtotime($inventario['fecha_vencimiento'])) 
+                : '2099-01-01';
+
+            $cantidad = $inventario['cantidad'] ?? 0;
+
+            $inventarioExistente = Inventario::where('idarticulo', $inventario['idarticulo'])
+                ->where('idalmacen', $inventario['idalmacen'])
+                ->whereDate('fecha_vencimiento', $fechaVencimiento)
+                ->first();
+
+            if ($inventarioExistente) {
+                $inventarioExistente->saldo_stock += $cantidad;
+                $inventarioExistente->cantidad += $cantidad;
+                $inventarioExistente->save();
+            } else {
+                Inventario::create([
+                    'idalmacen' => $inventario['idalmacen'],
+                    'idarticulo' => $inventario['idarticulo'],
+                    'fecha_vencimiento' => $fechaVencimiento,
+                    'saldo_stock' => $cantidad,
+                    'cantidad' => $cantidad
+                ]);
+            }
+        }
+
+        DB::commit();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Inventarios guardados exitosamente'
+        ], 200);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Error al guardar inventarios'
+        ], 500);
+    }
+}
+
+    
     public function store(Request $request)
     {
         Log::info("al menos llegaa xddd");

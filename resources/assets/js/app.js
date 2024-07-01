@@ -12,9 +12,9 @@ import Toasted from "vue-toasted";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 
 
-import 'bootstrap-icons/font/bootstrap-icons.css'
+/*import 'bootstrap-icons/font/bootstrap-icons.css'
 import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";*/
 
 import 'primeflex/primeflex.css';
 import 'primevue/resources/themes/lara-light-blue/theme.css';
