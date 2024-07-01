@@ -1091,7 +1091,7 @@ public function imprimirResivoCarta($id) {
 
         if ($venta->detalles->isNotEmpty()) {
             $pdf = new FPDF('P', 'mm', 'Letter');
-            $pdf->SetMargins(20, 20, 20);
+            $pdf->SetMargins(20, 10, 20);
             $pdf->SetAutoPageBreak(true, 20);
             $pdf->AddPage();
 
