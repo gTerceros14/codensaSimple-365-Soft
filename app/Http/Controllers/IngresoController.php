@@ -123,8 +123,72 @@ class IngresoController extends Controller
         return ['detalles' => $detalles];
     }
 
-public function store(Request $request)
+public function registrarIngreso(Request $request)
 {
+    if (!$request->ajax()) return redirect('/');
+
+    try {
+        DB::beginTransaction();
+
+        $ultimaCaja = Caja::latest()->first();
+
+        if (!$ultimaCaja || $ultimaCaja->estado != '1') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Debe tener una caja abierta',
+            ], 400);
+        }
+
+        $ingreso = new Ingreso;
+        $ingreso->idproveedor = $request->form['proveedorSeleccionado']['id'] ?? null;
+        $ingreso->idusuario = $request->usuario_actual_id ?? auth()->id();
+        $ingreso->tipo_comprobante = $request->form['tipo_comprobante']['nombre'] ?? 'No especificado';
+        $ingreso->serie_comprobante = $request->form['serie_comprobante'] ?? 'No especificado';
+        $ingreso->num_comprobante = $request->form['num_comprobante'] ?? 'No especificado';
+        $ingreso->fecha_hora = now();
+        $ingreso->impuesto = 0;
+        $ingreso->total = $request->saldoTotalCompra ?? 0;
+        $ingreso->tipoCompra = $request->tipoCompra['id'] ?? null;
+        $ingreso->dias_cuotas = 0;
+        $ingreso->estado = true;
+        $ingreso->idalmacen = $request->almacenSeleccionado['id'] ?? null;
+        $ingreso->idcaja = $ultimaCaja->id;
+        $ingreso->descuento_global = 0;
+        $ingreso->save();
+
+        $ultimaCaja->comprasContado += $request->saldoTotalCompra ?? 0;
+        $ultimaCaja->save();
+
+        $detalles = $request->array_articulos_completo ?? [];
+        foreach ($detalles as $articulo) {
+            $detalle = new DetalleIngreso;
+            $detalle->idingreso = $ingreso->id;
+            $detalle->idarticulo = $articulo['id'] ?? null;
+            $detalle->cantidad = $articulo['unidadesTotales'] ?? 0;
+            $detalle->descuento = $articulo['descuento'] ?? 0;
+            $detalle->precio = $articulo['subtotal'] ?? 0;
+            $detalle->save();
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Compra registrada con exito',
+            'ingreso' => $ingreso
+        ], 200);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Error al registrar la compra: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+    public function store(Request $request)
+    {
     if (!$request->ajax()) return redirect('/');
 
     try {
@@ -142,7 +206,8 @@ public function store(Request $request)
             $ingreso->fecha_hora = now()->setTimezone('America/La_Paz');
             $ingreso->impuesto = $request->impuesto;
             $ingreso->total = $request->total;
-            $ingreso->estado = 'Registrado';
+            //$ingreso->estado = 'Registrado';
+            $ingreso->estado = 1;
             $ingreso->idcaja = $ultimaCaja->id;
             //$ingreso->descuento_global = $request->descuento_global;
             $ingreso->descuento_global = 0;
@@ -207,7 +272,7 @@ public function store(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
         $ingreso = Ingreso::findOrFail($request->id);
-        $ingreso->estado = 'Anulado';
+        $ingreso->estado = 0;
         $ingreso->save();
     }
 }

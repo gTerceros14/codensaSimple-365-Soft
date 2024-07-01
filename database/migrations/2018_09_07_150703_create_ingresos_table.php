@@ -25,7 +25,11 @@ class CreateIngresosTable extends Migration
             $table->dateTime('fecha_hora');
             $table->decimal('impuesto', 4, 2);
             $table->decimal('total', 11, 2);
-            $table->string('estado', 20);
+            $table->boolean('tipoCompra')->nullable();
+            $table->integer('dias_cuotas')->nullable();
+            $table->boolean('estado');
+            $table->integer('idalmacen')->unsigned()->nullable();
+            $table->foreign('idalmacen')->references('id')->on('almacens');
             $table->integer('idcaja')->unsigned();
             $table->foreign('idcaja')->references('id')->on('cajas');
             $table->decimal('descuento_global')->nullable();
