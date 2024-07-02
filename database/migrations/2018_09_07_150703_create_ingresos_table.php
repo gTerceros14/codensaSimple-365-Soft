@@ -20,8 +20,8 @@ class CreateIngresosTable extends Migration
             $table->integer('idusuario')->unsigned();
             $table->foreign('idusuario')->references('id')->on('users');
             $table->string('tipo_comprobante', 20);
-            $table->string('serie_comprobante', 7)->nullable();
-            $table->string('num_comprobante', 10)->nullable();
+            $table->string('serie_comprobante')->nullable();
+            $table->string('num_comprobante')->nullable();
             $table->dateTime('fecha_hora');
             $table->decimal('impuesto', 4, 2);
             $table->decimal('total', 11, 2);

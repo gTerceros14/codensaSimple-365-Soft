@@ -106,9 +106,9 @@
 <template v-if="menu==26">
     <grupos></grupos>
 </template>
-<template v-if="menu==27">
+<!--<template v-if="menu==27">
     <medidas></medidas>
-</template>
+</template>-->
 <template v-if="menu==28">
     <monitoreoproductos></monitoreoproductos>
 </template>
@@ -241,8 +241,11 @@
 <template v-if="menu==70">
     <nuevacompra></nuevacompra>
 </template>
+<template v-if="menu==27">
+    <medidasnewview></medidasnewview>
+</template>
 <template v-if="menu==71">
-    <nuevavista1></nuevavista1>
+    <industrianewview></industrianewview>
 </template>
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">

@@ -20,23 +20,12 @@ class IndustriaController extends Controller
         $criterio = $request->criterio;
 
         if ($buscar == '') {
-            $industrias = Industria::orderBy('id', 'desc')->paginate(6);
+            $industrias = Industria::orderBy('id', 'desc');
         } else {
-            $industrias = Industria::where($criterio, 'like', '%' . $buscar . '%')->orderBy('id', 'desc')->paginate(10);
+            $industrias = Industria::where($criterio, 'like', '%' . $buscar . '%')->orderBy('id', 'desc');
         }
-
-
-        return [
-            'pagination' => [
-                'total' => $industrias->total(),
-                'current_page' => $industrias->currentPage(),
-                'per_page' => $industrias->perPage(),
-                'last_page' => $industrias->lastPage(),
-                'from' => $industrias->firstItem(),
-                'to' => $industrias->lastItem(),
-            ],
-            'industrias' => $industrias
-        ];
+        $industrias=$industrias->get();
+        return [ 'industrias' => $industrias ];
     }
     //refistrar industrias
     public function store(Request $request)

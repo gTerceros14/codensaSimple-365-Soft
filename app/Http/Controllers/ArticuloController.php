@@ -647,6 +647,35 @@ class ArticuloController extends Controller
             return response()->json(['error' => 'Error en la importación', 'mensaje' => $e->getMessage()], 500);
         }
     }
+
+    public function editarCostoUnidadPaquete(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        try {
+            DB::beginTransaction();
+
+            $articulo = Articulo::findOrFail($request->newData['id']);
+            $articulo->precio_costo_unid = $request->newData['precio_costo_unid'];
+            $articulo->precio_costo_paq = $request->newData['precio_costo_paq'];
+            $articulo->save();
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Articulo actualizado correctamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al actualizar articulo: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function editarPrecioCompraVenta(Request $request){
         $articulo = Articulo::findOrFail($request->id);
         $articulo->precio_costo_unid = $request->precio_costo_unidad;
