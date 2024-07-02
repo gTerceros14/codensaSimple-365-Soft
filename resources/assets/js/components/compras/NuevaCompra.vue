@@ -85,6 +85,7 @@
                                         :rows="4"
                                         tableStyle="height:325px"
                                         class="p-datatable-sm"
+                                        :metaKeySelection="false"
                                     >
                                         <template #header>
                                             <div class="tablas-articulos-header">
@@ -235,10 +236,10 @@
                                                     :touchUI="true"
                                                     dateFormat="yy.mm.dd"
                                                     :minDate="minDate"
-                                                    :class="{'p-invalid': (slotProps.data.vencimiento == 0) || (slotProps.data.vencimiento == null)}"
+                                                    :class="{'p-invalid': verificarFechaVencimiento(slotProps.data)}"
                                                     :disabled="slotProps.data.vencimiento == 1"
                                                 />
-                                                <small class="p-error" v-if="(slotProps.data.vencimiento == 0) || (slotProps.data.vencimiento == null)">Fecha requerida</small>
+                                                <small class="p-error" v-if="verificarFechaVencimiento(slotProps.data)">Fecha requerida</small>
                                             </template>
                                         </Column>
                                         <Column field="nombre_categoria" header="Categoria" :styles="{width:'15%'}"></Column>
@@ -523,6 +524,11 @@ export default {
                 return total + (articulo.subtotal || 0);
             }, 0)).toFixed(2);
         },*/
+
+        verificarFechaVencimiento(data) {
+            console.log('verificando fecha', ((data.vencimiento == 0) || (data.vencimiento == null)) && !(data.fecha_vencimiento))
+            return ((data.vencimiento == 0) || (data.vencimiento == null)) && !(data.fecha_vencimiento);
+        },
 
         calcularSaldoTotalCompra() {
             const totalSinDescuento = this.array_articulos_completo.reduce((total, articulo) => {
