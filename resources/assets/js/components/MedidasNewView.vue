@@ -11,7 +11,7 @@
             <div class="searchbar">
                 <span class="p-input-icon-left">
                 <i class="pi pi-search" />
-                <InputText type="text" v-model="searchTerm" placeholder="Buscar por descripcion" class="p-inputtext-sm" />
+                <InputText type="text" v-model="searchTerm" placeholder="Buscar por descripcion" class="p-inputtext-sm custom-input" />
                 </span>
             </div>
           <!--<div class="toolbar">
@@ -21,11 +21,11 @@
           </div>
           -->
         </div>
-        <DataTable class="p-datatable-sm" :value="filteredProducts" paginator :rows="9">
+        <DataTable class="p-datatable-sm p-datatable-gridlines"   responsiveLayout="scroll" :value="filteredProducts" paginator :rows="9">
           <Column header="Opciones">
             <template #body="slotProps">
-              <Button icon="pi pi-pencil" class="p-button-sm p-button-warning custom-icon-size" @click="abrirModal('medida', 'actualizar', slotProps.data)" />
-              <Button v-if="slotProps.data.estado" icon="pi pi-trash" class="p-button-sm p-button-danger custom-icon-size" @click="desactivarMedida(slotProps.data.id)" />
+              <Button icon="pi pi-pencil" class="p-button-sm p-button-warning custom-icon-size"  @click="abrirModal('medida', 'actualizar', slotProps.data)" />
+              <Button v-if="slotProps.data.estado" icon="pi pi-ban" class="p-button-sm p-button-danger custom-icon-size" @click="desactivarMedida(slotProps.data.id)" />
               <Button v-else icon="pi pi-check-circle" class="p-button-sm p-button-success custom-icon-size" @click="activarMedida(slotProps.data.id)" />
 
             </template>
@@ -72,7 +72,6 @@
   import Dialog from 'primevue/dialog';
   import InputText from 'primevue/inputtext';
   import ConfirmDialog from 'primevue/confirmdialog';
-import { array } from 'yup';
     
   export default {
     name: 'DataTableCrud',
@@ -358,7 +357,7 @@ import { array } from 'yup';
 .custom-button-sm .pi {
   font-size: 1rem; /* Ajusta el tamaño del icono */
 }
->>> .p-inputtext {
+.custom-input {
   width: 300%;
  }
   @media (max-width: 768px) {
@@ -375,7 +374,7 @@ import { array } from 'yup';
         margin-bottom: 10px;
         order: 1; /* Esto asegura que la barra de búsqueda esté abajo en vista móvil */
     }
-    >>> .p-inputtext {
+    .custom-input {
       width: 150%;
     }
   }
