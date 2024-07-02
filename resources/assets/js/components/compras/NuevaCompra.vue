@@ -193,7 +193,6 @@
                             @row-collapse="onRowCollapse"
                             responsiveLayout="scroll"
                             tableStyle="height:400px"
-                            class="p-datatable-sm"
                         >
                             <Column :expander="true" :headerStyle="{'width': '5%'}" />
                             <Column field="codigo" header="Codigo" :sortable="true" :styles="{width:'5%'}"></Column>
@@ -230,7 +229,16 @@
                                     <DataTable :value="[slotProps.data]" responsiveLayout="scroll">
                                         <Column header="Fecha Vencimiento" :styles="{width:'15%'}">
                                             <template #body="slotProps">
-                                                <Calendar class="p-inputtext-sm" v-model="slotProps.data.vencimiento" :touchUI="true" dateFormat="yy.mm.dd" :minDate="minDate"/>
+                                                <Calendar
+                                                    class="p-inputtext-sm"
+                                                    v-model="slotProps.data.fecha_vencimiento"
+                                                    :touchUI="true"
+                                                    dateFormat="yy.mm.dd"
+                                                    :minDate="minDate"
+                                                    :class="{'p-invalid': (slotProps.data.vencimiento == 0) || (slotProps.data.vencimiento == null)}"
+                                                    :disabled="slotProps.data.vencimiento == 1"
+                                                />
+                                                <small class="p-error" v-if="(slotProps.data.vencimiento == 0) || (slotProps.data.vencimiento == null)">Fecha requerida</small>
                                             </template>
                                         </Column>
                                         <Column field="nombre_categoria" header="Categoria" :styles="{width:'15%'}"></Column>
@@ -256,8 +264,10 @@
                                                         incrementButtonIcon="pi pi-plus"
                                                         decrementButtonIcon="pi pi-minus"
                                                         @input="updateSubtotal(slotProps.data)"
+                                                        :class="{'p-invalid': slotProps.data.unidades <= 0}"
                                                     />
                                                 </div>
+                                                <small class="p-error" v-if="slotProps.data.unidades <= 0">Cantidad inválida</small>
                                             </template>
                                         </Column>
                                         <Column :header="slotProps.data.esPaquetesBonificacion ? 'Bonificacion en: Paquetes' : 'Bonificacion en: Unidades'" :styles="{width:'25%'}">
@@ -446,7 +456,7 @@ export default {
             ],
             array_almacenes: [],
             almacenSeleccionado: null,
-            total: null,
+            //total: null,
             nombreUsuario: null,
             usuario_actual_id: null,
             saldoTotalCompra: 0,
@@ -508,14 +518,27 @@ export default {
 
     methods: {
 
-        calcularSaldoTotalCompra() {
+        /*calcularSaldoTotalCompra() {
             this.saldoTotalCompra = (this.array_articulos_completo.reduce((total, articulo) => {
                 return total + (articulo.subtotal || 0);
             }, 0)).toFixed(2);
+        },*/
+
+        calcularSaldoTotalCompra() {
+            const totalSinDescuento = this.array_articulos_completo.reduce((total, articulo) => {
+                return total + (articulo.subtotal || 0);
+            }, 0);
+            const descuento = (totalSinDescuento * this.descuentoGlobal) / 100;
+            this.saldoTotalCompra = (totalSinDescuento - descuento).toFixed(2);
         },
 
         updateSubtotal(articulo) {
             const cantidad = articulo.unidades;
+            if (cantidad <= 0) {
+                articulo.subtotal = 0;
+                return;
+            }
+
             const precio = articulo.esPaquetesCantidad ? articulo.precio_costo_paq : articulo.precio_costo_unid;
             const descuento = (articulo.descuento / 100);
             const precioDescontado = precio * (1 - descuento);
@@ -559,7 +582,21 @@ export default {
                 return;
             }
 
-            else if (!result) {
+            if (!result) {
+                return;
+            }
+
+            const articulos_invalidos = this.array_articulos_completo.filter(
+                articulo => !articulo.vencimiento || articulo.unidades <= 0
+            );
+
+            if (articulos_invalidos.length > 0) {
+                this.$toast.add({
+                severity:'error',
+                summary: 'Error de validación',
+                detail: 'Hay artículos sin fecha de vencimiento o con cantidad inválida',
+                life: 3000
+                });
                 return;
             }
 
@@ -601,7 +638,7 @@ export default {
             return this.array_articulos_completo.map(articulo => ({
                 idalmacen: this.almacenSeleccionado.id,
                 idarticulo: articulo.id,
-                fecha_vencimiento: articulo.vencimiento || '2099-01-01',
+                //fecha_vencimiento: articulo.vencimiento || '2099-01-01',
                 cantidad: articulo.unidadesTotales
             }));
         },
@@ -609,6 +646,7 @@ export default {
         actualizarLista() {
             this.array_articulos_completo = this.array_articulos_seleccionados.map(articulo => ({
                 ...articulo,
+                fecha_vencimiento: null,
                 unidadesTotales: 0,
                 vencimiento: null,
                 unidades: 0,
@@ -840,6 +878,12 @@ export default {
                 this.calcularSaldoTotalCompra();
             },
             deep: true
+        },
+
+        descuentoGlobal: {
+            handler() {
+                this.calcularSaldoTotalCompra();
+            }
         },
     },
 
