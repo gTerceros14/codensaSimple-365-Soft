@@ -18,6 +18,40 @@ use Exception;
 
 class IngresoController extends Controller
 {
+    public function generarNotaIngreso($idIngreso){
+    $ingreso = Ingreso::join('personas', 'ingresos.idproveedor', '=', 'personas.id')
+        ->join('users', 'ingresos.idusuario', '=', 'users.id')
+        ->select(
+            'ingresos.id',
+            'ingresos.tipo_comprobante',
+            'ingresos.serie_comprobante',
+            'ingresos.num_comprobante',
+            'ingresos.created_at',
+            'ingresos.impuesto',
+            'ingresos.total',
+            'ingresos.estado',
+            'personas.nombre',
+            'personas.tipo_documento',
+            'personas.num_documento',
+            'personas.direccion',
+            'personas.email',
+            'personas.telefono',
+            'users.usuario'
+        )
+        ->where('ingresos.id', '=', $idIngreso)
+        ->orderBy('ingresos.id', 'desc')
+        ->first();
+
+    $detalles = DetalleIngreso::join('articulos', 'detalle_ingresos.idarticulo', '=', 'articulos.id')
+        ->select('detalle_ingresos.cantidad', 'detalle_ingresos.precio', 'articulos.nombre as articulo')
+        ->where('detalle_ingresos.idingreso', '=', $idIngreso)
+        ->orderBy('detalle_ingresos.id', 'desc')
+        ->get();
+
+    $pdf = PDF::loadView('pdf.nota_ingreso', ['ingreso' => $ingreso, 'detalles' => $detalles]);
+
+    return $pdf->download('nota_ingreso.pdf');
+}
     public function generarPdfBoleta($idIngreso)
     {
         $ingreso = Ingreso::join('personas', 'ingresos.idproveedor', '=', 'personas.id')

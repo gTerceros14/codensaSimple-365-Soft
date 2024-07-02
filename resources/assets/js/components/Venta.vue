@@ -4,22 +4,19 @@
 
 
         <div class="card">
+            <div>
+                <i class="fa fa-align-justify"></i> Ventas
+            </div>
             <template>
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <div>
-                        <i class="fa fa-align-justify"></i> Ventas
+                <div class="p-d-flex p-jc-between p-ai-center card-header">
+                    <div class="p-field">
+                        <input type="search" v-model="buscar" @keyup="buscarVenta" class="p-inputtext"
+                            placeholder="Texto a buscar">
                     </div>
-                    <div class="form-group row">
-                        <div class="col-md-40">
-                            <div class="input-group">
-                                <input type="search" v-model="buscar" @keyup="buscarVenta" class="form-control"
-                                    placeholder="Texto a buscar">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid">
+                    <div class="p-field">
                         <Button type="button" @click="abrirTipoVenta" label="Nuevo" icon="pi pi-plus"
                             class="p-button-sm p-button-primary" />
+                        <!-- Aumentamos el tamaño del botón con p-button-lg -->
                     </div>
                 </div>
             </template>
@@ -45,33 +42,20 @@
                         <tbody>
                             <tr v-for="venta in arrayVenta" :key="venta.id">
                                 <template>
-                                    <td class="d-flex align-items-center">
-                                        <Button type="button" icon="pi pi-eye"
-                                            class="p-button-success p-button-sm p-mr-1" @click="verVenta(venta.id)" />
-                                        <!--
-                                             <Button
-                                               type="button"
-                                               icon="pi pi-file"
-                                               class="p-button-info p-button-sm p-mr-1"
-                                               @click="pdfVenta(venta.id)"
-                                             />
-                                             -->
-                                        <template v-if="venta.estado == 'Registrado' && idrol !== 2">
-                                            <Button type="button" icon="pi pi-trash" class="p-button-danger p-button-sm"
-                                                @click="desactivarVenta(venta.id)" />
+                                    <td class="p-d-flex p-ai-center">
+                                        <Button type="button" icon="pi pi-eye" @click="verVenta(venta.id)"
+                                            class="p-button-sm p-mr-1" />
+
+                                        <template v-if="venta.estado === 'Registrado' && idrol !== 2">
+                                            <Button type="button" icon="pi pi-trash" @click="desactivarVenta(venta.id)"
+                                                class="p-button-sm p-button-danger p-mr-1" />
                                         </template>
 
-                                        <Button type="button" icon="pi pi-print" class="p-button-primary p-button-sm"
-                                            @click="imprimirResivo(venta.id, venta.correo)" />
-
-                                        <template v-if="venta.idtipo_venta == 2 && venta.estado == 'Pendiente'">
-                                            <Button type="button" icon="pi pi-plus"
-                                                class="p-button-primary p-button-sm p-mr-1"
-                                                @click="abrirModalCuotas(venta.id)" />
-                                        </template>
+                                        <Button type="button" icon="pi pi-print"
+                                            @click="imprimirResivo(venta.id, venta.correo)"
+                                            class="p-button-sm p-button-primary p-mr-1" />
                                     </td>
                                 </template>
-
                                 <td v-text="venta.usuario"></td>
                                 <td v-text="venta.razonSocial"></td>
                                 <td class="d-none d-md-table-cell" v-text="venta.documentoid"></td>
@@ -149,18 +133,18 @@
                                             <td v-text="detalle.articulo"></td>
                                             <td>
                                                 {{
-                                    (detalle.precio * parseFloat(monedaVenta[0])).toFixed(2)
-                                }}
+                                                    (detalle.precio * parseFloat(monedaVenta[0])).toFixed(2)
+                                                }}
                                                 {{ monedaVenta[1] }}
                                             </td>
                                             <td v-text="detalle.cantidad"></td>
                                             <td>
                                                 {{
-                                    (
-                                        (detalle.precio * detalle.cantidad) *
-                                        parseFloat(monedaVenta[0])
-                                    ).toFixed(2)
-                                }}
+                                                    (
+                                                        (detalle.precio * detalle.cantidad) *
+                                                        parseFloat(monedaVenta[0])
+                                                    ).toFixed(2)
+                                                }}
                                                 {{ monedaVenta[1] }}
                                             </td>
                                         </tr>
@@ -321,16 +305,16 @@
                                                     <span class="badge bg-primary">Medida: {{ arraySeleccionado.medida
                                                         }}</span>
                                                     <span class="badge bg-primary">Línea: {{
-                                    arraySeleccionado.nombre_categoria }}</span>
+                                                        arraySeleccionado.nombre_categoria }}</span>
                                                     <img v-if="arraySeleccionado.fotografia"
                                                         :src="'img/articulo/' + arraySeleccionado.fotografia + '?t=' + new Date().getTime()"
                                                         width="150" height="150" ref="imagen" class="card-img my-3" />
                                                     <img v-else src="img/productoSinImagen.png" alt="Imagen del Card"
                                                         width="150" height="150" class="card-img my-3" />
                                                     <div class="alert" :class="{
-                                    'alert-success': calcularStockDisponible > 0,
-                                    'alert-warning': calcularStockDisponible <= 0
-                                }" role="alert">
+                                                        'alert-success': calcularStockDisponible > 0,
+                                                        'alert-warning': calcularStockDisponible <= 0
+                                                    }" role="alert">
                                                         <p style="margin:0px">Stock disponible</p>
                                                         <b>{{ calcularStockDisponible }} Unidades</b>
                                                     </div>
@@ -364,19 +348,19 @@
                                                             style="display:flex;align-items:center;margin:0px;">
                                                             <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
                                                             <b v-else>{{
-                                    (calcularPrecioConDescuento(resultadoMultiplicacion,
-                                        arrayPromocion.porcentaje) *
-                                        parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                    monedaVenta[1] }}</b>
+                                                                (calcularPrecioConDescuento(resultadoMultiplicacion,
+                                                                    arrayPromocion.porcentaje) *
+                                                                    parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                                                    monedaVenta[1] }}</b>
                                                             <s style="font-size:15px" class="lead">{{
-                                    calcularPrecioConDescuento(resultadoMultiplicacion *
-                                        parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                    monedaVenta[1] }}</s>
+                                                                calcularPrecioConDescuento(resultadoMultiplicacion *
+                                                                    parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                                                    monedaVenta[1] }}</s>
                                                         </h3>
                                                         <h3 v-else style="display:flex;align-items:center;margin:0px;">
                                                             <b>{{ calcularPrecioConDescuento(resultadoMultiplicacion *
-                                    parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                    monedaVenta[1] }}</b>
+                                                                parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                                                    monedaVenta[1] }}</b>
                                                         </h3>
                                                     </div>
                                                     <div class="form-group d-flex mt-3">
@@ -415,7 +399,7 @@
                                             <Column field="precioUnidad" header="Precio Unidad" style="width: 15%">
                                                 <template v-slot:body="slotProps">
                                                     {{ (slotProps.data.precioseleccionado *
-                                    parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                                                        parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
                                                 </template>
                                             </Column>
                                             <Column field="unidades" header="Unidades" style="width: 15%">
@@ -429,7 +413,7 @@
                                             <Column field="total" header="Total" style="width: 20%">
                                                 <template v-slot:body="slotProps">
                                                     {{ (slotProps.data.precioseleccionado * slotProps.data.cantidad *
-                                    parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                                                        parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
                                                 </template>
                                             </Column>
                                         </DataTable>
@@ -440,7 +424,7 @@
                                     <div class="p-col-12 p-md-8"></div>
                                     <div class="p-col-12 p-md-4" style="text-align: right;">
                                         <h3>Total Neto: {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                    monedaVenta[1] }}</h3>
+                                            monedaVenta[1] }}</h3>
                                     </div>
                                 </div>
                             </div>
@@ -505,17 +489,17 @@
                                                         <div class="d-flex justify-content-between mb-2">
                                                             <span><i class="fa fa-dollar mr-2"></i> Monto Total:</span>
                                                             <span class="font-weight-bold">{{ (calcularTotal *
-                                    parseFloat(monedaVenta[0])).toFixed(2)
+                                                                parseFloat(monedaVenta[0])).toFixed(2)
                                                                 }}
                                                                 {{
-                                    monedaVenta[1] }}</span>
+                                                                    monedaVenta[1] }}</span>
                                                         </div>
                                                         <div class="d-flex justify-content-between">
                                                             <span><i class="fa fa-money mr-2"></i> Total a Pagar:</span>
                                                             <span class="font-weight-bold h5">{{ (calcularTotal *
-                                    parseFloat(monedaVenta[0])).toFixed(2)
+                                                                parseFloat(monedaVenta[0])).toFixed(2)
                                                                 }} {{
-                                    monedaVenta[1] }}</span>
+                                                                    monedaVenta[1] }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -536,7 +520,7 @@
                                                     <div class="form-group">
                                                         <label for="montoEfectivo">Monto:</label>
                                                         <span class="font-weight-bold">{{ montoEfectivo =
-                                (calcularTotal).toFixed(2) }}</span>
+                                                        (calcularTotal).toFixed(2) }}</span>
                                                     </div>
                                                     <button class="btn btn-primary mb-2" @click="generarQr">Generar
                                                         QR</button>
@@ -552,8 +536,8 @@
                                                         <div class="font-weight-bold">Estado Actual:</div>
                                                         <div>
                                                             <span :class="'badge badge-' + badgeSeverity">{{
-                                    estadoTransaccion.objeto.estadoActual
-                                }}</span>
+                                                                estadoTransaccion.objeto.estadoActual
+                                                                }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -632,10 +616,10 @@
                                                                 <td v-text="articulo.nombre_categoria"></td>
                                                                 <td>
                                                                     {{
-                                                                    (
-                                                                    articulo.precio_venta *
-                                                                    parseFloat(monedaVenta[0])
-                                                                    ).toFixed(2)
+                                                                        (
+                                                                            articulo.precio_venta *
+                                                                            parseFloat(monedaVenta[0])
+                                                                        ).toFixed(2)
                                                                     }}
                                                                     {{ monedaVenta[1] }}
                                                                 </td>
@@ -693,6 +677,7 @@ import DataTable from 'primevue/datatable';
 import Dropdown from 'primevue/dropdown';
 import InputNumber from 'primevue/inputnumber';
 import InputText from 'primevue/inputtext';
+import Swal from 'sweetalert2';
 import vSelect from "vue-select";
 import { TileSpinner } from "vue-spinners";
 export default {
@@ -1607,7 +1592,7 @@ export default {
             clearTimeout(this.timer);
             this.timer = setTimeout(() => {
                 let me = this;
-                var url = "/articulo/buscarArticuloVenta?filtro=" + me.codigo + "&idalmacen="+me.selectedAlmacen;
+                var url = "/articulo/buscarArticuloVenta?filtro=" + me.codigo + "&idalmacen=" + me.selectedAlmacen;
                 axios
                     .get(url)
                     .then(function (response) {
@@ -2408,12 +2393,22 @@ export default {
                     if (error.response && error.response.status === 404) {
                         this.nombreCliente = '';
                         this.nombreClienteEditable = true; // Habilita el input si no se encuentra el cliente
-                        alert('Cliente no encontrado');
+                        Swal.fire({
+                            title: 'Cliente no encontrado',
+                            text: 'No se encontró ningún cliente con el documento proporcionado.',
+                            icon: 'warning',
+                            confirmButtonText: 'Ok'
+                        });
                     } else {
                         console.error('Error al buscar el cliente:', error);
                         this.nombreCliente = '';
                         this.nombreClienteEditable = false; // Asegura que el input esté deshabilitado en caso de error
-                        alert('Error al buscar el cliente');
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Hubo un problema al buscar el cliente. Por favor, inténtelo de nuevo más tarde.',
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        });
                     }
                 });
         },
@@ -2432,56 +2427,6 @@ export default {
 };
 </script>
 <style scoped>
-.d-flex {
-    display: flex;
-}
-
-.justify-content-between {
-    justify-content: space-between;
-}
-
-.align-items-center {
-    align-items: center;
-}
-
-.p-button-lg {
-    font-size: 1.25rem;
-    padding: 0.75rem 1.5rem;
-}
-
-.d-flex {
-    display: flex;
-    align-items: center;
-}
-
-.p-mr-1 {
-    margin-right: 0.25rem;
-}
-
-/* Estilos para los iconos (ajusta según tus necesidades) */
-.fa-check-circle {
-    margin-left: 5px;
-    /* Espacio entre el precio y el icono */
-}
-
-.custom-btn {
-    width: 100%;
-    text-align: center;
-    padding: 5px;
-    color: #939392;
-    border: 1px solid #939392;
-    background-color: white;
-    margin-left: 5px;
-    margin-right: 5px;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
-    border-radius: 5%;
-    /* Agregando sombra */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
 .selected {
     background-color: rgba(5, 75, 122, 0.1);
     /* Ajusta el último valor para cambiar la opacidad */
@@ -2493,7 +2438,7 @@ export default {
 
 /* #054b7a; */
 .efectivo {
-    color: #054b7a;
+    color: #38e411;
     transition: all 0.3s ease;
 }
 
@@ -2639,24 +2584,7 @@ input[readonly] {
 }
 
 /* Button styles */
-.btnagregar {
-    margin-top: 25px;
-}
 
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
-}
-
-.btn-danger {
-    background-color: #dc3545;
-    border-color: #dc3545;
-}
 
 .btn-primary:hover,
 .btn-secondary:hover,
@@ -2698,10 +2626,7 @@ input[type="number"] {
     font-size: 1.25rem;
 }
 
-.icon-plus,
-.icon-minus {
-    font-size: 1rem;
-}
+
 
 body {
     font-family: 'Roboto', sans-serif;
@@ -2805,13 +2730,7 @@ input:required {
     margin-top: 10px;
 }
 
-.buttons {
-    margin-top: 20px;
-}
 
-.btn {
-    font-size: 16px;
-}
 
 .card-body {
     display: flex;
@@ -2822,5 +2741,9 @@ input:required {
 .card-img {
     max-width: 100%;
     height: auto;
+}
+
+.p-button-sm .p-button-icon {
+    font-size: 1.2rem !important;
 }
 </style>
