@@ -21,7 +21,7 @@
           </div>
           -->
         </div>
-        <DataTable class="p-datatable-sm "   responsiveLayout="scroll" :value="filteredProducts" paginator :rows="9">
+        <DataTable class="p-datatable-sm p-datatable-gridlines"   responsiveLayout="scroll" :value="filteredProducts" paginator :rows="9">
           <Column header="Opciones">
             <template #body="slotProps">
               <Button icon="pi pi-pencil" class="p-button-sm p-button-warning custom-icon-size"  @click="abrirModal('medida', 'actualizar', slotProps.data)" />
