@@ -677,7 +677,7 @@ import DataTable from 'primevue/datatable';
 import Dropdown from 'primevue/dropdown';
 import InputNumber from 'primevue/inputnumber';
 import InputText from 'primevue/inputtext';
-import Swal from 'sweetalert2';
+//import Swal from 'sweetalert2';
 import vSelect from "vue-select";
 import { TileSpinner } from "vue-spinners";
 export default {
