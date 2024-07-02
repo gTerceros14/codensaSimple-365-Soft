@@ -194,6 +194,7 @@
                             @row-collapse="onRowCollapse"
                             responsiveLayout="scroll"
                             tableStyle="height:400px"
+                            stateStorage="session" stateKey="dt-state-demo-session"
                         >
                             <Column :expander="true" :headerStyle="{'width': '5%'}" />
                             <Column field="codigo" header="Codigo" :sortable="true" :styles="{width:'5%'}"></Column>
@@ -519,14 +520,7 @@ export default {
 
     methods: {
 
-        /*calcularSaldoTotalCompra() {
-            this.saldoTotalCompra = (this.array_articulos_completo.reduce((total, articulo) => {
-                return total + (articulo.subtotal || 0);
-            }, 0)).toFixed(2);
-        },*/
-
         verificarFechaVencimiento(data) {
-            console.log('verificando fecha', ((data.vencimiento == 0) || (data.vencimiento == null)) && !(data.fecha_vencimiento))
             return ((data.vencimiento == 0) || (data.vencimiento == null)) && !(data.fecha_vencimiento);
         },
 
@@ -593,10 +587,11 @@ export default {
             }
 
             const articulos_invalidos = this.array_articulos_completo.filter(
-                articulo => !articulo.vencimiento || articulo.unidades <= 0
+                articulo => !articulo.fecha_vencimiento || articulo.unidades <= 0
             );
 
             if (articulos_invalidos.length > 0) {
+                console.log('array final: ', this.array_articulos_completo);
                 this.$toast.add({
                 severity:'error',
                 summary: 'Error de validación',
@@ -626,6 +621,16 @@ export default {
 
                     if (inventarioResponse.data.status === 'success') {
                         this.$toast.add({severity:'success', summary: 'Éxito', detail: 'Compra registrada e inventario actualizado', life: 3000});
+
+                        this.activeIndex = 0;
+                        this.array_articulos_completo = [];
+                        this.array_articulos_seleccionados = [];
+                        this.form.serie_comprobante = '';
+                        this.form.num_comprobante = '';
+                        this.almacenSeleccionado = null;
+                        this.tipoCompra = null;
+                        this.saldoTotalCompra = 0;
+                        this.descuentoGlobal = 0;
                     }
                 }
             } catch (error) {
@@ -649,7 +654,7 @@ export default {
             }));
         },
 
-        actualizarLista() {
+        /*actualizarLista() {
             this.array_articulos_completo = this.array_articulos_seleccionados.map(articulo => ({
                 ...articulo,
                 fecha_vencimiento: null,
@@ -662,6 +667,36 @@ export default {
                 esPaquetesCantidad: false,
                 esPaquetesBonificacion: false,
             }))
+        },*/
+
+        actualizarLista() {
+            let articulosActualizados = this.array_articulos_seleccionados.map(articulo => {
+                let articuloExistente = this.array_articulos_completo.find(a => a.id === articulo.id);
+                
+                if (articuloExistente) {
+                    return {
+                        ...articuloExistente,
+                        precio_costo_unid: articulo.precio_costo_unid,
+                        precio_costo_paq: articulo.precio_costo_paq,
+                        nombre: articulo.nombre,
+                    };
+                } else {
+                    return {
+                        ...articulo,
+                        fecha_vencimiento: null,
+                        unidadesTotales: 0,
+                        vencimiento: null,
+                        unidades: 0,
+                        bonificacion: 0,
+                        descuento: 0,
+                        subtotal: 0,
+                        esPaquetesCantidad: false,
+                        esPaquetesBonificacion: false,
+                    };
+                }
+            });
+
+            this.array_articulos_completo = articulosActualizados;
         },
 
         onRowEditSave(event) {
@@ -736,7 +771,7 @@ export default {
             }
         },
 
-        async nextStep() {
+        /*async nextStep() {
             this.submitted = true;
             const result = await this.validarPaginaActual();
 
@@ -749,10 +784,26 @@ export default {
 
                 this.actualizarLista();
             }
-            /*if (result) {
-                this.activeIndex += 1;
-                this.actualizarLista();
-            }*/
+            //if (result) {
+            //    this.activeIndex += 1;
+            //    this.actualizarLista();
+            //}
+        },*/
+
+        async nextStep() {
+            this.submitted = true;
+            const result = await this.validarPaginaActual();
+
+            if (!result) {
+                return;
+            }
+
+            if (this.activeIndex < this.steps.length - 1) {
+                if (this.activeIndex === 0) {
+                    this.actualizarLista();
+                }
+                this.activeIndex++;
+            }
         },
 
         prevStep() {
