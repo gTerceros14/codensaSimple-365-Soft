@@ -48,10 +48,12 @@
                                         class="btn btn-success btn-sm">
                                         <i class="icon-eye"></i>
                                     </button> &nbsp;
-                                    <button type="button" @click="pdfboleta(ingreso.id)"
+
+                                    <button type="button" @click="imprimirDocumento(ingreso.id)"
                                         class="btn btn-info btn-sm mr-1">
-                                        <i class="icon-doc"></i>
+                                        <i class="icon-printer"></i>
                                     </button>
+
                                     <template v-if="ingreso.estado == 'Registrado'">
                                         <button type="button" class="btn btn-danger btn-sm"
                                             @click="desactivarIngreso(ingreso.id)">
@@ -67,7 +69,7 @@
                                 <td v-text="ingreso.fecha_hora"></td>
                                 <td>
                                     {{ (ingreso.total * parseFloat(monedaCompra[0])).toFixed(2) }} {{
-            monedaCompra[1] }}
+                                        monedaCompra[1] }}
 
                                 </td>
                                 <td class="d-none d-md-table-cell" v-text="ingreso.estado"></td>
@@ -140,14 +142,14 @@
                                         </td>
                                         <td>
                                             {{ (detalle.precio * parseFloat(monedaCompra[0])).toFixed(2) }} {{
-            monedaCompra[1] }}
+                                                monedaCompra[1] }}
 
                                         </td>
                                         <td v-text="detalle.cantidad">
                                         </td>
                                         <td>
                                             {{ ((detalle.precio * detalle.cantidad)
-            * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
+                                                * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
 
                                         </td>
                                     </tr>
@@ -155,7 +157,7 @@
                                         <td colspan="3" align="right"><strong>Total Parcial:</strong></td>
                                         <td>
                                             {{ ((totalParcial = (total - totalImpuesto))
-            * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
+                                                * parseFloat(monedaCompra[0])).toFixed(2) }} {{ monedaCompra[1] }}
 
                                         </td>
                                     </tr>
@@ -164,8 +166,8 @@
                                         <td colspan="3" align="right"><strong>Total Neto:</strong></td>
                                         <td>
                                             {{ (total * parseFloat(monedaCompra[0])).toFixed(2) }} {{
-            monedaCompra[1]
-        }}
+                                                monedaCompra[1]
+                                            }}
 
                                         </td>
                                     </tr>
@@ -297,6 +299,31 @@ export default {
         }
     },
     methods: {
+        imprimirDocumento(id) {
+            swal({
+                title: "Selecciona el tipo de documento",
+                text: "¿Qué tipo de documento deseas generar?",
+                type: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Nota de Ingreso",
+                cancelButtonText: "Boleta",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    // El usuario seleccionó "Nota de Ingreso"
+                    window.open("/ingreso/generar-nota-ingreso/" + id, "_blank");
+                } else {
+                    // El usuario seleccionó "Boleta"
+                    window.open("/ingreso/generar-pdf-boleta/" + id, "_blank");
+                }
+            });
+        },
+
+        generarNotaIngreso(id) {
+            window.open("/ingreso/generar-nota-ingreso/" + id, "_blank");
+        },
         pdfboleta(id) {
             window.open("/ingreso/generar-pdf-boleta/" + id, "_blank");
         },
