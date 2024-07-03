@@ -130,7 +130,7 @@ export default {
               });
       },
       listarIndustria(page, buscar, criterio) {
-          let url = '/industria?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+          let url = '/industrianewview?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
           axios.get(url)
               .then(response => {
                   this.arrayIndustria = response.data.industrias;
