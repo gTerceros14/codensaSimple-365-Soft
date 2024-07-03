@@ -311,6 +311,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/industria/desactivar', 'IndustriaController@desactivar');
         Route::put('/industria/actualizar', 'IndustriaController@update');
         Route::post('/industrias/importar', 'IndustriaController@importar');
+        Route::get('/industrianewview', 'IndustriaController@index2');
 
         //MEDIDAS
         Route::get('/medida', 'MedidaController@index');
