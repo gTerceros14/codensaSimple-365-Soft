@@ -83,7 +83,7 @@
                                         responsiveLayout="scroll"
                                         :paginator="true"
                                         :rows="4"
-                                        tableStyle="height:325px"
+                                        tableStyle="height:34vh"
                                         class="p-datatable-sm"
                                         :metaKeySelection="false"
                                     >
@@ -125,8 +125,8 @@
                                     dataKey="codigo"
                                     responsiveLayout="scroll"
                                     :paginator="true"
-                                    :rows="4"
-                                    tableStyle="height:325px"
+                                    :rows="3"
+                                    tableStyle="height:34vh"
                                     editMode="row"
                                     :editingRows.sync="editingRows"
                                     @row-edit-save="onRowEditSave"
@@ -193,8 +193,8 @@
                             @row-expand="onRowExpand"
                             @row-collapse="onRowCollapse"
                             responsiveLayout="scroll"
-                            tableStyle="height:400px"
-                            stateStorage="session" stateKey="dt-state-demo-session"
+                            tableStyle="height: 33vh"
+                            class="p-datatable-sm"
                         >
                             <Column :expander="true" :headerStyle="{'width': '5%'}" />
                             <Column field="codigo" header="Codigo" :sortable="true" :styles="{width:'5%'}"></Column>
@@ -355,9 +355,13 @@
                                 <small class="p-error" v-if="(submitted && v$.almacenSeleccionado.required.$invalid)"><strong>Almacén de destino es obligatorio.</strong></small>
                             </div>
 
-                            <div class="p-field p-col-12 p-md-3">
-                                <label for="botonComprar" style="padding-bottom: 17px;"></label>
-                                <Button id="botonComprar" icon="pi pi-check-square" label="Registrar Compra" class="p-button-success p-button-sm" @click="registrarCompra" :disabled="verificarCompraContado"/>
+                            <div class="p-field p-col-12 p-md-3" v-if="!verificarCompraContado">
+                                <label for="botonComprarContado" style="padding-bottom: 17px;"></label>
+                                <Button id="botonComprarContado" icon="pi pi-check-square" label="Registrar Compra" class="p-button-success p-button-sm" @click="registrarCompra" />
+                            </div>
+                            <div class="p-field p-col-12 p-md-3" v-else>
+                                <label for="botonComprarCredito" style="padding-bottom: 17px;"></label>
+                                <Button id="botonComprarCredito" icon="pi pi-check-square" label="Compra a Credito" class="p-button-help p-button-sm" @click="openComprasCredito" />
                             </div>
                         </div>
                     </div>
@@ -382,6 +386,72 @@
                 <Button label="Si" icon="pi pi-check" @click="actualizarCostosArticulo" class="p-button-sm p-button-success" autofocus />
             </template>
         </Dialog>
+
+        <div class="dialog-cuotas">
+        <Dialog header="Compra a Credito" :visible.sync="displayCompraCredito" :modal="true" :containerStyle="{width: '65vw'}">
+            <div class="card">
+                <div class="p-fluid p-formgrid p-grid">
+                    <div class="p-field p-col-12 p-md-4">
+                        <label for="cantidadCuotas">Cantidad de Cuotas</label>
+                        <InputNumber class="p-inputtext-sm" id="cantidadCuotas" v-model="form_cuotas.num_cuotas" mode="decimal" />
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-4">
+                        <label for="frecuenciaPago">Frecuencia de Pago</label>
+                        <InputNumber class="p-inputtext-sm" id="frecuenciaPago" v-model="form_cuotas.frecuencia_pagos" mode="decimal" />
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-4">
+                        <label for="generarCuotas"><strong>TOTAL Bs. {{ saldoTotalCompra }}</strong></label>
+                        <Button class="p-button-success p-button-sm" label="Generar Cuota" icon="pi pi-clock" />
+                    </div>
+                </div>
+
+                <div class="p-fluid p-formgrid p-grid">
+                    <div class="p-field p-col-12 p-md-4">
+                        <label for="cuotaInicial">Cuota Inicial</label>
+                        <InputNumber class="p-inputtext-sm" id="cuota_inicial" v-model="form_cuotas.cuota_inicial" mode="decimal" />
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-4">
+                        <label for="tipoPagoCuota">Tipo de Pago</label>
+                        <Dropdown class="p-inputtext-sm" v-model="form_cuotas.tipoPagoCuotaSeleccionado" :options="lista_tipo_pago_cuotas" optionLabel="nombre" placeholder="Selecciona el tipo de pago" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <DataTable
+                    :value="data"
+                    :paginator="false"
+                    tableStyle="height: 33vh"
+                    class="p-datatable-sm"
+                    :rows="10"
+                    dataKey="id"
+                    :rowHover="true"
+                    responsiveLayout="scroll"
+                >
+                    <template #empty>
+                        Sin cuotas generadas.
+                    </template>
+
+                    <Column field="id" header="#" dataType="numeric"></Column>
+                    <Column field="fecha_pago" header="Fecha Pago" datatype="date"></Column>
+                    <Column field="precio_cuota" header="Precio Cuota" datatype="numeric"></Column>
+                    <Column field="total_cancelado" header="Total Cancelado" datatype="numeric"></Column>
+                    <Column field="saldo_restante" header="Saldo Restante" datatype="numeric"></Column>
+                    <Column field="fecha_cancelado" header="Fecha Cancelado" datatype="numeric"></Column>
+                    <Column field="estado" header="Estado"></Column>
+
+                </DataTable>
+            </div>
+
+            <template #footer>
+                <Button label="Cancelar" icon="pi pi-times" @click="closeComprasCredito" class="p-button-sm p-button-danger"/>
+                <Button label="Registrar Compra" icon="pi pi-check-square" @click="closeComprasCredito" class="p-button-sm p-button-help" autofocus />
+            </template>
+        </Dialog>
+        </div>
 
     </main>
 </template>
@@ -435,6 +505,18 @@ export default {
                 {nombre: 'Nota de Ingreso', id: 2},
             ],
 
+            form_cuotas: {
+                num_cuotas: 0,
+                frecuencia_pagos: 0,
+                cuota_inicial: 0,
+                tipoPagoCuotaSeleccionado: null,
+            },
+            lista_tipo_pago_cuotas: [
+                {nombre: 'Efectivo'},
+                {nombre: 'Tarjeta'},
+                {nombre: 'QR'}
+            ],
+
             codigo: '',
             idproveedor: null,
 
@@ -454,7 +536,7 @@ export default {
             tipoCompra: null,
             lista_tipo_compra: [
                 {nombre: 'Contado', id: 1},
-                {nombre: 'Couotas', id: 2},
+                {nombre: 'Credito', id: 2},
             ],
             array_almacenes: [],
             almacenSeleccionado: null,
@@ -463,9 +545,60 @@ export default {
             usuario_actual_id: null,
             saldoTotalCompra: 0,
             displayConfirmation: false,
+            displayCompraCredito: false,
             array_precios: [],
             objeto_newData: null,
             descuentoGlobal: 0,
+
+
+
+            data: [
+                {
+                    "id": 11,
+                    "fecha_pago": "2018-08-13",
+                    "precio_cuota": "400",
+                    "total_cancelado": "200",
+                    "saldo_restante": "100",
+                    "fecha_cancelado": "2018-10-21",
+                    "estado": "Pendiente"
+                },
+                {
+                    "id": 22,
+                    "fecha_pago": "2018-08-13",
+                    "precio_cuota": "400",
+                    "total_cancelado": "200",
+                    "saldo_restante": "100",
+                    "fecha_cancelado": "2018-10-21",
+                    "estado": "Pendiente"
+                },
+                {
+                    "id": 33,
+                    "fecha_pago": "2018-08-13",
+                    "precio_cuota": "400",
+                    "total_cancelado": "200",
+                    "saldo_restante": "100",
+                    "fecha_cancelado": "2018-10-21",
+                    "estado": "Pendiente"
+                },
+                {
+                    "id": 44,
+                    "fecha_pago": "2018-08-13",
+                    "precio_cuota": "400",
+                    "total_cancelado": "200",
+                    "saldo_restante": "100",
+                    "fecha_cancelado": "2018-10-21",
+                    "estado": "Pendiente"
+                },
+                {
+                    "id": 55,
+                    "fecha_pago": "2018-08-13",
+                    "precio_cuota": "400",
+                    "total_cancelado": "200",
+                    "saldo_restante": "100",
+                    "fecha_cancelado": "2018-10-21",
+                    "estado": "Pendiente"
+                },
+            ]
         }
     },
 
@@ -591,7 +724,6 @@ export default {
             );
 
             if (articulos_invalidos.length > 0) {
-                console.log('array final: ', this.array_articulos_completo);
                 this.$toast.add({
                 severity:'error',
                 summary: 'Error de validación',
@@ -610,7 +742,8 @@ export default {
                     saldoTotalCompra: this.saldoTotalCompra,
                     tipoCompra: this.tipoCompra,
                     almacenSeleccionado: this.almacenSeleccionado,
-                    array_articulos_completo: this.array_articulos_completo
+                    array_articulos_completo: this.array_articulos_completo,
+                    descuento_global: this.descuentoGlobal,
                 });
 
                 if (compraResponse.data.status === 'success') {
@@ -644,6 +777,9 @@ export default {
             }
         },
 
+        registrarCompraCredito() {
+            console.log('compra credito');
+        },
 
         prepararDatosInventario() {
             return this.array_articulos_completo.map(articulo => ({
@@ -653,21 +789,6 @@ export default {
                 cantidad: articulo.unidadesTotales
             }));
         },
-
-        /*actualizarLista() {
-            this.array_articulos_completo = this.array_articulos_seleccionados.map(articulo => ({
-                ...articulo,
-                fecha_vencimiento: null,
-                unidadesTotales: 0,
-                vencimiento: null,
-                unidades: 0,
-                bonificacion: 0,
-                descuento: 0,
-                subtotal: 0,
-                esPaquetesCantidad: false,
-                esPaquetesBonificacion: false,
-            }))
-        },*/
 
         actualizarLista() {
             let articulosActualizados = this.array_articulos_seleccionados.map(articulo => {
@@ -709,6 +830,14 @@ export default {
 
         closeConfirmation() {
             this.displayConfirmation = false;
+        },
+
+        openComprasCredito() {
+            this.displayCompraCredito = true;
+        },
+
+        closeComprasCredito() {
+            this.displayCompraCredito = false;
         },
 
         async actualizarCostosArticulo() {
@@ -770,25 +899,6 @@ export default {
                 return !(this.v$.tipoCompra.$invalid || this.v$.almacenSeleccionado.$invalid);
             }
         },
-
-        /*async nextStep() {
-            this.submitted = true;
-            const result = await this.validarPaginaActual();
-
-            if (!result) {
-                return;
-            }
-
-            if (this.activeIndex < this.steps.length - 1) {
-                this.activeIndex++;
-
-                this.actualizarLista();
-            }
-            //if (result) {
-            //    this.activeIndex += 1;
-            //    this.actualizarLista();
-            //}
-        },*/
 
         async nextStep() {
             this.submitted = true;
@@ -906,7 +1016,6 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.array_precios = respuesta.precio.data;
-                console.log(me.array_precios);
             }).catch(function (error) {
                 console.log(error);
             });
@@ -1044,6 +1153,10 @@ export default {
     margin-bottom: 0.5rem;
 }
 
+>>> .p-md-4 {
+    padding: 0 0.75rem 0 0.75rem !important;
+}
+
 .flechas-buttons {
     padding-top: 0;
     display: flex;
@@ -1122,6 +1235,17 @@ export default {
 
 >>> .p-dialog-header {
     padding: 1.5rem 1rem 1.5rem 1.5rem;
+}
+
+/* Dialog cuotas*/
+>>> .dialog-cuotas .p-dialog-header {
+    padding: 1rem 1rem 1rem 1.5rem;
+    background: #33b378;
+    color: #ffffff;
+}
+
+>>> .dialog-cuotas .p-dialog-content {
+    padding: 1rem 1rem 0 1rem;
 }
 
 </style>
