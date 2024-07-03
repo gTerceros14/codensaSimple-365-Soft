@@ -231,7 +231,7 @@
                                         <label class="font-weight-bold">Documento <span
                                                 class="text-danger">*</span></label>
                                         <input type="text" id="documento" class="form-control" v-model="documento"
-                                            @keyup.enter="buscarClientePorDocumento" />
+                                            @keyup.enter="buscarClientePorDocumento" placeholder="000000" />
                                     </div>
 
                                     <!-- Nombre Input -->
@@ -239,7 +239,8 @@
                                         <label class="font-weight-bold">Cliente <span
                                                 class="text-danger">*</span></label>
                                         <input type="text" id="nombreCliente" class="form-control"
-                                            v-model="nombreCliente" :readonly="!nombreClienteEditable" />
+                                            v-model="nombreCliente" :readonly="!nombreClienteEditable"
+                                            placeholder="SIN NOMBRE" />
                                     </div>
 
                                     <!-- Hidden Inputs -->
@@ -430,125 +431,257 @@
                             </div>
 
                             <div v-show="step === 3" class="step-content">
-                                <!-- Pagos Selection -->
                                 <div class="d-flex justify-content-center mb-3">
                                     <div class="form-group">
-                                        <div class="btn-group">
-                                            <button class="btn btn-primary" @click="opcionPago = 'efectivo'">
-                                                <i class="fa fa-money mr-2" aria-hidden="true"></i>
-                                                Efectivo
-                                            </button>
-                                            <button class="btn btn-primary" @click="opcionPago = 'qr'">
-                                                <i class="fa fa-qrcode mr-2" aria-hidden="true"></i>
-                                                QR
-                                            </button>
-                                        </div>
-                                    </div><br>
-                                    <div v-if="opcionPago === 'efectivo'">
-                                        <div class="row">
-                                            <div class="col-md-7">
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <form>
-                                                            <div class="form-group">
-                                                                <label for="montoEfectivo"><i
-                                                                        class="fa fa-money mr-2"></i>
-                                                                    Monto
-                                                                    Recibido:</label>
-                                                                <div class="input-group mb-3">
-                                                                    <div class="input-group-prepend">
-                                                                        <span class="input-group-text">{{ monedaVenta[1]
-                                                                            }}</span>
-                                                                    </div>
-                                                                    <input type="number" class="form-control"
-                                                                        id="montoEfectivo" v-model="recibido"
-                                                                        placeholder="Ingrese el monto recibido" />
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="cambioRecibir"><i
-                                                                        class="fa fa-exchange mr-2"></i>
-                                                                    Cambio a
-                                                                    Entregar:</label>
-                                                                <input type="text" class="form-control"
-                                                                    id="cambioRecibir"
-                                                                    placeholder="Se calculará automáticamente"
-                                                                    :value="recibido - calcularTotal * parseFloat(monedaVenta[0])"
-                                                                    readonly />
-                                                            </div>
-                                                        </form>
-                                                    </div>
+                                        <div class="d-flex">
+                                            <button class="btn btn-lg me-3"
+                                                :class="{ 'btn-primary': tipoVenta === 'contado', 'btn-outline-primary': tipoVenta !== 'contado' }"
+                                                @click="seleccionarTipoVenta('contado')">
+                                                <div class="d-flex flex-column align-items-center">
+                                                    <i class="fa fa-money fa-2x mb-2"></i>
+                                                    <span>Contado</span>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-5">
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <div class="mb-3">
-                                                            <h5 class="mb-0">Detalle de Venta</h5>
-                                                        </div>
-                                                        <div class="d-flex justify-content-between mb-2">
-                                                            <span><i class="fa fa-dollar mr-2"></i> Monto Total:</span>
-                                                            <span class="font-weight-bold">{{ (calcularTotal *
-                                                                parseFloat(monedaVenta[0])).toFixed(2)
-                                                                }}
-                                                                {{
-                                                                    monedaVenta[1] }}</span>
-                                                        </div>
-                                                        <div class="d-flex justify-content-between">
-                                                            <span><i class="fa fa-money mr-2"></i> Total a Pagar:</span>
-                                                            <span class="font-weight-bold h5">{{ (calcularTotal *
-                                                                parseFloat(monedaVenta[0])).toFixed(2)
-                                                                }} {{
-                                                                    monedaVenta[1] }}</span>
-                                                        </div>
-                                                    </div>
+                                            </button>
+                                            <button class="btn btn-lg"
+                                                :class="{ 'btn-primary': tipoVenta === 'credito', 'btn-outline-primary': tipoVenta !== 'credito' }"
+                                                @click="seleccionarTipoVenta('credito')">
+                                                <div class="d-flex flex-column align-items-center">
+                                                    <i class="fa fa-credit-card fa-2x mb-2"></i>
+                                                    <span>Crédito</span>
                                                 </div>
-                                                <button type="button" @click="aplicarDescuento"
-                                                    class="btn btn-success btn-block">
-                                                    <i class="fa fa-check mr-2"></i> Registrar Pago
-                                                </button>
-                                            </div>
+                                            </button>
                                         </div>
                                     </div>
-                                    <div v-else-if="opcionPago === 'qr'">
-                                        <div class="container">
-                                            <div class="row justify-content-center">
-                                                <div class="col-md-8">
-                                                    <div class="form-group">
-                                                        <input v-model="alias" readonly style="display: none;" />
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="montoEfectivo">Monto:</label>
-                                                        <span class="font-weight-bold">{{ montoEfectivo =
-                                                        (calcularTotal).toFixed(2) }}</span>
-                                                    </div>
-                                                    <button class="btn btn-primary mb-2" @click="generarQr">Generar
-                                                        QR</button>
-                                                    <div v-if="qrImage" class="mb-2 text-center">
-                                                        <img :src="qrImage" alt="Código QR" class="img-fluid" />
-                                                    </div>
-                                                    <button class="btn btn-secondary mb-2" @click="verificarEstado"
-                                                        v-if="qrImage">Verificar
-                                                        Estado
-                                                        de
-                                                        Pago</button>
-                                                    <div v-if="estadoTransaccion" class="card p-2">
-                                                        <div class="font-weight-bold">Estado Actual:</div>
-                                                        <div>
-                                                            <span :class="'badge badge-' + badgeSeverity">{{
-                                                                estadoTransaccion.objeto.estadoActual
-                                                                }}</span>
+                                </div>
+                                <div v-if="tipoVenta === 'contado'">
+                                    <!-- ... (existing cash and QR payment code) ... -->
+                                    <div class="d-flex justify-content-center mb-3">
+                                        <div class="form-group">
+                                            <div class="btn-group">
+                                                <button class="btn btn-primary" @click="opcionPago = 'efectivo'">
+                                                    <i class="fa fa-money mr-2" aria-hidden="true"></i>
+                                                    Efectivo
+                                                </button>
+                                                <button class="btn btn-primary" @click="opcionPago = 'qr'">
+                                                    <i class="fa fa-qrcode mr-2" aria-hidden="true"></i>
+                                                    QR
+                                                </button>
+                                            </div>
+                                        </div><br>
+                                        <div v-if="opcionPago === 'efectivo'">
+                                            <div class="row">
+                                                <div class="col-md-7">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <form>
+                                                                <div class="form-group">
+                                                                    <label for="montoEfectivo"><i
+                                                                            class="fa fa-money mr-2"></i>
+                                                                        Monto
+                                                                        Recibido:</label>
+                                                                    <div class="input-group mb-3">
+                                                                        <div class="input-group-prepend">
+                                                                            <span class="input-group-text">{{
+                                                                                monedaVenta[1]
+                                                                            }}</span>
+                                                                        </div>
+                                                                        <input type="number" class="form-control"
+                                                                            id="montoEfectivo" v-model="recibido"
+                                                                            placeholder="Ingrese el monto recibido" />
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="cambioRecibir"><i
+                                                                            class="fa fa-exchange mr-2"></i>
+                                                                        Cambio a
+                                                                        Entregar:</label>
+                                                                    <input type="text" class="form-control"
+                                                                        id="cambioRecibir"
+                                                                        placeholder="Se calculará automáticamente"
+                                                                        :value="recibido - calcularTotal * parseFloat(monedaVenta[0])"
+                                                                        readonly />
+                                                                </div>
+                                                            </form>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <button type="button" @click="registrarVenta(7)"
-                                                    class="btn btn-success btn-block">
-                                                    <i class="fa fa-check mr-2"></i> Registrar Pago
-                                                </button>
+                                                <div class="col-md-5">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <div class="mb-3">
+                                                                <h5 class="mb-0">Detalle de Venta</h5>
+                                                            </div>
+                                                            <div class="d-flex justify-content-between mb-2">
+                                                                <span><i class="fa fa-dollar mr-2"></i> Monto
+                                                                    Total:</span>
+                                                                <span class="font-weight-bold">{{ (calcularTotal *
+                                                                    parseFloat(monedaVenta[0])).toFixed(2)
+                                                                    }}
+                                                                    {{
+                                                                        monedaVenta[1] }}</span>
+                                                            </div>
+                                                            <div class="d-flex justify-content-between">
+                                                                <span><i class="fa fa-money mr-2"></i> Total a
+                                                                    Pagar:</span>
+                                                                <span class="font-weight-bold h5">{{ (calcularTotal *
+                                                                    parseFloat(monedaVenta[0])).toFixed(2)
+                                                                    }} {{
+                                                                        monedaVenta[1] }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" @click="aplicarDescuento"
+                                                        class="btn btn-success btn-block">
+                                                        <i class="fa fa-check mr-2"></i> Registrar Pago
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div v-else-if="opcionPago === 'qr'">
+                                            <div class="container">
+                                                <div class="row justify-content-center">
+                                                    <div class="col-md-8">
+                                                        <div class="form-group">
+                                                            <input v-model="alias" readonly style="display: none;" />
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="montoEfectivo">Monto:</label>
+                                                            <span class="font-weight-bold">{{ montoEfectivo =
+                                                            (calcularTotal).toFixed(2) }}</span>
+                                                        </div>
+                                                        <button class="btn btn-primary mb-2" @click="generarQr">Generar
+                                                            QR</button>
+                                                        <div v-if="qrImage" class="mb-2 text-center">
+                                                            <img :src="qrImage" alt="Código QR" class="img-fluid" />
+                                                        </div>
+                                                        <button class="btn btn-secondary mb-2" @click="verificarEstado"
+                                                            v-if="qrImage">Verificar
+                                                            Estado
+                                                            de
+                                                            Pago</button>
+                                                        <div v-if="estadoTransaccion" class="card p-2">
+                                                            <div class="font-weight-bold">Estado Actual:</div>
+                                                            <div>
+                                                                <span :class="'badge badge-' + badgeSeverity">{{
+                                                                    estadoTransaccion.objeto.estadoActual
+                                                                }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" @click="registrarVenta(7)"
+                                                        class="btn btn-success btn-block">
+                                                        <i class="fa fa-check mr-2"></i> Registrar Pago
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
+                                <div v-else-if="tipoVenta === 'credito'">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label for="" class="font-weight-bold">Cantidad de cuotas
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="number" id="numeroCuotas" class="form-control"
+                                                v-model="numero_cuotas">
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="" class="font-weight-bold">Frecuencia de Pagos
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group mb-3">
+                                                <input type="number" class="form-control" v-model="tiempo_diaz">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">Dias</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="font-weight-bold">Total</label>
+                                                <label>
+                                                    {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                                        monedaVenta[1] }}
+                                                </label>
+                                                <button @click="generarCuotas" type="button"
+                                                    class="btn btn-success">GENERAR CUOTAS</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" v-model="primera_cuota">
+                                        <label class="form-check-label" for="defaultCheck1">
+                                            Primera cuota pagada
+                                        </label>
+                                    </div>
+
+                                    <div class="row" v-if="primera_cuota">
+                                        <div class="col-md-5 form-group">
+                                            <label class="font-weight-bold">Monto a pagar</label>
+                                            <input type="number" class="form-control" v-model="primer_precio_cuota">
+                                        </div>
+                                        <div class="col-md-5 form-group">
+                                            <label class="font-weight-bold" for="select-input">Tipo de Pago</label>
+                                            <select class="form-control" id="select-input" v-model="tipo_pago"
+                                                @change="seleccionarTipoPago(tipo_pago)">
+                                                <option v-for="(value, key) in tiposPago" :value="value">{{ key }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cuotas table -->
+                                    <div class="form-group row border">
+                                        <div class="table-responsive col-md-12">
+                                            <table class="table table-bordered table-striped table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Fecha Pago</th>
+                                                        <th>Precio Cuota</th>
+                                                        <th>Total Cancelado</th>
+                                                        <th>Saldo</th>
+                                                        <th>Fecha Cancelado</th>
+                                                        <th>Estado</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(cuota, index) in cuotas" :key="index">
+                                                        <td>{{ index + 1 }}</td>
+                                                        <td>{{ new Date(cuota.fecha_pago).toLocaleDateString('es-ES') }}
+                                                        </td>
+                                                        <td>{{ (cuota.precio_cuota *
+                                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
+                                                            }}</td>
+                                                        <td>{{ (cuota.totalCancelado *
+                                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
+                                                            }}</td>
+                                                        <td>{{ (cuota.saldo_restante *
+                                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
+                                                            }}</td>
+                                                        <td>{{ cuota.fecha_cancelado ? new
+                                                            Date(cuota.fecha_cancelado).toLocaleDateString('es-ES') :
+                                                            "Sin fecha" }}</td>
+                                                        <td>{{ cuota.estado }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        @click="cerrarModal3()">Volver</button>
+                                    <button type="button" class="btn btn-primary"
+                                        @click="registrarVenta()">Registrar</button>
+                                </div>
+
                             </div>
 
                             <div class="buttons d-flex justify-content-center">
@@ -677,12 +810,15 @@ import DataTable from 'primevue/datatable';
 import Dropdown from 'primevue/dropdown';
 import InputNumber from 'primevue/inputnumber';
 import InputText from 'primevue/inputtext';
-//import Swal from 'sweetalert2';
+import Swal from 'sweetalert2';
 import vSelect from "vue-select";
 import { TileSpinner } from "vue-spinners";
 export default {
     data() {
         return {
+            opcionPago: '',
+            tipoVenta: '',
+            mostrarSpinner: false,
             selectedAlmacen: null,
 
             step: 1,
@@ -960,6 +1096,94 @@ export default {
     },
 
     methods: {
+        generarCuotas() {
+            this.cuotas = [];
+            const fechaHoy = new Date();
+
+            const montoEntero = Math.floor(this.calcularTotal / this.numero_cuotas);
+            const montoDecimal = (this.calcularTotal - montoEntero * (this.numero_cuotas - 1)).toFixed(2);
+
+            let fechaInicioPago;
+            let saldoRestante;
+            let estadoCuota;
+
+            if (this.primera_cuota) {
+                const primerPago = Number(this.primer_precio_cuota) || 0;
+                fechaInicioPago = fechaHoy;
+                saldoRestante = (this.calcularTotal - primerPago).toFixed(2);
+                estadoCuota = 'Pagado';
+
+                const primeraCuota = {
+                    fecha_pago: `${fechaHoy.getFullYear()}-${fechaHoy.getMonth() + 1}-${fechaHoy.getDate()} ${fechaHoy.toLocaleTimeString()}`,
+                    precio_cuota: primerPago.toFixed(2),
+                    totalCancelado: primerPago.toFixed(2),
+                    saldo_restante: saldoRestante,
+                    fecha_cancelado: `${fechaHoy.getFullYear()}-${fechaHoy.getMonth() + 1}-${fechaHoy.getDate()} ${fechaHoy.toLocaleTimeString()}`,
+                    estado: 'Pagado',
+                };
+
+                this.cuotas.push(primeraCuota);
+
+                const montoRestante = this.calcularTotal - primerPago;
+                const montoEnteroRestante = Math.floor(montoRestante / (this.numero_cuotas - 1));
+                const montoDecimalRestante = (montoRestante - montoEnteroRestante * (this.numero_cuotas - 2)).toFixed(2);
+
+                saldoRestante = montoRestante;
+                fechaInicioPago = new Date(fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000);
+                estadoCuota = 'Pendiente';
+
+                for (let i = 1; i < this.numero_cuotas; i++) {
+                    const fechaPago = new Date(fechaInicioPago.getTime() + (i - 1) * this.tiempo_diaz * 24 * 60 * 60 * 1000);
+                    const dia = fechaPago.getDate();
+                    const mes = fechaPago.getMonth() + 1;
+                    const año = fechaPago.getFullYear();
+
+                    const cuota = {
+                        fecha_pago: `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}`,
+                        precio_cuota: i === this.numero_cuotas - 1 ? parseFloat(montoDecimalRestante).toFixed(2) : montoEnteroRestante,
+                        totalCancelado: 0,
+                        saldo_restante: saldoRestante,
+                        fecha_cancelado: null,
+                        estado: 'Pendiente',
+                    };
+
+                    saldoRestante -= cuota.precio_cuota;
+                    saldoRestante = saldoRestante.toFixed(2);
+
+                    this.cuotas.push(cuota);
+                }
+            } else {
+                fechaInicioPago = new Date(fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000);
+                saldoRestante = this.calcularTotal;
+                estadoCuota = 'Pendiente';
+
+                for (let i = 0; i < this.numero_cuotas; i++) {
+                    const fechaPago = new Date(fechaInicioPago.getTime() + i * this.tiempo_diaz * 24 * 60 * 60 * 1000);
+                    const dia = fechaPago.getDate();
+                    const mes = fechaPago.getMonth() + 1;
+                    const año = fechaPago.getFullYear();
+
+                    const cuota = {
+                        fecha_pago: `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}`,
+                        precio_cuota: i === this.numero_cuotas - 1 ? parseFloat(montoDecimal).toFixed(2) : montoEntero,
+                        totalCancelado: 0,
+                        saldo_restante: saldoRestante,
+                        fecha_cancelado: null,
+                        estado: 'Pendiente',
+                    };
+
+                    saldoRestante -= cuota.precio_cuota;
+                    saldoRestante = saldoRestante.toFixed(2);
+
+                    this.cuotas.push(cuota);
+                }
+            }
+        },
+        seleccionarTipoVenta(tipo) {
+            this.tipoVenta = tipo;
+            this.idtipo_venta = tipo === 'contado' ? 1 : 2;
+            this.opcionPago = ''; // Reinicia la opción de pago al cambiar el tipo de venta
+        },
         buscarVenta() {
             this.listarVenta(1, this.buscar);
         },
@@ -967,10 +1191,7 @@ export default {
         validarYAvanzar() {
             const errores = [];
 
-            if (this.step === 1) {
-                if (this.nombreCliente === '') errores.push('Necesita un nombre del Cliente');
-                if (this.tipo_comprobante === '0') errores.push('Seleccione un tipo de comprobante');
-            } else if (this.step === 2) {
+            if (this.step === 2) {
                 if (!this.idAlmacen) errores.push('Seleccione un almacén');
             }
 
@@ -2001,161 +2222,154 @@ export default {
                     console.error("Error al mostrar el diálogo:", error);
                 });
         },
-        async registrarVenta(idtipo_pago) {
-            if (this.validarVenta()) {
-                return;
-            }
-            console.log(" REGISTRANDO VENTA")
-            let me = this;
-            this.mostrarSpinner = false;
-            this.idtipo_pago = idtipo_pago;
 
-            for (let i = 0; i < me.cuotas.length; i++) {
-                console.log("LLEGA ARRAYDATA!", me.cuotas[i]);
-            }
-            console.log("hola");
-            console.log(this.primer_precio_cuota);
-            if (this.tipo_comprobante === "RESIVO") {
+        async buscarOCrearCliente() {
+            try {
+                // Primero, intenta buscar el cliente
                 const response = await axios.get(`/api/clientes/existe?documento=${this.documento}`);
-                if (!response.data.existe) {
+
+                if (response.data.existe) {
+                    // Si el cliente existe, usa ese ID y actualiza los datos del cliente
+                    this.idcliente = response.data.cliente.id;
+                    this.nombreCliente = response.data.cliente.nombre;
+                    this.tipo_documento = response.data.cliente.tipo_documento;
+                    this.complemento_id = response.data.cliente.complemento_id;
+                } else {
+                    // Si el cliente no existe, intenta crearlo
                     const nuevoClienteResponse = await axios.post('/cliente/registrar', {
                         'nombre': this.nombreCliente,
                         'num_documento': this.documento,
                         'tipo_documento': '5'
                     });
                     this.idcliente = nuevoClienteResponse.data.id;
-                } else {
-                    this.idcliente = response.data.cliente.id;
                 }
-                axios
-                    .post("/venta/registrar", {
-                        idcliente: this.idcliente,
-                        resivo: this.resivo, // Campo adicional para RESIVO
-                        tipo_comprobante: this.tipo_comprobante,
-                        serie_comprobante: this.serie_comprobante, // Agregado para prueba
-                        num_comprobante: this.num_comprob, // Agregado para prueba
-                        impuesto: this.impuesto,
-                        total: this.calcularTotal,
-                        idAlmacen: this.idAlmacen,
-                        idtipo_pago: idtipo_pago,
-                        idtipo_venta: this.idtipo_venta,
-                        data: this.arrayDetalle,
-                    })
-                    .then((response) => {
-                        if (response.data.id > 0) {
-                            // Restablecer valores después de una venta exitosa
-                            me.listado = 1;
-                            me.ejecutarFlujoCompleto();
-                            me.listarVenta(1, "", "num_comprob");
-                            me.cerrarModal2();
-                            me.cerrarModal3();
-                            this.imprimirResivo(response.data.id);
-                            me.idproveedor = 0;
-                            me.tipo_comprobante = "FACTURA";
-                            me.nombreCliente = "";
-                            me.idcliente = 0;
-                            me.tipo_documento = 0;
-                            me.complemento_id = "";
-                            me.documento = "";
-                            me.imagen = "";
-                            me.serie_comprobante = "";
-                            me.num_comprob = "";
-                            me.impuesto = 0.18;
-                            me.total = 0.0;
-                            me.idarticulo = 0;
-                            me.articulo = "";
-                            me.cantidad = 0;
-                            me.precio = 0;
-                            me.stock = 0;
-                            me.codigo = "";
-                            me.descuento = 0;
-                            me.arrayDetalle = [];
-                            me.primer_precio_cuota = 0;
-                            me.step = 1;
-                            me.recibido = 0;
-                        } else {
-                            console.log(response);
-                            me.ejecutarFlujoCompleto();
-                            // Manejo de errores
-                        }
-                    })
-                    .catch((error) => {
-                        me.ejecutarFlujoCompleto();
-                        console.log(error);
-                    });
-            } else {
-                axios
-                    .post("/venta/registrar", {
-                        idcliente: this.idcliente,
-                        tipo_comprobante: this.tipo_comprobante,
-                        serie_comprobante: this.serie_comprobante,
-                        num_comprobante: this.num_comprob,
-                        impuesto: this.impuesto,
-                        total: this.calcularTotal,
-                        idAlmacen: this.idAlmacen,
-                        idtipo_pago: idtipo_pago,
-                        idtipo_venta: this.idtipo_venta,
-                        idpersona: this.idcliente,
-                        data: this.arrayDetalle,
-                    })
-                    .then((response) => {
-                        let idVentaRecienRegistrada = response.data.id;
-                        //this.emitirFactura(idVentaRecienRegistrada);
-
-                        if (response.data.id > 0) {
-                            // Restablecer valores después de una venta exitosa
-                            me.listado = 1;
-                            me.listarVenta(1, "", "num_comprob");
-                            me.cerrarModal2();
-                            me.cerrarModal3();
-                            me.idproveedor = 0;
-                            me.tipo_comprobante = "RESIVO";
-                            me.nombreCliente = "";
-                            me.idcliente = 0;
-                            me.tipo_documento = 0;
-                            me.complemento_id = "";
-                            me.documento = "";
-                            me.imagen = "";
-                            me.serie_comprobante = "";
-                            me.num_comprob = "";
-                            me.impuesto = 0.18;
-                            me.total = 0.0;
-                            me.idarticulo = 0;
-                            me.articulo = "";
-                            me.cantidad = 0;
-                            me.precio = 0;
-                            me.stock = 0;
-                            me.codigo = "";
-                            me.descuento = 0;
-                            me.arrayDetalle = [];
-                            me.primer_precio_cuota = 0;
-
-                            //window.open('/factura/imprimir/' + response.data.id);
-                        } else {
-                            console.log(response);
-                            if (response.data.valorMaximo) {
-                                //alert('El valor de descuento no puede exceder el '+ response.data.valorMaximo);
-                                swal(
-                                    "Aviso",
-                                    "El valor de descuento no puede exceder el " +
-                                    response.data.valorMaximo,
-                                    "warning"
-                                );
-                                return
-                            } else {
-                                //alert(response.data.caja_validado);
-                                swal("Aviso", response.data.caja_validado, "warning");
-                                return;
-                            }
-                            //console.log(response.data.valorMaximo)
-                        }
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    });
+            } catch (error) {
+                console.error("Error al buscar o crear cliente:", error);
+                // Manejar el error adecuadamente
             }
         },
 
+        async registrarVenta(idtipo_pago) {
+            if (this.validarVenta()) return;
+
+            this.prepararDatosCliente();
+            await this.buscarOCrearCliente();
+
+            const ventaData = this.prepararDatosVenta(idtipo_pago);
+
+            try {
+                this.mostrarSpinner = true;
+                const response = await axios.post("/venta/registrar", ventaData);
+
+                if (response.data.id > 0) {
+                    this.manejarVentaExitosa(response.data.id);
+                } else {
+                    this.manejarErrorVenta(response.data);
+                }
+            } catch (error) {
+                console.error("Error al registrar venta:", error);
+                this.ejecutarFlujoCompleto();
+            } finally {
+                this.mostrarSpinner = false;
+            }
+        },
+
+        prepararDatosCliente() {
+            if (!this.nombreCliente.trim()) {
+                this.nombreCliente = "SIN NOMBRE";
+                this.documento = "000000";
+            }
+        },
+
+        prepararDatosVenta(idtipo_pago) {
+            const datosComunes = {
+                idcliente: this.idcliente,
+                tipo_comprobante: this.tipo_comprobante,
+                serie_comprobante: this.serie_comprobante,
+                num_comprobante: this.num_comprob,
+                impuesto: this.impuesto,
+                total: this.calcularTotal,
+                idAlmacen: this.idAlmacen,
+                idtipo_pago,
+                idtipo_venta: this.idtipo_venta,
+                data: this.arrayDetalle,
+            };
+
+            if (this.tipoVenta === 'credito') {
+                return {
+                    ...datosComunes,
+                    idpersona: this.idcliente,
+                    numero_cuotasCredito: this.numero_cuotas,
+                    tiempo_dias_cuotaCredito: this.tiempo_diaz,
+                    totalCredito: this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal,
+                    estadoCredito: "Pendiente",
+                    cuotaspago: this.cuotas,
+                    primer_precio_cuota: this.primer_precio_cuota
+                };
+            } else if (this.tipo_comprobante === "RESIVO") {
+                return { ...datosComunes, resivo: this.resivo };
+            } else {
+                return { ...datosComunes, idpersona: this.idcliente };
+            }
+        },
+
+        manejarVentaExitosa(idVenta) {
+            this.listado = 1;
+            this.ejecutarFlujoCompleto();
+            this.listarVenta(1, "", "num_comprob");
+            this.cerrarModal2();
+            this.cerrarModal3();
+
+            if (this.tipo_comprobante === "RESIVO") {
+                this.imprimirResivo(idVenta);
+            }
+
+            this.reiniciarFormulario();
+        },
+
+        manejarErrorVenta(data) {
+            if (data.valorMaximo) {
+                swal("Aviso", `El valor de descuento no puede exceder el ${data.valorMaximo}`, "warning");
+            } else if (data.caja_validado) {
+                swal("Aviso", data.caja_validado, "warning");
+            } else {
+                console.error("Error desconocido al registrar venta:", data);
+            }
+        },
+
+        reiniciarFormulario() {
+            // Restablecer todos los valores del formulario
+            Object.assign(this, {
+                idproveedor: 0,
+                tipo_comprobante: this.tipo_comprobante === "RESIVO" ? "FACTURA" : "RESIVO",
+                nombreCliente: "",
+                idcliente: 0,
+                tipo_documento: 0,
+                complemento_id: "",
+                documento: "",
+                imagen: "",
+                serie_comprobante: "",
+                num_comprob: "",
+                impuesto: 0.18,
+                total: 0.0,
+                idarticulo: 0,
+                articulo: "",
+                cantidad: 0,
+                precio: 0,
+                stock: 0,
+                codigo: "",
+                descuento: 0,
+                arrayDetalle: [],
+                primer_precio_cuota: 0,
+                step: 1,
+                recibido: 0
+            });
+        },
+        handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                this.registrarVenta(this.idtipo_pago);
+            }
+        },
         eliminarVenta(idVenta) {
             axios.delete('/venta/eliminarVenta/' + idVenta)
                 .then(function (response) {
@@ -2423,7 +2637,12 @@ export default {
         //this.obtenerDatosUsuario();
         this.actualizarFechaHora();
         this.ejecutarFlujoCompleto();
+        document.addEventListener('keypress', this.handleKeyPress);
+
     },
+    beforeDestroy() {
+        document.removeEventListener('keypress', this.handleKeyPress);
+    }
 };
 </script>
 <style scoped>
@@ -2689,8 +2908,8 @@ input:required {
 }
 
 .step-number {
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
     background-color: #ccc;
     color: #fff;

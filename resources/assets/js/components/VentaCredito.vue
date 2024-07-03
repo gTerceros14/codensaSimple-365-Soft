@@ -1,8 +1,5 @@
 <template>
     <main class="main">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
-        </ol>
         <div class="container-fluid">
             <div class="card">
                 <div class="card-header">
@@ -17,8 +14,8 @@
                                     <option value="nombre_vendedor">Nombre del vendedor</option>
                                 </select>
                                 <input type="text" v-model="buscar"
-                                    @keyup.enter="obtenerCreditos(1, buscar, criterio, filtroAvanzado)" class="form-control"
-                                    placeholder="Texto a buscar">
+                                    @keyup.enter="obtenerCreditos(1, buscar, criterio, filtroAvanzado)"
+                                    class="form-control" placeholder="Texto a buscar">
                                 <button type="submit" @click="obtenerCreditos(1, buscar, criterio, filtroAvanzado)"
                                     class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                             </div>
@@ -65,8 +62,9 @@
                                     <td v-text="credito.nombre_vendedor"></td>
                                     <td>{{ (credito.totalVenta * monedaVenta[0]).toFixed(2) }} {{ monedaVenta[1] }}</td>
                                     <td>{{ (credito.total * monedaVenta[0]).toFixed(2) }} {{ monedaVenta[1] }}</td>
-                                    <td>{{ calcularCuotasPagadas(credito.totalVenta, credito.total, credito.numero_cuotas)
-                                    }}/{{ credito.numero_cuotas }}</td>
+                                    <td>{{ calcularCuotasPagadas(credito.totalVenta, credito.total,
+                                        credito.numero_cuotas)
+                                        }}/{{ credito.numero_cuotas }}</td>
                                     <td>{{ credito.estado == "Completado" ? "Sin Próximos Pagos" :
                                         formatFecha(credito.proximo_pago) }}</td>
                                     <td>
@@ -116,15 +114,18 @@
                             <dd class="col-sm-9">{{ arraySeleccionado.nombre_vendedor }}</dd>
                             <dt class="col-sm-3">Comprobante</dt>
                             <dd class="col-sm-9">
-                                <p>{{ arraySeleccionado.tipo_comprobante }} - {{ arraySeleccionado.num_comprobante }}</p>
+                                <p>{{ arraySeleccionado.tipo_comprobante }} - {{ arraySeleccionado.num_comprobante }}
+                                </p>
                             </dd>
                             <dt class="col-sm-3">Próximo pago</dt>
                             <dd class="col-sm-9">{{ formatFecha(arraySeleccionado.proximo_pago) }}</dd>
                             <dt class="col-sm-3">Total de la venta</dt>
-                            <dd class="col-sm-3">{{ (arraySeleccionado.totalVenta * monedaVenta[0]).toFixed(2) }} {{ monedaVenta[1] }}
+                            <dd class="col-sm-3">{{ (arraySeleccionado.totalVenta * monedaVenta[0]).toFixed(2) }} {{
+                                monedaVenta[1] }}
                             </dd>
                             <dt class="col-sm-3">Monto pendiente</dt>
-                            <dd class="col-sm-3">{{ (arraySeleccionado.total * monedaVenta[0]).toFixed(2) }} {{ monedaVenta[1] }}</dd>
+                            <dd class="col-sm-3">{{ (arraySeleccionado.total * monedaVenta[0]).toFixed(2) }} {{
+                                monedaVenta[1] }}</dd>
                         </dl>
                         <div class="form-group row border">
                             <div class="table-responsive col-md-12">
@@ -165,8 +166,8 @@
                                                     ? 'Atrasado' : cuota.estado }} </td>
                                             <td>
 
-                                                <icon-button v-if="cuota.estado != 'Pagado'" icon="fa fa-inbox" size="small"
-                                                    color="success" @click="abrirModal(cuota, index)" />
+                                                <icon-button v-if="cuota.estado != 'Pagado'" icon="fa fa-inbox"
+                                                    size="small" color="success" @click="abrirModal(cuota, index)" />
                                                 <icon-button v-else icon="fa fa-check" size="small" color="success" />
                                             </td>
 
@@ -187,7 +188,6 @@
 </template>
 
 <script>
-import VueBarcode from 'vue-barcode';
 
 export default {
     data() {

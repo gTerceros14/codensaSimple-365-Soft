@@ -191,20 +191,29 @@ class ClienteController extends Controller
         //return ['clientes' => $clientes];
     }
 
-    public function store(Request $request)
-    {
-        if (!$request->ajax())
-            return redirect('/');
-        $persona = new Persona();
-        $persona->nombre = $request->nombre;
-        $persona->usuario = Auth::user()->iduse;
-        //$persona->usuario = Auth::user()->id;
-        $persona->tipo_documento = $request->tipo_documento;
-        $persona->num_documento = $request->num_documento;
-        $persona->complemento_id = $request->complemento;
-        $persona->save();
-        return ['id' => $persona->id];
+public function store(Request $request)
+{
+    if (!$request->ajax()) return redirect('/');
+
+    // Verificar si ya existe un cliente con este número de documento
+    $clienteExistente = Persona::where('num_documento', $request->num_documento)->first();
+
+    if ($clienteExistente) {
+        // Si ya existe, devolver ese ID
+        return ['id' => $clienteExistente->id];
     }
+
+    // Si no existe, crear uno nuevo
+    $persona = new Persona();
+    $persona->nombre = $request->nombre;
+    $persona->usuario = Auth::user()->iduse;
+    $persona->tipo_documento = $request->tipo_documento;
+    $persona->num_documento = $request->num_documento;
+    $persona->complemento_id = $request->complemento;
+    $persona->save();
+
+    return ['id' => $persona->id];
+}
 
     public function update(Request $request)
     {
