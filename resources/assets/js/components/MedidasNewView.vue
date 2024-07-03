@@ -48,13 +48,28 @@
             <Button v-if="tipoAccion === 2" label="Actualizar" icon="pi pi-check" class="p-button-text" @click="actualizarMedida()" />
           </template>
           <div class="p-fluid">
-            <div class="p-field">
-              <label for="name">Descripción</label>
-              <InputText id="name" v-model="descripcionMedida" required autofocus />
+            <div class="p-field input-container">
+              <label for="descripcionMedida">Descripción</label>
+              <InputText 
+                id="descripcionMedida" 
+                v-model="descripcionMedida" 
+                required 
+                autofocus 
+                :class="{'p-invalid': descripcionMedidaError}" 
+                @input="validarDescripcionEnTiempoReal"
+              />
+              <small class="p-error error-message" v-if="descripcionMedidaError">{{ descripcionMedidaError }}</small>
             </div>
-            <div class="p-field">
-              <label for="code">Código Clasificador</label>
-              <InputText id="code" v-model="codigoClasificador" required />
+            <div class="p-field input-container">
+              <label for="codigoClasificador">Código Clasificador</label>
+              <InputText 
+                id="codigoClasificador" 
+                v-model="codigoClasificador" 
+                required 
+                :class="{'p-invalid': codigoClasificadorError}" 
+                @input="validarCodigoEnTiempoReal"
+              />
+              <small class="p-error error-message" v-if="codigoClasificadorError">{{ codigoClasificadorError }}</small>
             </div>
           </div>
         </Dialog>
@@ -100,6 +115,8 @@
         tituloModal:'',
         errorMedida: 0,
       errorMostrarMsjMedida: [],
+      descripcionMedidaError: '',
+    codigoClasificadorError: '',
       };
     },
     computed: {
@@ -110,7 +127,21 @@
       }
     },
     methods: {
+      validarDescripcionEnTiempoReal() {
+        if (!this.descripcionMedida.trim()) {
+          this.descripcionMedidaError = "La descripción de la medida no puede estar vacía.";
+        } else {
+          this.descripcionMedidaError = '';
+        }
+      },
 
+      validarCodigoEnTiempoReal() {
+        if (!this.codigoClasificador.trim()) {
+          this.codigoClasificadorError = "El código clasificador no puede estar vacío.";
+        } else {
+          this.codigoClasificadorError = '';
+        }
+      },
       listarMedidas(page, buscar, criterio) {
         let me = this;
         var url = '/medida2?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
@@ -165,15 +196,21 @@
           });
       },
       validarMedida() {
-        this.errorMedida = 0;
-        this.errorMostrarMsjMedida = [];
+        this.descripcionMedidaError = '';
+        this.codigoClasificadorError = '';
+        let hasError = false;
 
-        if (!this.descripcionMedida) this.errorMostrarMsjMedida.push('La descripción de la medida no puede estar vacía.');
-        if (!this.codigoClasificador) this.errorMostrarMsjMedida.push('El código clasificador no puede estar vacío.');
+        if (!this.descripcionMedida.trim()) {
+          this.descripcionMedidaError = "La descripción de la medida no puede estar vacía.";
+          hasError = true;
+        }
 
-        if (this.errorMostrarMsjMedida.length) this.errorMedida = 1;
+        if (!this.codigoClasificador.trim()) {
+          this.codigoClasificadorError = "El código clasificador no puede estar vacío.";
+          hasError = true;
+        }
 
-        return this.errorMedida;
+        return hasError;
       },
       desactivarMedida(id) {
         swal({
@@ -283,6 +320,8 @@
         this.tituloModal = '';
         this.descripcionMedida = '';
         this.codigoClasificador = '';
+        this.descripcionMedidaError = '';
+        this.codigoClasificadorError = '';
       },
     },
     mounted() {
@@ -292,6 +331,29 @@
   </script>
     
   <style scoped>
+  .input-container {
+    position: relative;
+    padding-bottom: 20px; /* Espacio para el mensaje de error */
+}
+
+.input-container .p-inputtext {
+    width: 100%;
+    margin-bottom: 0; /* Eliminar margen inferior si existe */
+}
+
+.error-message {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-size: 0.75rem; /* Tamaño de fuente más pequeño */
+    margin-top: 2px; /* Pequeño espacio entre el input y el mensaje */
+}
+
+/* Asegurar que el input no crezca */
+.p-inputtext {
+    height: 2.5rem; /* O el alto que prefieras */
+    line-height: 2.5rem;
+}
   >>> .custom-icon-size .pi {
   font-size: 1.2rem; /* Ajusta este tamaño según sea necesario */
 }

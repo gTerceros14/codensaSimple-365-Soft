@@ -10,12 +10,9 @@
 
           <div class="toolbar-container">
             <div class="toolbar">
-                  <Button @click="abrirModal('industria', 'registrar')" class=" p-button-sm p-button-success">
-                      <i class="pi pi-plus"></i> Nuevo
-                  </Button>
-                  <Button @click="showUploadDialog" class="p-button-sm p-button-help">
-                    <i class="pi pi-file-excel"></i> Subir Archivo
-                  </Button>
+                  <Button label="Nuevo" icon="pi pi-plus" @click="abrirModal('industria', 'registrar')" class="p-button-success p-button-sm" />
+                  <Button label="Importar" icon="pi pi-file-excel" @click="showUploadDialog" class="p-button-help p-button-sm" />
+                  
               </div>
               <div class="searchbar">
                   <span class="p-input-icon-left">
@@ -26,7 +23,7 @@
               
           </div>
 
-          <DataTable :value="arrayIndustria" class="p-datatable-gridlines" paginator :rows="9">
+          <DataTable :value="filteredProducts" class="p-datatable-gridlines p-datatable-sm"   responsiveLayout="scroll" paginator :rows="9">
               <Column header="Opciones">
                   <template #body="slotProps">
                       <Button icon="pi pi-pencil" class="p-button-sm p-button-warning custom-icon-size" @click="abrirModal('industria', 'actualizar', slotProps.data)" />
@@ -45,18 +42,21 @@
           </DataTable>
 
           <Dialog :visible.sync="modal" modal :header="tituloModal" :closable="true">
-              <template #footer>
-                  <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="cerrarModal()" />
-                  <Button v-if="tipoAccion === 1" label="Guardar" icon="pi pi-check" class="p-button-text" @click="registrarIndustria()" />
-                  <Button v-if="tipoAccion === 2" label="Actualizar" icon="pi pi-check" class="p-button-text" @click="actualizarIndustria()" />
-              </template>
-              <div class="p-fluid">
-                  <div class="p-field">
-                      <label for="name">Nombre Industria</label>
-                      <InputText id="name" v-model="nombre" required autofocus />
-                  </div>
-              </div>
-          </Dialog>
+            <template #footer>
+                <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="cerrarModal()" />
+                <Button v-if="tipoAccion === 1" label="Guardar" icon="pi pi-check" class="p-button-text" @click="registrarIndustria()" />
+                <Button v-if="tipoAccion === 2" label="Actualizar" icon="pi pi-check" class="p-button-text" @click="actualizarIndustria()" />
+            </template>
+            <div class="p-fluid">
+                <div class="p-field">
+                    <div class="p-field input-container">
+                        <label for="name">Nombre Industria</label>
+                        <InputText id="name" v-model="nombre" required autofocus :class="{'p-invalid': nombreError}" @input="validarNombreEnTiempoReal" />
+                        <small class="p-error error-message" v-if="nombreError">{{ nombreError }}</small>
+                    </div>
+                </div>
+            </div>
+        </Dialog>
 
           <Dialog :visible.sync="importar" modal :header="'Importar Industrias'" :closable="true">
               <FileUpload  @select="onFileSelect" :showUploadButton="false"  chooseLabel="Seleccionar" cancelLabel="Cancelar" :customUpload="true" :multiple="false" accept=".xls,.xlsx,.csv" :maxFileSize="1000000">
@@ -93,20 +93,36 @@ export default {
       Panel,
       Dialog,
   },
+  computed: {
+    filteredProducts() {
+        return this.arrayIndustria.filter(arrayIndustria => 
+        arrayIndustria.nombre.toLowerCase().includes(this.buscar.toLowerCase())
+        );
+      }
+  },
   data() {
       return {
+        industria_id: 0,
           modal: false,
           tituloModal: 'Registrar industria',
           tipoAccion: 1,
           arrayIndustria: [],
           criterio: 'nombre',
           buscar: '',
-          nombre: '',
+          nombre: '', 
           archivo: null,
           importar: false,
+          nombreError: '',
       };
   },
   methods: {
+    validarNombreEnTiempoReal() {
+        if (this.nombre.trim() === '') {
+            this.nombreError = "El nombre de Industria no puede estar vacío.";
+        } else {
+            this.nombreError = '';
+        }
+    },
       onFileSelect(event) {
           this.archivo = event.files[0];
       },
@@ -129,8 +145,51 @@ export default {
                   console.error(error);
               });
       },
+      registrarIndustria() {
+            if (this.validarIndustria()) {
+                return;
+            }
+            let me = this;
+
+            axios.post('/industria/registrar', {
+                'nombre': this.nombre
+            }).then(function (response) {
+                me.cerrarModal();
+                console.log(response)
+                me.listarIndustria(1, '', 'nombre');
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        actualizarIndustria() {
+            if (this.validarIndustria()) {
+                return;
+            }
+
+            let me = this;
+
+            axios.put('/industria/actualizar', {
+                'nombre': this.nombre,
+                'id': this.industria_id
+            }).then(function (response) {
+                me.cerrarModal();
+                me.listarIndustria(1, '', 'nombre');
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        validarIndustria() {
+            this.nombreError = '';
+
+            if (!this.nombre.trim()) {
+                this.nombreError = "El nombre de Industria no puede estar vacío.";
+                return true;
+            }
+
+            return false;
+        },
       listarIndustria(page, buscar, criterio) {
-          let url = '/industria?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+          let url = '/industrianewview?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
           axios.get(url)
               .then(response => {
                   this.arrayIndustria = response.data.industrias;
@@ -218,29 +277,39 @@ export default {
             })
         },
       abrirModal(modelo, accion, data = []) {
-          switch (modelo) {
-              case "industria":
-                  switch (accion) {
-                      case 'registrar':
-                          this.modal = true;
-                          this.tituloModal = 'Registrar Industria';
-                          this.tipoAccion = 1;
-                          break;
-                      case 'actualizar':
-                          this.modal = true;
-                          this.tituloModal = 'Actualizar Industria';
-                          this.tipoAccion = 2;
-                          this.nombre = data['nombre'];
-                          break;
-                  }
-                  break;
-          }
+        switch (modelo) {
+                case "industria":
+                    {
+                        switch (accion) {
+                            case 'registrar':
+                                {
+                                    this.modal = true;
+                                    this.tituloModal = 'Registrar Industria';
+                                    this.nombre = '';
+                                    //this.descripcion = '';
+                                    this.tipoAccion = 1;
+                                    break;
+                                }
+                            case 'actualizar':
+                                {
+                                    //console.log(data);
+                                    this.modal = true;
+                                    this.tituloModal = 'Actualizar Industria';
+                                    this.tipoAccion = 2;
+                                    this.industria_id = data['id'];
+                                    this.nombre = data['nombre'];
+                                    break;
+                                }
+                        }
+                    }
+            }
       },
       cerrarModal() {
-          this.modal = false;
-          this.tituloModal = '';
-          this.nombre = '';
-      },
+        this.modal = false;
+        this.tituloModal = '';
+        this.nombre = '';
+        this.nombreError = ''; // Limpiar el error
+    },
       showUploadDialog() {
           this.importar = true;
       }
@@ -252,6 +321,29 @@ export default {
 </script>
 
 <style scoped>
+.input-container {
+    position: relative;
+    padding-bottom: 20px; /* Espacio para el mensaje de error */
+}
+
+.input-container .p-inputtext {
+    width: 100%;
+    margin-bottom: 0; /* Eliminar margen inferior si existe */
+}
+
+.error-message {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-size: 0.75rem; /* Tamaño de fuente más pequeño */
+    margin-top: 2px; /* Pequeño espacio entre el input y el mensaje */
+}
+
+/* Asegurar que el input no crezca */
+.p-inputtext {
+    height: 2.5rem; /* O el alto que prefieras */
+    line-height: 2.5rem;
+}
 .p-panel .p-panel-header {
   padding-top: 10px;
   padding-bottom: 10px;
@@ -274,11 +366,9 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
 }
 .searchbar {
   display: flex;
-  width: 50%;
   align-items: center;    
   justify-content: flex-start;
   display: inline-block;
@@ -395,4 +485,21 @@ export default {
 >>> .p-dialog .p-dialog-content{
   padding: 0 1.5rem 1.5rem 1.5rem;
 }
+@media (max-width: 768px) {
+    .toolbar-container {
+    flex-direction: column;
+    align-items: flex-start;
+    }
+    .toolbar {
+        margin-bottom: 10px;
+        justify-content: space-between;
+    }
+    .searchbar {
+        margin-bottom: 10px;
+        order: 1; /* Esto asegura que la barra de búsqueda esté abajo en vista móvil */
+    }
+    .custom-input {
+      width: 150%;
+    }
+  }
 </style>
