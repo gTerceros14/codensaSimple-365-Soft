@@ -28,4 +28,8 @@ class Venta extends Model
 {
     return $this->hasMany(DetalleVenta::class, 'idventa');
 }
+public function creditoVenta()
+{
+    return $this->hasOne(CreditoVenta::class, 'idventa');
+}
 }

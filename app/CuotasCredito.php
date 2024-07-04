@@ -17,4 +17,9 @@ class CuotasCredito extends Model
         'estado'
     ];
     public $timestamps = false;
+
+    public function creditoVenta()
+{
+    return $this->belongsTo(CreditoVenta::class, 'idcredito');
+}
 }

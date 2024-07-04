@@ -468,6 +468,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/api/clientes', 'ClienteController@buscarPorDocumento');
 
         Route::get('/ingreso/generar-nota-ingreso/{id}', 'IngresoController@generarNotaIngreso');
+        Route::get('/credito/recibo-cuota/{id}', 'CreditoVentaController@generarReciboCuota')->name('credito.recibo-cuota');
     });
 
     //RUTA PARA RECUPERAR LA SESSION CON EL ID DE LA PERSONA LOGUEADA
