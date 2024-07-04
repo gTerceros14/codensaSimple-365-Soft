@@ -22,7 +22,7 @@ class CreditoVentaController extends Controller
 
         $buscar = $request->buscar;
         $criterio = $request->criterio;
-        $perPage = $request->input('per_page', 3);
+        $perPage = $request->input('per_page', 10);
         $filtroAvanzado = $request->filtro_avanzado;
 
         $creditosQuery = CreditoVenta::query()
