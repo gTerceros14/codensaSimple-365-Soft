@@ -109,6 +109,7 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/backup', 'BackupDbController@createBackup');
         Route::get('/categoria', 'CategoriaController@index');
+        Route::get('/categorianewview', 'CategoriaController@index2');
         Route::post('/categoria/registrar', 'CategoriaController@store');
         Route::put('/categoria/actualizar', 'CategoriaController@update');
         Route::put('/categoria/desactivar', 'CategoriaController@desactivar');

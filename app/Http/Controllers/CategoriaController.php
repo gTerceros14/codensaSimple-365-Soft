@@ -45,7 +45,27 @@ class CategoriaController extends Controller
             'categorias' => $categorias
         ];
     }
+    public function index2(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
 
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+        
+        if ($buscar==''){
+            $categorias = Categoria::orderBy('id', 'desc');
+        }
+        if (!empty($buscar)) {
+            $categorias = Categoria::where(function ($q) use ($buscar) {
+                $q->where('categorias.nombre', 'like', '%' . $buscar . '%')
+                  ->orWhere('categorias.descripcion', 'like', '%' . $buscar . '%')
+                  ->orWhere('categorias.codigoProductoSin', 'like', '%' . $buscar . '%')
+                  ->orderBy('id', 'desc');
+            });
+        }
+        $categorias = $categorias->get();
+        return ['categorias' => $categorias];
+    }
     public function selectCategoria(Request $request){
         if (!$request->ajax()) return redirect('/');
         $categorias = Categoria::where('condicion','=','1')
