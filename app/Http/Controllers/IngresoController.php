@@ -187,7 +187,7 @@ class IngresoController extends Controller
             $ingreso->estado = true;
             $ingreso->idalmacen = $request->almacenSeleccionado['id'] ?? null;
             $ingreso->idcaja = $ultimaCaja->id;
-            $ingreso->descuento_global = 0;
+            $ingreso->descuento_global = $request->descuento_global ?? 0;
             $ingreso->save();
 
             $ultimaCaja->comprasContado += $request->saldoTotalCompra ?? 0;

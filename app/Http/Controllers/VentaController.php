@@ -1037,10 +1037,7 @@ public function imprimirResivoRollo($id) {
             $pdf->Cell(50, 6, utf8_decode(strtoupper('TOTAL')), 0, 0);
             $pdf->Cell(20, 6, utf8_decode(number_format($total, 2)), 0, 1, 'R');
 
-             $formatter = new NumberFormatter("es", NumberFormatter::SPELLOUT);
-            $totalTexto = strtoupper($formatter->format($total)) . ' BOLIVIANOS';
-            $pdf->SetFont('Courier', 'B', 8);
-            $pdf->Cell(0, 5, 'SON: ' . $totalTexto, 0, 1);
+          
             
             // Tipo de pago
             $tipoPago = $venta->tipoPago;
@@ -1349,5 +1346,56 @@ public function imprimirResivoCarta($id) {
     
         return response()->json(['last_comprobante' => $lastComprobante]);
     }
+    private function crearCreditoVenta($venta, $request)
+    {
+        $creditoventa = new CreditoVenta();
+        $creditoventa->idventa = $venta->id;
+        $creditoventa->idcliente = $request->idcliente;
+        $creditoventa->numero_cuotas = $request->numero_cuotasCredito;
+        $creditoventa->tiempo_dias_cuota = $request->tiempo_dias_cuotaCredito;
+        $creditoventa->total = $request->totalCredito;
+        $creditoventa->estado = $request->estadoCredito;
+
+        $primerCuotaNoPagada = null;
+        foreach ($request->cuotaspago as $cuota) {
+            if ($cuota['estado'] !== 'Pagado') {
+                $primerCuotaNoPagada = $cuota;
+                break;
+            }
+        }
+        $creditoventa->proximo_pago = $primerCuotaNoPagada['fecha_pago'];
+
+        $creditoventa->save();
+
+        return $creditoventa;
+    }
+
+    private function registrarCuotasCredito($creditoventa, $cuotas)
+    {
+        $numeroCuota = 1; // Inicializamos el número de cuota en 1
+
+        foreach ($cuotas as $detalle) {
+            $cuota = new CuotasCredito();
+            $cuota->idcredito = $creditoventa->id;
+            if ($detalle['estado'] == "Pagado") {
+                $cuota->idcobrador = \Auth::user()->id;
+                $cuota->fecha_cancelado = $detalle['fecha_cancelado']; // Podrías ajustar esto según tus necesidades
+
+            } else {
+                $cuota->idcobrador = null;
+                $cuota->fecha_cancelado = null; // Podrías ajustar esto según tus necesidades
+
+
+            }
+
+            $cuota->numero_cuota = $numeroCuota++; // Asignamos el número de cuota y luego incrementamos
+            $cuota->fecha_pago = $detalle['fecha_pago'];
+            $cuota->precio_cuota = $detalle['precio_cuota'];
+            $cuota->saldo_restante = $detalle['saldo_restante'];
+            $cuota->estado = $detalle['estado'];
+            $cuota->save();
+        }
+    }
+
     
 }
