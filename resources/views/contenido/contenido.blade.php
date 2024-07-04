@@ -81,10 +81,10 @@
 <template v-if="menu==19">
     <linea></linea>
 </template>
-<template v-if="menu==20">
+<!--|<template v-if="menu==20">
     <industria></industria>
 </template>
-
+-->
 <template v-if="menu==21">
     <configuracion></configuracion>
 </template>
@@ -244,8 +244,11 @@
 <template v-if="menu==27">
     <medidasnewview></medidasnewview>
 </template>
-<template v-if="menu==71">
+<template v-if="menu==20">
     <industrianewview></industrianewview>
+</template>
+<template v-if="menu==71">
+    <lineanewview></lineanewview>
 </template>
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">

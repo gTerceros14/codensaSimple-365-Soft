@@ -3,7 +3,7 @@
       <Panel>
           <template #header>
               <div class="panel-header">
-                  <i class="pi pi-align-justify"></i>
+                  <i class="bi bi-buildings"></i>
                   <h4 class="panel-title">Industrias</h4>
               </div>
           </template>
@@ -338,7 +338,13 @@ export default {
     font-size: 0.75rem; /* Tamaño de fuente más pequeño */
     margin-top: 2px; /* Pequeño espacio entre el input y el mensaje */
 }
-
+>>>.p-paginator {
+    padding: 0px;
+  }
+>>> .p-panel .p-panel-header {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
 /* Asegurar que el input no crezca */
 .p-inputtext {
     height: 2.5rem; /* O el alto que prefieras */
@@ -366,6 +372,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  gap: 10px;
 }
 .searchbar {
   display: flex;
