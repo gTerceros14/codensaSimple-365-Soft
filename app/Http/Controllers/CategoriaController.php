@@ -55,8 +55,13 @@ class CategoriaController extends Controller
         if ($buscar==''){
             $categorias = Categoria::orderBy('id', 'desc');
         }
-        else{
-            $categorias = Categoria::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc');
+        if (!empty($buscar)) {
+            $categorias = Categoria::where(function ($q) use ($buscar) {
+                $q->where('categorias.nombre', 'like', '%' . $buscar . '%')
+                  ->orWhere('categorias.descripcion', 'like', '%' . $buscar . '%')
+                  ->orWhere('categorias.codigoProductoSin', 'like', '%' . $buscar . '%')
+                  ->orderBy('id', 'desc');
+            });
         }
         $categorias = $categorias->get();
         return ['categorias' => $categorias];

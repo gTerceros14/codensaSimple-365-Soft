@@ -78,9 +78,10 @@
 <template v-if="menu==18">
     <marca></marca>
 </template>
-<template v-if="menu==19">
+<!--<template v-if="menu==19">
     <linea></linea>
 </template>
+-->
 <!--|<template v-if="menu==20">
     <industria></industria>
 </template>
@@ -248,6 +249,9 @@
     <industrianewview></industrianewview>
 </template>
 <template v-if="menu==71">
+    <lineanewview></lineanewview>
+</template>
+<template v-if="menu==19">
     <lineanewview></lineanewview>
 </template>
 @elseif (Auth::user()->idrol == 2)

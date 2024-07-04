@@ -7,19 +7,20 @@
             <h4 class="panel-title">Lineas</h4>
           </div>
         </template>
-        <div class="toolbar">
-          <Button label="Nuevo" icon="pi pi-plus" @click="abrirModal('categoria', 'registrar')" class="p-button-secondary p-button-sm" />
-          <Button label="Exportar" icon="pi pi-cloud-download" @click="cargarExcel" class="p-button-success p-button-sm" />
-          <Button label="Importar" icon="pi pi-cloud-upload" @click="showUploadDialog" class="p-button-help p-button-sm" />
+        <div class="toolbar-container">
+          <div class="toolbar">
+            <Button label="Nuevo" icon="pi pi-plus" @click="abrirModal('categoria', 'registrar')" class="p-button-secondary p-button-sm" />
+            <Button label="Exportar" icon="pi pi-cloud-download" @click="cargarExcel" class="p-button-success p-button-sm" />
+            <Button label="Importar" icon="pi pi-cloud-upload" @click="showUploadDialog" class="p-button-help p-button-sm" />
+          </div>
+          <div class="search-bar">
+            <span class="p-input-icon-left">
+              <i class="pi pi-search" />
+            <InputText type="text" placeholder="Texto a buscar" v-model="buscar" class="p-inputtext-sm" @keyup="buscarlinea" />
+          </span>
+          </div>
         </div>
-        <div class="search-bar">
-          <input type="text" placeholder="Nombre" v-model="nombre" class="p-inputtext" />
-          <input type="text" placeholder="Texto a buscar" v-model="buscarTexto" class="p-inputtext" />
-          <Button class="p-button p-component p-button-primary" @click="buscar">
-            Buscar
-          </Button>
-        </div>
-        <DataTable :value="arrayCategoria" class="p-datatable-sm p-datatable-gridlines"  responsiveLayout="scroll" paginator :rows="9">
+        <DataTable :value="arrayCategoria" class="p-datatable-sm p-datatable-gridlines"  responsiveLayout="scroll" paginator :rows="movil">
           <Column header="Opciones">
             <template #body="slotProps">
                 <Button icon="pi pi-pencil" class="p-button-sm p-button-warning custom-icon-size" @click="abrirModal('categoria', 'actualizar', slotProps.data)" />
@@ -32,7 +33,7 @@
           <Column field="descripcion" header="Descripción"></Column>
           <Column field="estado" header="Estado">
             <template #body="slotProps">
-                <span :class="['status-badge', slotProps.data.estado === 1 ? 'active' : 'inactive']">
+                <span :class="['status-badge', slotProps.data.condicion === 1 ? 'active' : 'inactive']">
                     {{ slotProps.data.condicion === 1 ? 'Activo' : 'Inactivo' }}
                 </span>
             </template>
@@ -48,17 +49,17 @@
             <div class="p-field input-container">
               <label for="nombre">Nombre Línea</label>
               <InputText id="nombre" v-model="nombre" required autofocus :class="{'p-invalid': nombreError}" @input="validarNombreEnTiempoReal" />
-              <small class="p-error error-message" v-if="nombreError">{{ nombreError }}</small>
+              <small class="p-error error-message" v-if="nombreError"><strong>{{ nombreError }}</strong></small>
             </div>
             <div class="p-field input-container">
               <label for="descripcion">Descripción</label>
               <InputText id="descripcion" v-model="descripcion" required :class="{'p-invalid': descripcionError}" @input="validarDescripcionEnTiempoReal" />
-              <small class="p-error error-message" v-if="descripcionError">{{ descripcionError }}</small>
+              <small class="p-error error-message" v-if="descripcionError"><strong>{{ descripcionError }}</strong></small>
             </div>
             <div class="p-field input-container">
               <label for="codigo">Código</label>
               <InputNumber :useGrouping="false" id="codigo" v-model="codigoProductoSin" required :class="{'p-invalid': codigoProductoSinError}" @input="validarCodigoEnTiempoReal" />
-              <small class="p-error error-message" v-if="codigoProductoSinError">{{ codigoProductoSinError }}</small>
+              <small class="p-error error-message" v-if="codigoProductoSinError"><strong>{{ codigoProductoSinError }}</strong></small>
             </div>
           </div>
         </Dialog>
@@ -100,11 +101,6 @@ import axios from 'axios';
     },
     data() {
       return {
-        buscarTexto: '',
-        items: [
-          { opciones: '', nombre: 'linea2', codigo: 3, descripcion: 'linea2', estado: 'Activo' },
-          { opciones: '', nombre: 'LINEA1', codigo: 1, descripcion: 'LINEA1', estado: 'Activo' },
-        ],
         modal: false,
         tituloModal: '',
         tipoAccion: 1,
@@ -121,11 +117,25 @@ import axios from 'axios';
         modalImportar: 0,
         showUpload: false,
         importar: false,
-        archivo: null
+        archivo: null,
+        movil : '9'
       };
       
     },
+    computed: {
+        isMobile() {
+            return window.innerWidth <= 768;
+        },
+    },
     methods: {
+      vistamovil(){
+        if (this.isMobile){
+          this.movil = "7";
+        }
+      },
+      buscarlinea() {
+        this.listarCategoria(1, this.buscar);
+      },
       onFileSelect(event) {
           this.archivo = event.files[0];
           
@@ -208,11 +218,19 @@ import axios from 'axios';
         });
       },
       validarCategoria() {
-        this.errorCategoria = 0;
-        this.errorMostrarMsjCategoria = [];
-        if (!this.nombre) this.errorMostrarMsjCategoria.push("El nombre de la categoría no puede estar vacío.");
-        if (this.errorMostrarMsjCategoria.length) this.errorCategoria = 1;
-        return this.errorCategoria;
+        let hasError = false;
+        this.codigoProductoSinError = '';
+        this.descripcionError ='';
+        this.nombreError = '';
+        if (!this.descripcion.trim()){
+          this.descripcionError = "La descripción de la linea no puede estar vacía.";
+        }
+        if (this.codigoProductoSin === null || this.codigoProductoSin === undefined || String(this.codigoProductoSin).trim() === '') {
+          this.codigoProductoSinError = 'El código no puede estar vacío.';
+        }
+        if (!this.nombre.trim()) {
+          this.nombreError = "El nombre de la linea no puede estar vacío.";
+        }
       },
       actualizarCategoria() {
         if (this.validarCategoria()) {
@@ -360,7 +378,7 @@ import axios from 'axios';
     },
     mounted(){
       this.listarCategoria(1, this.buscar, this.criterio);
-
+      this.movil();
     }
   };
   </script>
@@ -398,20 +416,59 @@ import axios from 'axios';
   margin: 0;
   padding-left: 5px; 
 }
+.toolbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
 
-  .toolbar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .search-bar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  .activo {
-    color: green;
-    font-weight: bold;
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.search-bar {
+  flex-grow: 0.5;
+  display: flex;
+  align-items: center;    
+  justify-content: flex-start;
+}
+.search-bar .p-input-icon-left {
+  width: 100%;
+}
+.search-bar .p-inputtext-sm {
+  width: 100%;
+}
+.activo {
+  color: green;
+  font-weight: bold;
+}
+.status-badge {
+  padding: 0.25em 0.5em;
+  border-radius: 4px;
+  color: white;
+}
+.status-badge.active {
+  background-color: rgb(0, 225, 0);
+}
+.status-badge.inactive {
+  background-color: red;
+}
+@media (max-width: 768px) {
+    .toolbar-container {
+    flex-direction: column;
+    align-items: flex-start;
+    }
+    .toolbar {
+        margin-bottom: 10px;
+        justify-content: space-between;
+    }
+    .searchbar {
+        margin-bottom: 10px;
+        order: 1; /* Esto asegura que la barra de búsqueda esté abajo en vista móvil */
+    }
   }
   </style>
   

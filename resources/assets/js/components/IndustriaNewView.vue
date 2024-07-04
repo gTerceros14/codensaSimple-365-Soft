@@ -52,7 +52,7 @@
                     <div class="p-field input-container">
                         <label for="name">Nombre Industria</label>
                         <InputText id="name" v-model="nombre" required autofocus :class="{'p-invalid': nombreError}" @input="validarNombreEnTiempoReal" />
-                        <small class="p-error error-message" v-if="nombreError">{{ nombreError }}</small>
+                        <small class="p-error error-message" v-if="nombreError"> <strong>{{ nombreError }}</strong></small>
                     </div>
                 </div>
             </div>

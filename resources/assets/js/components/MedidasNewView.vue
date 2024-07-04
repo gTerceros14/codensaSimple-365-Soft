@@ -58,7 +58,7 @@
                 :class="{'p-invalid': descripcionMedidaError}" 
                 @input="validarDescripcionEnTiempoReal"
               />
-              <small class="p-error error-message" v-if="descripcionMedidaError">{{ descripcionMedidaError }}</small>
+              <small class="p-error error-message" v-if="descripcionMedidaError"><strong>{{ descripcionMedidaError }}</strong></small>
             </div>
             <div class="p-field input-container">
               <label for="codigoClasificador">Código Clasificador</label>
@@ -69,7 +69,7 @@
                 :class="{'p-invalid': codigoClasificadorError}" 
                 @input="validarCodigoEnTiempoReal"
               />
-              <small class="p-error error-message" v-if="codigoClasificadorError">{{ codigoClasificadorError }}</small>
+              <small class="p-error error-message" v-if="codigoClasificadorError"><strong>{{ codigoClasificadorError }}</strong></small>
             </div>
           </div>
         </Dialog>
