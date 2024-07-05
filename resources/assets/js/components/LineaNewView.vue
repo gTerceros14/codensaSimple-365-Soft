@@ -20,7 +20,7 @@
           </span>
           </div>
         </div>
-        <DataTable :value="arrayCategoria" class="p-datatable-sm p-datatable-gridlines"  responsiveLayout="scroll" paginator :rows="movil">
+        <DataTable :value="arrayCategoria" class="p-datatable-sm p-datatable-gridlines"  responsiveLayout="scroll" paginator :rows="9">
           <Column header="Opciones">
             <template #body="slotProps">
                 <Button icon="pi pi-pencil" class="p-button-sm p-button-warning custom-icon-size" @click="abrirModal('categoria', 'actualizar', slotProps.data)" />
@@ -378,7 +378,6 @@ import axios from 'axios';
     },
     mounted(){
       this.listarCategoria(1, this.buscar, this.criterio);
-      this.movil();
     }
   };
   </script>
