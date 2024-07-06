@@ -5,7 +5,7 @@
             <template #header>
                 <div class="panel-header">
                     <i class="pi pi-shopping-cart panel-icon"></i>
-                    <h4 class="panel-title">Registrar Compra</h4>
+                    <h4 class="panel-icon">Registrar Compra</h4>
                 </div>
             </template>
 
@@ -229,7 +229,7 @@
                                 <div class="orders-subtable">
                                     <h6>Informacion adicional</h6>
                                     <DataTable :value="[slotProps.data]" responsiveLayout="scroll">
-                                        <Column header="Fecha Vencimiento" :styles="{width:'15%'}">
+                                        <Column header="Fecha Vencimiento" :styles="{width:'10%'}">
                                             <template #body="slotProps">
                                                 <Calendar
                                                     class="p-inputtext-sm"
@@ -244,7 +244,7 @@
                                             </template>
                                         </Column>
                                         <Column field="nombre_categoria" header="Categoria" :styles="{width:'15%'}"></Column>
-                                        <Column :header="slotProps.data.esPaquetesCantidad ? ' Cantidad en: Paquetes' : 'Cantidad en: Unidades'" :styles="{width:'25%'}">
+                                        <Column :header="slotProps.data.esPaquetesCantidad ? ' Cantidad en: Paquetes' : 'Cantidad en: Unidades'" :styles="{width:'20%'}">
                                             <template #body="slotProps">
                                                 <div class="p-inputgroup">
                                                     <Button
@@ -272,7 +272,7 @@
                                                 <small class="p-error" v-if="slotProps.data.unidades <= 0">Cantidad inválida</small>
                                             </template>
                                         </Column>
-                                        <Column :header="slotProps.data.esPaquetesBonificacion ? 'Bonificacion en: Paquetes' : 'Bonificacion en: Unidades'" :styles="{width:'25%'}">
+                                        <Column :header="slotProps.data.esPaquetesBonificacion ? 'Bonificacion en: Paquetes' : 'Bonificacion en: Unidades'" :styles="{width:'20%'}">
                                             <template #body="slotProps">
                                                 <div class="p-inputgroup">
                                                     <Button
@@ -393,36 +393,43 @@
                 <div class="p-fluid p-formgrid p-grid">
                     <div class="p-field p-col-12 p-md-4">
                         <label for="cantidadCuotas">Cantidad de Cuotas</label>
-                        <InputNumber class="p-inputtext-sm" id="cantidadCuotas" v-model="form_cuotas.num_cuotas" mode="decimal" />
+                        <InputNumber class="p-inputtext-sm" id="cantidadCuotas" v-model="form_cuotas.num_cuotas" mode="decimal" suffix=" cuotas" :min="0" :class="{'p-invalid': submitted && v$.form_cuotas.num_cuotas.$invalid}"/>
+                        <small class="p-error" v-if="(submitted && v$.form_cuotas.num_cuotas.required.$invalid)"><strong>Cantidad es obligatorio.</strong></small>
+                        <small class="p-error" v-if="(submitted && v$.form_cuotas.num_cuotas.minValueValue.$invalid)"><strong>No puede ser 0.</strong></small>
                     </div>
 
                     <div class="p-field p-col-12 p-md-4">
                         <label for="frecuenciaPago">Frecuencia de Pago</label>
-                        <InputNumber class="p-inputtext-sm" id="frecuenciaPago" v-model="form_cuotas.frecuencia_pagos" mode="decimal" />
+                        <InputNumber class="p-inputtext-sm" id="frecuenciaPago" v-model="form_cuotas.frecuencia_pagos" mode="decimal" suffix=" dias" :min="0" :class="{'p-invalid': submitted && v$.form_cuotas.frecuencia_pagos.$invalid}"/>
+                        <small class="p-error" v-if="(submitted && v$.form_cuotas.frecuencia_pagos.required.$invalid)"><strong>Frecuencia es obligatorio.</strong></small>
+                        <small class="p-error" v-if="(submitted && v$.form_cuotas.frecuencia_pagos.minValueValue.$invalid)"><strong>No puede ser 0.</strong></small>
                     </div>
 
                     <div class="p-field p-col-12 p-md-4">
                         <label for="generarCuotas"><strong>TOTAL Bs. {{ saldoTotalCompra }}</strong></label>
-                        <Button class="p-button-success p-button-sm" label="Generar Cuota" icon="pi pi-clock" />
+                        <Button class="p-button-success p-button-sm" label="Generar Cuota" icon="pi pi-clock" @click="generarCuotas"/>
                     </div>
                 </div>
 
                 <div class="p-fluid p-formgrid p-grid">
                     <div class="p-field p-col-12 p-md-4">
                         <label for="cuotaInicial">Cuota Inicial</label>
-                        <InputNumber class="p-inputtext-sm" id="cuota_inicial" v-model="form_cuotas.cuota_inicial" mode="decimal" />
+                        <InputNumber class="p-inputtext-sm" id="cuota_inicial" v-model="form_cuotas.cuota_inicial" mode="decimal" :min="0" suffix=" Bs" :class="{'p-invalid': submitted && v$.form_cuotas.cuota_inicial.$invalid}"/>
+                        <small class="p-error" v-if="(submitted && v$.form_cuotas.cuota_inicial.required.$invalid)"><strong>Cuota Inicial es obligatorio.</strong></small>
+                        <small class="p-error" v-if="(submitted && v$.form_cuotas.cuota_inicial.minValueValue.$invalid)"><strong>No puede ser 0.</strong></small>
                     </div>
 
                     <div class="p-field p-col-12 p-md-4">
                         <label for="tipoPagoCuota">Tipo de Pago</label>
-                        <Dropdown class="p-inputtext-sm" v-model="form_cuotas.tipoPagoCuotaSeleccionado" :options="lista_tipo_pago_cuotas" optionLabel="nombre" placeholder="Selecciona el tipo de pago" />
+                        <Dropdown class="p-inputtext-sm" v-model="form_cuotas.tipoPagoCuotaSeleccionado" :options="lista_tipo_pago_cuotas" optionLabel="nombre" placeholder="Selecciona el tipo de pago" :class="{'p-invalid': submitted && v$.form_cuotas.tipoPagoCuotaSeleccionado.$invalid}"/>
+                        <small class="p-error" v-if="(submitted && v$.form_cuotas.tipoPagoCuotaSeleccionado.required.$invalid)"><strong>Tipo Pago es obligatorio.</strong></small>
                     </div>
                 </div>
             </div>
 
             <div class="card">
                 <DataTable
-                    :value="data"
+                    :value="array_cuotas_calculadas"
                     :paginator="false"
                     tableStyle="height: 33vh"
                     class="p-datatable-sm"
@@ -435,12 +442,12 @@
                         Sin cuotas generadas.
                     </template>
 
-                    <Column field="id" header="#" dataType="numeric"></Column>
-                    <Column field="fecha_pago" header="Fecha Pago" datatype="date"></Column>
-                    <Column field="precio_cuota" header="Precio Cuota" datatype="numeric"></Column>
-                    <Column field="total_cancelado" header="Total Cancelado" datatype="numeric"></Column>
-                    <Column field="saldo_restante" header="Saldo Restante" datatype="numeric"></Column>
-                    <Column field="fecha_cancelado" header="Fecha Cancelado" datatype="numeric"></Column>
+                    <Column field="id" header="#" ></Column>
+                    <Column field="fecha_pago" header="Fecha Pago" ></Column>
+                    <Column field="precio_cuota" header="Precio Cuota" ></Column>
+                    <Column field="total_cancelado" header="Total Cancelado" ></Column>
+                    <Column field="saldo_restante" header="Saldo Restante" ></Column>
+                    <Column field="fecha_cancelado" header="Fecha Cancelado" </Column>
                     <Column field="estado" header="Estado"></Column>
 
                 </DataTable>
@@ -448,7 +455,7 @@
 
             <template #footer>
                 <Button label="Cancelar" icon="pi pi-times" @click="closeComprasCredito" class="p-button-sm p-button-danger"/>
-                <Button label="Registrar Compra" icon="pi pi-check-square" @click="closeComprasCredito" class="p-button-sm p-button-help" autofocus />
+                <Button label="Registrar Compra" icon="pi pi-check-square" @click="registrarCompra" class="p-button-sm p-button-help" autofocus />
             </template>
         </Dialog>
         </div>
@@ -458,7 +465,7 @@
 
 <script>
 import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
+import { required, minValue } from '@vuelidate/validators';
 
 import Button from 'primevue/button';
 import Panel from 'primevue/panel';
@@ -552,65 +559,15 @@ export default {
 
 
 
-            data: [
-                {
-                    "id": 11,
-                    "fecha_pago": "2018-08-13",
-                    "precio_cuota": "400",
-                    "total_cancelado": "200",
-                    "saldo_restante": "100",
-                    "fecha_cancelado": "2018-10-21",
-                    "estado": "Pendiente"
-                },
-                {
-                    "id": 22,
-                    "fecha_pago": "2018-08-13",
-                    "precio_cuota": "400",
-                    "total_cancelado": "200",
-                    "saldo_restante": "100",
-                    "fecha_cancelado": "2018-10-21",
-                    "estado": "Pendiente"
-                },
-                {
-                    "id": 33,
-                    "fecha_pago": "2018-08-13",
-                    "precio_cuota": "400",
-                    "total_cancelado": "200",
-                    "saldo_restante": "100",
-                    "fecha_cancelado": "2018-10-21",
-                    "estado": "Pendiente"
-                },
-                {
-                    "id": 44,
-                    "fecha_pago": "2018-08-13",
-                    "precio_cuota": "400",
-                    "total_cancelado": "200",
-                    "saldo_restante": "100",
-                    "fecha_cancelado": "2018-10-21",
-                    "estado": "Pendiente"
-                },
-                {
-                    "id": 55,
-                    "fecha_pago": "2018-08-13",
-                    "precio_cuota": "400",
-                    "total_cancelado": "200",
-                    "saldo_restante": "100",
-                    "fecha_cancelado": "2018-10-21",
-                    "estado": "Pendiente"
-                },
-            ]
+            array_cuotas_calculadas: [],
         }
     },
 
     validations() {
         return {
             form: {
-                proveedorSeleccionado: {
-                    required,
-                },
-                tipo_comprobante: {
-                    required,
-                }
+                proveedorSeleccionado: { required },
+                tipo_comprobante: { required },
             },
 
             tipoCompra: {
@@ -619,6 +576,22 @@ export default {
             almacenSeleccionado: {
                 required
             },
+
+            form_cuotas : {
+                num_cuotas: {
+                    required,
+                    minValueValue: minValue(1),
+                },
+                frecuencia_pagos: {
+                    required,
+                    minValueValue: minValue(1),
+                },
+                cuota_inicial: {
+                    required,
+                    minValueValue: minValue(1),
+                },
+                tipoPagoCuotaSeleccionado: { required },
+            }
         }
     },
 
@@ -744,6 +717,9 @@ export default {
                     almacenSeleccionado: this.almacenSeleccionado,
                     array_articulos_completo: this.array_articulos_completo,
                     descuento_global: this.descuentoGlobal,
+                    form_cuotas: this.form_cuotas,
+                    cuotaData: this.array_cuotas_calculadas,
+                    formCuotas: this.form_cuotas,
                 });
 
                 if (compraResponse.data.status === 'success') {
@@ -764,6 +740,8 @@ export default {
                         this.tipoCompra = null;
                         this.saldoTotalCompra = 0;
                         this.descuentoGlobal = 0;
+
+                        this.closeComprasCredito();
                     }
                 }
             } catch (error) {
@@ -777,8 +755,97 @@ export default {
             }
         },
 
-        registrarCompraCredito() {
-            console.log('compra credito');
+        generarCuotas() {
+            if (this.validarCompraCredito()) {
+                const numCuotas = this.form_cuotas.num_cuotas;
+                const frecuenciaPagos = this.form_cuotas.frecuencia_pagos;
+                const montoTotal = this.saldoTotalCompra;
+                const cuotaInicial = this.form_cuotas.cuota_inicial;
+                
+                const montoRestante = montoTotal - cuotaInicial;
+                const montoPorCuota = montoRestante / numCuotas;
+
+                let fechaActual = new Date();
+                let saldoRestante = montoTotal;
+
+                this.array_cuotas_calculadas = [];
+
+                this.array_cuotas_calculadas.push({
+                    id: 0,
+                    fecha_pago: fechaActual.toISOString().split('T')[0],
+                    precio_cuota: cuotaInicial.toFixed(2),
+                    total_cancelado: cuotaInicial.toFixed(2),
+                    saldo_restante: (saldoRestante - cuotaInicial).toFixed(2),
+                    fecha_cancelado: fechaActual.toISOString().split('T')[0],
+                    estado: 'Pagado'
+                });
+
+                saldoRestante -= cuotaInicial;
+
+                for (let i = 1; i <= numCuotas; i++) {
+                    fechaActual.setDate(fechaActual.getDate() + frecuenciaPagos);
+                    saldoRestante -= montoPorCuota;
+
+                    this.array_cuotas_calculadas.push({
+                        id: i,
+                        fecha_pago: fechaActual.toISOString().split('T')[0],
+                        precio_cuota: montoPorCuota.toFixed(2),
+                        total_cancelado: '0.00',
+                        saldo_restante: saldoRestante > 0 ? saldoRestante.toFixed(2) : '0.00',
+                        fecha_cancelado: '',
+                        estado: 'Pendiente'
+                    });
+                }
+            }
+        },
+
+        validarCompraCredito() {
+            this.submitted = true;
+            if (this.v$.form_cuotas.$invalid) {
+                return false;
+            }
+            return true;
+        },
+
+        async openComprasCredito() {
+
+            this.submitted = true;
+            const result = await this.validarPaginaActual();
+
+            if (this.array_articulos_completo.length == 0) {
+                this.$toast.add({severity:'warn', summary: 'Sin artículos', detail: 'Lista de articulos vacía', life: 3000});
+                return;
+            }
+
+            if (!result) {
+                return;
+            }
+
+            const articulos_invalidos = this.array_articulos_completo.filter(
+                articulo => !articulo.fecha_vencimiento || articulo.unidades <= 0
+            );
+
+            if (articulos_invalidos.length > 0) {
+                this.$toast.add({
+                severity:'error',
+                summary: 'Error de validación',
+                detail: 'Hay artículos sin fecha de vencimiento o con cantidad inválida',
+                life: 3000
+                });
+                return;
+            }
+
+            this.displayCompraCredito = true;
+        },
+
+        closeComprasCredito() {
+            this.form_cuotas.num_cuotas = 0;
+            this.form_cuotas.frecuencia_pagos = 0;
+            this.form_cuotas.cuota_inicial = 0;
+            this.form_cuotas.tipoPagoCuotaSeleccionado = null;
+            this.array_cuotas_calculadas = [];
+
+            this.displayCompraCredito = false;
         },
 
         prepararDatosInventario() {
@@ -786,6 +853,7 @@ export default {
                 idalmacen: this.almacenSeleccionado.id,
                 idarticulo: articulo.id,
                 //fecha_vencimiento: articulo.vencimiento || '2099-01-01',
+                fecha_vencimiento: articulo.fecha_vencimiento,
                 cantidad: articulo.unidadesTotales
             }));
         },
@@ -830,14 +898,6 @@ export default {
 
         closeConfirmation() {
             this.displayConfirmation = false;
-        },
-
-        openComprasCredito() {
-            this.displayCompraCredito = true;
-        },
-
-        closeComprasCredito() {
-            this.displayCompraCredito = false;
         },
 
         async actualizarCostosArticulo() {
@@ -890,18 +950,20 @@ export default {
 
         async validarPaginaActual() {
 
+            this.submitted = true;
             if (this.activeIndex === 0) {
                 this.v$.form.$touch();
+                this.submitted = this.v$.form.$invalid;
                 return !this.v$.form.$invalid;
             } else if (this.activeIndex === 1) {
                 this.v$.tipoCompra.$touch();
                 this.v$.almacenSeleccionado.$touch();
+                this.submitted = (this.v$.tipoCompra.$invalid || this.v$.almacenSeleccionado.$invalid)
                 return !(this.v$.tipoCompra.$invalid || this.v$.almacenSeleccionado.$invalid);
             }
         },
 
         async nextStep() {
-            this.submitted = true;
             const result = await this.validarPaginaActual();
 
             if (!result) {
@@ -1085,7 +1147,7 @@ export default {
     margin-right: 10px;
 }
 
-.panel-title {
+.panel-icon {
     font-size: 1.5rem;
     margin: 0;
 }

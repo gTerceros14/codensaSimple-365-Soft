@@ -88,7 +88,9 @@
                     <li @click="menu=70" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px"></i> Nueva Compra</a>
                     </li>
-
+                    <li @click="menu=72" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px"></i> Compras a Credito</a>
+                    </li>
                 </ul>
             </li>
 
