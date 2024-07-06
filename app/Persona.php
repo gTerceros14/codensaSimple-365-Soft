@@ -21,5 +21,9 @@ class Persona extends Model
     {
         return $this->hasMany(DetalleVenta::class, 'idventa');
     }
+    public function creditosVenta()
+    {
+        return $this->hasMany(CreditoVenta::class, 'idpersona');
+    }
 
 }

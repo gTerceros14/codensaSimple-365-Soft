@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use PDF;
 use App\Venta;
 use Illuminate\Support\Facades\Log;
 use App\CreditoVenta;
@@ -10,10 +10,39 @@ use App\Caja;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-
+use Carbon\Carbon;
 
 class CreditoVentaController extends Controller
 {
+    public function generarReciboCuota($idCuota)
+    {
+        $cuota = CuotasCredito::with(['creditoVenta.cliente', 'creditoVenta.venta', 'creditoVenta.cuotas'])
+            ->findOrFail($idCuota);
+
+       
+
+        $todasLasCuotas = $cuota->creditoVenta->cuotas()->orderBy('fecha_pago')->get();
+        $numeroCuotaActual = $todasLasCuotas->search(function($item) use ($cuota) {
+            return $item->id === $cuota->id;
+        }) + 1;
+
+        $cuotasRestantes = $todasLasCuotas->filter(function($item) {
+            return $item->estado !== 'Pagado' && $item->fecha_pago >= Carbon::today();
+        });
+
+        $pdf = PDF::loadView('pdf.recibo_credito', [
+            'cuota' => $cuota,
+            'credito' => $cuota->creditoVenta,
+            'cliente' => $cuota->creditoVenta->cliente,
+            'venta' => $cuota->creditoVenta->venta,
+            'numeroCuotaActual' => $numeroCuotaActual,
+            'totalCuotas' => $todasLasCuotas->count(),
+            'cuotasRestantes' => $cuotasRestantes
+        ]);
+
+        return $pdf->download('recibo_cuota_' . $idCuota . '.pdf');
+    }
+ 
     public function index(Request $request)
     {
         if (!$request->ajax()) {
@@ -22,7 +51,7 @@ class CreditoVentaController extends Controller
 
         $buscar = $request->buscar;
         $criterio = $request->criterio;
-        $perPage = $request->input('per_page', 3);
+        $perPage = $request->input('per_page', 10);
         $filtroAvanzado = $request->filtro_avanzado;
 
         $creditosQuery = CreditoVenta::query()

@@ -109,6 +109,7 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/backup', 'BackupDbController@createBackup');
         Route::get('/categoria', 'CategoriaController@index');
+        Route::get('/categorianewview', 'CategoriaController@index2');
         Route::post('/categoria/registrar', 'CategoriaController@store');
         Route::put('/categoria/actualizar', 'CategoriaController@update');
         Route::put('/categoria/desactivar', 'CategoriaController@desactivar');
@@ -468,6 +469,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/api/clientes', 'ClienteController@buscarPorDocumento');
 
         Route::get('/ingreso/generar-nota-ingreso/{id}', 'IngresoController@generarNotaIngreso');
+        Route::get('/credito/recibo-cuota/{id}', 'CreditoVentaController@generarReciboCuota')->name('credito.recibo-cuota');
     });
 
     //RUTA PARA RECUPERAR LA SESSION CON EL ID DE LA PERSONA LOGUEADA
