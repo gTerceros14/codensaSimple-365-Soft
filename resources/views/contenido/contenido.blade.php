@@ -242,6 +242,11 @@
 <template v-if="menu==70">
     <nuevacompra></nuevacompra>
 </template>
+
+<template v-if="menu==72">
+    <comprascredito></comprascredito>
+</template>
+
 <template v-if="menu==27">
     <medidasnewview></medidasnewview>
 </template>

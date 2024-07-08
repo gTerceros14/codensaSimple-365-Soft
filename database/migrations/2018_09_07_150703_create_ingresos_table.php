@@ -26,7 +26,10 @@ class CreateIngresosTable extends Migration
             $table->decimal('impuesto', 4, 2);
             $table->decimal('total', 11, 2);
             $table->boolean('tipoCompra')->nullable();
-            $table->integer('dias_cuotas')->nullable();
+            $table->integer('num_cuotas')->nullable();
+            $table->integer('frecuencia_cuotas')->nullable();
+            $table->decimal('cuota_inicial', 11, 2)->nullable();
+            $table->string('tipo_pago_cuota')->nullable();
             $table->boolean('estado');
             $table->integer('idalmacen')->unsigned()->nullable();
             $table->foreign('idalmacen')->references('id')->on('almacens');
