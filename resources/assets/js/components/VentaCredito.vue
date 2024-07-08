@@ -58,7 +58,8 @@
                                         <icon-button v-else icon="icon-eye" label="Ver cuotas" size="small"
                                             color="secondary" @click="abrirDetalle(credito)" />
 
-                                    
+                                            <icon-button icon="fa fa-file-pdf-o" label="Generar Recibo General" size="small" color="info"
+                                             @click="generarReciboGeneral(credito.id)" />
                                     </td>
                                     <td v-text="credito.nombre_cliente"></td>
                                     <td v-text="credito.nombre_vendedor"></td>
@@ -171,8 +172,7 @@
                                                 <icon-button v-if="cuota.estado != 'Pagado'" icon="fa fa-inbox"
                                                     size="small" color="success" @click="abrirModal(cuota, index)" />
                                                 <icon-button v-else icon="fa fa-check" size="small" color="success" />
-                                                <icon-button icon="fa fa-file-pdf-o" label="Generar Recibo" size="small" color="info"
-    @click="generarRecibo(cuota.id)" />
+                                                <icon-button icon="fa fa-file-pdf-o" label="Generar Recibo" size="small" color="info" @click="generarRecibo(cuota.id)" />
                                             </td>
 
                                         </tr>
@@ -245,7 +245,9 @@ export default {
         }
     },
     methods: {
-
+        generarReciboGeneral(id_credito) {
+        window.open(`/credito/recibo-general/${id_credito}` , '_blank');
+    },
         generarRecibo(idCuota) {
     if (idCuota) {
         window.open(`/credito/recibo-cuota/${idCuota}`, '_blank');

@@ -24,7 +24,7 @@ class CreditoVenta extends Model
 
     public function cliente()
     {
-        return $this->belongsTo(Persona::class, 'idpersona');
+        return $this->belongsTo(Persona::class, 'idcliente');
     }
 
     public function cuotas()
