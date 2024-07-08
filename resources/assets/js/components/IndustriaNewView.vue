@@ -10,7 +10,7 @@
 
           <div class="toolbar-container">
             <div class="toolbar">
-                  <Button label="Nuevo" icon="pi pi-plus" @click="abrirModal('industria', 'registrar')" class="p-button-success p-button-sm" />
+                  <Button label="Nuevo" icon="pi pi-plus" @click="abrirModal('industria', 'registrar')" class="p-button-secondary p-button-sm" />
                   <Button label="Importar" icon="pi pi-file-excel" @click="showUploadDialog" class="p-button-help p-button-sm" />
                   
               </div>

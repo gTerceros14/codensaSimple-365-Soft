@@ -804,7 +804,6 @@
 </template>
 
 <script>
-import 'primeicons/primeicons.css';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';

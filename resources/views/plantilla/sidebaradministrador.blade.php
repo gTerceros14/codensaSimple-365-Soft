@@ -74,19 +74,22 @@
                 <a class="nav-link nav-dropdown-toggle" href="#"><i class="fa fa-shopping-bag" aria-hidden="true"></i>
                     Compras</a>
                 <ul class="nav-dropdown-items">
-                <li @click="menu=3" class="nav-item">
-    <a class="nav-link" href="#"><i class="fa fa-arrow-circle-down" style="font-size: 19px;"></i> Ingresos</a>
-</li>
-<li @click="menu=4" class="nav-item">
-    <a class="nav-link" href="#"><i class="fa fa-truck" style="font-size: 19px;"></i> Proveedores</a>
-</li>
-<!-- <li @click="menu=22" class="nav-item">
-    <a class="nav-link" href="#"><i class="fa fa-clipboard" style="font-size: 11px;"></i> Pedidos a Prov.</a>
-</li> -->
-<li @click="menu=70" class="nav-item">
-    <a class="nav-link" href="#"><i class="fa fa-plus-circle" style="font-size: 19px;"></i> Nueva Compra</a>
-</li>
-
+                    <li @click="menu=3" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Ingresos</a>
+                    </li>
+                    <li @click="menu=4" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Proveedores</a>
+                    </li>
+                    <!-- <li @click="menu=22" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Pedidos a
+                            Prov.</a>
+                    </li> -->
+                    <li @click="menu=70" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px"></i> Nueva Compra</a>
+                    </li>
+                    <li @click="menu=72" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px"></i> Compras a Credito</a>
+                    </li>
                 </ul>
             </li>
 

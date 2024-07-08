@@ -12,9 +12,9 @@ import Toasted from "vue-toasted";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 
 
-import 'bootstrap-icons/font/bootstrap-icons.css'
+/*import 'bootstrap-icons/font/bootstrap-icons.css'
 import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";*/
 
 import 'primeflex/primeflex.css';
 import 'primevue/resources/themes/lara-light-blue/theme.css';
@@ -111,6 +111,7 @@ Vue.component(
 );
 
 Vue.component("marca", require("./components/Marca.vue"));
+Vue.component("marcanewview",require("./components/MarcaNewView.vue"));
 Vue.component("linea", require("./components/Linea.vue"));
 Vue.component("lineanewview",require("./components/LineaNewView.vue"));
 Vue.component("industria", require("./components/Industria.vue"));
@@ -299,6 +300,7 @@ Vue.component(
 Vue.component("mayoreo", require("./components/OfertasEspecialesMayoreo.vue"));
 
 Vue.component("nuevacompra", require("./components/compras/NuevaCompra.vue"));
+Vue.component("comprascredito", require("./components/compras/ComprasCredito.vue"));
 
 Vue.use(BootstrapVue);
 Vue.use(Toasted);

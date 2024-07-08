@@ -11,6 +11,7 @@ use App\Caja;
 use App\Ingreso;
 use App\Articulo;
 use App\DetalleIngreso;
+use App\IngresoCuota;
 use App\User;
 use App\Notifications\NotifyAdmin;
 use Exception;
@@ -157,7 +158,7 @@ class IngresoController extends Controller
         return ['detalles' => $detalles];
     }
 
-    public function registrarIngreso(Request $request)
+    /*public function registrarIngreso2(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
 
@@ -219,7 +220,111 @@ class IngresoController extends Controller
                 'message' => 'Error al registrar la compra: ' . $e->getMessage()
             ], 500);
         }
+    }*/
+
+    public function registrarIngreso(Request $request)
+{
+    if (!$request->ajax()) return redirect('/');
+
+    try {
+        DB::beginTransaction();
+
+        $ultimaCaja = Caja::latest()->first();
+
+        if (!$ultimaCaja || $ultimaCaja->estado != '1') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Debe tener una caja abierta',
+            ], 400);
+        }
+
+        if (!isset($request->form) || !is_array($request->form)) {
+            throw new \Exception("Los datos del formulario no son válidos");
+        }
+
+        $ingreso = new Ingreso;
+        $ingreso->idproveedor = $request->form['proveedorSeleccionado']['id'] ?? null;
+        $ingreso->idusuario = $request->usuario_actual_id ?? auth()->id();
+        $ingreso->tipo_comprobante = $request->form['tipo_comprobante']['nombre'] ?? 'No especificado';
+        $ingreso->serie_comprobante = $request->form['serie_comprobante'] ?? 'No especificado';
+        $ingreso->num_comprobante = $request->form['num_comprobante'] ?? 'No especificado';
+        $ingreso->fecha_hora = now();
+        $ingreso->impuesto = 0;
+        $ingreso->total = $request->saldoTotalCompra ?? 0;
+        $ingreso->tipoCompra = $request->tipoCompra['id'] ?? null;
+        $ingreso->frecuencia_cuotas = $request->form_cuotas['frecuencia_pagos'] ?? 0;
+        $ingreso->estado = true;
+        $ingreso->idalmacen = $request->almacenSeleccionado['id'] ?? null;
+        $ingreso->idcaja = $ultimaCaja->id;
+        $ingreso->descuento_global = $request->descuento_global ?? 0;
+        $ingreso->num_cuotas = $request->form_cuotas['num_cuotas'] ?? 0;
+        $ingreso->cuota_inicial = $request->form_cuotas['cuota_inicial'] ?? 0;
+        $ingreso->tipo_pago_cuota = $request->form_cuotas['tipoPagoCuotaSeleccionado']['nombre'] ?? 'Ninguna';
+        $ingreso->save();
+
+        if ($ingreso->tipoCompra == 2) {
+            if (!is_array($request->cuotaData)) {
+                throw new \Exception("Las cuotas no son un array válido");
+            }
+
+            foreach ($request->cuotaData as $cuotaObj) {
+                if (!is_array($cuotaObj)) {
+                    throw new \Exception("Una de las cuotas no es un array válido");
+                }
+
+                $cuota = new IngresoCuota;
+                $cuota->idingreso = $ingreso->id;
+                $cuota->fecha_pago = $cuotaObj['fecha_pago'] ?? null;
+                $cuota->precio_cuota = $cuotaObj['precio_cuota'] ?? 0;
+                $cuota->total_cancelado = $cuotaObj['total_cancelado'] ?? 0;
+                $cuota->saldo_restante = $cuotaObj['saldo_restante'] ?? 0;
+                $cuota->fecha_cancelado = $cuotaObj['fecha_cancelado'] ?? null;
+                $cuota->estado = $cuotaObj['estado'] ?? 'Pendiente';
+                $cuota->save();
+            }
+
+            $ultimaCaja->comprasCredito += $ingreso->total;
+        } else {
+            $ultimaCaja->comprasContado += $ingreso->total;
+        }
+        $ultimaCaja->save();
+
+        if (!is_array($request->array_articulos_completo)) {
+            throw new \Exception("El array de artículos no es válido");
+        }
+
+        foreach ($request->array_articulos_completo as $articulo) {
+            if (!is_array($articulo)) {
+                throw new \Exception("Uno de los artículos no es un array válido");
+            }
+
+            $detalle = new DetalleIngreso;
+            $detalle->idingreso = $ingreso->id;
+            $detalle->idarticulo = $articulo['id'] ?? null;
+            $detalle->cantidad = $articulo['unidadesTotales'] ?? 0;
+            $detalle->descuento = $articulo['descuento'] ?? 0;
+            $detalle->precio = $articulo['subtotal'] ?? 0;
+            $detalle->save();
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Compra registrada con éxito',
+            'ingreso' => $ingreso
+        ], 200);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Error al registrar la compra: ' . $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile()
+        ], 500);
     }
+}
 
     public function store(Request $request)
     {

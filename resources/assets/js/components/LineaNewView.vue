@@ -20,7 +20,7 @@
           </span>
           </div>
         </div>
-        <DataTable :value="arrayCategoria" class="p-datatable-sm p-datatable-gridlines"  responsiveLayout="scroll" paginator :rows="movil">
+        <DataTable :value="arrayCategoria" class="p-datatable-sm p-datatable-gridlines"  responsiveLayout="scroll" paginator :rows="9">
           <Column header="Opciones">
             <template #body="slotProps">
                 <Button icon="pi pi-pencil" class="p-button-sm p-button-warning custom-icon-size" @click="abrirModal('categoria', 'actualizar', slotProps.data)" />
@@ -378,7 +378,6 @@ import axios from 'axios';
     },
     mounted(){
       this.listarCategoria(1, this.buscar, this.criterio);
-      this.movil();
     }
   };
   </script>
@@ -455,6 +454,107 @@ import axios from 'axios';
 }
 .status-badge.inactive {
   background-color: red;
+}
+>>> .p-fileupload .p-button.p-fileupload-choose {
+    background-color: #22c55e !important;
+    border-color: #22c55e !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* Efecto hover */
+>>> .p-fileupload .p-button.p-fileupload-choose:enabled:hover {
+    background-color: #16a34a !important;
+    border-color: #16a34a !important;
+}
+
+/* Efecto focus */
+>>> .p-fileupload .p-button.p-fileupload-choose:focus {
+    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.5) !important;
+}
+
+/* Efecto active (cuando se hace clic) */
+>>> .p-fileupload .p-button.p-fileupload-choose:enabled:active {
+    background-color: #15803d !important;
+    border-color: #15803d !important;
+}
+
+/* Estilo cuando está deshabilitado */
+>>> .p-fileupload .p-button.p-fileupload-choose:disabled {
+    background-color: #22c55e !important;
+    border-color: #22c55e !important;
+    opacity: 0.6;
+}
+>>> .p-fileupload .p-fileupload-buttonbar .p-button.p-component:not(.p-fileupload-choose) {
+    background: #ef4444 !important;
+    border-color: #ef4444 !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* Efecto hover */
+>>> .p-fileupload .p-fileupload-buttonbar .p-button.p-component:not(.p-fileupload-choose):enabled:hover {
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+}
+
+/* Efecto focus */
+>>> .p-fileupload .p-fileupload-buttonbar .p-button.p-component:not(.p-fileupload-choose):focus {
+    box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.5) !important;
+}
+
+/* Efecto active (cuando se hace clic) */
+>>> .p-fileupload .p-fileupload-buttonbar .p-button.p-component:not(.p-fileupload-choose):enabled:active {
+    background: #b91c1c !important;
+    border-color: #b91c1c !important;
+}
+
+/* Estilo cuando está deshabilitado */
+>>> .p-fileupload .p-fileupload-buttonbar .p-button.p-component:not(.p-fileupload-choose):disabled {
+    background: #ef4444 !important;
+    border-color: #ef4444 !important;
+    opacity: 0.6;
+}
+>>> .p-fileupload .p-fileupload-files .p-button {
+    background: #ef4444 !important;
+    border-color: #ef4444 !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* Efecto hover */
+>>> .p-fileupload .p-fileupload-files .p-button:enabled:hover {
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+}
+
+/* Efecto focus */
+>>> .p-fileupload .p-fileupload-files .p-button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.5) !important;
+}
+
+/* Efecto active (cuando se hace clic) */
+>>> .p-fileupload .p-fileupload-files .p-button:enabled:active {
+    background: #b91c1c !important;
+    border-color: #b91c1c !important;
+}
+
+/* Estilo cuando está deshabilitado */
+>>> .p-fileupload .p-fileupload-files .p-button:disabled {
+    background: #ef4444 !important;
+    border-color: #ef4444 !important;
+    opacity: 0.6;
+}
+
+/* Asegurar que el icono dentro del botón también sea blanco */
+>>> .p-fileupload .p-fileupload-files .p-button .p-button-icon {
+    color: #ffffff !important;
+} 
+>>> .p-fileupload-row > div:first-child {
+    display: none !important;
+}
+>>> .p-dialog .p-dialog-content{
+  padding: 0 1.5rem 1.5rem 1.5rem;
 }
 @media (max-width: 768px) {
     .toolbar-container {

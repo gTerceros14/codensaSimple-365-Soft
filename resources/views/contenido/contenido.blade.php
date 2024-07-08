@@ -75,9 +75,10 @@
 <template v-if="menu==17">
     <editarperfil></editarperfil>
 </template>
-<template v-if="menu==18">
+<!--<template v-if="menu==18">
     <marca></marca>
 </template>
+-->
 <!--<template v-if="menu==19">
     <linea></linea>
 </template>
@@ -242,17 +243,25 @@
 <template v-if="menu==70">
     <nuevacompra></nuevacompra>
 </template>
+
+<template v-if="menu==72">
+    <comprascredito></comprascredito>
+</template>
+
 <template v-if="menu==27">
     <medidasnewview></medidasnewview>
 </template>
 <template v-if="menu==20">
     <industrianewview></industrianewview>
 </template>
-<template v-if="menu==71">
-    <lineanewview></lineanewview>
-</template>
 <template v-if="menu==19">
     <lineanewview></lineanewview>
+</template>
+<template v-if="menu==18">
+    <marcanewview></marcanewview>
+</template>
+<template v-if="menu==71">
+    <marcanewview></marcanewview>
 </template>
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
