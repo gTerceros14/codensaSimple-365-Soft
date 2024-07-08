@@ -14,6 +14,33 @@ use Carbon\Carbon;
 
 class CreditoVentaController extends Controller
 {
+
+    public function generarReciboGeneral($idCredito)
+    {
+        $credito = CreditoVenta::with(['cliente', 'venta', 'cuotas'])
+            ->findOrFail($idCredito);
+    
+        $todasLasCuotas = $credito->cuotas()->orderBy('fecha_pago')->get();
+        
+        $cuotasPagadas = $todasLasCuotas->filter(function($item) {
+            return $item->estado === 'Pagado';
+        });
+    
+        $cuotasRestantes = $todasLasCuotas->filter(function($item) {
+            return $item->estado !== 'Pagado' && $item->fecha_pago >= Carbon::today();
+        });
+    
+        $pdf = PDF::loadView('pdf.recibo_general_creditos', [
+            'credito' => $credito,
+            'cliente' => $credito->cliente,
+            'venta' => $credito->venta,
+            'cuotasPagadas' => $cuotasPagadas,
+            'totalCuotas' => $todasLasCuotas->count(),
+            'cuotasRestantes' => $cuotasRestantes
+        ]);
+    
+        return $pdf->download('recibo_general_' . $idCredito . '.pdf');
+    }
     public function generarReciboCuota($idCuota)
     {
         $cuota = CuotasCredito::with(['creditoVenta.cliente', 'creditoVenta.venta', 'creditoVenta.cuotas'])
