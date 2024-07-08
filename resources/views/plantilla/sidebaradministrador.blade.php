@@ -131,9 +131,10 @@
                     <li @click="menu=18" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Marca</a>
                     </li>
-                    <li @click="menu=71" class="nav-item">
+                    <!--<li @click="menu=71" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Marca NUEVO</a>
                     </li>
+                    -->
                     <li @click="menu=19" class="nav-item">
                         <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Linea</a>
                     </li>
