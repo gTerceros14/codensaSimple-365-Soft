@@ -120,6 +120,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/linea/import_excel', 'CategoriaController@importsaveExecelUser')->name('import_excel');
 
         Route::get('/marca', 'MarcaController@index');
+        Route::get('/marcanewview', 'MarcaController@index2');
         Route::post('/marca/registrar', 'MarcaController@store');
         Route::put('/marca/actualizar', 'MarcaController@update');
         Route::put('/marca/desactivar', 'MarcaController@desactivar');

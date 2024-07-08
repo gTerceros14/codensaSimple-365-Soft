@@ -111,6 +111,7 @@ Vue.component(
 );
 
 Vue.component("marca", require("./components/Marca.vue"));
+Vue.component("marcanewview",require("./components/MarcaNewView.vue"));
 Vue.component("linea", require("./components/Linea.vue"));
 Vue.component("lineanewview",require("./components/LineaNewView.vue"));
 Vue.component("industria", require("./components/Industria.vue"));

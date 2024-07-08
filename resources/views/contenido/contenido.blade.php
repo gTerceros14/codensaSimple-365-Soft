@@ -248,11 +248,11 @@
 <template v-if="menu==20">
     <industrianewview></industrianewview>
 </template>
-<template v-if="menu==71">
-    <lineanewview></lineanewview>
-</template>
 <template v-if="menu==19">
     <lineanewview></lineanewview>
+</template>
+<template v-if="menu==71">
+    <marcanewview></marcanewview>
 </template>
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
