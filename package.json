@@ -36,6 +36,7 @@
         "vue-select": "^2.5.0",
         "vue-spinner": "^1.0.4",
         "vue-spinners": "^1.0.2",
+        "vue-sweetalert2": "^5.0.11",
         "vue-template-compiler": "^2.7.16",
         "vue-toast-notification": "^3.1.2",
         "vue-toasted": "^1.1.28",

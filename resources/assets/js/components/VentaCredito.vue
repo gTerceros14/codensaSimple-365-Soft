@@ -129,7 +129,7 @@
                             <dt class="col-sm-3">Monto pendiente</dt>
                             <dd class="col-sm-3">{{ (arraySeleccionado.total * monedaVenta[0]).toFixed(2) }} {{
                                 monedaVenta[1] }}</dd>
-                        </dl>
+                        </dl>Monto
                         <div class="form-group row border">
                             <div class="table-responsive col-md-12">
                                 <table class="table table-bordered table-striped table-sm">
@@ -192,7 +192,7 @@
 </template>
 
 <script>
-
+import Swal from 'sweetalert2';
 export default {
     data() {
         return {

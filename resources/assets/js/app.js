@@ -11,10 +11,12 @@ import ToastService from 'primevue/toastservice';
 import Toasted from "vue-toasted";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
-/*import 'bootstrap-icons/font/bootstrap-icons.css'
+import 'bootstrap-icons/font/bootstrap-icons.css'
 import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";*/
+import "bootstrap-vue/dist/bootstrap-vue.css";
 
 import 'primeflex/primeflex.css';
 import 'primevue/resources/themes/lara-light-blue/theme.css';
@@ -24,7 +26,7 @@ import 'primeicons/primeicons.css';
 //Vue.use(PrimeVue);
 Vue.use(PrimeVue, {ripple: true});
 Vue.use(ToastService);
-
+Vue.use(VueSweetalert2);
 require("./bootstrap");
 
 window.$ = window.jQuery = require("jquery");
