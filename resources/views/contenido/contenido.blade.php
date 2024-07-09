@@ -261,7 +261,7 @@
     <marcanewview></marcanewview>
 </template>
 <template v-if="menu==71">
-    <marcanewview></marcanewview>
+    <articulonewview></articulonewview>
 </template>
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">
