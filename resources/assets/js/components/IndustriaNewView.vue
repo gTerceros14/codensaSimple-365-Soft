@@ -41,7 +41,7 @@
               </Column>
           </DataTable>
 
-          <Dialog :visible.sync="modal" modal :header="tituloModal" :closable="true">
+          <Dialog :visible.sync="modal" modal :header="tituloModal" :closable="true" @hide="cerrarModal">
             <template #footer>
                 <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="cerrarModal()" />
                 <Button v-if="tipoAccion === 1" label="Guardar" icon="pi pi-check" class="p-button-text" @click="registrarIndustria()" />

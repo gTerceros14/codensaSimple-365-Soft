@@ -141,7 +141,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/articulo/listarArticuloPedido', 'ArticuloController@listPedProve'); //aumente esto 21 sept
         Route::post('/articulos/importar', 'ArticuloController@importar')->name('articulos.importar');
         Route::post('/articulo/actualizarPrecios', 'ArticuloController@editarCostoUnidadPaquete');
-        Route::post('/articulo/editarCostoUnidadPaquete', 'ArticuloController@editarCostoUnidadPaquete');
+        Route::post('/articulo/editarCostoUnidadPaquete', 'ArticuloController@editarPrecioCompraVenta');
         Route::get('/proveedor', 'ProveedorController@index');
         Route::post('/proveedor/registrar', 'ProveedorController@store');
         Route::put('/proveedor/actualizar', 'ProveedorController@update');
@@ -226,6 +226,9 @@ Route::group(['middleware' => ['auth']], function () {
         //Rura para que el usuario pueda editar su perfil
         Route::get('/user/editarpersona', 'UserController@editarPersona');
         //Route::put('/editarperfil', 'UserController@editarPerfil');
+
+        Route::get('/ingresoCuotas/listarCuotas', 'IngresoCuotaController@index');
+        Route::get('/ingresoCuotas/cuotasPorIngreso', 'IngresoCuotaController@getCuotasByIngreso');
 
         Route::get('/ingreso', 'IngresoController@index');
         Route::post('/ingreso/registrar', 'IngresoController@store');

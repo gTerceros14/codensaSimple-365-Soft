@@ -39,7 +39,7 @@
                 </Column>
             </DataTable>
         
-            <Dialog :visible.sync="modal" :header="tituloModal" modal>
+            <Dialog :visible.sync="modal" :header="tituloModal" modal @hide="cerrarModal">
                 <div class="p-fluid ">
                     <div class="p-field input-container">
                         <label for="nombre">Nombre marca</label>

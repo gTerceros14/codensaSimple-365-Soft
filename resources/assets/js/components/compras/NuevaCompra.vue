@@ -388,76 +388,76 @@
         </Dialog>
 
         <div class="dialog-cuotas">
-        <Dialog header="Compra a Credito" :visible.sync="displayCompraCredito" :modal="true" :containerStyle="{width: '65vw'}">
-            <div class="card">
-                <div class="p-fluid p-formgrid p-grid">
-                    <div class="p-field p-col-12 p-md-4">
-                        <label for="cantidadCuotas">Cantidad de Cuotas</label>
-                        <InputNumber class="p-inputtext-sm" id="cantidadCuotas" v-model="form_cuotas.num_cuotas" mode="decimal" suffix=" cuotas" :min="0" :class="{'p-invalid': submitted && v$.form_cuotas.num_cuotas.$invalid}"/>
-                        <small class="p-error" v-if="(submitted && v$.form_cuotas.num_cuotas.required.$invalid)"><strong>Cantidad es obligatorio.</strong></small>
-                        <small class="p-error" v-if="(submitted && v$.form_cuotas.num_cuotas.minValueValue.$invalid)"><strong>No puede ser 0.</strong></small>
+            <Dialog header="Compra a Credito" :visible.sync="displayCompraCredito" :modal="true" :containerStyle="{width: '65vw'}">
+                <div class="card">
+                    <div class="p-fluid p-formgrid p-grid">
+                        <div class="p-field p-col-12 p-md-4">
+                            <label for="cantidadCuotas">Cantidad de Cuotas</label>
+                            <InputNumber class="p-inputtext-sm" id="cantidadCuotas" v-model="form_cuotas.num_cuotas" mode="decimal" suffix=" cuotas" :min="0" :class="{'p-invalid': submitted && v$.form_cuotas.num_cuotas.$invalid}"/>
+                            <small class="p-error" v-if="(submitted && v$.form_cuotas.num_cuotas.required.$invalid)"><strong>Cantidad es obligatorio.</strong></small>
+                            <small class="p-error" v-if="(submitted && v$.form_cuotas.num_cuotas.minValueValue.$invalid)"><strong>No puede ser 0.</strong></small>
+                        </div>
+
+                        <div class="p-field p-col-12 p-md-4">
+                            <label for="frecuenciaPago">Frecuencia de Pago</label>
+                            <InputNumber class="p-inputtext-sm" id="frecuenciaPago" v-model="form_cuotas.frecuencia_pagos" mode="decimal" suffix=" dias" :min="0" :class="{'p-invalid': submitted && v$.form_cuotas.frecuencia_pagos.$invalid}"/>
+                            <small class="p-error" v-if="(submitted && v$.form_cuotas.frecuencia_pagos.required.$invalid)"><strong>Frecuencia es obligatorio.</strong></small>
+                            <small class="p-error" v-if="(submitted && v$.form_cuotas.frecuencia_pagos.minValueValue.$invalid)"><strong>No puede ser 0.</strong></small>
+                        </div>
+
+                        <div class="p-field p-col-12 p-md-4">
+                            <label for="generarCuotas"><strong>TOTAL Bs. {{ saldoTotalCompra }}</strong></label>
+                            <Button class="p-button-success p-button-sm" label="Generar Cuota" icon="pi pi-clock" @click="generarCuotas"/>
+                        </div>
                     </div>
 
-                    <div class="p-field p-col-12 p-md-4">
-                        <label for="frecuenciaPago">Frecuencia de Pago</label>
-                        <InputNumber class="p-inputtext-sm" id="frecuenciaPago" v-model="form_cuotas.frecuencia_pagos" mode="decimal" suffix=" dias" :min="0" :class="{'p-invalid': submitted && v$.form_cuotas.frecuencia_pagos.$invalid}"/>
-                        <small class="p-error" v-if="(submitted && v$.form_cuotas.frecuencia_pagos.required.$invalid)"><strong>Frecuencia es obligatorio.</strong></small>
-                        <small class="p-error" v-if="(submitted && v$.form_cuotas.frecuencia_pagos.minValueValue.$invalid)"><strong>No puede ser 0.</strong></small>
-                    </div>
+                    <div class="p-fluid p-formgrid p-grid">
+                        <div class="p-field p-col-12 p-md-4">
+                            <label for="cuotaInicial">Cuota Inicial</label>
+                            <InputNumber class="p-inputtext-sm" id="cuota_inicial" v-model="form_cuotas.cuota_inicial" mode="decimal" :min="0" suffix=" Bs" :class="{'p-invalid': submitted && v$.form_cuotas.cuota_inicial.$invalid}"/>
+                            <small class="p-error" v-if="(submitted && v$.form_cuotas.cuota_inicial.required.$invalid)"><strong>Cuota Inicial es obligatorio.</strong></small>
+                            <small class="p-error" v-if="(submitted && v$.form_cuotas.cuota_inicial.minValueValue.$invalid)"><strong>No puede ser 0.</strong></small>
+                        </div>
 
-                    <div class="p-field p-col-12 p-md-4">
-                        <label for="generarCuotas"><strong>TOTAL Bs. {{ saldoTotalCompra }}</strong></label>
-                        <Button class="p-button-success p-button-sm" label="Generar Cuota" icon="pi pi-clock" @click="generarCuotas"/>
+                        <div class="p-field p-col-12 p-md-4">
+                            <label for="tipoPagoCuota">Tipo de Pago</label>
+                            <Dropdown class="p-inputtext-sm" v-model="form_cuotas.tipoPagoCuotaSeleccionado" :options="lista_tipo_pago_cuotas" optionLabel="nombre" placeholder="Selecciona el tipo de pago" :class="{'p-invalid': submitted && v$.form_cuotas.tipoPagoCuotaSeleccionado.$invalid}"/>
+                            <small class="p-error" v-if="(submitted && v$.form_cuotas.tipoPagoCuotaSeleccionado.required.$invalid)"><strong>Tipo Pago es obligatorio.</strong></small>
+                        </div>
                     </div>
                 </div>
 
-                <div class="p-fluid p-formgrid p-grid">
-                    <div class="p-field p-col-12 p-md-4">
-                        <label for="cuotaInicial">Cuota Inicial</label>
-                        <InputNumber class="p-inputtext-sm" id="cuota_inicial" v-model="form_cuotas.cuota_inicial" mode="decimal" :min="0" suffix=" Bs" :class="{'p-invalid': submitted && v$.form_cuotas.cuota_inicial.$invalid}"/>
-                        <small class="p-error" v-if="(submitted && v$.form_cuotas.cuota_inicial.required.$invalid)"><strong>Cuota Inicial es obligatorio.</strong></small>
-                        <small class="p-error" v-if="(submitted && v$.form_cuotas.cuota_inicial.minValueValue.$invalid)"><strong>No puede ser 0.</strong></small>
-                    </div>
+                <div class="card">
+                    <DataTable
+                        :value="array_cuotas_calculadas"
+                        :paginator="false"
+                        tableStyle="height: 33vh"
+                        class="p-datatable-sm"
+                        :rows="10"
+                        dataKey="id"
+                        :rowHover="true"
+                        responsiveLayout="scroll"
+                    >
+                        <template #empty>
+                            Sin cuotas generadas.
+                        </template>
 
-                    <div class="p-field p-col-12 p-md-4">
-                        <label for="tipoPagoCuota">Tipo de Pago</label>
-                        <Dropdown class="p-inputtext-sm" v-model="form_cuotas.tipoPagoCuotaSeleccionado" :options="lista_tipo_pago_cuotas" optionLabel="nombre" placeholder="Selecciona el tipo de pago" :class="{'p-invalid': submitted && v$.form_cuotas.tipoPagoCuotaSeleccionado.$invalid}"/>
-                        <small class="p-error" v-if="(submitted && v$.form_cuotas.tipoPagoCuotaSeleccionado.required.$invalid)"><strong>Tipo Pago es obligatorio.</strong></small>
-                    </div>
+                        <Column field="id" header="#" ></Column>
+                        <Column field="fecha_pago" header="Fecha Pago" ></Column>
+                        <Column field="precio_cuota" header="Precio Cuota" ></Column>
+                        <Column field="total_cancelado" header="Total Cancelado" ></Column>
+                        <Column field="saldo_restante" header="Saldo Restante" ></Column>
+                        <Column field="fecha_cancelado" header="Fecha Cancelado" ></Column>
+                        <Column field="estado" header="Estado"></Column>
+
+                    </DataTable>
                 </div>
-            </div>
 
-            <div class="card">
-                <DataTable
-                    :value="array_cuotas_calculadas"
-                    :paginator="false"
-                    tableStyle="height: 33vh"
-                    class="p-datatable-sm"
-                    :rows="10"
-                    dataKey="id"
-                    :rowHover="true"
-                    responsiveLayout="scroll"
-                >
-                    <template #empty>
-                        Sin cuotas generadas.
-                    </template>
-
-                    <Column field="id" header="#" ></Column>
-                    <Column field="fecha_pago" header="Fecha Pago" ></Column>
-                    <Column field="precio_cuota" header="Precio Cuota" ></Column>
-                    <Column field="total_cancelado" header="Total Cancelado" ></Column>
-                    <Column field="saldo_restante" header="Saldo Restante" ></Column>
-                    <Column field="fecha_cancelado" header="Fecha Cancelado" </Column>
-                    <Column field="estado" header="Estado"></Column>
-
-                </DataTable>
-            </div>
-
-            <template #footer>
-                <Button label="Cancelar" icon="pi pi-times" @click="closeComprasCredito" class="p-button-sm p-button-danger"/>
-                <Button label="Registrar Compra" icon="pi pi-check-square" @click="registrarCompra" class="p-button-sm p-button-help" autofocus />
-            </template>
-        </Dialog>
+                <template #footer>
+                    <Button label="Cancelar" icon="pi pi-times" @click="closeComprasCredito" class="p-button-sm p-button-danger"/>
+                    <Button label="Registrar Compra" icon="pi pi-check-square" @click="registrarCompra" class="p-button-sm p-button-help" autofocus />
+                </template>
+            </Dialog>
         </div>
 
     </main>
@@ -556,9 +556,6 @@ export default {
             array_precios: [],
             objeto_newData: null,
             descuentoGlobal: 0,
-
-
-
             array_cuotas_calculadas: [],
         }
     },
@@ -728,24 +725,29 @@ export default {
                         inventarios: inventarios
                     });
 
-                    if (inventarioResponse.data.status === 'success') {
-                        this.$toast.add({severity:'success', summary: 'Éxito', detail: 'Compra registrada e inventario actualizado', life: 3000});
+                    try {
+                        if (inventarioResponse.data.status === 'success') {
+                            this.$toast.add({severity:'success', summary: 'Éxito', detail: 'Compra registrada e inventario actualizado', life: 3000});
 
-                        this.activeIndex = 0;
-                        this.array_articulos_completo = [];
-                        this.array_articulos_seleccionados = [];
-                        this.form.serie_comprobante = '';
-                        this.form.num_comprobante = '';
-                        this.almacenSeleccionado = null;
-                        this.tipoCompra = null;
-                        this.saldoTotalCompra = 0;
-                        this.descuentoGlobal = 0;
+                            this.activeIndex = 0;
+                            this.array_articulos_completo = [];
+                            this.array_articulos_seleccionados = [];
+                            this.form.serie_comprobante = '';
+                            this.form.num_comprobante = '';
+                            this.almacenSeleccionado = null;
+                            this.tipoCompra = null;
+                            this.saldoTotalCompra = 0;
+                            this.descuentoGlobal = 0;
 
-                        this.closeComprasCredito();
+                            this.closeComprasCredito();
+                        }
+                    } catch(error) {
+                        let errorInventario = 'Error al actualizar inventario';
+                        this.$toast.add({severity:'error', summary: 'Error', detail: errorInventario, life: 3000});
                     }
                 }
             } catch (error) {
-                let errorMessage = 'Error al registrar la compra y actualizar el inventario';
+                let errorMessage = 'Error al registrar la compra';
                 if (error.response && error.response.data && error.response.data.message) {
                     errorMessage = error.response.data.message;
                 }
@@ -1139,12 +1141,11 @@ export default {
 .panel-header {
     display: flex;
     align-items: center;
-    padding-right: 20px;
 }
 
 .panel-icon {
     font-size: 2rem;
-    margin-right: 10px;
+    padding-left: 10px;
 }
 
 .panel-icon {
