@@ -45,6 +45,24 @@ class MarcaController extends Controller
             'marcas' => $marcas
         ];
     }
+    public function index2(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+        
+        if ($buscar==''){
+            $marcas = Marca::orderBy('id', 'desc');
+        }
+        else{
+            $marcas = Marca::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc');
+        }
+        
+        $marcas= $marcas->get();
+        return [ 'marcas' => $marcas
+        ];
+    }
 
     public function selectCategoria(Request $request){
         if (!$request->ajax()) return redirect('/');

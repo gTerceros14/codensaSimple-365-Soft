@@ -10,7 +10,7 @@
 
           <div class="toolbar-container">
             <div class="toolbar">
-                  <Button label="Nuevo" icon="pi pi-plus" @click="abrirModal('industria', 'registrar')" class="p-button-success p-button-sm" />
+                  <Button label="Nuevo" icon="pi pi-plus" @click="abrirModal('industria', 'registrar')" class="p-button-secondary p-button-sm" />
                   <Button label="Importar" icon="pi pi-file-excel" @click="showUploadDialog" class="p-button-help p-button-sm" />
                   
               </div>
@@ -41,7 +41,7 @@
               </Column>
           </DataTable>
 
-          <Dialog :visible.sync="modal" modal :header="tituloModal" :closable="true">
+          <Dialog :visible.sync="modal" modal :header="tituloModal" :closable="true" @hide="cerrarModal">
             <template #footer>
                 <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="cerrarModal()" />
                 <Button v-if="tipoAccion === 1" label="Guardar" icon="pi pi-check" class="p-button-text" @click="registrarIndustria()" />

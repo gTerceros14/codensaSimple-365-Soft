@@ -70,6 +70,7 @@ Vue.component("moneda", require("./components/Moneda.vue"));
 Vue.component("caja", require("./components/Caja.vue"));
 Vue.component("categoria", require("./components/Categoria.vue"));
 Vue.component("articulo", require("./components/Articulo.vue"));
+Vue.component("articulonewview", require("./components/ArticuloNewView.vue"));
 
 Vue.component("ofertas", require("./components/Ofertas.vue"));
 Vue.component("kits", require("./components/Kits.vue"));
@@ -111,6 +112,7 @@ Vue.component(
 );
 
 Vue.component("marca", require("./components/Marca.vue"));
+Vue.component("marcanewview",require("./components/MarcaNewView.vue"));
 Vue.component("linea", require("./components/Linea.vue"));
 Vue.component("lineanewview",require("./components/LineaNewView.vue"));
 Vue.component("industria", require("./components/Industria.vue"));

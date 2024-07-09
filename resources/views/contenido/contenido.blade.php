@@ -75,9 +75,10 @@
 <template v-if="menu==17">
     <editarperfil></editarperfil>
 </template>
-<template v-if="menu==18">
+<!--<template v-if="menu==18">
     <marca></marca>
 </template>
+-->
 <!--<template v-if="menu==19">
     <linea></linea>
 </template>
@@ -253,11 +254,14 @@
 <template v-if="menu==20">
     <industrianewview></industrianewview>
 </template>
-<template v-if="menu==71">
-    <lineanewview></lineanewview>
-</template>
 <template v-if="menu==19">
     <lineanewview></lineanewview>
+</template>
+<template v-if="menu==18">
+    <marcanewview></marcanewview>
+</template>
+<template v-if="menu==71">
+    <articulonewview></articulonewview>
 </template>
 @elseif (Auth::user()->idrol == 2)
 <template v-if="menu==0">

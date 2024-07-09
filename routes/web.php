@@ -120,6 +120,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/linea/import_excel', 'CategoriaController@importsaveExecelUser')->name('import_excel');
 
         Route::get('/marca', 'MarcaController@index');
+        Route::get('/marcanewview', 'MarcaController@index2');
         Route::post('/marca/registrar', 'MarcaController@store');
         Route::put('/marca/actualizar', 'MarcaController@update');
         Route::put('/marca/desactivar', 'MarcaController@desactivar');
@@ -473,6 +474,8 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/ingreso/generar-nota-ingreso/{id}', 'IngresoController@generarNotaIngreso');
         Route::get('/credito/recibo-cuota/{id}', 'CreditoVentaController@generarReciboCuota')->name('credito.recibo-cuota');
+        Route::get('/credito/recibo-general/{id}', 'CreditoVentaController@generarReciboGeneral');
+   
     });
 
     //RUTA PARA RECUPERAR LA SESSION CON EL ID DE LA PERSONA LOGUEADA

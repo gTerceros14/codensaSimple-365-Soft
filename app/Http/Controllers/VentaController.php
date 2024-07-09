@@ -1037,7 +1037,11 @@ public function imprimirResivoRollo($id) {
             $pdf->Cell(50, 6, utf8_decode(strtoupper('TOTAL')), 0, 0);
             $pdf->Cell(20, 6, utf8_decode(number_format($total, 2)), 0, 1, 'R');
 
-          
+            $formatter = new NumberFormatter("es", NumberFormatter::SPELLOUT);
+            $totalTexto = strtoupper($formatter->format($total)) . ' BOLIVIANOS';
+            $pdf->SetFont('Courier', 'B', 8);
+            $pdf->Cell(0, 5, 'SON: ' . $totalTexto, 0, 1);
+            
             
             // Tipo de pago
             $tipoPago = $venta->tipoPago;
