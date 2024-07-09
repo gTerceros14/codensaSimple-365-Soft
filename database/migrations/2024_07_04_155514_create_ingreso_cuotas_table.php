@@ -22,6 +22,7 @@ class CreateIngresoCuotasTable extends Migration
             $table->decimal('total_cancelado', 11, 2)->default(0);
             $table->decimal('saldo_restante', 11, 2);
             $table->date('fecha_cancelado')->nullable();
+            $table->string('tipo_pago_cuota')->nullable();
             $table->string('estado', 20)->default('Pendiente');
             $table->timestamps();
         });
