@@ -36,5 +36,10 @@ class Ingreso extends Model
     {
         return $this->hasMany(DetalleIngreso::class, 'idarticulo');
     }
+
+    public function cuotas()
+    {
+        return $this->hasMany(IngresoCuota::class, 'idingreso');
+    }
   
 }

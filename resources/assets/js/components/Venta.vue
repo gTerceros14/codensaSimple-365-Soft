@@ -22,9 +22,6 @@
             </template>
             <!-- Listado-->
             <template v-if="listado == 1">
-
-
-
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-sm">
                         <thead>
@@ -44,7 +41,8 @@
                                 <template>
                                     <td class="p-d-flex p-ai-center">
                                         <Button type="button" icon="pi pi-eye" @click="verVenta(venta.id)"
-                                            class="p-button-sm p-mr-1" />
+        class="p-button-sm p-mr-1" style="background-color: green; border-color: green; color: white;" />
+
 
                                         <template v-if="venta.estado === 'Registrado' && idrol !== 2">
                                             <Button type="button" icon="pi pi-trash" @click="desactivarVenta(venta.id)"
@@ -404,13 +402,15 @@
                                                 </template>
                                             </Column>
                                             <Column field="unidades" header="Unidades" style="width: 15%">
-                                                <template v-slot:body="slotProps">
-                                                    <input type="number" v-model="slotProps.data.cantidad" min="1"
-                                                        @input="actualizarDetalle(slotProps.data.id)"
-                                                        class="form-control text-center"
-                                                        style="border: none; outline: none; width: 60px;" />
-                                                </template>
-                                            </Column>
+  <template v-slot:body="slotProps">
+    <input type="number" 
+           v-model="slotProps.data.cantidad" 
+           min="1"
+           @input="actualizarDetalle(slotProps.data.id)"
+           class="form-control text-center"
+           style="border: none; outline: none; width: 60px;" />
+  </template>
+</Column>
                                             <Column field="total" header="Total" style="width: 20%">
                                                 <template v-slot:body="slotProps">
                                                     {{ (slotProps.data.precioseleccionado * slotProps.data.cantidad *
@@ -1070,20 +1070,7 @@ export default {
             return resultado;
         },
 
-        calcularSubTotal: function () {
-            var resultado = 0.0;
-            for (var i = 0; i < this.arrayDetalle.length; i++) {
-                resultado =
-                    resultado +
-                    (this.arrayDetalle[i].precioseleccionado *
-                        this.arrayDetalle[i].cantidad -
-                        (this.arrayDetalle[i].precioseleccionado *
-                            this.arrayDetalle[i].cantidad *
-                            this.arrayDetalle[i].descuento) /
-                        100);
-            }
-            return resultado;
-        },
+    
         badgeSeverity() {
             if (this.estadoTransaccion && this.estadoTransaccion.objeto.estadoActual === 'PENDIENTE') {
                 return 'danger'; // Rojo para estado PENDIENTE
@@ -1095,7 +1082,22 @@ export default {
         }
     },
 
-    methods: {
+  methods: {
+    calcularTotal() {
+      var resultado = 0.0;
+      for (var i = 0; i < this.arrayDetalle.length; i++) {
+        resultado +=
+          this.arrayDetalle[i].precioseleccionado *
+          this.arrayDetalle[i].cantidad -
+          (this.arrayDetalle[i].precioseleccionado *
+            this.arrayDetalle[i].cantidad *
+            this.arrayDetalle[i].descuento) /
+          100;
+      }
+      resultado -= this.descuentoAdicional;
+      //resultado -= this.descuentoGiftCard;
+      return parseFloat(resultado.toFixed(2));
+    },
         generarCuotas() {
             this.cuotas = [];
             const fechaHoy = new Date();
@@ -1621,8 +1623,14 @@ export default {
             return diasRestantes;
         },
         actualizarDetalle(index) {
+        if (this.arrayDetalle[index] && typeof this.arrayDetalle[index].precioseleccionado !== 'undefined' && typeof this.arrayDetalle[index].cantidad !== 'undefined') {
             this.arrayDetalle[index].total = (this.arrayDetalle[index].precioseleccionado * this.arrayDetalle[index].cantidad).toFixed(2);
-        },
+            this.calcularTotal(); // Asegúrate de recalcular el total después de actualizar
+        } else {
+            console.error('Datos inválidos en actualizarDetalle para el índice:', index);
+        }
+    },
+
         actualizarDetalleDescuento(index) {
             this.calcularTotal(index);
         },
@@ -1843,11 +1851,14 @@ export default {
             }
             return sw;
         },
-        eliminarDetalle(index) {
-            let me = this;
-            me.arrayDetalle.splice(index, 1);
-            me.arrayProductos.splice(index, 1);
-        },
+        eliminarDetalle(id) {
+    const index = this.arrayDetalle.findIndex(item => item.id === id);
+    if (index !== -1) {
+        this.arrayDetalle.splice(index, 1);
+        this.arrayProductos.splice(index, 1);
+        this.calcularTotal();
+    }
+},
         eliminarKit(id) {
             const indicesEliminar = [];
             for (let i = 0; i < this.arrayDetalle.length; i++) {
@@ -1864,63 +1875,72 @@ export default {
         },
 
         agregarDetalle() {
-            let actividadEconomica = 461021;
-            let numeroSerie = null;
-            let numeroImei = null;
-            let descuento = (this.precioseleccionado * this.cantidad * (this.descuentoProducto / 100)).toFixed(2);
-            if (this.encuentra(this.arraySeleccionado.id)) {
-                swal({
-                    type: "error",
-                    title: "Error...",
-                    text: "Este Artículo ya se encuentra agregado!",
-                });
-            } else {
-                if (this.saldosNegativos === 0 && this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete) {
-                    swal({
-                        type: "error",
-                        title: "Error...",
-                        text: "No hay stock disponible!",
-                    });
-                    return;
-                }
-                const precioArticulo = this.calcularPrecioConDescuento(this.resultadoMultiplicacion, this.arrayPromocion ? this.arrayPromocion.porcentaje : 0) * this.monedaVenta[0];
-                console.log("Este es el precio del articulo: ", precioArticulo);
-                this.arrayDetalle.push({
-                    idkit: -1,
-                    idarticulo: this.arraySeleccionado.id,
-                    articulo: this.arraySeleccionado.nombre,
-                    medida: this.arraySeleccionado.medida,
-                    unidad_envase: this.arraySeleccionado.unidad_envase,
-                    cantidad: this.cantidad * this.unidadPaquete,
-                    cantidad_paquetes: this.arraySeleccionado.unidad_envase,
-                    precio: precioArticulo,
-                    descuento: this.descuentoProducto,
-                    stock: this.arraySeleccionado.saldo_stock,
-                    precioseleccionado: this.precioseleccionado,
-                });
-                console.log(this.arrayDetalle);
-                this.arrayProductos.push({
-                    actividadEconomica: actividadEconomica,
-                    codigoProductoSin: this.arraySeleccionado.codigoProductoSin,
-                    codigoProducto: this.arraySeleccionado.codigo,
-                    descripcion: this.arraySeleccionado.nombre,
-                    cantidad: this.cantidad * this.unidadPaquete,
-                    unidadMedida: this.arraySeleccionado.codigoClasificador,
-                    precioUnitario: parseFloat(this.precioseleccionado).toFixed(2),
-                    montoDescuento: descuento,
-                    subTotal: precioArticulo.toFixed(2),
-                    numeroSerie: numeroSerie,
-                    numeroImei: numeroImei,
-                });
-                console.log("pa la factura: ", this.arrayProductos);
-                this.precioBloqueado = true;
-                this.arraySeleccionado = [];
-                this.cantidad = 1;
-                this.unidadPaquete = 1;
-                this.codigo = "";
-                this.descuentoProducto = 0;
-            }
-        },
+    if (this.encuentra(this.arraySeleccionado.id)) {
+        swal({
+            type: "error",
+            title: "Error...",
+            text: "Este Artículo ya se encuentra agregado!",
+        });
+        return;
+    }
+    
+    if (this.saldosNegativos === 0 && this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete) {
+        swal({
+            type: "error",
+            title: "Error...",
+            text: "No hay stock disponible!",
+        });
+        return;
+    }
+    
+    const precioUnitario = parseFloat(this.precioseleccionado);
+    const cantidad = this.cantidad * this.unidadPaquete;
+    const descuento = (precioUnitario * cantidad * (this.descuentoProducto / 100)).toFixed(2);
+    const total = (precioUnitario * cantidad - descuento).toFixed(2);
+    
+    const nuevoDetalle = {
+        id: Date.now(),
+        idkit: -1,
+        idarticulo: this.arraySeleccionado.id,
+        articulo: this.arraySeleccionado.nombre,
+        medida: this.arraySeleccionado.medida,
+        unidad_envase: this.arraySeleccionado.unidad_envase,
+        cantidad: cantidad,
+        cantidad_paquetes: this.arraySeleccionado.unidad_envase,
+        precio: precioUnitario,
+        descuento: this.descuentoProducto,
+        stock: this.arraySeleccionado.saldo_stock,
+        precioseleccionado: precioUnitario,
+        total: total
+    };
+    
+    this.arrayDetalle.push(nuevoDetalle);
+    
+    const nuevoProducto = {
+        actividadEconomica: 461021,
+        codigoProductoSin: this.arraySeleccionado.codigoProductoSin,
+        codigoProducto: this.arraySeleccionado.codigo,
+        descripcion: this.arraySeleccionado.nombre,
+        cantidad: cantidad,
+        unidadMedida: this.arraySeleccionado.codigoClasificador,
+        precioUnitario: precioUnitario.toFixed(2),
+        montoDescuento: descuento,
+        subTotal: total,
+        numeroSerie: null,
+        numeroImei: null,
+    };
+    
+    this.arrayProductos.push(nuevoProducto);
+    
+    this.precioBloqueado = true;
+    this.arraySeleccionado = [];
+    this.cantidad = 1;
+    this.unidadPaquete = 1;
+    this.codigo = "";
+    this.descuentoProducto = 0;
+    
+    this.calcularTotal();
+},
 
         agregarDetalleModal(data) {
             //this.scrollToSection();
@@ -2013,29 +2033,44 @@ export default {
             this.idAlmacen = event.value;
         },
         validarVenta() {
-            let me = this;
-            me.errorVenta = 0;
-            me.errorMostrarMsjVenta = [];
-            var art;
+    let me = this;
+    me.errorVenta = 0;
+    me.errorMostrarMsjVenta = [];
 
-            me.arrayDetalle.map(function (x) {
-                if (x.cantidad > x.stock) {
-                    art = x.articulo + " Stock insuficiente";
-                    me.errorMostrarMsjVenta.push(art);
-                }
-            });
+    // Verificar stock de cada artículo
+    me.arrayDetalle.forEach(function (x) {
+        if (x.cantidad > x.stock) {
+            let art = `${x.articulo}: Stock insuficiente`;
+            me.errorMostrarMsjVenta.push(art);
+        }
+    });
 
-            if (me.tipo_comprobante == 0)
-                me.errorMostrarMsjVenta.push("Seleccione el Comprobante");
-            if (!me.impuesto)
-                me.errorMostrarMsjVenta.push("Ingrese el impuesto de compra");
-            if (me.arrayDetalle.length <= 0)
-                me.errorMostrarMsjVenta.push("Ingrese detalles");
+    // Verificar si se seleccionó el tipo de comprobante
+    if (me.tipo_comprobante == 0)
+        me.errorMostrarMsjVenta.push("Seleccione el Comprobante");
 
-            if (me.errorMostrarMsjVenta.length) me.errorVenta = 1;
-            return me.errorVenta;
-        },
+    // Verificar si se ingresó el impuesto
+    if (!me.impuesto)
+        me.errorMostrarMsjVenta.push("Ingrese el impuesto de compra");
 
+    // Verificar si hay detalles en la venta
+    if (me.arrayDetalle.length <= 0)
+        me.errorMostrarMsjVenta.push("Ingrese detalles");
+
+    // Verificar si hay errores
+    if (me.errorMostrarMsjVenta.length) {
+        me.errorVenta = 1;
+        
+        // Mostrar todos los errores en un solo mensaje de SweetAlert
+        swal({
+            type: "error",
+            title: "Error en la venta",
+            text: me.errorMostrarMsjVenta.join("\n"),
+        });
+    }
+
+    return me.errorVenta === 0;
+},
         aplicarDescuento() {
             const descuentoGiftCard = this.descuentoGiftCard;
             const numeroTarjeta = this.numeroTarjeta;
@@ -2250,29 +2285,50 @@ export default {
         },
 
         async registrarVenta(idtipo_pago) {
-            if (this.validarVenta()) return;
+            if (this.validarVenta()) {
+                this.prepararDatosCliente();
+                await this.buscarOCrearCliente();
 
-            this.prepararDatosCliente();
-            await this.buscarOCrearCliente();
+                const ventaData = this.prepararDatosVenta(idtipo_pago);
 
-            const ventaData = this.prepararDatosVenta(idtipo_pago);
+                try {
+                    this.mostrarSpinner = true;
+                    const response = await axios.post("/venta/registrar", ventaData);
 
-            try {
-                this.mostrarSpinner = true;
-                const response = await axios.post("/venta/registrar", ventaData);
-
-                if (response.data.id > 0) {
-                    this.manejarVentaExitosa(response.data.id);
-                } else {
-                    this.manejarErrorVenta(response.data);
+                    if (response.data.id > 0) {
+                        this.manejarVentaExitosa(response.data.id);
+                    } else {
+                        this.manejarErrorVenta(response.data);
+                    }
+                } catch (error) {
+                    console.error("Error al registrar venta:", error);
+                    this.ejecutarFlujoCompleto();
+                } finally {
+                    this.mostrarSpinner = false;
                 }
-            } catch (error) {
-                console.error("Error al registrar venta:", error);
-                this.ejecutarFlujoCompleto();
-            } finally {
-                this.mostrarSpinner = false;
             }
         },
+
+   
+
+
+        cambiarProducto(index, nuevoProducto) {
+            if (index >= 0 && index < this.arrayDetalle.length) {
+                this.arrayDetalle[index] = {
+                    idarticulo: nuevoProducto.id,
+                    articulo: nuevoProducto.nombre,
+                    cantidad: 1,
+                    precio: nuevoProducto.precio,
+                    stock: nuevoProducto.stock,
+                    subtotal: nuevoProducto.precio
+                };
+                this.calcularTotal();
+            }
+        },
+
+        calcularTotal() {
+    return this.arrayDetalle.reduce((sum, item) => sum + parseFloat(item.total), 0);
+},
 
         prepararDatosCliente() {
             if (!this.nombreCliente.trim()) {
@@ -2296,6 +2352,18 @@ export default {
             };
 
             if (this.tipoVenta === 'credito') {
+                const totalCredito = this.primera_cuota 
+            ? this.calcularTotal - this.primer_precio_cuota 
+            : this.calcularTotal;
+
+        let cuotasActualizadas = [...this.cuotas];
+        if (this.primera_cuota) {
+            cuotasActualizadas[0] = {
+                ...cuotasActualizadas[0],
+                totalCancelado: this.primer_precio_cuota,
+                estado: 'Pagado'
+            };
+        }
                 return {
                     ...datosComunes,
                     idpersona: this.idcliente,
@@ -2303,8 +2371,9 @@ export default {
                     tiempo_dias_cuotaCredito: this.tiempo_diaz,
                     totalCredito: this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal,
                     estadoCredito: "Pendiente",
-                    cuotaspago: this.cuotas,
-                    primer_precio_cuota: this.primer_precio_cuota
+                    cuotaspago: cuotasActualizadas,
+            primer_precio_cuota: this.primer_precio_cuota,
+            primera_cuota_pagada: this.primera_cuota
                 };
             } else if (this.tipo_comprobante === "RESIVO") {
                 return { ...datosComunes, resivo: this.resivo };
@@ -2965,4 +3034,6 @@ input:required {
 .p-button-sm .p-button-icon {
     font-size: 1.2rem !important;
 }
+
+
 </style>
