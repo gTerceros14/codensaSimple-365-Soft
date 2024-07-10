@@ -16,7 +16,7 @@
                 dataKey="id"
                 :rowHover="true"
             >
-                <template #header>
+                <!--<template #header>
                     <div class="flex justify-content-between align-items-center">
                         <h5 class="m-0">Customers</h5>
                         <span class="p-input-icon-left">
@@ -24,7 +24,7 @@
                             <InputText placeholder="Keyword Search" class="p-inputtext-sm"/>
                         </span>
                     </div>
-                </template>
+                </template>-->
 
                 <template #empty>
                     Sin compras a credito ...
@@ -41,7 +41,7 @@
                 <Column field="nombre_almacen" header="Almacen" ></Column>
                 <Column field="total" header="Total Compra" ></Column>
                 <Column field="cuota_inicial" header="Cuota Inicial" ></Column>
-                <Column field="saldo_restante" header="Monto Pendiente" ></Column>
+                <Column field="saldo_restante" header="Deuda" ></Column>
                 <Column header="Estado">
                     <template #body="slotProps">
                         <Tag v-if="slotProps.data.estado_pago == 'Pagado'" class="mr-2" severity="success" value="Success">Pagado</Tag>
@@ -51,7 +51,8 @@
             </DataTable>
         </Panel>
 
-        <Dialog header="Cuotas Pendientes" :visible.sync="displayListaCuotas" :modal="true" position="center" :containerStyle="{width: '65vw'}">
+        <div class="div-lista-cuota">
+            <Dialog header="Cuotas Pendientes" :visible.sync="displayListaCuotas" :modal="true" position="center" :containerStyle="{width: '60vw'}">
                 <DataTable
                     :value="array_cuotas"
                     :paginator="false"
@@ -59,22 +60,65 @@
                     dataKey="id"
                     :rowHover="true"
                 >
-                    <Column field="fecha_pago" header="Fecha Pago"></Column>
+                    <Column field="fecha_pago" header="Fecha Pago" :styles="{width:'13%'}"></Column>
                     <Column field="precio_cuota" header="Precio Cuota"></Column>
                     <Column field="total_cancelado" header="Total Cancelado"></Column>
                     <Column field="saldo_restante" header="Saldo Restante"></Column>
                     <Column field="fecha_cancelado" header="Fecha Cancelado"></Column>
-                    <Column field="estado" header="Estado"></Column>
+                    <Column field="tipo_pago_cuota" header="Tipo Pago"></Column>
+                    <Column header="Estado">
+                        <template #body="slotProps">
+                            <Tag v-if="slotProps.data.estado == 'Pagado'" class="mr-2" severity="success" value="Success">Pagado</Tag>
+                            <Tag v-else class="mr-2" severity="warning" value="Warning">Pendiente</Tag>
+                        </template>
+                    </Column>
                     <Column :bodyStyle="{'text-align': 'center'}">
-                        <template #body>
-                            <Button type="button" class="p-button-sm p-button-success" label="Pagar" icon="pi pi-dollar"></Button>
+                        <template #body="slotProps">
+                            <Button v-if="slotProps.data.estado == 'Pagado'" disabled type="button" class="p-button-sm p-button-warning" label="Pagado" icon="pi pi-flag-fill" ></Button>
+                            <Button v-else type="button" class="p-button-sm p-button-success" label="Pagar" icon="pi pi-dollar" @click="openModalPagoCuota"></Button>
                         </template>
                     </Column>
                 </DataTable>
-                <template #footer>
-                </template>
-        </Dialog>
+            </Dialog>
+        </div>
 
+        <div class="div-pagar-cuota">
+            <Dialog header="Pagar Cuota" :visible.sync="displayPagarCuota" :modal="true" position="center" :contentStyle="{overflow: 'visible'}" :containerStyle="{width: '50vw'}">
+                <div class="p-fluid p-formgrid p-grid">
+                    <div class="p-field p-col-12 p-md-4">
+                        <label for="tipoPago">Tipo de Pago</label>
+                        <Dropdown class="p-inputtext-sm" v-model="form.tipo_pago_cuota" :options="lista_tipo_pago_cuotas" optionLabel="nombre" placeholder="Selecciona el tipo de pago" />
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-4">
+                        <label for="fechaPago">Fecha de Pago</label>
+                        <InputText class="p-inputtext-sm" id="fechaPago" v-model="form.fecha_pago" disabled />
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-4">
+                        <label for="saldoRestante">Saldo Restante</label>
+                        <InputNumber class="p-inputtext-sm" id="saldoRestante" v-model="form.saldo_restante" disabled />
+                    </div>
+                </div>
+
+                <div class="p-fluid p-formgrid p-grid">
+                    <div class="p-field p-col-12 p-md-4">
+                        <label for="cuotaActual">Cuota Actual</label>
+                        <InputNumber class="p-inputtext-sm" id="cuotaActual" v-model="form.cuota_actual" disabled />
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-4">
+                        <label for="montoPagar">Monto a Pagar</label>
+                        <InputNumber class="p-inputtext-sm" id="montoPagar" v-model="form.pago_actual" :min="0" />
+                    </div>
+                </div>
+
+                <template #footer>
+                    <Button label="Cancelar" icon="pi pi-times" class="p-button-sm p-button-danger"/>
+                    <Button label="Abonar" icon="pi pi-check-square" class="p-button-sm p-button-help" autofocus />
+                </template>
+            </Dialog>
+        </div>
     </main>
 </template>
 
@@ -86,9 +130,11 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup'; 
 import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
 import Button from 'primevue/button';
 import Tag from 'primevue/tag';
 import Dialog from 'primevue/dialog';
+import Dropdown from 'primevue/dropdown';
 
 export default {
     setup () {
@@ -99,10 +145,22 @@ export default {
 
     data() {
         return {
-
             array_ingresos: [],
             array_cuotas: [],
             displayListaCuotas: false,
+            displayPagarCuota: false,
+            lista_tipo_pago_cuotas: [
+                {nombre: 'Efectivo'},
+                {nombre: 'Tarjeta'},
+                {nombre: 'QR'}
+            ],
+            form: {
+                fecha_pago: null,
+                saldo_restante: null,
+                tipo_pago_cuota: null,
+                cuota_actual: null,
+                pago_actual: null,
+            },
         }
     },
 
@@ -115,6 +173,8 @@ export default {
         Button,
         Tag,
         Dialog,
+        InputNumber,
+        Dropdown,
     },
 
     computed: {
@@ -140,16 +200,25 @@ export default {
         },
 
         async listarCuotasPorIngreso(ingresoId) {
-
             try {
                 const cuotasResponse = await axios.get('/ingresoCuotas/cuotasPorIngreso?id=' + ingresoId);
             
                 if (cuotasResponse.data.status === 'success') {
-                    this.array_cuotas = cuotasResponse.data.cuotas;
+                    let cuotas = cuotasResponse.data.cuotas.slice(1);
+                    
+                    this.array_cuotas = cuotas.map((cuota, index) => ({
+                        ...cuota,
+                        fecha_pago: cuota.fecha_pago.split(' ')[0],
+                        enumeracion: index + 1
+                    }));
                 }
             } catch (error) {
-
+                console.error(error);
             }
+        },
+
+        cortarString(cadena) {
+            return cadena.substring(0, 9);
         },
 
         openModalListaCuotas(ingresoId) {
@@ -159,6 +228,15 @@ export default {
 
         closeModalListaCuotas() {
             this.displayListaCuotas = false;
+        },
+
+        openModalPagoCuota() {
+            this.displayListaCuotas = false;
+            this.displayPagarCuota = true;
+        },
+
+        closeModalPagoCuota() {
+            this.displayPagarCuota = false;
         }
     },
 
@@ -187,5 +265,39 @@ export default {
 .panel-icon {
     font-size: 1.5rem;
     margin: 0;
+}
+
+/* Dialog Cuotas */
+>>> .div-lista-cuota .p-dialog-header {
+    padding: 1rem 1rem 1rem 1.5rem;
+    background: #33b378;
+    color: #ffffff;
+}
+
+>>> .div-lista-cuota .p-dialog-content {
+    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+/* Dialog Pagar */
+>>> .div-pagar-cuota .p-dialog-header {
+    padding: 1rem 1rem 1rem 1.5rem;
+    background: #33b378;
+    color: #ffffff;
+}
+
+>>> .div-pagar-cuota .p-dialog-content {
+    padding: 0.5rem 0.5rem 0 0.5rem;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+>>> .div-pagar-cuota .p-dialog-footer {
+    
+}
+
+>>> .p-md-4 {
+    padding: 0 0.75rem 0 0.75rem !important;
 }
 </style>
