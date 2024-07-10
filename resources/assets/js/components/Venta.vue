@@ -1,187 +1,115 @@
 <template>
     <main class="main">
         <!-- Breadcrumb -->
-
-
-        <div class="card">
-            <div>
-                <i class="fa fa-align-justify"></i> Ventas
-            </div>
-            <template>
-                <div class="p-d-flex p-jc-between p-ai-center card-header">
-                    <div class="p-field">
-                        <input type="search" v-model="buscar" @keyup="buscarVenta" class="p-inputtext"
-                            placeholder="Texto a buscar">
+        
+            <Panel header=" Ventas">
+         
+                      
+                  <template>
+                    <div class="p-d-flex p-jc-between p-ai-center">
+                      <span class="p-input-icon-left">
+                        <i class="pi pi-search" />
+                        <InputText v-model="buscar" @input="buscarVenta" placeholder="Texto a buscar" />
+                      </span>
+                      <Button @click="abrirTipoVenta" label="Nuevo" icon="pi pi-plus" class="p-button-primary" />
                     </div>
-                    <div class="p-field">
-                        <Button type="button" @click="abrirTipoVenta" label="Nuevo" icon="pi pi-plus"
-                            class="p-button-sm p-button-primary" />
-                        <!-- Aumentamos el tamaño del botón con p-button-lg -->
-                    </div>
-                </div>
-            </template>
+                  </template>
+               
+         
             <!-- Listado-->
             <template v-if="listado == 1">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th>Opciones</th>
-                                <th>Vendedor</th>
-                                <th>Cliente</th>
-                                <th class="d-none d-md-table-cell">Documento</th>
-                                <th class="d-none d-md-table-cell">N° de Comprobante</th>
-                                <th class="d-none d-md-table-cell">Fecha y Hora</th>
-                                <th>Total</th>
-                                <th class="d-none d-md-table-cell">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="venta in arrayVenta" :key="venta.id">
-                                <template>
-                                    <td class="p-d-flex p-ai-center">
-                                        <Button type="button" icon="pi pi-eye" @click="verVenta(venta.id)"
-        class="p-button-sm p-mr-1" style="background-color: green; border-color: green; color: white;" />
-
-
-                                        <template v-if="venta.estado === 'Registrado' && idrol !== 2">
-                                            <Button type="button" icon="pi pi-trash" @click="desactivarVenta(venta.id)"
-                                                class="p-button-sm p-button-danger p-mr-1" />
-                                        </template>
-
-                                        <Button type="button" icon="pi pi-print"
-                                            @click="imprimirResivo(venta.id, venta.correo)"
-                                            class="p-button-sm p-button-primary p-mr-1" />
-                                    </td>
-                                </template>
-                                <td v-text="venta.usuario"></td>
-                                <td v-text="venta.razonSocial"></td>
-                                <td class="d-none d-md-table-cell" v-text="venta.documentoid"></td>
-                                <td class="d-none d-md-table-cell" v-text="venta.num_comprobante"></td>
-                                <td class="d-none d-md-table-cell" v-text="venta.fecha_hora"></td>
-                                <td>{{ (venta.total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
-                                </td>
-                                <td class="d-none d-md-table-cell" v-text="venta.estado"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <nav>
-                    <ul class="pagination">
-                        <li class="page-item" v-if="pagination.current_page > 1">
-                            <a class="page-link" href="#"
-                                @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
-                        </li>
-                        <li class="page-item" v-for="page in pagesNumber" :key="page"
-                            :class="[page == isActived ? 'active' : '']">
-                            <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                v-text="page"></a>
-                        </li>
-                        <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                            <a class="page-link" href="#"
-                                @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
-                        </li>
-                    </ul>
-                </nav>
-
-            </template>
-
-
-
-            <!--Fin Listado-->
-
-            <!--Ver ingreso-->
-            <template v-else-if="listado == 2">
-                <div class="card shadow">
-                    <div class="card-body">
-                        <div class="form-group row border p-3">
-                            <div class="col-md-9">
-                                <div class="form-group">
-                                    <label for="">Cliente</label>
-                                    <p class="mb-0" v-text="cliente"></p>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Tipo Comprobante</label>
-                                    <p class="mb-0" v-text="tipo_comprobante"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Número Comprobante</label>
-                                    <p class="mb-0" v-text="num_comprobante"></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group row border">
-                            <div class="table-responsive col-md-12">
-                                <table class="table table-bordered table-striped table-sm">
-                                    <thead class="thead-dark">
-                                        <tr>
-                                            <th>Artículo</th>
-                                            <th>Precio</th>
-                                            <th>Cantidad</th>
-                                            <th>Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody v-if="arrayDetalle.length">
-                                        <tr v-for="detalle in arrayDetalle" :key="detalle.id">
-                                            <td v-text="detalle.articulo"></td>
-                                            <td>
-                                                {{
-                                                    (detalle.precio * parseFloat(monedaVenta[0])).toFixed(2)
-                                                }}
-                                                {{ monedaVenta[1] }}
-                                            </td>
-                                            <td v-text="detalle.cantidad"></td>
-                                            <td>
-                                                {{
-                                                    (
-                                                        (detalle.precio * detalle.cantidad) *
-                                                        parseFloat(monedaVenta[0])
-                                                    ).toFixed(2)
-                                                }}
-                                                {{ monedaVenta[1] }}
-                                            </td>
-                                        </tr>
-                                        <tr class="bg-light font-weight-bold">
-                                            <td colspan="3" class="text-right">Total Neto:</td>
-                                            <td>
-                                                {{ (total * parseFloat(monedaVenta[0])).toFixed(2) }}
-                                                {{ monedaVenta[1] }}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-12 text-right">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">
-                                    Cerrar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </template>
-            <!--Fin ver ingreso-->
-            <!-- Vista Devoluciones -->
-            <template v-else-if="listado == 3">
                 <div>
-                    <devoluciones></devoluciones>
-                    <div class="form-group row">
-                        <div class="col-md-12">
-                            <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">
-                                Cerrar
-                            </button>
-                        </div>
-                    </div>
+                    <DataTable :value="arrayVenta" :rows="10" :responsive="scroll">
+                    <Column header="Opciones">
+                        <template #body="slotProps">
+                        <Button icon="pi pi-eye" @click="verVenta(slotProps.data.id)"
+                            class="p-button-sm p-mr-1" style="background-color: green; border-color: green; color: white;" />
+                        <template v-if="slotProps.data.estado === 'Registrado' && idrol !== 2">
+                            <Button icon="pi pi-trash" @click="desactivarVenta(slotProps.data.id)"
+                            class="p-button-sm p-button-danger p-mr-1" />
+                        </template>
+                        <Button icon="pi pi-print" @click="imprimirResivo(slotProps.data.id, slotProps.data.correo)"
+                            class="p-button-sm p-button-primary p-mr-1" />
+                        </template>
+                    </Column>
+                    <Column field="usuario" header="Vendedor"></Column>
+                    <Column field="razonSocial" header="Cliente"></Column>
+                    <Column field="documentoid" header="Documento" class="d-none d-md-table-cell"></Column>
+                    <Column field="num_comprobante" header="N° de Comprobante" class="d-none d-md-table-cell"></Column>
+                    <Column field="fecha_hora" header="Fecha y Hora" class="d-none d-md-table-cell"></Column>
+                    <Column header="Total">
+                        <template #body="slotProps">
+                        {{ (slotProps.data.total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                        </template>
+                    </Column>
+                    <Column field="estado" header="Estado" class="d-none d-md-table-cell"></Column>
+                    </DataTable>
+                    
+                    <Paginator 
+                    :rows="10"
+                    :totalRecords="pagination.total"
+                    :first="(pagination.current_page - 1) * 10"
+                    @page="onPageChange"
+                    />
                 </div>
             </template>
-        </div>
+
+
+
+                            <!--Fin Listado-->
+
+                            <!--Ver ingreso-->
+            <template v-else-if="listado == 2">
+                <Card class="shadow">
+                    <template #content>
+                    <div class="p-grid p-fluid border p-3 mb-3">
+                        <div class="p-col-12 p-md-9">
+                        <div class="p-field">
+                            <label>Cliente</label>
+                            <InputText v-model="cliente" disabled />
+                        </div>
+                        </div>
+                        <div class="p-col-12 p-md-3">
+                        <div class="p-field">
+                            <label>Tipo Comprobante</label>
+                            <InputText v-model="tipo_comprobante" disabled />
+                        </div>
+                        </div>
+                        <div class="p-col-12 p-md-3">
+                        <div class="p-field">
+                            <label>Número Comprobante</label>
+                            <InputText v-model="num_comprobante" disabled />
+                        </div>
+                        </div>
+                    </div>
+
+                    <DataTable :value="arrayDetalle" class="mb-3">
+                        <Column field="articulo" header="Artículo"></Column>
+                        <Column header="Precio">
+                        <template #body="slotProps">
+                            {{ (slotProps.data.precio * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                        </template>
+                        </Column>
+                        <Column field="cantidad" header="Cantidad"></Column>
+                        <Column header="Subtotal">
+                        <template #body="slotProps">
+                            {{ ((slotProps.data.precio * slotProps.data.cantidad) * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                        </template>
+                        </Column>
+                    </DataTable>
+
+                    <div class="p-text-right p-mb-3">
+                        <strong>Total Neto: {{ (total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}</strong>
+                    </div>
+
+                    <div class="p-text-right">
+                        <Button label="Cerrar" @click="ocultarDetalle()" class="p-button-secondary" />
+                    </div>
+                    </template>
+                </Card>
+            </template>            
+        
+    </panel>
         <!-- HASTA AQUI DEVOLUCIONES -->
         <template>
             <div class="modal" tabindex="-1" :class="{ 'mostrar': modal2 }" role="dialog" aria-labelledby="myModalLabel"
@@ -694,7 +622,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal " tabindex="-1" :class="{ mostrar: modal }" role="dialog"
+                
+            </div>
+        </template>
+        <div class="modal " tabindex="-1" :class="{ mostrar: modal }" role="dialog"
                     aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
                     <div class="modal-dialog modal-primary modal-lg" role="document">
                         <div class="modal-content">
@@ -797,23 +728,34 @@
                     </div>
                     <!-- /.modal-dialog -->
                 </div>
-            </div>
-        </template>
         <!--##################---HASTA AQUI---####################-->
     </main>
 </template>
 
 <script>
-import Button from 'primevue/button';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-import Dropdown from 'primevue/dropdown';
-import InputNumber from 'primevue/inputnumber';
-import InputText from 'primevue/inputtext';
+
+
 import Swal from 'sweetalert2';
 import vSelect from "vue-select";
-import { TileSpinner } from "vue-spinners";
+import TileSpinner  from "vue-spinners";
+import DataTable  from 'primevue/datatable';
+import Column  from 'primevue/column';
+import Paginator  from 'primevue/paginator';
+import Card from 'primevue/card';
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
+import  Panel  from 'primevue/panel';
 export default {
+components: {
+    DataTable,
+    Column,
+    Button,
+    Paginator,
+    Card,
+    InputText,
+    Button,
+    Panel,
+  },
     data() {
         return {
             opcionPago: '',
@@ -898,13 +840,10 @@ export default {
             errorVenta: 0,
             errorMostrarMsjVenta: [],
             pagination: {
-                total: 0,
-                current_page: 0,
-                per_page: 0,
-                last_page: 0,
-                from: 0,
-                to: 0,
-            },
+      total: 0,
+      current_page: 1,
+      last_page: 0, // Asegúrate de actualizar este valor al obtener datos
+    },
             offset: 3,
             criterio: "",
             buscar: "",
@@ -996,17 +935,6 @@ export default {
                 newDocumento === "99002" || newDocumento === "99003";
         },
     },
-    components: {
-        TileSpinner,
-        vSelect,
-        Dropdown,
-        InputText,
-        Button,
-        InputNumber,
-        DataTable,
-        Column,
-        Button,
-    },
     computed: {
         calcularStockDisponible() {
             return this.unidadPaquete == 1
@@ -1031,28 +959,21 @@ export default {
         },
 
         //Calcula los elementos de la paginación
-        pagesNumber: function () {
-            if (!this.pagination.to) {
-                return [];
-            }
-
-            var from = this.pagination.current_page - this.offset;
-            if (from < 1) {
-                from = 1;
-            }
-
-            var to = from + this.offset * 2;
-            if (to >= this.pagination.last_page) {
-                to = this.pagination.last_page;
-            }
-
-            var pagesArray = [];
-            while (from <= to) {
-                pagesArray.push(from);
-                from++;
-            }
-            return pagesArray;
-        },
+        pagesNumber() {
+    let from = this.pagination.current_page - 2;
+    if (from < 1) {
+      from = 1;
+    }
+    let to = from + 4;
+    if (to >= this.pagination.last_page) {
+      to = this.pagination.last_page;
+    }
+    let pagesArray = [];
+    for (let page = from; page <= to; page++) {
+      pagesArray.push(page);
+    }
+    return pagesArray;
+  },
 
         calcularTotal: function () {
             var resultado = 0.0;
@@ -1083,21 +1004,7 @@ export default {
     },
 
   methods: {
-    calcularTotal() {
-      var resultado = 0.0;
-      for (var i = 0; i < this.arrayDetalle.length; i++) {
-        resultado +=
-          this.arrayDetalle[i].precioseleccionado *
-          this.arrayDetalle[i].cantidad -
-          (this.arrayDetalle[i].precioseleccionado *
-            this.arrayDetalle[i].cantidad *
-            this.arrayDetalle[i].descuento) /
-          100;
-      }
-      resultado -= this.descuentoAdicional;
-      //resultado -= this.descuentoGiftCard;
-      return parseFloat(resultado.toFixed(2));
-    },
+
         generarCuotas() {
             this.cuotas = [];
             const fechaHoy = new Date();
@@ -1837,11 +1744,14 @@ export default {
         pdfVenta(id) {
             window.open("/venta/pdf/" + id, "_blank");
         },
-        cambiarPagina(page, buscar, criterio) {
-            let me = this;
-            me.pagination.current_page = page;
-            me.listarVenta(page, buscar, criterio);
-        },
+        onPageChange(event) {
+        let page = event.page + 1; // PrimeVue pages are 0-based, while your logic uses 1-based
+        this.cambiarPagina(page, this.buscar, this.criterio);
+    },
+    cambiarPagina(page, buscar, criterio) {
+        this.pagination.current_page = page;
+        this.listarVenta(page, buscar, criterio);
+    },
         encuentra(id) {
             var sw = 0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
