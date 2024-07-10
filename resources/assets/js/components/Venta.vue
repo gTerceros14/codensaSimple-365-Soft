@@ -2434,11 +2434,7 @@ export default {
                 recibido: 0
             });
         },
-        handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                this.registrarVenta(this.idtipo_pago);
-            }
-        },
+       
         eliminarVenta(idVenta) {
             axios.delete('/venta/eliminarVenta/' + idVenta)
                 .then(function (response) {
