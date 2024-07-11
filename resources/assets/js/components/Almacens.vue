@@ -1,310 +1,183 @@
 <template>
-  <main class="main">
-
-
-    <!-- Ejemplo de tabla Listado -->
-    <div class="card">
-      <div class="card-header">
-        <i class="fa fa-align-justify"></i> Almacenes
-        <button type="button" @click="abrirModal('almacenes', 'registrar')" class="btn btn-secondary">
-          <i class="icon-plus"></i>&nbsp;Nuevo
-        </button>
-      </div>
-      <div class="card-body">
-        <div class="form-group row">
-          <div class="col-md-6">
-            <div class="input-group">
-              <select class="form-control col-md-4" v-model="criterio">
-                <option value="nombre_almacen">Nombre Almacen</option>
-                <option value="nombre_encargado">Nombre Encargado</option>
-                <option value="nombre_sucursal">Nombre Sucursal</option>
-              </select>
-              <input type="text" v-model="buscar" @keyup.enter="listarAlmacenes(1, buscar, criterio)"
-                class="form-control" placeholder="Texto a buscar" />
-              <button type="submit" @click="listarAlmacenes(1, buscar, criterio)" class="btn btn-primary">
-                <i class="fa fa-search"></i> Buscar
-              </button>
-            </div>
+  <div class="main">
+    <Panel>
+      <template #header>
+        <div class="flex justify-content-between align-items-center">
+          <h5 class="m-0">Almacenes</h5>
+          <Button icon="pi pi-plus" label="Nuevo" @click="abrirModal('almacenes', 'registrar')" />
+        </div>
+      </template>
+      
+      <div class="p-grid">
+        <div class="p-col-12 p-md-6">
+          <div class="p-inputgroup-sm">
+            <Dropdown v-model="criterio" :options="criterioOptions" optionLabel="label" optionValue="value" class="p-inputgroup-addon-sm" style="width: 150px;" />
+            <InputText v-model="buscar" placeholder="Texto a buscar" @keyup.enter="listarAlmacenes(1, buscar, criterio)" />
+            <Button icon="pi pi-search" @click="listarAlmacenes(1, buscar, criterio)" />
           </div>
         </div>
-        <div class="table-responsive">
-          <table class="table table-bordered table-striped table-sm">
-            <thead>
-              <tr>
-                <th>Acciones</th>
-                <th>Nombre del Almacén</th>
-                <th>Dirección (Ubicación)</th>
-                <th>Encargado</th>
-                <th class="d-none d-md-table-cell">Teléfono</th>
-                <th class="d-none d-md-table-cell">Sucursal</th>
-                <th class="d-none d-md-table-cell">Observación</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="almacen in arrayAlmacen" :key="almacen.id">
-                <td>
-                  <button type="button" @click="abrirModal('almacenes', 'actualizar', almacen)"
-                    class="btn btn-warning btn-sm">
-                    <i class="icon-pencil"></i>
-                  </button>
-                  &nbsp;
-                </td>
-                <td>{{ almacen.nombre_almacen }}</td>
-                <td>{{ almacen.ubicacion }}</td>
-                <td>{{ almacen.encargados_nombres }}</td>
-
-                <td class="d-none d-md-table-cell">{{ almacen.telefono }}</td>
-                <td class="d-none d-md-table-cell">{{ almacen.nombre_sucursal }}</td>
-                <td class="d-none d-md-table-cell">{{ almacen.observacion }}</td>
-
-                <!-- Asegúrate de que los campos existan y tengan valores -->
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <nav>
-          <ul class="pagination">
-            <li class="page-item" v-if="pagination.current_page > 1">
-              <a class="page-link" href="#" @click.prevent="
-          cambiarPagina(pagination.current_page - 1, buscar, criterio)
-          ">Ant</a>
-            </li>
-            <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
-              <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)" v-text="page"></a>
-            </li>
-            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-              <a class="page-link" href="#" @click.prevent="
-          cambiarPagina(pagination.current_page + 1, buscar, criterio)
-          ">Sig</a>
-            </li>
-          </ul>
-        </nav>
       </div>
-    </div>
-    <!-- Fin ejemplo de tabla Listado -->
 
-    <!--Inicio del modal agregar/actualizar-->
-    <div class="modal " tabindex="-1" :class="{ mostrar: modal }" role="dialog" aria-labelledby="myModalLabel"
-      style="display: none;" aria-hidden="true">
-      <div class="modal-dialog modal-primary modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title" v-text="tituloModal"></h4>
-            <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
+      <DataTable :value="arrayAlmacen" class="p-datatable-sm" :rows="10" :paginator="true" :rowsPerPageOptions="[5,10,20]" responsiveLayout="scroll">
+        <Column header="Acciones">
+          <template #body="slotProps">
+            <Button icon="pi pi-pencil" class="p-button-warning p-button-sm" @click="abrirModal('almacenes', 'actualizar', slotProps.data)" />
+          </template>
+        </Column>
+        <Column field="nombre_almacen" header="Nombre del Almacén"></Column>
+        <Column field="ubicacion" header="Dirección (Ubicación)"></Column>
+        <Column field="encargados_nombres" header="Encargado"></Column>
+        <Column field="telefono" header="Teléfono"></Column>
+        <Column field="nombre_sucursal" header="Sucursal"></Column>
+        <Column field="observacion" header="Observación"></Column>
+      </DataTable>
+    </Panel>
+
+    <Dialog :visible.sync="modal" :containerStyle="{width: '50vw'}" :modal="true" :closable="false">
+      <template #header>
+        <h3>{{ tituloModal }}</h3>
+      </template>
+
+      <form @submit.prevent="enviarFormulario">
+        <div class="p-fluid p-formgrid p-grid">
+          <div class="p-field p-col-12 p-md-6">
+            <label for="nombre_almacen">Nombre del almacén</label>
+            <InputText id="nombre_almacen" v-model="datosFormulario.nombre_almacen" :class="{'p-invalid': errores.nombre_almacen}" @input="validarCampo('nombre_almacen')" />
+            <small class="p-error" v-if="errores.nombre_almacen">{{ errores.nombre_almacen }}</small>
           </div>
-          <form @submit.prevent="enviarFormulario">
-            <div class="modal-body">
-              <div class="form-group row">
-                <div class="col-md-6">
-                  <label for="nombre_almacen" class="font-weight-bold">Nombre del almacén
-                    <span class="text-danger">*</span></label>
-                  <input type="text" id="nombre_almacen" v-model="datosFormulario.nombre_almacen" class="form-control"
-                    placeholder="Ej. Almacén Principal" :class="{ 'is-invalid': errores.nombre_almacen }"
-                    @input="validarCampo('nombre_almacen')" />
-                  <p class="text-danger" v-if="errores.nombre_almacen">
-                    {{ errores.nombre_almacen }}
-                  </p>
-                </div>
-                <div class="col-md-6">
-                  <label for="ubicacion" class="font-weight-bold">Ubicacion <span class="text-danger">*</span></label>
-                  <input type="text" id="ubicacion" v-model="datosFormulario.ubicacion" class="form-control"
-                    placeholder="Ej. Calle 123, Ciudad" :class="{ 'is-invalid': errores.ubicacion }"
-                    @input="validarCampo('ubicacion')" />
-                  <p class="text-danger" v-if="errores.ubicacion">
-                    {{ errores.ubicacion }}
-                  </p>
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <div class="col-md-6">
-                  <label for="encargado" class="font-weight-bold">Encargados <span class="text-danger">*</span></label>
-                  <v-select :on-search="selectUsuario" label="nombre" :options="arrayUsuario"
-                    :class="{ 'is-invalid': errores.encargado }" placeholder="Buscar encargados..." multiple
-                    :onChange="getDatosUsuarios" v-model="usuariosSeleccionados">
-                  </v-select>
-                  <p class="text-danger" v-if="errores.encargado">
-                    {{ errores.encargado }}
-                  </p>
-                </div>
-                <div class="col-md-6">
-                  <label for="telefono" class="font-weight-bold">Teléfono <span class="text-danger">*</span></label>
-                  <input type="number" id="telefono" v-model="datosFormulario.telefono" class="form-control"
-                    placeholder="Ej. 123456789" :class="{ 'is-invalid': errores.telefono }"
-                    @input="validarCampo('telefono')" />
-                  <p class="text-danger" v-if="errores.telefono">
-                    {{ errores.telefono }}
-                  </p>
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <div class="col-md-6">
-                  <label for="sucursal" class="font-weight-bold">Sucursal <span class="text-danger">*</span></label>
-                  <v-select :on-search="selectSucursal" label="nombre" :options="arraySucursal"
-                    :class="{ 'is-invalid': errores.sucursal }" placeholder="Buscar Sucursales..."
-                    :onChange="getDatosSucursales" v-model="sucursalSeleccionado">
-                  </v-select>
-                  <p class="text-danger" v-if="errores.sucursal">
-                    {{ errores.sucursal }}
-                  </p>
-                </div>
-                <div class="col-md-6">
-                  <label for="observaciones" class="font-weight-bold">Observaciones</label>
-                  <textarea id="observaciones" v-model="datosFormulario.observaciones" class="form-control"
-                    placeholder="Ej. Horario de funcionamiento, Capacitad de almacenamiento, etc."></textarea>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" @click="cerrarModal()">
-                Cerrar
-              </button>
-              <button type="submit" v-if="tipoAccion == 1" class="btn btn-primary">
-                Guardar
-              </button>
-              <button type="submit" v-if="tipoAccion == 2" class="btn btn-primary">
-                Actualizar
-              </button>
-            </div>
-          </form>
+          <div class="p-field p-col-12 p-md-6">
+            <label for="ubicacion">Ubicación</label>
+            <InputText id="ubicacion" v-model="datosFormulario.ubicacion" :class="{'p-invalid': errores.ubicacion}" @input="validarCampo('ubicacion')" />
+            <small class="p-error" v-if="errores.ubicacion">{{ errores.ubicacion }}</small>
+          </div>
+          <div class="p-field p-col-12 p-md-6">
+            <label for="encargado">Encargados</label>
+            <MultiSelect v-model="usuariosSeleccionados" :options="arrayUsuario" optionLabel="nombre" 
+              placeholder="Buscar encargados..." :filter="true" :showClear="true" 
+              @filter="onFilterUsuarios" @change="getDatosUsuarios">
+            </MultiSelect>
+            <small class="p-error" v-if="errores.encargado">{{ errores.encargado }}</small>
+          </div>
+          <div class="p-field p-col-12 p-md-6">
+            <label for="telefono">Teléfono</label>
+            <InputNumber id="telefono" v-model="datosFormulario.telefono" :class="{'p-invalid': errores.telefono}" @input="validarCampo('telefono')" />
+            <small class="p-error" v-if="errores.telefono">{{ errores.telefono }}</small>
+          </div>
+          <div class="p-field p-col-12 p-md-6">
+            <label for="sucursal">Sucursal</label>
+            <Dropdown v-model="sucursalSeleccionado" :options="arraySucursal" optionLabel="nombre" 
+              placeholder="Buscar Sucursales..." :class="{'p-invalid': errores.sucursal}" 
+              @change="getDatosSucursales" :filter="true" @filter="onFilterSucursales" />
+            <small class="p-error" v-if="errores.sucursal">{{ errores.sucursal }}</small>
+          </div>
+          <div class="p-field p-col-12">
+            <label for="observaciones">Observaciones</label>
+            <Textarea id="observaciones" v-model="datosFormulario.observaciones" rows="3" />
+          </div>
         </div>
-        <!-- /.modal-content -->
-      </div>
-      <!-- /.modal-dialog -->
-    </div>
-    <!--Fin del modal-->
-  </main>
+      </form>
+
+      <template #footer>
+        <Button label="Cerrar" icon="pi pi-times" @click="cerrarModal" class="p-button-text" />
+        <Button v-if="tipoAccion == 1" label="Guardar" icon="pi pi-check" @click="enviarFormulario" autofocus />
+        <Button v-if="tipoAccion == 2" label="Actualizar" icon="pi pi-check" @click="enviarFormulario" autofocus />
+      </template>
+    </Dialog>
+  </div>
 </template>
+
 <script>
-import vSelect from "vue-select";
 import { esquemaAlmacen } from "../constants/validations";
 
+import Panel from 'primevue/panel';
+import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown';
+import InputText from 'primevue/inputtext';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Dialog from 'primevue/dialog';
+import MultiSelect from 'primevue/multiselect';
+import InputNumber from 'primevue/inputnumber';
+import Textarea from 'primevue/textarea';
+
 export default {
+  components: {
+    Panel,
+    Button,
+    Dropdown,
+    InputText,
+    DataTable,
+    Column,
+    Dialog,
+    MultiSelect,
+    InputNumber,
+    Textarea
+  },
   data() {
     return {
+      criterioOptions: [
+        { label: 'Nombre Almacen', value: 'nombre_almacen' },
+        { label: 'Nombre Encargado', value: 'nombre_encargado' },
+        { label: 'Nombre Sucursal', value: 'nombre_sucursal' }
+      ],
       arraySucursal: [],
-      sucursalSeleccionado: "",
+      sucursalSeleccionado: null,
       arrayUsuario: [],
       usuariosSeleccionados: [],
-
       datosFormulario: {
         nombre_almacen: "",
         ubicacion: "",
-        encargado: -1,
-        telefono: "",
-        sucursal: -1,
+        encargado: "",
+        telefono: null,
+        sucursal: null,
         observaciones: "",
       },
       errores: {},
-
       arrayAlmacen: [],
-      modal: 0,
+      modal: false,
       tituloModal: "",
       tipoAccion: 0,
-      pagination: {
-        total: 0,
-        current_page: 0,
-        per_page: 0,
-        last_page: 0,
-        from: 0,
-        to: 0,
-      },
-      offset: 3,
       criterio: "nombre_almacen",
       buscar: "",
     };
   },
-  computed: {
-    isActived: function () {
-      return this.pagination.current_page;
-    },
-    pagesNumber: function () {
-      if (!this.pagination.to) {
-        return [];
-      }
-
-      var from = this.pagination.current_page - this.offset;
-      if (from < 1) {
-        from = 1;
-      }
-
-      var to = from + this.offset * 2;
-      if (to >= this.pagination.last_page) {
-        to = this.pagination.last_page;
-      }
-
-      var pagesArray = [];
-      while (from <= to) {
-        pagesArray.push(from);
-        from++;
-      }
-      return pagesArray;
-    },
-  },
-  components: {
-    vSelect,
-  },
   methods: {
-    getDatosSucursales(val1) {
-      console.log("Ejecucion de sucursales");
-      if (this.tipoAccion == 2) {
-        this.datosFormulario.sucursal =
-          val1 && val1.id ? val1.id : this.datosFormulario.sucursal2;
-        delete this.datosFormulario["sucursal2"];
-      } else {
-        this.datosFormulario.sucursal = val1 && val1.id ? val1.id : null;
-      }
+    onFilterUsuarios(event) {
+      this.selectUsuario(event.filter);
     },
-    getDatosUsuarios(val1) {
-      if (this.tipoAccion === 2) {
-        this.datosFormulario.encargado =
-          val1 && val1.length > 0
-            ? val1.map((v) => v.id).join(",")
-            : this.datosFormulario.encargado2;
-        delete this.datosFormulario["encargado2"];
-      } else {
-        this.datosFormulario.encargado =
-          val1 && val1.length > 0 ? val1.map((v) => v.id).join(",") : "";
-      }
-    },
-
-    selectSucursal(search, loading) {
+    selectUsuario(search) {
       let me = this;
-      loading(true);
+      let url = "/user/selectUser/filter?filtro=" + search + "&idrol=3";
+      axios.get(url)
+        .then(function (response) {
+          me.arrayUsuario = response.data.usuarios;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+    onFilterSucursales(event) {
+      this.selectSucursal(event.filter);
+    },
+    selectSucursal(search) {
+      let me = this;
       let url = "/sucursal/selectedSucursal/filter?filtro=" + search;
-      axios
-        .get(url)
+      axios.get(url)
         .then(function (response) {
-          let respuesta = response.data;
-          me.arraySucursal = respuesta.sucursales;
-          console.log(respuesta);
-          loading(false);
+          me.arraySucursal = response.data.sucursales;
         })
         .catch(function (error) {
           console.log(error);
         });
     },
-    selectUsuario(search, loading) {
-      let me = this;
-      loading(true);
-      let url = "/user/selectUser/filter?filtro=" + search + "&idrol=3"; // Agregar el parámetro idrol=3 al URL
-      axios
-        .get(url)
-        .then(function (response) {
-          let respuesta = response.data;
-          me.arrayUsuario = respuesta.usuarios;
-          console.log(respuesta);
-          loading(false);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+    getDatosSucursales(val) {
+      this.datosFormulario.sucursal = val && val.id ? val.id : null;
     },
-
+    getDatosUsuarios() {
+      this.datosFormulario.encargado = this.usuariosSeleccionados && this.usuariosSeleccionados.length > 0 
+        ? this.usuariosSeleccionados.map((v) => v.id).join(",") 
+        : "";
+    },
     async validarCampo(campo) {
       try {
         await esquemaAlmacen.validateAt(campo, this.datosFormulario);
@@ -314,142 +187,90 @@ export default {
       }
     },
     async enviarFormulario() {
-      await esquemaAlmacen.validate(this.datosFormulario, { abortEarly: false })
-        .then(() => {
-          // Verificar si el nombre del almacén está vacío
-          if (!this.datosFormulario.nombre_almacen) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Campo vacío',
-              text: 'El nombre del almacén debe ser llenado.',
-            })
-            return
-          }
-
-          // Verificar si el nombre del almacén ya existe
-          const almacenExistente = this.arrayAlmacen.find(almacen => almacen.nombre_almacen === this.datosFormulario.nombre_almacen)
-          if (almacenExistente) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Nombre duplicado',
-              text: 'El nombre del almacén ya existe.',
-            })
-            return
-          }
-
-          if (this.tipoAccion == 2) {
-            this.actualizarAlmacen(this.datosFormulario)
-          } else {
-            this.registrarAlmacen(this.datosFormulario)
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-          const erroresValidacion = {}
-          error.inner.forEach((e) => {
-            erroresValidacion[e.path] = e.message
-          })
-
-          this.errores = erroresValidacion
-        })
-    },
-    cambiarPagina(page, buscar, criterio) {
-      let me = this;
-      me.pagination.current_page = page;
-      me.listarAlmacenes(page, buscar, criterio);
+      try {
+        await esquemaAlmacen.validate(this.datosFormulario, { abortEarly: false });
+        if (this.tipoAccion == 2) {
+          this.actualizarAlmacen(this.datosFormulario);
+        } else {
+          this.registrarAlmacen(this.datosFormulario);
+        }
+      } catch (error) {
+        const erroresValidacion = {};
+        error.inner.forEach((e) => {
+          erroresValidacion[e.path] = e.message;
+        });
+        this.errores = erroresValidacion;
+      }
     },
     listarAlmacenes(page, buscar, criterio) {
       let me = this;
-      var url =
-        "/almacen?page=" + page + "&buscar=" + buscar + "&criterio=" + criterio;
-      axios
-        .get(url)
+      var url = "/almacen?page=" + page + "&buscar=" + buscar + "&criterio=" + criterio;
+      axios.get(url)
         .then(function (response) {
-          let respuesta = response.data;
-          me.arrayAlmacen = respuesta.almacenes.data;
-          me.pagination = respuesta.pagination;
-          console.log("Array de almacenes:", me.arrayAlmacen); // Verifica los datos en arrayAlmacen
+          me.arrayAlmacen = response.data.almacenes.data;
         })
         .catch(function (error) {
           console.log(error);
         });
     },
-
     registrarAlmacen(data) {
       let me = this;
-      axios
-        .post("/almacen/registrar", data)
+      axios.post("/almacen/registrar", data)
         .then(function (response) {
           me.cerrarModal();
           me.listarAlmacenes(1, "", "nombre_almacen");
-          me.usuariosSeleccionados = [];
-          me.arrayUsuario = [];
+          me.$toast.add({severity:'success', summary: 'Éxito', detail: 'Almacén registrado', life: 3000});
         })
         .catch(function (error) {
           console.log(error);
+          me.$toast.add({severity:'error', summary: 'Error', detail: 'No se pudo registrar el almacén', life: 3000});
         });
     },
     actualizarAlmacen(data) {
       let me = this;
-      axios
-        .put("/almacen/editar", data)
+      axios.put("/almacen/editar", data)
         .then(function (response) {
           me.cerrarModal();
-          //console.log(response)
           me.listarAlmacenes(1, "", "nombre_almacen");
+          me.$toast.add({severity:'success', summary: 'Éxito', detail: 'Almacén actualizado', life: 3000});
         })
         .catch(function (error) {
           console.log(error);
+          me.$toast.add({severity:'error', summary: 'Error', detail: 'No se pudo actualizar el almacén', life: 3000});
         });
     },
-
     cerrarModal() {
-      this.modal = 0;
+      this.modal = false;
       this.tituloModal = "";
-      this.sucursalSeleccionado = "";
-      this.usuarioSeleccionado = "";
+      this.sucursalSeleccionado = null;
+      this.usuariosSeleccionados = [];
+      this.datosFormulario = {
+        nombre_almacen: "",
+        ubicacion: "",
+        encargado: "",
+        telefono: null,
+        sucursal: null,
+        observaciones: "",
+      };
+      this.errores = {};
     },
     abrirModal(modelo, accion, data = []) {
       switch (modelo) {
         case "almacenes": {
           switch (accion) {
             case "registrar": {
-              this.modal = 1;
+              this.modal = true;
               this.tituloModal = "Registrar Almacen";
               this.tipoAccion = 1;
-              this.datosFormulario = {
-                nombre_almacen: "",
-                ubicacion: "",
-                encargado: "",
-                telefono: "",
-                sucursal: "",
-                observaciones: "",
-              };
-              this.errores = {};
               break;
             }
             case "actualizar": {
-              console.log("Datos almacen:", data);
-              this.modal = 1;
+              this.modal = true;
               this.tituloModal = "Actualizar Almacen";
               this.tipoAccion = 2;
-              this.datosFormulario = {
-                id: data["id"],
-                nombre_almacen: data["nombre_almacen"],
-                ubicacion: data["ubicacion"],
-                encargado: data["encargado"],
-                telefono: data["telefono"],
-                sucursal: data["sucursal"],
-                sucursal2: data["sucursal"],
-                encargado2: data["encargado"],
-                observaciones:
-                  data["observacion"] == null ? "" : data["observacion"],
-              };
-              this.sucursalSeleccionado = data["nombre_sucursal"];
-              this.usuarioSeleccionado = data["nombre_encargado"];
-
-              this.errores = {};
-
+              this.datosFormulario = { ...data };
+              this.sucursalSeleccionado = { id: data.sucursal, nombre: data.nombre_sucursal };
+              this.usuariosSeleccionados = data.encargados ? data.encargados.map(e => ({ id: e.id, nombre: e.nombre })) : [];
               break;
             }
           }
@@ -462,3 +283,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.p-inputgroup {
+  width: 100%;
+}
+</style>

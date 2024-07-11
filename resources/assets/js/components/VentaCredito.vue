@@ -23,7 +23,7 @@
                         </div>
                     </div>
 
-                    <DataTable :value="arrayCreditos" responsiveLayout="scroll">
+                    <DataTable :value="arrayCreditos" class="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll">
                         <Column header="Acciones">
                             <template #body="slotProps">
                                 <Button v-if="slotProps.data.estado != 'Completado'" icon="pi pi-plus" class="p-button-success p-button-sm" @click="abrirDetalle(slotProps.data)" />
@@ -140,7 +140,6 @@
 
 import Toast from 'primevue/toast';
 import Card from 'primevue/card';
-import { ref, onMounted, computed } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';

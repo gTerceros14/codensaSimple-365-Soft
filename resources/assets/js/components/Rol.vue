@@ -1,171 +1,103 @@
 <template>
-            <main class="main">
-            <!-- Breadcrumb -->
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
-            </ol>
-            <div class="container-fluid">
-                <!-- Ejemplo de tabla Listado -->
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Roles
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
-                                      <option value="nombre">Nombre</option>
-                                      <option value="descripcion">Descripción</option>
-                                    </select>
-                                    <input type="text" v-model="buscar" @keyup.enter="listarRol(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listarRol(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Descripción</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="rol in arrayRol" :key="rol.id">
-                                    
-                                    <td v-text="rol.nombre"></td>
-                                    <td v-text="rol.descripcion"></td>
-                                    <td>
-                                        <div v-if="rol.condicion">
-                                            <span class="badge badge-success">Activo</span>
-                                        </div>
-                                        <div v-else>
-                                            <span class="badge badge-danger">Desactivado</span>
-                                        </div>
-                                        
-                                    </td>
-                                </tr>                                
-                            </tbody>
-                        </table>
-                        </div>
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item" v-if="pagination.current_page > 1">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Ant</a>
-                                </li>
-                                <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(page,buscar,criterio)" v-text="page"></a>
-                                </li>
-                                <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Sig</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+    <div class="main">
+        <Card class="custom-card">
+          <template #title>
+            <i class="pi pi-list"></i> Roles
+          </template>
+          <template #content>
+              <div class="p-col-12 p-md-8">
+                <div class="p-inputgroup">
+                  <Dropdown v-model="criterio" :options="criterioOptions" optionLabel="label" optionValue="value" class="p-col-4-sm" />
+                  <InputText v-model="buscar" placeholder="Texto a buscar" @keyup.enter="listarRol(1, buscar, criterio)" />
+                  <Button icon="pi pi-search" @click="listarRol(1, buscar, criterio)" label="Buscar" />
                 </div>
-                <!-- Fin ejemplo de tabla Listado -->
-            </div>
-        </main>
+              </div>
+                <DataTable :value="arrayRol"class="p-datatable-gridlines p-datatable-sm" :paginator="true" :rows="10"  :containerStyle="{width: '70vw'}"
+                           :totalRecords="pagination.total" :lazy="true" 
+                           @page="onPage($event)" :loading="loading" 
+                           dataKey="id" >
+                  <Column field="nombre" header="Nombre"></Column>
+                  <Column field="descripcion" header="Descripción"></Column>
+                  <Column field="condicion" header="Estado">
+                    <template #body="slotProps">
+                      <Tag :severity="slotProps.data.condicion ? 'success' : 'danger'" 
+                           :value="slotProps.data.condicion ? 'Activo' : 'Desactivado'" />
+                    </template>
+                  </Column>
+                </DataTable>
+          </template>
+        </Card>
+    </div>
 </template>
-
 <script>
-    export default {
-        data (){
-            return {
-                rol_id: 0,
-                nombre : '',
-                descripcion : '',
-                arrayRol : [],
-                modal : 0,
-                tituloModal : '',
-                tipoAccion : 0,
-                pagination : {
-                    'total' : 0,
-                    'current_page' : 0,
-                    'per_page' : 0,
-                    'last_page' : 0,
-                    'from' : 0,
-                    'to' : 0,
-                },
-                offset : 3,
-                criterio : 'nombre',
-                buscar : ''
-            }
+  import Breadcrumb from 'primevue/breadcrumb';
+  import Card from 'primevue/card';
+  import Dropdown from 'primevue/dropdown';
+  import InputText from 'primevue/inputtext';
+  import Button from 'primevue/button';
+  import DataTable from 'primevue/datatable';
+  import Column from 'primevue/column';
+  import Tag from 'primevue/tag';
+  
+  export default {
+    components: {
+      Breadcrumb,
+      Card,
+      Dropdown,
+      InputText,
+      Button,
+      DataTable,
+      Column,
+      Tag
+    },
+    data() {
+      return {
+        home: { icon: 'pi pi-home', to: '/' },
+        items: [{ label: 'Escritorio' }],
+        rol_id: 0,
+        nombre: '',
+        descripcion: '',
+        arrayRol: [],
+        loading: false,
+        pagination: {
+          'total': 0,
+          'current_page': 0,
+          'per_page': 0,
+          'last_page': 0,
+          'from': 0,
+          'to': 0,
         },
-        computed:{
-            isActived: function(){
-                return this.pagination.current_page;
-            },
-            //Calcula los elementos de la paginación
-            pagesNumber: function() {
-                if(!this.pagination.to) {
-                    return [];
-                }
-                
-                var from = this.pagination.current_page - this.offset; 
-                if(from < 1) {
-                    from = 1;
-                }
-
-                var to = from + (this.offset * 2); 
-                if(to >= this.pagination.last_page){
-                    to = this.pagination.last_page;
-                }  
-
-                var pagesArray = [];
-                while(from <= to) {
-                    pagesArray.push(from);
-                    from++;
-                }
-                return pagesArray;             
-
-            }
-        },
-        methods : {
-            listarRol (page,buscar,criterio){
-                let me=this;
-                var url= '/rol?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
-                axios.get(url).then(function (response) {
-                    var respuesta= response.data;
-                    me.arrayRol = respuesta.roles.data;
-                    me.pagination= respuesta.pagination;
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-            },
-            cambiarPagina(page,buscar,criterio){
-                let me = this;
-                //Actualiza la página actual
-                me.pagination.current_page = page;
-                //Envia la petición para visualizar la data de esa página
-                me.listarRol(page,buscar,criterio);
-            }
-        },
-        mounted() {
-            this.listarRol(1,this.buscar,this.criterio);
-        }
+        criterio: 'nombre',
+        criterioOptions: [
+          {label: 'Nombre', value: 'nombre'},
+          {label: 'Descripción', value: 'descripcion'}
+        ],
+        buscar: ''
+      }
+    },
+    methods: {
+      listarRol(page, buscar, criterio) {
+        this.loading = true;
+        let url = `/rol?page=${page}&buscar=${buscar}&criterio=${criterio}`;
+        axios.get(url).then(response => {
+          let respuesta = response.data;
+          this.arrayRol = respuesta.roles.data;
+          this.pagination = respuesta.pagination;
+        })
+        .catch(error => {
+          console.log(error);
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+      },
+      onPage(event) {
+        this.listarRol(event.page + 1, this.buscar, this.criterio);
+      }
+    },
+    mounted() {
+      this.listarRol(1, this.buscar, this.criterio);
     }
-</script>
-<style>    
-    .modal-content{
-        width: 100% !important;
-        position: absolute !important;
-    }
-    .mostrar{
-        display: list-item !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        background-color: #3c29297a !important;
-    }
-    .div-error{
-        display: flex;
-        justify-content: center;
-    }
-    .text-error{
-        color: red !important;
-        font-weight: bold;
-    }
-</style>
+  }
+  </script>
+  

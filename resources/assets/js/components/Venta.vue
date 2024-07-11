@@ -19,7 +19,7 @@
             <!-- Listado-->
             <template v-if="listado == 1">
                 <div>
-                    <DataTable :value="arrayVenta" :rows="10" :responsive="scroll">
+                    <DataTable responsiveLayout="scroll" class="p-datatable-gridlines p-datatable-sm":value="arrayVenta" :rows="10" >
                     <Column header="Opciones">
                         <template #body="slotProps">
                         <Button icon="pi pi-eye" @click="verVenta(slotProps.data.id)"
@@ -733,8 +733,7 @@
 </template>
 
 <script>
-
-
+import  Dropdown  from 'primevue/dropdown';
 import Swal from 'sweetalert2';
 import vSelect from "vue-select";
 import TileSpinner  from "vue-spinners";
@@ -747,6 +746,7 @@ import Button from 'primevue/button';
 import  Panel  from 'primevue/panel';
 export default {
 components: {
+    Dropdown,
     DataTable,
     Column,
     Button,
@@ -762,7 +762,7 @@ components: {
             tipoVenta: '',
             mostrarSpinner: false,
             selectedAlmacen: null,
-
+            idrol:null,
             step: 1,
             modal2: false,
             opcionPago: "",
@@ -975,7 +975,7 @@ components: {
     return pagesArray;
   },
 
-        calcularTotal: function () {
+        calcularTotal () {
             var resultado = 0.0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
                 resultado +=
@@ -2236,9 +2236,7 @@ components: {
             }
         },
 
-        calcularTotal() {
-    return this.arrayDetalle.reduce((sum, item) => sum + parseFloat(item.total), 0);
-},
+
 
         prepararDatosCliente() {
             if (!this.nombreCliente.trim()) {
