@@ -29,9 +29,9 @@
                      dataKey="id" class="p-datatable-gridlines p-datatable-sm">
             <Column>
               <template #body="slotProps">
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-warning p-mr-2" @click="abrirModal('persona', 'actualizar', slotProps.data)" />
-                <Button v-if="slotProps.data.condicion" icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="desactivarUsuario(slotProps.data.id)" />
-                <Button v-else icon="pi pi-check" class="p-button-rounded p-button-info" @click="activarUsuario(slotProps.data.id)" />
+                <Button icon="pi pi-pencil" class="p-button p-button-warning p-mr-2" @click="abrirModal('persona', 'actualizar', slotProps.data)" />
+                <Button v-if="slotProps.data.condicion" icon="pi pi-trash" class="p-button p-button-danger" @click="desactivarUsuario(slotProps.data.id)" />
+                <Button v-else icon="pi pi-check" class="p-button p-button-info" @click="activarUsuario(slotProps.data.id)" />
               </template>
             </Column>
             <Column header="Foto">

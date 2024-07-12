@@ -13,9 +13,9 @@
                     <div class="p-grid">
                         <div class="p-col-6">
                             <div class="p-inputgroup">
-                                <Dropdown v-model="criterio" :options="criterioOptions" optionLabel="label" optionValue="value" class="p-col-4" />
-                                <InputText v-model="buscar" placeholder="Texto a buscar" @keyup.enter="obtenerCreditos(1, buscar, criterio, filtroAvanzado)" />
-                                <Button icon="pi pi-search" @click="obtenerCreditos(1, buscar, criterio, filtroAvanzado)" label="Buscar" />
+                                <Dropdown v-model="criterio" :options="criterioOptions" optionLabel="label" optionValue="value" class="p-col-4-sm" />
+                                <InputText class="p-col-4-sm"v-model="buscar" placeholder="Texto a buscar" @keyup.enter="obtenerCreditos(1, buscar, criterio, filtroAvanzado)" />
+                                <Button  class="p-col-4-sm"icon="pi pi-search" @click="obtenerCreditos(1, buscar, criterio, filtroAvanzado)" label="Buscar" />
                             </div>
                         </div>
                         <div class="p-col-2">
@@ -28,7 +28,7 @@
                             <template #body="slotProps">
                                 <Button v-if="slotProps.data.estado != 'Completado'" icon="pi pi-plus" class="p-button-success p-button-sm" @click="abrirDetalle(slotProps.data)" />
                                 <Button v-else icon="pi pi-eye" class="p-button-secondary p-button-sm" @click="abrirDetalle(slotProps.data)" />
-                                <Button icon="pi pi-file-pdf" class="p-button-info p-button-sm" @click="generarReciboGeneral(slotProps.data.id)" />
+                                <Button icon="pi pi-file-pdf" class="p-button-danger p-button-sm" @click="generarReciboGeneral(slotProps.data.id)" />
                             </template>
                         </Column>
                         <Column field="nombre_cliente" header="Cliente" />
@@ -125,7 +125,7 @@
                         <template #body="slotProps">
                             <Button v-if="slotProps.data.estado != 'Pagado'" icon="pi pi-inbox" class="p-button-success p-button-sm" @click="abrirModal(slotProps.data, slotProps.index)" />
                             <Button v-else icon="pi pi-check" class="p-button-success p-button-sm" />
-                            <Button icon="pi pi-file-pdf" class="p-button-info p-button-sm" @click="generarRecibo(slotProps.data.id)" />
+                            <Button icon="pi pi-file-pdf" class="p-button-danger p-button-sm" @click="generarRecibo(slotProps.data.id)" />
                         </template>
                     </Column>
                 </DataTable>
