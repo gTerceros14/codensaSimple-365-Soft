@@ -1,176 +1,135 @@
 <template>
-  <main class="main">
-    <!-- Breadcrumb -->
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
-    </ol>
-    <div class="container-fluid">
-      <!-- Ejemplo de tabla Listado -->
-      <div class="card">
-        <div class="card-header">
-          <i class="fa fa-align-justify"></i> Sucursales
-          <icon-button icon="icon-plus" size="small" color="secondary"  @click="abrirModal('sucursal', 'registrar')" label="Nuevo"/>
-        </div>
-        <div class="card-body">
-          <div class="form-group row">
-            <div class="col-md-6">
-              <div class="input-group">
-                <select class="form-control col-md-3" v-model="criterio">
-                  <option value="nombre">Nombres</option>
-                  <option value="direccion">Dirección</option>
-                  <option value="correo">Correo</option>
-                  <option value="telefono">Teléfono</option>
-                  <option value="departamento">Departamento</option>
-                </select>
-                <input type="text" v-model="buscar" @keyup.enter="listarSucursal(1, buscar, criterio)"
-                  class="form-control" placeholder="Texto a buscar">
-                <button type="submit" @click="listarSucursal(1, buscar, criterio)" class="btn btn-primary"><i
-                    class="fa fa-search"></i> Buscar</button>
+   <main class="main">
+  <div class="p-grid">
+    <div class="p-col-12">
+      <Breadcrumb :home="{ icon: 'pi pi-home', to: '/' }" :model="breadcrumbItems" />
+    </div>
+    <div class="p-col-12">
+      <Card>
+        <template #title>
+          <i class="pi pi-align-justify"></i> Sucursales
+          <Button icon="pi pi-plus" class="p-button-secondary p-button-sm" @click="abrirModal('sucursal', 'registrar')" label="Nuevo" />
+        </template>
+        <template #content>
+          <div class="p-grid">
+            <div class="p-col-12 p-md-6">
+              <div class="p-inputgroup-sm">
+                <Dropdown v-model="criterio" :options="criterioOptions" optionLabel="label" optionValue="value" placeholder="Seleccione criterio"  />
+                <InputText  v-model="buscar" placeholder="Texto a buscar" @keyup.enter="listarSucursal(1, buscar, criterio)" />
+                <Button     icon="pi pi-search" @click="listarSucursal(1, buscar, criterio)" />
               </div>
             </div>
           </div>
-          <div class="table-responsive">
-            <table class="table table-bordered table-striped table-sm">
-              <thead>
-                <tr>
-                  <th>Acciones</th>
-                  <th>Empresa</th>
-                  <th>Nombre sucursal</th>
-                  <th>Dirección</th>
-                  <th>Correo</th>
-                  <th>Teléfono</th>
-                  <th>Departamento</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="sucursal in arraySucursal" :key="sucursal.id">
-                  <td>
-                    <icon-button icon="icon-pencil" size="small" color="warning" @click="abrirModal('sucursal', 'actualizar', sucursal)" />
-                    <icon-button v-if="sucursal.condicion" icon="icon-trash" size="small" color="danger" @click="desactivarSucursal(sucursal.id)" />
-                    <icon-button v-else icon="icon-check" size="small" color="info"  @click="activarSucursal(sucursal.id)"/>
-                  </td>
-                  <td v-text="sucursal.nombre_empresa"></td>
-                  <td v-text="sucursal.nombre"></td>
-                  <td v-text="sucursal.direccion"></td>
-                  <td v-text="sucursal.correo"></td>
-                  <td v-text="sucursal.telefono"></td>
-                  <td v-text="sucursal.departamento"></td>
-                  <td>
-                    <div v-if="sucursal.condicion">
-                      <span class="badge badge-success">Activo</span>
-                    </div>
-                    <div v-else>
-                      <span class="badge badge-danger">Desactivado</span>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <nav>
-            <ul class="pagination mt-2">
-              <li class="page-item" v-if="pagination.current_page > 1">
-                <a class="page-link" href="#"
-                  @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Anterior</a>
-              </li>
-              <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
-                <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)" v-text="page"></a>
-              </li>
-              <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                <a class="page-link" href="#"
-                  @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Siguiente</a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-      <!-- Fin ejemplo de tabla Listado -->
+          <DataTable :value="arraySucursal" responsiveLayout="scroll" class="p-datatable-gridlines p-datatable-sm" :rows="10" :responsive="true">
+            <Column header="Acciones">
+              <template #body="slotProps">
+                <Button icon="pi pi-pencil" class="p-button-warning p-button-sm" @click="abrirModal('sucursal', 'actualizar', slotProps.data)" />
+                <Button v-if="slotProps.data.condicion" icon="pi pi-trash" class="p-button-danger p-button-sm" @click="desactivarSucursal(slotProps.data.id)" />
+                <Button v-else icon="pi pi-check" class="p-button-info p-button-sm" @click="activarSucursal(slotProps.data.id)" />
+              </template>
+            </Column>
+            <Column field="nombre_empresa" header="Empresa"></Column>
+            <Column field="nombre" header="Nombre sucursal"></Column>
+            <Column field="direccion" header="Dirección"></Column>
+            <Column field="correo" header="Correo"></Column>
+            <Column field="telefono" header="Teléfono"></Column>
+            <Column field="departamento" header="Departamento"></Column>
+            <Column header="Estado">
+              <template #body="slotProps">
+                <Tag :severity="slotProps.data.condicion ? 'success' : 'danger'" :value="slotProps.data.condicion ? 'Activo' : 'Desactivado'" />
+              </template>
+            </Column>
+          </DataTable>
+          <Paginator :rows="10" :totalRecords="pagination.total" @page="onPageChange($event)" :rowsPerPageOptions="[10,20,30]"></Paginator>
+        </template>
+      </Card>
     </div>
-    <!-- Inicio del modal agregar/actualizar -->
-    <div class="modal" tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
-      style="display: none;" aria-hidden="true">
-      <div class="modal-dialog modal-primary modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title" v-text="tituloModal"></h4>
-            <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
+
+    <Dialog :visible.sync="modal" :containerStyle="{width: '600px'}" :modal="true">
+      <template #header>
+        <h3>{{ tituloModal }}</h3>
+      </template>
+      <form @submit.prevent="enviarFormulario">
+        <div class="p-fluid p-formgrid p-grid">
+          <div class="p-field p-col-12 p-md-8">
+            <label for="nombre">Nombre de la sucursal</label>
+            <InputText id="nombre" v-model="datosFormulario.nombre" :class="{'p-invalid': errores.nombre}" @input="validarCampo('nombre')" />
+            <small v-if="errores.nombre" class="p-error">{{ errores.nombre }}</small>
           </div>
-          <form @submit.prevent="enviarFormulario">
-
-          <div class="modal-body" >
-            <div>
-                <div class="form-group row">
-                  <div class="col-md-8">
-                    <label for="" class="font-weight-bold">Nombre de la sucursal <span
-                        class="text-danger">*</span></label>
-                    <input type="text" v-model="datosFormulario.nombre" class="form-control"
-                      placeholder="Ej. Sucursal CODENSA - Punto A"  :class="{ 'is-invalid': errores.nombre }"  @input="validarCampo('nombre')"/>
-                    <p class="text-danger" v-if="errores.nombre">{{ errores.nombre }}</p>
-                  </div>
-   
-                </div>
-
-                <div class="form-group row">
-                  <div class="col-md-6">
-                    <label for="" class="font-weight-bold">Correo electronico <span class="text-danger">*</span></label>
-                    <input type="text" v-model="datosFormulario.correo" class="form-control"
-                      placeholder="Ej. nombre@dominio.com" :class="{ 'is-invalid': errores.correo }" @input="validarCampo('correo')"/> 
-                    <p class="text-danger" v-if="errores.correo">{{ errores.correo }}</p>
-                  </div>
-                  <div class="col-md-6">
-                    <label for="" class="font-weight-bold">Telefono <span class="text-danger">*</span></label>
-                    <input type="number" v-model="datosFormulario.telefono" class="form-control" placeholder="Ej. 123456789" :class="{ 'is-invalid': errores.telefono }"  @input="validarCampo('telefono')"/>
-                    <p class="text-danger" v-if="errores.telefono">{{ errores.telefono }}</p>
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <div class="col-md-6">
-                    <label for="" class="font-weight-bold">Dirección <span class="text-danger">*</span></label>
-                    <input v-model="datosFormulario.direccion" class="form-control" placeholder="Ej. Calle XXX-XXX, Barrio YYY" :class="{ 'is-invalid': errores.direccion }" @input="validarCampo('direccion')"/>
-                    <p class="text-danger" v-if="errores.direccion">{{ errores.direccion }}</p>
-                  </div>
-                  <div class="col-md-6">
-                    <label for="" class="font-weight-bold">Departamento <span class="text-danger">*</span></label>
-                    <div >
-                      <select class="form-control" v-model="datosFormulario.departamento" :class="{ 'is-invalid': errores.departamento }" @change="validarCampo('departamento')">
-                        <option value="" disabled selected>Seleccione</option>
-                        <option v-for="departamento in arrayDepartamentos" :key="departamento" :value="departamento"
-                          v-text="departamento"></option>
-                      </select>
-                    </div>
-                    <p class="text-danger" v-if="errores.departamento">{{ errores.departamento }}</p>
-                  </div>
-
-                </div>
-                <p v-if="tipoAccion == 1"><strong>Código de Sucursal:</strong> {{ codigoSucursal }}</p>
-                <p v-if="tipoAccion == 2"><strong>Código de Sucursal:</strong> {{ datosFormulario.codigoSucursal }}</p>
-            </div>
-
+          <div class="p-field p-col-12 p-md-6">
+            <label for="correo">Correo electrónico</label>
+            <InputText id="correo" v-model="datosFormulario.correo" :class="{'p-invalid': errores.correo}" @input="validarCampo('correo')" />
+            <small v-if="errores.correo" class="p-error">{{ errores.correo }}</small>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
-            <button type="submit" v-if="tipoAccion == 1" class="btn btn-success"
-              >Guardar</button>
-            <button type="submit" v-if="tipoAccion == 2" class="btn btn-success"
-            >Actualizar</button>
+          <div class="p-field p-col-12 p-md-6">
+            <label for="telefono">Teléfono</label>
+            <InputNumber id="telefono" v-model="datosFormulario.telefono" :class="{'p-invalid': errores.telefono}" @input="validarCampo('telefono')" />
+            <small v-if="errores.telefono" class="p-error">{{ errores.telefono }}</small>
           </div>
-        </form>
-
+          <div class="p-field p-col-12 p-md-6">
+            <label for="direccion">Dirección</label>
+            <InputText id="direccion" v-model="datosFormulario.direccion" :class="{'p-invalid': errores.direccion}" @input="validarCampo('direccion')" />
+            <small v-if="errores.direccion" class="p-error">{{ errores.direccion }}</small>
+          </div>
+          <div class="p-field p-col-12 p-md-6">
+            <label for="departamento">Departamento</label>
+            <Dropdown id="departamento" v-model="datosFormulario.departamento" :options="arrayDepartamentos" :class="{'p-invalid': errores.departamento}" @change="validarCampo('departamento')" placeholder="Seleccione" />
+            <small v-if="errores.departamento" class="p-error">{{ errores.departamento }}</small>
+          </div>
         </div>
-      </div>
-    </div>
-    <!-- Fin del modal -->
+        <div v-if="tipoAccion === 1">
+          <strong>Código de Sucursal:</strong> {{ codigoSucursal }}
+        </div>
+        <div v-if="tipoAccion === 2">
+          <strong>Código de Sucursal:</strong> {{ datosFormulario.codigoSucursal }}
+        </div>
+      </form>
+      <template #footer>
+        <Button label="Cerrar" icon="pi pi-times" @click="cerrarModal" class="p-button-text" />
+        <Button v-if="tipoAccion === 1" label="Guardar" icon="pi pi-check" @click="enviarFormulario" autofocus />
+        <Button v-if="tipoAccion === 2" label="Actualizar" icon="pi pi-check" @click="enviarFormulario" autofocus />
+      </template>
+    </Dialog>
+  </div>
   </main>
 </template>
   
 <script>
 import { esquemaSucursal } from '../constants/validations';
+import Breadcrumb from 'primevue/breadcrumb';
+import Card from 'primevue/card';
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Dropdown from 'primevue/dropdown';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Dialog from 'primevue/dialog';
+import Paginator from 'primevue/paginator';
+import Tag from 'primevue/tag';
+import InputNumber from 'primevue/inputnumber';
 export default {
+  components: {
+    Breadcrumb,
+    Card,
+    Button,
+    InputText,
+    Dropdown,
+    DataTable,
+    Column,
+    Dialog,
+    Paginator,
+    Tag,
+    InputNumber
+  },
   data() {
     return {
+      criterioOptions: [
+        { label: 'Nombres', value: 'nombre' },
+        { label: 'Dirección', value: 'direccion' },
+        { label: 'Correo', value: 'correo' },
+        { label: 'Teléfono', value: 'telefono' },
+        { label: 'Departamento', value: 'departamento' }
+      ],
       datosFormulario: {
         nombre: '',
         direccion: '',
