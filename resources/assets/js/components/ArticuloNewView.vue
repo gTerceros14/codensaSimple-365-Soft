@@ -39,268 +39,401 @@
                 <Column field="nombre_grupo" header="GRUPO/FAMILIA" />
                 <Column field="fotografia" header="FOTO" />
             </DataTable>
-            <Dialog :visible.sync="dialogVisible" :modal="true" header="Registrar Artículo" :closable="true" @hide="closeDialog" :style="{ '--overlay-zindex': '9999' }"
-            :contentStyle="{ zIndex: 10000 }">
-                <form>
-                    <div class="form-group row">
-                        <div class="col-md-6">
-                            <label for="nombreProducto">Nombre del Producto *</label>
+        </Panel>
+        <!-- MODAL REGISTRAR PRODUCTO -->
+        <Dialog :visible.sync="dialogVisible" :modal="true" header="Registrar Artículo" :closable="true" @hide="closeDialog" :containerStyle="{width: '800px'}" >
+            <form>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <div>
+                            <label class="font-weight-bold" for="nombreProducto">Nombre del Producto <span class="text-danger">*</span></label>
                             <InputText id="nombreProducto" v-model="nuevoArticulo.nombreComercial" placeholder="Ej. Ibuprofeno 400 mg (20 comprimidos)" class="form-control p-inputtext-sm" />
                         </div>
-                        <div class="col-md-6">
-                            <label for="nombreGenerico">Nombre Genérico *</label>
+                        <div>
+                            <label class="font-weight-bold" for="nombreGenerico">Nombre Genérico <span class="text-danger">*</span></label>
                             <InputText id="nombreGenerico" v-model="nuevoArticulo.nombreGenerico" placeholder="Ej. Ibuprofeno" class="form-control p-inputtext-sm" />
                         </div>
-                        <div class="col-md-6">
-                            <label for="foto">Foto del Producto</label>
-                            <FileUpload name="foto[]"  chooseLabel="Seleccionar archivo" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <div>
+                            <label class="font-weight-bold" for="foto">Foto del Producto</label>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="d-flex justify-content-center">
+                                        <div v-if="!imagen" class="bg-light p-5 rounded">
+                                            <i class="fa fa-camera fa-2x" style="color:#6e6e6e" aria-hidden="true"></i>
+                                        </div>
+                                        <figure v-else>
+                                            <ImagePreview :src="imagen" alt="Image" width="140" height="140" />
+                                        </figure>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-group mt-2">
+                                <input type="file" @change="obtenerFotografia" class="form-control" placeholder="fotografia" ref="fotografiaInput">
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <div class="col-md-6">
-                            <label for="descripcion">Descripción del Producto *</label>
-                            <Textarea id="descripcion" v-model="nuevoArticulo.descripcion" placeholder="Ej. Alivio rápido para el dolor de cabeza y fiebre" rows="3" class="form-control" />
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <div>
+                            <label class="font-weight-bold" for="descripcion">Descripción del Producto <span class="text-danger">*</span></label>
+                            <Textarea id="descripcion" v-model="nuevoArticulo.descripcion" placeholder="Ej. Alivio rápido para el dolor de cabeza y fiebre" rows="3" class="form-control p-inputtext-sm" />
                         </div>
-                        <div class="col-md-6">
-                            <label for="codigo">Código del Producto *</label>
-                            <InputText id="codigo" v-model="nuevoArticulo.codigo" placeholder="Ej. SKU123" class="form-control p-inputtext-sm" />
-                        </div>
-                        <div class="col-md-6">
-                            <label for="codigoAlfanumerico">Código Alfanumérico (Opcional)</label>
-                            <InputText id="codigoAlfanumerico" v-model="nuevoArticulo.codigoAlfanumerico" placeholder="Ej. ABC123" class="form-control p-inputtext-sm" />
+                        <div>
+                            <label class="font-weight-bold" for="codigoAlfanumerico">Código Alfanumérico <span class="text-danger">*</span></label>
+                              <InputText id="codigoAlfanumerico" v-model="nuevoArticulo.codigoAlfanumerico" placeholder="Ej. ABC123" class="form-control p-inputtext-sm" />
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <div class="col-md-6">
-                            <label for="descripcionFabricacion">Descripción de Fabricación (Opcional)</label>
-                            <Textarea id="descripcionFabricacion" v-model="nuevoArticulo.descripcionFabricacion" placeholder="Ej. Producto fabricado por Laboratorios XYZ" rows="3" class="form-control" />
-                        </div>
-                        <div class="col-md-6">
-                            <label for="proveedor">Proveedor *</label>
-                            <Dropdown id="proveedor" v-model="nuevoArticulo.proveedor" :options="proveedores" optionLabel="name" placeholder="Seleccione un proveedor" class="form-control" />
+                    <div class="col-md-6">
+                        <label class="font-weight-bold" for="codigo">Código del Producto <span class="text-danger">*</span> </label>
+                        <InputText id="codigo" v-model="nuevoArticulo.codigo" placeholder="Ej. SKU123" class="form-control p-inputtext-sm" />
+                        <div class="d-flex mt-4 justify-content-center" style="width:250px;overflow-x: auto;">
+                            <barcode :value="nuevoArticulo.codigo" :options="{ format: 'EAN-13' }"></barcode>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <div class="col-md-6">
-                            <label for="linea">Línea *</label>
-                            <Dropdown id="linea" v-model="nuevoArticulo.linea" :options="lineas" optionLabel="name" placeholder="Seleccione una línea" class="form-control" />
-                        </div>
-                        <div class="col-md-6">
-                            <label for="marca">Marca *</label>
-                            <Dropdown id="marca" v-model="nuevoArticulo.marca" :options="marcas" optionLabel="name" placeholder="Seleccione una marca" class="form-control" />
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="font-weight-bold" for="descripcionFabricacion">Descripción de Fabricación (Opcional)</label>
+                        <Textarea id="descripcionFabricacion" v-model="nuevoArticulo.descripcionFabricacion" placeholder="Ej. Producto fabricado por Laboratorios XYZ" rows="3" class="form-control p-inputtext-sm" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="font-weight-bold" for="proveedor">Proveedor <span class="text-danger">*</span></label>
+                        <div class="p-inputgroup ">
+                            <InputText id="proveedor" v-model="proveedorSeleccionado.nombre"  placeholder="Seleccione un proveedor" class="form-control p-inputtext-sm bold-input" disabled />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirProveedores" />
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <div class="col-md-6">
-                            <label for="industria">Industria *</label>
-                            <InputText id="industria" v-model="nuevoArticulo.industria" placeholder="Ej. Farmacéutica" class="form-control p-inputtext-sm" />
-                        </div>
-                        <div class="col-md-6">
-                            <label for="grupoFamilia">Grupo/Familia *</label>
-                            <InputText id="grupoFamilia" v-model="nuevoArticulo.grupoFamilia" placeholder="Ej. Analgésicos" class="form-control p-inputtext-sm" />
-                        </div>
-                    </div>
-                    <!-- Agregar campos adicionales -->
-                    <div class="form-group row">
-                        <div class="col-md-6">
-                            <label for="stockMinimo">Stock Mínimo *</label>
-                            <InputText id="stockMinimo" v-model="nuevoArticulo.stockMinimo" placeholder="Ej. 50" class="form-control p-inputtext-sm" />
-                        </div>
-                        <div class="col-md-6">
-                            <label for="unidadesPorPaquete">Unidades por Paquete *</label>
-                            <InputText id="unidadesPorPaquete" v-model="nuevoArticulo.unidadesPorPaquete" placeholder="Ej. 10" class="form-control p-inputtext-sm" />
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="font-weight-bold" for="linea">Línea <span class="text-danger">*</span></label>
+                        <div class="p-inputgroup">
+                            <InputText id="linea"  v-model="lineaSeleccionado.nombre" placeholder="Seleccione una línea" class="form-control p-inputtext-sm bold-input" disabled />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirLineas" />
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="controlado">Controlado *</label>
-                            <Dropdown id="controlado" v-model="nuevoArticulo.controlado" :options="controladoOptions" optionLabel="label" placeholder="Seleccione una opción" class="form-control" />
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="precioEstudiante">Precio Estudiante *</label>
-                            <InputText id="precioEstudiante" v-model="nuevoArticulo.precioEstudiante" placeholder="Ej. 15.00" class="form-control p-inputtext-sm" />
+                    <div class="col-md-6">
+                        <label class="font-weight-bold" for="marca">Marca <span class="text-danger">*</span></label>
+                        <div class="p-inputgroup">
+                            <InputText id="marca"  v-model="marcaSeleccionado.nombre" placeholder="Seleccione una marca" class="form-control p-inputtext-sm bold-input" disabled />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirMarcas" />
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="precioPublico">Precio Público *</label>
-                            <InputText id="precioPublico" v-model="nuevoArticulo.precioPublico" placeholder="Ej. 20.00" class="form-control p-inputtext-sm" />
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="precioFactura">Precio Factura *</label>
-                            <InputText id="precioFactura" v-model="nuevoArticulo.precioFactura" placeholder="Ej. 18.00" class="form-control p-inputtext-sm" />
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="font-weight-bold" for="industria">Industria <span class="text-danger">*</span></label>
+                        <div class="p-inputgroup">
+                            <InputText id="industria" v-model="industriaSeleccionado.nombre"  placeholder="Seleccione una industria" class="form-control p-inputtext-sm bold-input" disabled />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirIndustrias" />
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="industria">Industria *</label>
-                            <InputText id="industria" v-model="nuevoArticulo.industria" placeholder="Ej. Farmacéutica" class="form-control p-inputtext-sm" />
+                    <div class="col-md-6">
+                        <label class="font-weight-bold" for="grupoFamilia">Grupo/Familia <span class="text-danger">*</span></label>
+                        <div class="p-inputgroup">
+                            <InputText id="grupoFamilia"  v-model="grupoSeleccionado.nombre_grupo" placeholder="Seleccione un grupo" class="form-control p-inputtext-sm bold-input" disabled />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirGrupos" />
                         </div>
-                        
                     </div>
-                </form>
-                <template #footer>
-                    <div class="flex justify-content-end">
-                        <Button label="Cancelar" icon="pi pi-times" @click="closeDialog" class="p-button-text mr-2" />
-                        <Button label="Guardar" icon="pi pi-check" @click="saveArticulo" autofocus />
+                </div>
+                <!-- Agregar campos adicionales -->
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label class="font-weight-bold" for="stockMinimo">Stock Mínimo <span class="text-danger">*</span></label>
+                        <div class="p-inputgroup">
+                            <InputNumber id="stockMinimo"  placeholder="Ej: 10" class="p-inputtext-sm" />
+                            <Dropdown label="..." v-model="tipo_stock" :options="tipoEnvase" optionLabel="etiqueta" optionValue="valor" class="p-dropdown-sm p-inputtext-sm" />
+                        </div>
                     </div>
-                </template>
-            </Dialog>
-        </Panel>
+                    <div class="col-md-4">
+                        <label  class="font-weight-bold" for="unidadEnvase">Unidades por Envase <span class="text-danger">*</span></label>
+                        <div class="p-inputgroup">
+                            <InputNumber id="unidadEnvase"placeholder="Ej: 24" class="p-inputtext-sm" />
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="font-weight-bold" for="medida">Medidas <span class="text-danger">*</span></label>
+                        <div class="p-inputgroup">
+                            <InputText id="medida" v-model="medidaSeleccionado.descripcion_medida"  placeholder="Seleccione una medida" class="form-control p-inputtext-sm bold-input" disabled />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirMedidas" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="font-weight-bold" for="preciounitario">Precio Unitario <span class="text-danger">*</span></label>
+                        <div class="p-inputgroup">
+                            <InputNumber id="preciounitario"  v-model="grupoSeleccionado.nombre_grupo" placeholder="Sin decimales" class=" p-inputtext-sm bold-input" />
+                            <Button label="Calcular" class="p-button-primary p-button-sm" @click="abrirGrupos" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="font-weight-bold"  for="preciopaquete">Precio Paquete <span class="text-danger">*</span></label>
+                        <div class="p-inputgroup">
+                            <InputNumber id="preciopaquete"  v-model="grupoSeleccionado.nombre_grupo" placeholder="Sin decimales" class=" p-inputtext-sm bold-input"  />
+                            <Button label="Calcular" class="p-button-primary p-button-sm" @click="abrirGrupos" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6 switch-container" >
+                        <label class="font-weight-bold" style="margin-bottom: 0px;"  for="switchvencimiento">Fecha vencimiento <span class="text-danger">*</span></label>
+                            <InputSwitch id="switchvencimiento" v-model="fechaVencimientoSeleccion"  class="p-inputswitch-sm" />
+                    </div>
+                    <div class="col-md-6 switch-container">
+                        <label class="font-weight-bold" style="margin-bottom: 0px;" for="switchstock">Agregar a Stock <span class="text-danger">*</span></label>
+                            <InputSwitch id="switchstock" v-model="agregarStock"  class="p-inputswitch-sm" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-center">
+                            <Button label="Guardar" icon="pi pi-save" class="p-button-primary p-button-sm" @click="guardarArticulo" />
+                            <Button label="Cancelar" icon="pi pi-times" class="p-button-secondary p-button-sm ml-2" @click="closeDialog" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </Dialog>
+
+        <!-- MODALES DINÁMICOS -->
+        <DialogProveedores :visible.sync="mostrarDialogoProveedores" @close="cerrarDialogoProveedores" @proveedor-seleccionado="manejarProveedorSeleccionado" />
+        <DialogLineas :visible.sync="mostrarDialogoLineas" @close="cerrarDialogoLineas" @linea-seleccionado="manejarLineaSeleccionado"/>
+        <DialogMarcas :visible.sync="mostrarDialogoMarcas" @close="cerrarDialogoMarcas" @marca-seleccionado="manejarMarcaSeleccionado"/>
+        <DialogIndustrias :visible.sync="mostrarDialogoIndustrias" @close="cerrarDialogoIndustrias" @industria-seleccionado="manejarIndustriaSeleecionado"/>
+        <DialogGrupos :visible.sync="mostrarDialogoGrupos" @close="cerrarDialogoGrupos" @grupo-seleccionado="manejarGrupoSeleccionado"/>
+        <DialogMedidas :visible.sync="mostrarDialogoMedidas" @close="cerrarDialogoMedidas" @medida-seleccionado="manejarMedidaSeleccionado"/>
+
     </main>
 </template>
 
 <script>
-import Dialog from 'primevue/dialog';
 import Panel from 'primevue/panel';
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Dialog from 'primevue/dialog';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Button from 'primevue/button';
-import FileUpload from 'primevue/fileupload';
-import InputText from 'primevue/inputtext';
-import Dropdown from 'primevue/dropdown';
 import Textarea from 'primevue/textarea';
-import axios from 'axios';
-
+import InputNumber from 'primevue/inputnumber';
+import ImagePreview from 'primevue/imagepreview';
+import DialogProveedores from './modales/DialogProveedores.vue';
+import DialogLineas from './modales/DialogLineas.vue';
+import DialogMarcas from './modales/DialogMarcas.vue';
+import DialogIndustrias from './modales/DialogIndustrias.vue';
+import DialogGrupos from './modales/DialogGrupos.vue';
+import DialogMedidas from './modales/DialogMedidas.vue'
+import Dropdown from 'primevue/dropdown';
+import InputSwitch from 'primevue/inputswitch';
+import VueBarcode from 'vue-barcode';
 export default {
-    name: 'ArticleTable',
     components: {
+        Panel,
+        Button,
+        InputText,
+        Dialog,
         DataTable,
         Column,
-        Button,
-        FileUpload,
-        InputText,
-        Panel,
-        Dialog,
+        Textarea,
+        InputNumber,
+        ImagePreview,
         Dropdown,
-        Textarea
+        InputSwitch,
+        'barcode': VueBarcode,
+        DialogProveedores,
+        DialogLineas,
+        DialogMarcas,
+        DialogIndustrias,
+        DialogGrupos,
+        DialogMedidas
     },
     data() {
         return {
+            searchText: '',
+            arrayArticulo: [], // Datos del artículo
             dialogVisible: false,
+            agregarStock: false,
+            fechaVencimientoSeleccion: false,
             nuevoArticulo: {
                 nombreComercial: '',
                 nombreGenerico: '',
+                fotografia: null,
                 descripcion: '',
-                codigo: '',
                 codigoAlfanumerico: '',
+                codigo: '',
                 descripcionFabricacion: '',
-                proveedor: null,
-                linea: null,
-                marca: null,
-                // ... otros campos necesarios
+                proveedor: '',
+                linea: '',
+                marca: '',
+                industria: '',
+                grupoFamilia: '',
+                stockMinimo: '',
+                precioCosto: '',
+                precioPublico: '',
+                precioEstudiante: '',
+                precioFactura: '',
+                unidadEnvase: '',
+                controlado: false,
             },
-            arrayArticulo: [],
-            criterio: 'nombre',
-            buscar: '',
-            proveedores: [
-                { name: 'Proveedor 1', code: 'PROV1' },
-                { name: 'Proveedor 2', code: 'PROV2' },
-                // ... más proveedores
+            tipo_stock: '',
+            tipoEnvase: [
+                { valor: "paquetes", etiqueta: "Paquetes" },
+                { valor: "unidades", etiqueta: "Unidades" }
             ],
-            lineas: [
-                { name: 'Línea 1', code: 'LIN1' },
-                { name: 'Línea 2', code: 'LIN2' },
-                // ... más líneas
-            ],
-            marcas: [
-                { name: 'Marca 1', code: 'MAR1' },
-                { name: 'Marca 2', code: 'MAR2' },
-                // ... más marcas
-            ],
+            mostrarDialogoProveedores: false,
+            mostrarDialogoLineas: false,
+            mostrarDialogoMarcas: false,
+            mostrarDialogoIndustrias: false,
+            mostrarDialogoGrupos: false,
+            mostrarDialogoMedidas: false,
+            imagen: null,
+            proveedorSeleccionado: [],
+            lineaSeleccionado: [],
+            marcaSeleccionado: [],
+            industriaSeleccionado : [],
+            grupoSeleccionado: [],
+            medidaSeleccionado: []
         };
     },
     methods: {
-        search() {
-            // Lógica de búsqueda aquí
+        abrir() {
+            this.dialogVisible = true;
         },
         closeDialog() {
             this.dialogVisible = false;
         },
-        saveArticulo() {
-            // Lógica para guardar el artículo
+        obtenerFotografia(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.imagen = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
         },
-        abrir(){
+        manejarProveedorSeleccionado(proveedor) {
+            this.proveedorSeleccionado = proveedor;
+            console.log('Proveedor seleccionado:', this.proveedorSeleccionado.nombre);
+            // Puedes hacer cualquier otra cosa con el objeto seleccionado aquí
+        },
+        manejarLineaSeleccionado(linea){
+            this.lineaSeleccionado = linea;
+            console.log("grupo ",this.grupoSeleccionado)
+        },
+        manejarMarcaSeleccionado(marca){
+            this.marcaSeleccionado = marca;
+        },
+        manejarIndustriaSeleecionado(industria){
+            this.industriaSeleccionado = industria;
+        },
+        manejarGrupoSeleccionado(grupo){
+            this.grupoSeleccionado = grupo;
+        },
+        manejarMedidaSeleccionado(medida){
+            this.medidaSeleccionado = medida
+        },
+        abrirProveedores() {
+            this.mostrarDialogoProveedores = true;
+            this.dialogVisible= false;
+        },
+        cerrarDialogoProveedores() {
+            this.mostrarDialogoProveedores = false;
             this.dialogVisible = true;
         },
-        listarArticulo(page, buscar, criterio) {
-            let me = this;
-            var url = '/articulonewindex?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                me.arrayArticulo = respuesta.articulos;
-                me.pagination = respuesta.pagination;
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
+        abrirLineas() {
+            this.mostrarDialogoLineas = true;
+            this.dialogVisible= false;
+        },
+        cerrarDialogoLineas() {
+            this.mostrarDialogoLineas = false;
+            this.dialogVisible = true;
+        },
+        abrirMarcas() {
+            this.mostrarDialogoMarcas = true;
+            this.dialogVisible= false;
+        },
+        cerrarDialogoMarcas() {
+            this.mostrarDialogoMarcas = false;
+            this.dialogVisible= true;
+        },
+        abrirIndustrias() {
+            this.mostrarDialogoIndustrias = true;
+            this.dialogVisible= false;
+        },
+        cerrarDialogoIndustrias() {
+            this.mostrarDialogoIndustrias = false;
+            this.dialogVisible= true;
+        },
+        abrirGrupos() {
+            this.mostrarDialogoGrupos = true;
+            this.dialogVisible= false;
+        },
+        cerrarDialogoGrupos() {
+            this.mostrarDialogoGrupos = false;
+            this.dialogVisible= true;
+        },
+        abrirMedidas() {
+            this.mostrarDialogoMedidas = true;
+            this.dialogVisible= false;
+        },
+        cerrarDialogoMedidas() {
+            this.mostrarDialogoMedidas = false;
+            this.dialogVisible= true;
+        },
+        guardarArticulo() {
+            // Lógica para guardar el artículo
+        },
+        search() {
+            // Lógica para la búsqueda
         },
     },
-    mounted() {
-        this.listarArticulo(1, this.buscar, this.criterio);
-
-    }
 };
 </script>
 
 <style scoped>
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+.bold-input {
+    font-weight: bold;
 }
-
-.field {
-    display: flex;
-    flex-direction: column;
-}
-
-.photo-field {
-    grid-column: span 2;
-}
-
-.full-width {
-    grid-column: span 2;
-}
-
-.p-panel .p-panel-header {
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
 .panel-header {
     display: flex;
     align-items: center;
 }
-
 .panel-title {
-    margin: 0;
-    padding-left: 5px; 
+    margin-left: 8px;
 }
-
 .toolbar-container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
-
 .toolbar {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
 }
-
 .searchbar {
     display: flex;
-    align-items: center;    
-    justify-content: flex-start;
+    align-items: center;
+}
+.form-group {
+    margin-bottom: 15px;
 }
 .p-dialog-mask {
   z-index: 9999 !important;
 }
 .p-dialog {
   z-index: 10000 !important;
+}
+>>> .p-dropdown .p-dropdown-trigger {
+    width: 2rem;
+}
+.switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
 }
 </style>

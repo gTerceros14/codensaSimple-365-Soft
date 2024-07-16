@@ -41,9 +41,9 @@
         </DataTable>
         <Dialog :visible.sync="modal" modal :header="tituloModal" :closable="true" @hide="cerrarModal">
           <template #footer>
-            <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="cerrarModal()" />
-            <Button v-if="tipoAccion === 1" label="Guardar" icon="pi pi-check" class="p-button-text" @click="registrarCategoria()" />
-            <Button v-if="tipoAccion === 2" label="Actualizar" icon="pi pi-check" class="p-button-text" @click="actualizarCategoria()" />
+            <Button label="Cancelar" icon="pi pi-times" class="p-button-sm p-button-danger" @click="cerrarModal()" />
+            <Button v-if="tipoAccion === 1" label="Guardar" icon="pi pi-check" class="p-button-sm p-button-success" @click="registrarCategoria()" />
+            <Button v-if="tipoAccion === 2" label="Actualizar" icon="pi pi-check" class="p-button-sm p-button-warning" @click="actualizarCategoria()" />
           </template>
           <div class="p-fluid ">
             <div class="p-field input-container">

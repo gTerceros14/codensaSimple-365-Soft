@@ -121,6 +121,9 @@
                     <li @click="menu=20" class="nav-item">
                         <a class="nav-link" href="#"><i class="fa fa-industry" style="font-size: 19px;"></i> Industria</a>
                     </li>
+                    <li @click="menu=26" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Grupos</a>
+                    </li>
                     <li @click="menu=27" class="nav-item">
                         <a class="nav-link" href="#"><i class="fa fa-arrows-alt" style="font-size: 19px;"></i> Medidas</a>
                     </li>

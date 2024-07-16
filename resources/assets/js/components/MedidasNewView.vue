@@ -24,9 +24,9 @@
         <DataTable class="p-datatable-sm p-datatable-gridlines"   responsiveLayout="scroll" :value="filteredProducts" paginator :rows="9">
           <Column header="Opciones">
             <template #body="slotProps">
-              <Button icon="pi pi-pencil" class="p-button-sm p-button-warning custom-icon-size"  @click="abrirModal('medida', 'actualizar', slotProps.data)" />
-              <Button v-if="slotProps.data.estado" icon="pi pi-ban" class="p-button-sm p-button-danger custom-icon-size" @click="desactivarMedida(slotProps.data.id)" />
-              <Button v-else icon="pi pi-check-circle" class="p-button-sm p-button-success custom-icon-size" @click="activarMedida(slotProps.data.id)" />
+              <Button icon="pi pi-pencil" class="p-button-sm p-button-warning"  @click="abrirModal('medida', 'actualizar', slotProps.data)" />
+              <Button v-if="slotProps.data.estado" icon="pi pi-ban" class="p-button-sm p-button-danger" @click="desactivarMedida(slotProps.data.id)" />
+              <Button v-else icon="pi pi-check-circle" class="p-button-sm p-button-success" @click="activarMedida(slotProps.data.id)" />
 
             </template>
           </Column>
@@ -45,7 +45,7 @@
           <template #footer>
             <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="cerrarModal()" />
             <Button v-if="tipoAccion === 1" label="Guardar" icon="pi pi-check" class="p-button-text" @click="registrarMedida()" />
-            <Button v-if="tipoAccion === 2" label="Actualizar" icon="pi pi-check" class="p-button-text" @click="actualizarMedida()" />
+            <Button v-if="tipoAccion === 2" label="Actualizar" icon="pi pi-check" class="p-button-sm p-button-warning" @click="actualizarMedida()" />
           </template>
           <div class="p-fluid">
             <div class="p-field input-container">
