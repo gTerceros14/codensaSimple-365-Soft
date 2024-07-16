@@ -1,115 +1,76 @@
 <template>
-    <main class="main">
-        <!-- Breadcrumb -->
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
-        </ol>
-        <div class="container-fluid">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Empresa
-                    <button v-if="estadoInputs" type="button" @click="estadoCampos()" class="btn btn-secondary"
-                        style="margin-left: 10px;">
-                        <i class="icon-plus"></i>&nbsp;Editar
-                    </button>
+    <main class="main">   
+        <Card class="p-shadow-4-sm" style="width: 80vw">
+            <template #title>
+                <div class="p-d-flex p-ai-center p-jc-between">
+                    <h2 class="p-m-0"><i class="pi pi-building p-mr-2"></i>Información de la Empresa</h2>
+                    <Button v-if="estadoInputs" icon="pi pi-pencil" label="Editar" @click="estadoCampos()" class="p-button p-button-info p-button-sm" />
                 </div>
-                <br>
-                <div class="form-group row">
-                    <label class="col-md-3 form-control-label font-weight-bold" for="text-input">&nbsp; Logo de la
-                        Empresa:</label>
-                    <div class="col-md-4">
-                        <div class="row">
-                            <figure class="col-md-4">
-                                <img :src="logoUrl" width="129" height="129" alt="Logo empresa">
-                            </figure>
-                            <div v-if="!estadoInputs" class="col-md-8">
-                                <input type="file" @change="onLogoChange" accept="image/*" class="form-control-file">
+            </template>
+            <template #content>
+                <div class="p-fluid p-formgrid p-grid">
+                    <div class="p-field p-col-12 p-md-4">
+                       
+                            <img :src="logoUrl" width="150" height="150" alt="Logo empresa" class="p-mb-3 p-shadow-2" style="object-fit: contain;" />
+                            <FileUpload v-if="!estadoInputs" mode="basic" accept="image/*" :auto="true" @select="onLogoChange" chooseLabel="Cambiar Logo" class="p-button-rounded p-button-info p-button-sm" />
+                        
+                    </div>
+                    <div class="p-col-12 p-md-8">
+                        <div class="p-grid">
+                            <div class="p-field p-col-12 p-md-6">
+                                <label class="p-font-bold">Nombre:</label>
+                                <InputText v-if="!estadoInputs" v-model="nombre" placeholder="Nombre de la empresa" :readonly="estadoInputs" maxlength="30" class="p-inputtext-sm" />
+                                <div v-else class="p-text-bold p-p-2">{{ nombre }}</div>
+                            </div>
+                            <div class="p-field p-col-12 p-md-6">
+                                <label class="p-font-bold">Dirección:</label>
+                                <InputText v-if="!estadoInputs" v-model="direccion" placeholder="Dirección" :readonly="estadoInputs" maxlength="30" class="p-inputtext-sm" />
+                                <div v-else class="p-text-bold p-p-2">{{ direccion }}</div>
+                            </div>
+                            <div class="p-field p-col-12 p-md-6">
+                                <label class="p-font-bold">Teléfono:</label>
+                                <InputNumber v-if="!estadoInputs" v-model="telefono" placeholder="Teléfono" :readonly="estadoInputs" class="p-inputtext-sm" />
+                                <div v-else class="p-text-bold p-p-2">{{ telefono }}</div>
+                            </div>
+                            <div class="p-field p-col-12 p-md-6">
+                                <label class="p-font-bold">NIT:</label>
+                                <InputNumber v-if="!estadoInputs" v-model="nit" placeholder="NIT" :readonly="estadoInputs" class="p-inputtext-sm" />
+                                <div v-else class="p-text-bold p-p-2">{{ nit }}</div>
+                            </div>
+                            <div class="p-field p-col-12">
+                                <label class="p-font-bold">Email:</label>
+                                <InputText v-if="!estadoInputs" v-model="email" placeholder="Email" :readonly="estadoInputs" class="p-inputtext-sm" />
+                                <div v-else class="p-text-bold p-p-2">{{ email }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="form-group row">
-                    <label class="col-md-3 form-control-label font-weight-bold" for="text-input">&nbsp; Nombre de la
-                        Empresa:</label>
-                    <div v-if="!estadoInputs" class="col-md-4 mx-2">
-                        <input type="text" v-model="nombre" class="form-control"
-                            placeholder="Ingrese el nombre de la empresa" :readonly="this.estadoInputs" maxlength="50">
-                    </div>
-                    <div v-else class="col-md-4 mx-2">
-                        {{ nombre }}
-                    </div>
+                <div v-if="!estadoInputs" class="p-d-flex p-jc-center p-mt-4">
+                    <Button label="Cancelar" icon="pi pi-times" @click="estadoCampos(); datosEmpresa()" class="p-button p-button-danger p-button-sm p-mr-2" />
+                    <Button label="Guardar" icon="pi pi-check" @click="actualizarEmpresa()" class="p-button p-button-success p-button-sm" />
                 </div>
-
-
-                <div class="form-group row">
-                    <label class="col-md-3 form-control-label font-weight-bold" for="email-input">&nbsp; Dirección de la
-                        Empresa</label>
-                    <div v-if="!estadoInputs" class="col-md-4 mx-2">
-                        <input type="text" v-model="direccion" maxlength="50" class="form-control"
-                            placeholder="Ingrese la direccion" :readonly="this.estadoInputs">
-                    </div>
-                    <div v-else class="col-md-4 mx-2">
-                        {{ direccion }}
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label class="col-md-3 form-control-label font-weight-bold" for="email-input">&nbsp; Teléfono de la
-                        Empresa</label>
-                    <div v-if="!estadoInputs" class="col-md-4 mx-2">
-                        <input type="number" v-model="telefono" class="form-control" placeholder="Ingrese el telefono"
-                            :readonly="this.estadoInputs">
-                    </div>
-                    <div v-else class="col-md-4 mx-2">
-                        {{ telefono }}
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label class="col-md-3 form-control-label font-weight-bold" for="email-input">&nbsp; NIT de la
-                        Empresa</label>
-                    <div v-if="!estadoInputs" class="col-md-4 mx-2">
-                        <input type="number" v-model="nit" class="form-control" placeholder="Ingrese el telefono"
-                            :readonly="this.estadoInputs">
-                    </div>
-                    <div v-else class="col-md-4 mx-2">
-                        {{ nit }}
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label class="col-md-3 form-control-label font-weight-bold" for="email-input">&nbsp; Email de la
-                        Empresa</label>
-                    <div v-if="!estadoInputs" class="col-md-4 mx-2">
-                        <input type="email" v-model="email" class="form-control" placeholder="Ingrese el email"
-                            :readonly="this.estadoInputs">
-                        <!-- <p :style="{color:'red'}" v-if="validEmail === false">Por favor, ingrese un correo electronico de la empresa valido</p> -->
-                    </div>
-                    <div v-else class="col-md-4 mx-2">
-                        {{ email }}
-                    </div>
-
-                </div>
-
-
-
-
-
-                <div v-if="!estadoInputs" class="form-group-row justify-content-center text-center mt-3 mb-3">
-                    <button type="button" class="btn btn-danger"
-                        @click="estadoCampos(); datosEmpresa()">Cancelar</button>
-
-                    <button type="button" class="btn btn-success" @click="actualizarEmpresa()">Guardar cambios</button>
-                </div>
-
-            </div>
-            <!-- Fin ejemplo de tabla Listado -->
-        </div>
+            </template>
+        </Card>
     </main>
 </template>
 
 <script>
+import Card from 'primevue/card';
+import Panel from 'primevue/panel';
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
+import FileUpload from 'primevue/fileupload';
+
 export default {
+    components: {
+        Card,
+        Panel,
+        Button,
+        InputText,
+        InputNumber,
+        FileUpload
+    },
     data() {
         return {
             empresa_id: 0,
@@ -121,8 +82,7 @@ export default {
             licencia: '',
             estadoInputs: true,
             logo: null,
-            logoUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3bz1rSR914Qj3-mmNDyf-MhhLkdq3GzsVNKUZYXTJaQ&s', // Default image
-
+            logoUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3bz1rSR914Qj3-mmNDyf-MhhLkdq3GzsVNKUZYXTJaQ&s',
         }
     },
     methods: {
@@ -131,24 +91,20 @@ export default {
             return regexCorreoElectronico.test(correo);
         },
         validarCampos() {
-            if (this.telefono.length > 8) {
-                this.toastError("El número de telefono no debe contener mas de 8 digitos")
+            if (this.telefono.toString().length > 8) {
+                this.$toast.add({severity:'error', summary: 'Error', detail:'El número de teléfono no debe contener más de 8 dígitos', life: 3000});
                 return false;
             }
             if (!this.validarCorreoElectronico(this.email)) {
-                this.toastError("Ingrese un correo electronico valido")
+                this.$toast.add({severity:'error', summary: 'Error', detail:'Ingrese un correo electrónico válido', life: 3000});
                 return false;
             }
             return true
-
-
-
         },
         estadoCampos() {
             this.estadoInputs = !this.estadoInputs;
         },
         datosEmpresa() {
-
             let me = this;
             var url = '/empresa';
 
@@ -162,15 +118,15 @@ export default {
                 me.email = respuesta.empresa.email;
                 me.nit = respuesta.empresa.nit;
                 me.licencia = respuesta.empresa.licencia;
+                me.logoUrl = respuesta.empresa.logo || me.logoUrl;
             })
-                .catch(function (error) {
-                    console.log(error);
-                });
+            .catch(function (error) {
+                console.log(error);
+            });
         },
-        onLogoChange(e) {
-            const file = e.target.files[0];
-            this.logo = file;
-            this.logoUrl = URL.createObjectURL(file);
+        onLogoChange(event) {
+            this.logo = event.files[0];
+            this.logoUrl = URL.createObjectURL(this.logo);
         },
         actualizarEmpresa() {
             if (!this.validarCampos()) {
@@ -194,54 +150,12 @@ export default {
                     'Content-Type': 'multipart/form-data'
                 }
             }).then((response) => {
-                this.toastSuccess("Datos actualizados correctamente");
+                this.$toast.add({severity:'success', summary: 'Éxito', detail:'Datos actualizados correctamente', life: 3000});
                 this.estadoCampos();
-                this.datosEmpresa(); // Refresh data to get the new logo URL
+                this.datosEmpresa();
             }).catch((error) => {
-                console.error("Ocurrio un error al actualizar: ", error);
-                this.toastError("Hubo un error al actualizar los datos de la empresa");
-            });
-        },
-        datosEmpresa() {
-            let me = this;
-            var url = '/empresa';
-
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-
-                me.empresa_id = respuesta.empresa.id;
-                me.nombre = respuesta.empresa.nombre;
-                me.direccion = respuesta.empresa.direccion;
-                me.telefono = respuesta.empresa.telefono;
-                me.email = respuesta.empresa.email;
-                me.nit = respuesta.empresa.nit;
-                me.licencia = respuesta.empresa.licencia;
-                me.logoUrl = respuesta.empresa.logo || me.logoUrl; // Use the logo from the server if available
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        },
-        toastSuccess(mensaje) {
-            this.$toasted.show(`
-    <div style="height: 60px;font-size:16px;">
-        <br>
-        `+ mensaje + `.<br>
-    </div>`, {
-                type: "success",
-                position: "bottom-right",
-                duration: 4000
-            });
-        },
-        toastError(mensaje) {
-            this.$toasted.show(`
-    <div style="height: 60px;font-size:16px;">
-        <br>
-        `+ mensaje + `<br>
-    </div>`, {
-                type: "error",
-                position: "bottom-right",
-                duration: 4000
+                console.error("Ocurrió un error al actualizar: ", error);
+                this.$toast.add({severity:'error', summary: 'Error', detail:'Hubo un error al actualizar los datos de la empresa', life: 3000});
             });
         }
     },
@@ -250,16 +164,23 @@ export default {
     }
 }
 </script>
-<style>
-.modal-content {
-    width: 100% !important;
-    position: absolute !important;
-}
 
-.mostrar {
-    display: list-item !important;
-    opacity: 1 !important;
-    position: absolute !important;
-    background-color: #3c29297a !important;
+<style scoped>
+.main {
+    padding: 2rem;
+    background-color: #f8f9fa;
+}
+.p-card {
+    background-color: white;
+    border-radius: 10px;
+}
+.p-panel {
+    background-color: #f1f3f5;
+}
+.p-inputtext-lg {
+    font-size: 1.1rem;
+}
+.p-text-bold {
+    font-weight: 700;
 }
 </style>

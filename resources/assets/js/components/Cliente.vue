@@ -1,199 +1,150 @@
 <template>
     <main class="main">
-
-        <!-- Ejemplo de tabla Listado -->
-        <div class="card">
-            <div class="card-header">
-                <i class="fa fa-align-justify"></i> Clientes
-                <button type="button" @click="abrirModal('persona', 'registrar')" class="btn btn-secondary">
-                    <i class="icon-plus"></i>&nbsp;Nuevo
-                </button>
-                <button type="button" @click="cargarReporteExcel()" class="btn btn-info">
-                    <i class="icon-doc"></i>&nbsp;Reporte
-                </button>
-                <button type="button" @click="abrirModalImportar()" class="btn btn-success">
-                    <i class="icon-plus"></i>&nbsp;Importar
-                </button>
-            </div>
-            <div class="card-body">
-                <div class="form-group d-md-flex justify-content-md-between">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <select class="form-control col-md-3" v-model="criterio">
-                                <option value="nombre">Nombre</option>
-                                <option value="num_documento">Documento</option>
-                                <option value="email">Email</option>
-                                <option value="telefono">Teléfono</option>
-                            </select>
-                            <input type="text" v-model="buscar" @keyup="listarPersona(1, buscar, criterio)"
-                                class="form-control" placeholder="Texto a buscar">
-                        </div>
-
-                    </div>
-                    <div v-if="rolUsuario == 1" class="col-md-3">
-                        <label for="selectUsuarioFiltro" class="form-label"><strong>Buscar Cliente por
-                                Usuario</strong></label>
-                        <v-select id="selectUsuarioFiltro" :on-search="selectUsuarioFiltro" label="nombre"
-                            :options="arrayUsuarioFiltro" placeholder="Buscar Usuario..."
-                            :onChange="getDatosUsuarioFiltro" v-model="usuarioSeleccionadodos">
-                        </v-select>
+        <!-- Tabla de Clientes -->
+        <h5>Clientes</h5>
+        <Card>
+            <template #title>
+                <div class="p-d-flex p-jc-between p-ai-center">
+                   
+                    <div>
+                        <Button icon="pi pi-plus" label="Nuevo" class="p-button-secondary p-mr-2" @click="abrirModal('persona', 'registrar')" />
+                        <Button icon="pi pi-file" label="Reporte" class="p-button-info p-mr-2" @click="cargarReporteExcel()" />
+                        <Button icon="pi pi-upload" label="Importar" class="p-button-success" @click="abrirModalImportar()" />
                     </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th v-if="rolUsuario == 1">Acciones</th>
-                                <th>Nombres</th>
-                                <th>Tipo Documento</th>
-                                <th>Número de documento</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="persona in arrayPersona" :key="persona.id">
-                                <td>
-                                    <button type="button" @click="abrirModal('persona', 'actualizar', persona)"
-                                        class="btn btn-warning btn-sm">
-                                        <i class="icon-pencil"></i>
-                                    </button>
-                                </td>
-                                <td v-text="persona.nombre"></td>
-                                <td v-text="getTipoDocumentoText(persona.tipo_documento)"></td>
-                                <td v-text="persona.num_documento"></td>
-
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <nav>
-                    <ul class="pagination">
-                        <li class="page-item" v-if="pagination.current_page > 1">
-                            <a class="page-link" href="#"
-                                @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
-                        </li>
-                        <li class="page-item" v-for="page in pagesNumber" :key="page"
-                            :class="[page == isActived ? 'active' : '']">
-                            <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                v-text="page"></a>
-                        </li>
-                        <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                            <a class="page-link" href="#"
-                                @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-        <!-- Fin ejemplo de tabla Listado -->
-
-        <!--Inicio del modal agregar/actualizar-->
-        <div class="modal " tabindex="-1" :class="{ 'mostrar': modal }" role="dialog" aria-labelledby="myModalLabel"
-            style="display: none;" aria-hidden="true">
-            <div class="modal-dialog modal-primary modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" v-text="tituloModal"></h4>
-                        <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
+            </template>
+            <template #content>
+                <div class="p-grid p-mb-3">
+                    <div class="p-col-12 p-md-6">
+                        <div class="p-inputgroup">
+                            <Dropdown v-model="criterio" :options="criterioOptions" optionLabel="label" optionValue="value" placeholder="Seleccionar criterio" class="p-mr-2" />
+                            <InputText v-model="buscar" placeholder="Texto a buscar" @input="listarPersona(1, buscar, criterio)" />
+                        </div>
                     </div>
-                    <form @submit.prevent="enviarFormulario">
-                        <div class="modal-body">
-                            <div class="form-group row">
-                                <div>
-                                    <label for="nombre" class="font-weight-bold">Nombre del cliente <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" v-model="datosFormulario.nombre" class="form-control" id="nombre"
-                                        placeholder="Ej. Juan Pérez" :class="{ 'is-invalid': errores.nombre }"
-                                        @input="validarCampo('nombre')" style="width:  100%;">
-                                    <p class="text-danger" v-if="errores.nombre">{{ errores.nombre }}</p>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-6">
-                                    <label for="tipo_documento" class="font-weight-bold">Tipo de documento <span
-                                            class="text-danger">*</span></label>
-                                    <div>
-                                        <select class="form-control" v-model="datosFormulario.tipo_documento"
-                                            :class="{ 'is-invalid': errores.tipo_documento }"
-                                            @change="validarCampo('tipo_documento')">
-                                            <option value="" disabled>Selecciona una tipo de documento</option>
-                                            <option value="1">CI - CEDULA DE IDENTIDAD</option>
-                                            <option value="2">CEX - CEDULA DE IDENTIDAD DE EXTRANJERO</option>
-                                            <option value="5">NIT - NÚMERO DE IDENTIFICACIÓN TRIBUTARIA</option>
-                                            <option value="3">PAS - PASAPORTE</option>
-                                            <option value="4">OD - OTRO DOCUMENTO DE IDENTIDAD</option>
-                                        </select>
-                                    </div>
-                                    <p class="text-danger" v-if="errores.tipo_documento">{{ errores.tipo_documento }}
-                                    </p>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="num_documento" class="font-weight-bold">N°
-                                        {{ datosFormulario.tipo_documento == "" ? "Documento" : "" }}
-
-                                        {{ datosFormulario.tipo_documento == 1 ? "CI" : "" }}
-                                        {{ datosFormulario.tipo_documento == 2 ? "CEX" :
-                    "" }}
-                                        {{ datosFormulario.tipo_documento == 3 ? "Pasaporte" : "" }}
-                                        {{ datosFormulario.tipo_documento == 5 ? "NIT" : "" }}
-                                        <span class="text-danger">*</span></label>
-                                    <input type="text" v-model="datosFormulario.num_documento" class="form-control"
-                                        id="num_documento" placeholder="Ej. 12345678"
-                                        :class="{ 'is-invalid': errores.num_documento }"
-                                        @input="validarCampo('num_documento')">
-                                    <p class="text-danger" v-if="errores.num_documento">{{ errores.num_documento }}</p>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="font-weight-bold" for="complemento">Complemento</label>
-                                    <input class="form-check-input ml-2" type="checkbox" id="complemento"
-                                        v-model="mostrarComplemento">
-                                    <input type="text" v-show="mostrarComplemento" v-model="datosFormulario.complemento"
-                                        class="form-control" id="complemento" placeholder="Ingrese el complemento">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                            </div>
-                            <div v-if="tipoAccion == 2" class="alert alert-info " role="alert">
-                                Este cliente fue creado por: <strong>{{ usuarioSeleccionado }}</strong>.
-                            </div>
-                            <div class="form-group row" v-if="activaredit == true && rolUsuario == 1">
-                                <label for="user" class="font-weight-bold">Usuario <span
-                                        class="text-danger">*</span></label>
-                                <div class="col-md-9">
-                                    <v-select :on-search="selectUsuario" label="nombre" :options="arrayUsuarioV"
-                                        placeholder="Buscar Usuario..." :onChange="getDatosUsuario"
-                                        v-model="usuarioSeleccionado">
-                                    </v-select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
-                            <button type="submit" v-if="tipoAccion == 1" class="btn btn-success">Guardar</button>
-                            <button type="submit" v-if="tipoAccion == 2" class="btn btn-success">Actualizar</button>
-                        </div>
-                    </form>
+                    <div v-if="rolUsuario == 1" class="p-col-12 p-md-6">
+                        <label class="p-mb-2"><strong>Buscar Cliente por Usuario</strong></label>
+                        <AutoComplete v-model="usuarioSeleccionadodos" :suggestions="arrayUsuarioFiltro" @complete="selectUsuarioFiltro" field="nombre" @item-select="getDatosUsuarioFiltro" placeholder="Buscar Usuario..." />
+                    </div>
                 </div>
-                <!-- /.modal-content -->
-            </div>
-            <!-- /.modal-dialog -->
-        </div>
-        <!--Fin del modal-->
-        <div v-if="modalImportar">
+
+                <DataTable :value="arrayPersona" class="p-datatable-gridlines p-datatable-sm" :paginator="true" :rows="10" :rowsPerPageOptions="[5,10,20]" responsiveLayout="scroll">
+                    <Column v-if="rolUsuario == 1" header="Acciones">
+                        <template #body="slotProps">
+                            <Button icon="pi pi-pencil" class="p-button-warning p-button-sm" @click="abrirModal('persona', 'actualizar', slotProps.data)" />
+                        </template>
+                    </Column>
+                    <Column field="nombre" header="Nombres"></Column>
+                    <Column field="tipo_documento" header="Tipo Documento">
+                        <template #body="slotProps">
+                            {{ getTipoDocumentoText(slotProps.data.tipo_documento) }}
+                        </template>
+                    </Column>
+                    <Column field="num_documento" header="Número de documento"></Column>
+                </DataTable>
+
+                <Paginator :rows="10" :totalRecords="pagination.total" :first="pagination.current_page - 1" @page="onPageChange($event)"></Paginator>
+            </template>
+        </Card>
+
+        <!-- Modal para agregar/actualizar -->
+        <Dialog :visible.sync="modal" :containerStyle="{width: '50vw'}":modal="true">
+            <template #header>
+                <h3>{{ tituloModal }}</h3>
+            </template>
+
+            <form @submit.prevent="enviarFormulario">
+                <div class="p-fluid p-formgrid p-grid">
+                    <div class="p-field p-col-12">
+                        <label for="nombre">Nombre del cliente <span class="p-error">*</span></label>
+                        <InputText id="nombre" v-model="datosFormulario.nombre" :class="{'p-invalid': errores.nombre}" @input="validarCampo('nombre')" />
+                        <small class="p-error" v-if="errores.nombre">{{ errores.nombre }}</small>
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-6">
+                        <label for="tipo_documento">Tipo de documento <span class="p-error">*</span></label>
+                        <Dropdown id="tipo_documento" v-model="datosFormulario.tipo_documento" :options="tipoDocumentoOptions" optionLabel="label" optionValue="value" placeholder="Selecciona un tipo de documento" :class="{'p-invalid': errores.tipo_documento}" @change="validarCampo('tipo_documento')" />
+                        <small class="p-error" v-if="errores.tipo_documento">{{ errores.tipo_documento }}</small>
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-3">
+                        <label :for="'num_documento_' + datosFormulario.tipo_documento">N° {{ getTipoDocumentoLabel() }} <span class="p-error">*</span></label>
+                        <InputText :id="'num_documento_' + datosFormulario.tipo_documento" v-model="datosFormulario.num_documento" :class="{'p-invalid': errores.num_documento}" @input="validarCampo('num_documento')" />
+                        <small class="p-error" v-if="errores.num_documento">{{ errores.num_documento }}</small>
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-3">
+                        <label for="complemento">Complemento</label>
+                        <div class="p-inputgroup">
+                            <InputText id="complemento" v-model="datosFormulario.complemento" :disabled="!mostrarComplemento" />
+                            <Button icon="pi pi-check" @click="mostrarComplemento = !mostrarComplemento" />
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="tipoAccion == 2" class="p-mb-3">
+                    <Message severity="info">Este cliente fue creado por: <strong>{{ usuarioSeleccionado }}</strong>.</Message>
+                </div>
+
+                <div v-if="activaredit && rolUsuario == 1" class="p-field">
+                    <label for="user">Usuario <span class="p-error">*</span></label>
+                    <AutoComplete id="user" v-model="usuarioSeleccionado" :suggestions="arrayUsuarioV" @complete="selectUsuario" field="nombre" @item-select="getDatosUsuario" placeholder="Buscar Usuario..." />
+                </div>
+            </form>
+
+            <template #footer>
+                <Button label="Cerrar" icon="pi pi-times" class="p-button-text p-button-danger" @click="cerrarModal" />
+                <Button v-if="tipoAccion == 1" label="Guardar" icon="pi pi-check" class="p-button-text p-button-success" @click="enviarFormulario" />
+                <Button v-if="tipoAccion == 2" label="Actualizar" icon="pi pi-check" class="p-button-text p-button-success" @click="enviarFormulario" />
+            </template>
+        </Dialog>
+
+        <Dialog v-if="modalImportar" :visible.sync="modalImportar" :modal="true">
             <ImportarExcelCliente @cerrar="cerrarModalImportar"></ImportarExcelCliente>
-        </div>
+        </Dialog>
     </main>
 </template>
 
 <script>
-import vSelect from 'vue-select';
+import Card from 'primevue/card';
+import Button from 'primevue/button';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import InputText from 'primevue/inputtext';
+import Dropdown from 'primevue/dropdown';
+import AutoComplete from 'primevue/autocomplete';
+import Dialog from 'primevue/dialog';
+import Paginator from 'primevue/paginator';
+import Message from 'primevue/message';
 import { esquemaCliente } from '../constants/validations';
+
 export default {
+    components: {
+        Card,
+        Button,
+        DataTable,
+        Column,
+        InputText,
+        Dropdown,
+        AutoComplete,
+        Dialog,
+        Paginator,
+        Message
+    },
     data() {
         return {
+            tipoDocumentoOptions: [
+                {label: 'CI - CEDULA DE IDENTIDAD', value: '1'},
+                {label: 'CEX - CEDULA DE IDENTIDAD DE EXTRANJERO', value: '2'},
+                {label: 'NIT - NÚMERO DE IDENTIFICACIÓN TRIBUTARIA', value: '5'},
+                {label: 'PAS - PASAPORTE', value: '3'},
+                {label: 'OD - OTRO DOCUMENTO DE IDENTIDAD', value: '4'}
+            ],
+            criterioOptions: [
+                {label: 'Nombre', value: 'nombre'},
+                {label: 'Documento', value: 'num_documento'},
+                {label: 'Email', value: 'email'},
+                {label: 'Teléfono', value: 'telefono'}
+            ],
             datosFormulario: {
                 nombre: '',
                 tipo_documento: '',
@@ -201,7 +152,6 @@ export default {
                 complemento: '',
             },
             errores: {},
-
             rolUsuario: '',
             arrayUsuarioV: [],
             usuarioSeleccionado: '',
@@ -213,10 +163,9 @@ export default {
             usuariodos_id: '',
             role_id: '',
             mostrarComplemento: false,
-            modalImportar: 0,
-
+            modalImportar: false,
             arrayPersona: [],
-            modal: 0,
+            modal: false,
             tituloModal: '',
             tipoAccion: 0,
             errorPersona: 0,
@@ -229,42 +178,23 @@ export default {
                 'from': 0,
                 'to': 0,
             },
-            offset: 3,
             criterio: 'nombre',
             buscar: ''
         }
     },
-    components: {
-        vSelect
-    },
-    computed: {
-        isActived: function () {
-            return this.pagination.current_page;
-        },
-        pagesNumber: function () {
-            if (!this.pagination.to) {
-                return [];
-            }
-
-            let from = this.pagination.current_page - this.offset;
-            if (from < 1) {
-                from = 1;
-            }
-
-            let to = from + (this.offset * 2);
-            if (to >= this.pagination.last_page) {
-                to = this.pagination.last_page;
-            }
-            let pagesArray = [];
-            while (from <= to) {
-                pagesArray.push(from);
-                from++;
-            }
-            return pagesArray;
-
-        }
-    },
     methods: {
+        getTipoDocumentoLabel() {
+            switch(this.datosFormulario.tipo_documento) {
+                case '1': return 'CI';
+                case '2': return 'CEX';
+                case '3': return 'Pasaporte';
+                case '5': return 'NIT';
+                default: return 'Documento';
+            }
+        },
+        onPageChange(event) {
+            this.cambiarPagina(event.page + 1, this.buscar, this.criterio);
+        },
         async validarCampo(campo) {
             try {
                 await esquemaCliente.validateAt(campo, this.datosFormulario);
@@ -274,168 +204,115 @@ export default {
             }
         },
         async enviarFormulario() {
-
-            await esquemaCliente.validate(this.datosFormulario, { abortEarly: false })
-                .then(() => {
-                    if (this.tipoAccion == 1) {
-                        this.registrarPersona(this.datosFormulario);
-                    } else {
-                        this.datosFormulario.usuariodos_id = this.idusuario
-                        this.actualizarPersona(this.datosFormulario);
-                    }
-                    this.mostrarComplemento = false;
-                })
-                .catch((error) => {
-                    const erroresValidacion = {};
-                    error.inner.forEach((e) => {
-                        erroresValidacion[e.path] = e.message;
-                    });
-
-                    this.errores = erroresValidacion;
+            try {
+                await esquemaCliente.validate(this.datosFormulario, { abortEarly: false });
+                if (this.tipoAccion == 1) {
+                    this.registrarPersona(this.datosFormulario);
+                } else {
+                    this.datosFormulario.usuariodos_id = this.idusuario;
+                    this.actualizarPersona(this.datosFormulario);
+                }
+                this.mostrarComplemento = false;
+            } catch (error) {
+                const erroresValidacion = {};
+                error.inner.forEach((e) => {
+                    erroresValidacion[e.path] = e.message;
                 });
+                this.errores = erroresValidacion;
+            }
         },
-
         listarPersona(page, buscar, criterio) {
-            let me = this;
-            let url = '/cliente?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio + '&usuarioid=' + me.usuariodos_id;
-            axios.get(url).then(function (response) {
+            let url = `/cliente?page=${page}&buscar=${buscar}&criterio=${criterio}&usuarioid=${this.usuariodos_id}`;
+            axios.get(url).then(response => {
                 let respuesta = response.data;
-                me.arrayPersona = respuesta.usuarios.data;
-                me.pagination = respuesta.pagination;
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
+                this.arrayPersona = respuesta.usuarios.data;
+                this.pagination = respuesta.pagination;
+            }).catch(error => {
+                console.log(error);
+            });
         },
-        //---selecionar busqueda---
-        selectUsuarioFiltro(search, loading) {
-            let me = this;
-            loading(true)
-            let url = '/cliente/usuario/filtro?filtro=' + search;
-            axios.get(url).then(function (response) {
-                let respuesta = response.data;
-                q: search
-                me.arrayUsuarioFiltro = respuesta.usuariodos;
-                loading(false)
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
+        selectUsuarioFiltro(event) {
+            let url = '/cliente/usuario/filtro?filtro=' + event.query;
+            axios.get(url).then(response => {
+                this.arrayUsuarioFiltro = response.data.usuariodos;
+            }).catch(error => {
+                console.log(error);
+            });
         },
-        // limpiarUsuarioSeleccionado(newValue) {
-        //     console.log("Xd")
-        //     if (newValue === null) {
-        //         console.log('ENTRO##');
-        //     }
-        // },
-        getDatosUsuarioFiltro(val1) {
-            let me = this;
-            me.loading = true;
-
-            if (val1 && val1.iduse) {
-                me.usuariodos_id = val1.iduse;
-                me.usuarioSeleccionadodos = val1.nombre;
-                me.listarPersona(1, this.buscar, this.criterio);
+        getDatosUsuarioFiltro(event) {
+            if (event.value && event.value.iduse) {
+                this.usuariodos_id = event.value.iduse;
+                this.usuarioSeleccionadodos = event.value.nombre;
+                this.listarPersona(1, this.buscar, this.criterio);
             }
         },
         cambiarPagina(page, buscar, criterio) {
-            let me = this;
-            me.pagination.current_page = page;
-            me.listarPersona(page, buscar, criterio);
+            this.pagination.current_page = page;
+            this.listarPersona(page, buscar, criterio);
         },
         registrarPersona(datos) {
-            let me = this;
-
-            axios.post('/cliente/registrar', datos).then(function (response) {
-                me.cerrarModal();
-                me.listarPersona(1, '', 'nombre');
-            }).catch(function (error) {
+            axios.post('/cliente/registrar', datos).then(() => {
+                this.cerrarModal();
+                this.listarPersona(1, '', 'nombre');
+            }).catch(error => {
                 console.log(error);
             });
         },
         actualizarPersona(datos) {
-            let me = this;
-
-            axios.put('/cliente/actualizar', datos).then(function (response) {
-                me.cerrarModal();
-                me.listarPersona(1, '', 'nombre');
-            }).catch(function (error) {
+            axios.put('/cliente/actualizar', datos).then(() => {
+                this.cerrarModal();
+                this.listarPersona(1, '', 'nombre');
+            }).catch(error => {
                 console.log(error);
             });
         },
         cerrarModal() {
-            this.modal = 0;
+            this.modal = false;
             this.tituloModal = '';
             this.errorPersona = 0;
             this.activaredit = false;
             this.idusuario = '';
-
         },
         abrirModal(modelo, accion, data = []) {
-            switch (modelo) {
-                case "persona":
-                    {
-                        switch (accion) {
-                            case 'registrar':
-                                {
-                                    this.modal = 1;
-                                    this.tituloModal = 'Registrar Cliente';
-                                    this.tipoAccion = 1;
-                                    this.datosFormulario = {
-                                        nombre: '',
-                                        tipo_documento: '',
-                                        num_documento: '',
-                                        complemento: '',
-                                        direccion: '',
-                                        telefono: '',
-                                        email: ''
-                                    };
-                                    break;
-                                }
-                            case 'actualizar':
-                                {
-                                    this.modal = 1;
-                                    this.tituloModal = 'Actualizar Cliente';
-                                    this.datosFormulario = {
-                                        nombre: data['nombre'],
-                                        tipo_documento: data['tipo_documento'],
-                                        num_documento: data['num_documento'],
-                                        complemento: data['complemento_id'],
-                                        direccion: data['direccion'],
-                                        telefono: data['telefono'],
-                                        email: data['email'],
-                                        usuariodos_id: '',
-                                        id: data['id']
-                                    };
-                                    this.tipoAccion = 2;
-                                    this.activaredit = true;
-                                    this.verUsuario(data);
-                                    break;
-                                }
-                        }
-                    }
+            if (modelo === "persona") {
+                this.modal = true;
+                if (accion === 'registrar') {
+                    this.tituloModal = 'Registrar Cliente';
+                    this.tipoAccion = 1;
+                    this.datosFormulario = {
+                        nombre: '',
+                        tipo_documento: '',
+                        num_documento: '',
+                        complemento: '',
+                        direccion: '',
+                        telefono: '',
+                        email: ''
+                    };
+                } else if (accion === 'actualizar') {
+                    this.tituloModal = 'Actualizar Cliente';
+                    this.tipoAccion = 2;
+                    this.datosFormulario = { ...data, usuariodos_id: '' };
+                    this.activaredit = true;
+                    this.verUsuario(data);
+                }
             }
         },
         cargarReporteExcel() {
             window.open('/cliente/listarReporteClienteExcel', '_blank');
         },
         getTipoDocumentoText(value) {
-            switch (value) {
-                case '1':
-                    return 'CI';
-                case '2':
-                    return 'CEX';
-                case '4':
-                    return 'NIT';
-                case '3':
-                    return 'PAS';
-                default:
-                    return '';
-            }
+            const tipos = {
+                '1': 'CI',
+                '2': 'CEX',
+                '4': 'NIT',
+                '3': 'PAS'
+            };
+            return tipos[value] || '';
         },
         recuperarIdRol() {
             this.rolUsuario = window.userData.rol;
         },
+
         selectUsuario(search, loading) {
             let me = this;
             loading(true)

@@ -1,89 +1,52 @@
 <template>
     <main class="main">
         <!-- Breadcrumb -->
-
-
-        <div class="card">
-            <div>
-                <i class="fa fa-align-justify"></i> Ventas
-            </div>
+        <Panel header=" Ventas">
             <template>
-                <div class="p-d-flex p-jc-between p-ai-center card-header">
-                    <div class="p-field">
-                        <input type="search" v-model="buscar" @keyup="buscarVenta" class="p-inputtext"
-                            placeholder="Texto a buscar">
-                    </div>
-                    <div class="p-field">
-                        <Button type="button" @click="abrirTipoVenta" label="Nuevo" icon="pi pi-plus"
-                            class="p-button-sm p-button-primary" />
-                        <!-- Aumentamos el tamaño del botón con p-button-lg -->
-                    </div>
+                <div class="p-d-flex p-jc-between p-ai-center">
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-search" />
+                        <InputText v-model="buscar" @input="buscarVenta" placeholder="Texto a buscar" />
+                    </span>
+                    <Button @click="abrirTipoVenta" label="Nuevo" icon="pi pi-plus" class="p-button-primary" />
                 </div>
             </template>
             <!-- Listado-->
             <template v-if="listado == 1">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th>Opciones</th>
-                                <th>Vendedor</th>
-                                <th>Cliente</th>
-                                <th class="d-none d-md-table-cell">Documento</th>
-                                <th class="d-none d-md-table-cell">N° de Comprobante</th>
-                                <th class="d-none d-md-table-cell">Fecha y Hora</th>
-                                <th>Total</th>
-                                <th class="d-none d-md-table-cell">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="venta in arrayVenta" :key="venta.id">
-                                <template>
-                                    <td class="p-d-flex p-ai-center">
-                                        <Button type="button" icon="pi pi-eye" @click="verVenta(venta.id)"
-        class="p-button-sm p-mr-1" style="background-color: green; border-color: green; color: white;" />
-
-
-                                        <template v-if="venta.estado === 'Registrado' && idrol !== 2">
-                                            <Button type="button" icon="pi pi-trash" @click="desactivarVenta(venta.id)"
-                                                class="p-button-sm p-button-danger p-mr-1" />
-                                        </template>
-
-                                        <Button type="button" icon="pi pi-print"
-                                            @click="imprimirResivo(venta.id, venta.correo)"
-                                            class="p-button-sm p-button-primary p-mr-1" />
-                                    </td>
+                <div>
+                    <DataTable responsiveLayout="scroll" class="p-datatable-gridlines p-datatable-sm"
+                        :value="arrayVenta" :rows="10">
+                        <Column header="Opciones">
+                            <template #body="slotProps">
+                                <Button icon="pi pi-eye" @click="verVenta(slotProps.data.id)" class="p-button-sm p-mr-1"
+                                    style="background-color: green; border-color: green; color: white;" />
+                                <template v-if="slotProps.data.estado === 'Registrado' && idrol !== 2">
+                                    <Button icon="pi pi-trash" @click="desactivarVenta(slotProps.data.id)"
+                                        class="p-button-sm p-button-danger p-mr-1" />
                                 </template>
-                                <td v-text="venta.usuario"></td>
-                                <td v-text="venta.razonSocial"></td>
-                                <td class="d-none d-md-table-cell" v-text="venta.documentoid"></td>
-                                <td class="d-none d-md-table-cell" v-text="venta.num_comprobante"></td>
-                                <td class="d-none d-md-table-cell" v-text="venta.fecha_hora"></td>
-                                <td>{{ (venta.total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
-                                </td>
-                                <td class="d-none d-md-table-cell" v-text="venta.estado"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <nav>
-                    <ul class="pagination">
-                        <li class="page-item" v-if="pagination.current_page > 1">
-                            <a class="page-link" href="#"
-                                @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
-                        </li>
-                        <li class="page-item" v-for="page in pagesNumber" :key="page"
-                            :class="[page == isActived ? 'active' : '']">
-                            <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                v-text="page"></a>
-                        </li>
-                        <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                            <a class="page-link" href="#"
-                                @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
-                        </li>
-                    </ul>
-                </nav>
+                                <Button icon="pi pi-print"
+                                    @click="imprimirResivo(slotProps.data.id, slotProps.data.correo)"
+                                    class="p-button-sm p-button-primary p-mr-1" />
+                            </template>
+                        </Column>
+                        <Column field="usuario" header="Vendedor"></Column>
+                        <Column field="razonSocial" header="Cliente"></Column>
+                        <Column field="documentoid" header="Documento" class="d-none d-md-table-cell"></Column>
+                        <Column field="num_comprobante" header="N° de Comprobante" class="d-none d-md-table-cell">
+                        </Column>
+                        <Column field="fecha_hora" header="Fecha y Hora" class="d-none d-md-table-cell"></Column>
+                        <Column header="Total">
+                            <template #body="slotProps">
+                                {{ (slotProps.data.total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
+                                }}
+                            </template>
+                        </Column>
+                        <Column field="estado" header="Estado" class="d-none d-md-table-cell"></Column>
+                    </DataTable>
 
+                    <Paginator :rows="10" :totalRecords="pagination.total" :first="(pagination.current_page - 1) * 10"
+                        @page="onPageChange" />
+                </div>
             </template>
 
 
@@ -92,345 +55,242 @@
 
             <!--Ver ingreso-->
             <template v-else-if="listado == 2">
-                <div class="card shadow">
-                    <div class="card-body">
-                        <div class="form-group row border p-3">
-                            <div class="col-md-9">
-                                <div class="form-group">
-                                    <label for="">Cliente</label>
-                                    <p class="mb-0" v-text="cliente"></p>
+                <Card class="shadow">
+                    <template #content>
+                        <div class="p-grid p-fluid border p-3 mb-3">
+                            <div class="p-col-12 p-md-9">
+                                <div class="p-field">
+                                    <label>Cliente</label>
+                                    <InputText v-model="cliente" disabled />
                                 </div>
                             </div>
-
-                            <div class="col-md-3">
-                                <div class="form-group">
+                            <div class="p-col-12 p-md-3">
+                                <div class="p-field">
                                     <label>Tipo Comprobante</label>
-                                    <p class="mb-0" v-text="tipo_comprobante"></p>
+                                    <InputText v-model="tipo_comprobante" disabled />
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
+                            <div class="p-col-12 p-md-3">
+                                <div class="p-field">
                                     <label>Número Comprobante</label>
-                                    <p class="mb-0" v-text="num_comprobante"></p>
+                                    <InputText v-model="num_comprobante" disabled />
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group row border">
-                            <div class="table-responsive col-md-12">
-                                <table class="table table-bordered table-striped table-sm">
-                                    <thead class="thead-dark">
-                                        <tr>
-                                            <th>Artículo</th>
-                                            <th>Precio</th>
-                                            <th>Cantidad</th>
-                                            <th>Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody v-if="arrayDetalle.length">
-                                        <tr v-for="detalle in arrayDetalle" :key="detalle.id">
-                                            <td v-text="detalle.articulo"></td>
-                                            <td>
-                                                {{
-                                                    (detalle.precio * parseFloat(monedaVenta[0])).toFixed(2)
-                                                }}
-                                                {{ monedaVenta[1] }}
-                                            </td>
-                                            <td v-text="detalle.cantidad"></td>
-                                            <td>
-                                                {{
-                                                    (
-                                                        (detalle.precio * detalle.cantidad) *
-                                                        parseFloat(monedaVenta[0])
-                                                    ).toFixed(2)
-                                                }}
-                                                {{ monedaVenta[1] }}
-                                            </td>
-                                        </tr>
-                                        <tr class="bg-light font-weight-bold">
-                                            <td colspan="3" class="text-right">Total Neto:</td>
-                                            <td>
-                                                {{ (total * parseFloat(monedaVenta[0])).toFixed(2) }}
-                                                {{ monedaVenta[1] }}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+
+                        <DataTable :value="arrayDetalle" class="mb-3">
+                            <Column field="articulo" header="Artículo"></Column>
+                            <Column header="Precio">
+                                <template #body="slotProps">
+                                    {{ (slotProps.data.precio * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                        monedaVenta[1] }}
+                                </template>
+                            </Column>
+                            <Column field="cantidad" header="Cantidad"></Column>
+                            <Column header="Subtotal">
+                                <template #body="slotProps">
+                                    {{ ((slotProps.data.precio * slotProps.data.cantidad) *
+                                        parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                                </template>
+                            </Column>
+                        </DataTable>
+
+                        <div class="p-text-right p-mb-3">
+                            <strong>Total Neto: {{ (total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
+                                }}</strong>
                         </div>
-                        <div class="form-group row">
-                            <div class="col-md-12 text-right">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">
-                                    Cerrar
-                                </button>
-                            </div>
+
+                        <div class="p-text-right">
+                            <Button label="Cerrar" @click="ocultarDetalle()" class="p-button-secondary" />
                         </div>
-                    </div>
-                </div>
+                    </template>
+                </Card>
             </template>
-            <!--Fin ver ingreso-->
-            <!-- Vista Devoluciones -->
-            <template v-else-if="listado == 3">
-                <div>
-                    <devoluciones></devoluciones>
-                    <div class="form-group row">
-                        <div class="col-md-12">
-                            <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">
-                                Cerrar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </template>
-        </div>
+
+        </panel>
         <!-- HASTA AQUI DEVOLUCIONES -->
         <template>
-            <div class="modal" tabindex="-1" :class="{ 'mostrar': modal2 }" role="dialog" aria-labelledby="myModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Detalle Ventas</h5>
-                            <button type="button" class="close" @click="cerrarModal2()" aria-label="Cerrar">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+            <Dialog :visible.sync="modal2" :containerStyle="{ width: '60vw' }" :modal="true" :closable="false"
+                :closeOnEscape="false">
+                <template #header>
+                    <h5 class="modal-title">Detalle Ventas</h5>
+                </template>
+
+                <div class="p-fluid">
+                    <div class="p-field">
+                        <div class="step-indicators">
+                            <span :class="['step', { 'active': step === 1, 'completed': step > 1 }]">1</span>
+                            <span :class="['step', { 'active': step === 2, 'completed': step > 2 }]">2</span>
+                            <span :class="['step', { 'active': step === 3 }]">3</span>
                         </div>
-                        <div class="modal-body">
-                            <div class="linear-stepper">
-                                <div class="step-container">
-                                    <div class="step" :class="{ active: step === 1, completed: step > 1 }">
-                                        <span class="step-number" v-if="step > 1">✔</span>
-                                        <span class="step-number" v-else>1</span>
-                                        <span class="step-name">Cliente</span>
-                                    </div>
-                                    <div class="step-line" v-if="step >= 2"></div>
-                                </div>
-                                <div class="step-container">
-                                    <div class="step" :class="{ active: step === 2, completed: step > 2 }">
-                                        <span class="step-number" v-if="step > 2">✔</span>
-                                        <span class="step-number" v-else>2</span>
-                                        <span class="step-name">Producto</span>
-                                    </div>
-                                    <div class="step-line" v-if="step >= 3"></div>
-                                </div>
-                                <div class="step-container">
-                                    <div class="step" :class="{ active: step === 3, completed: step > 3 }">
-                                        <span class="step-number" v-if="step > 3">✔</span>
-                                        <span class="step-number" v-else>3</span>
-                                        <span class="step-name">Pagos</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div v-show="step === 1" class="step-content">
-                                <!-- Cliente Selection -->
+                    </div>
 
-                                <div class="form-group row border">
-                                    <!-- Cliente Selection -->
-                                    <div class="col-md-4">
-                                        <label class="font-weight-bold">Documento <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" id="documento" class="form-control" v-model="documento"
-                                            @keyup.enter="buscarClientePorDocumento" placeholder="000000" />
-                                    </div>
-
-                                    <!-- Nombre Input -->
-                                    <div class="col-md-4">
-                                        <label class="font-weight-bold">Cliente <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" id="nombreCliente" class="form-control"
-                                            v-model="nombreCliente" :readonly="!nombreClienteEditable"
-                                            placeholder="SIN NOMBRE" />
-                                    </div>
-
-                                    <!-- Hidden Inputs -->
-                                    <input type="hidden" id="idcliente" class="form-control" v-model="idcliente"
-                                        ref="idRef" readonly />
-                                    <input type="hidden" id="tipo_documento" class="form-control"
-                                        v-model="tipo_documento" ref="tipoDocumentoRef" readonly />
-                                    <input type="hidden" id="complemento_id" class="form-control"
-                                        v-model="complemento_id" ref="complementoIdRef" readonly />
-                                    <input type="hidden" id="usuarioAutenticado" class="form-control"
-                                        v-model="usuarioAutenticado" readonly />
-                                    <input type="hidden" id="puntoVentaAutenticado" class="form-control"
-                                        v-model="puntoVentaAutenticado" readonly />
-                                    <input type="hidden" id="email" class="form-control" v-model="email" readonly />
-
-                                    <!-- Tipo de Comprobante Selection -->
-                                    <div class="col-md-4">
-                                        <label class="font-weight-bold">Tipo de comprobante <span
-                                                class="text-danger">*</span></label>
-                                        <select class="form-control" v-model="tipo_comprobante"
-                                            ref="tipoComprobanteRef">
-
-                                            <option value="RESIVO">RECIBO</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Numero de Comprobante Input -->
-                                    <input type="hidden" id="num_comprobante" class="form-control" v-model="num_comprob"
-                                        disabled />
-                                </div>
-
+                    <div v-if="step === 1" class="step-content p-fluid">
+                        <div class="p-grid p-formgrid p-mb-3">
+                            <div class="p-col-12 p-md-4">
+                                <span class="p-float-label">
+                                    <InputText id="documento" v-model="documento"
+                                        @keyup.enter="buscarClientePorDocumento" />
+                                    <label for="documento">Documento <span class="p-error">*</span></label>
+                                </span>
                             </div>
 
-                            <div v-show="step === 2" class="step-content">
+                            <div class="p-col-12 p-md-4">
+                                <span class="p-float-label">
+                                    <InputText id="nombreCliente" v-model="nombreCliente"
+                                        :disabled="!nombreClienteEditable" />
+                                    <label for="nombreCliente">Cliente <span class="p-error">*</span></label>
+                                </span>
+                            </div>
 
-                                <!-- Producto Selection -->
-                                <div class="p-fluid p-grid">
-                                    <div class="p-col-12 p-md-6">
-                                        <label class="font-weight-bold">Almacen <span
-                                                class="text-danger">*</span></label>
-                                        <Dropdown :options="arrayAlmacenes" optionLabel="nombre_almacen"
-                                            optionValue="id" placeholder="Seleccione un almacén"
-                                            v-model="selectedAlmacen" @change="getAlmacenProductos" />
-                                    </div>
+                            <div class="p-col-12 p-md-4">
+                                <span class="p-float-label">
+                                    <Dropdown id="tipoComprobante" v-model="tipo_comprobante"
+                                        :options="tipoComprobanteOptions" optionLabel="name" optionValue="code" />
+                                    <label for="tipoComprobante">Tipo de comprobante <span
+                                            class="p-error">*</span></label>
+                                </span>
+                            </div>
+                        </div>
 
-                                    <div class="p-col-12 p-md-6">
-                                        <label class="font-weight-bold">Buscar articulo</label>
-                                        <div class="p-inputgroup">
-                                            <InputText :disabled="!selectedAlmacen" v-model="codigo"
-                                                placeholder="Codigo del articulo" @keyup="buscarArticulo()" />
-                                            <Button :disabled="!selectedAlmacen" label="..." @click="abrirModal" />
-                                        </div>
-                                    </div>
+                        <InputText v-model="idcliente" type="hidden" />
+                        <InputText v-model="tipo_documento" type="hidden" />
+                        <InputText v-model="complemento_id" type="hidden" />
+                        <InputText v-model="usuarioAutenticado" type="hidden" />
+                        <InputText v-model="puntoVentaAutenticado" type="hidden" />
+                        <InputText v-model="email" type="hidden" />
+                        <InputText v-model="num_comprob" type="hidden" disabled />
+                    </div>
+
+                    <div v-if="step === 2" class="step-content">
+                        <div class="p-fluid p-grid">
+                            <div class="p-col-12 p-md-6">
+                                <label class="p-d-block">Almacen <span class="p-error">*</span></label>
+                                <Dropdown v-model="selectedAlmacen" :options="arrayAlmacenes"
+                                    optionLabel="nombre_almacen" optionValue="id" placeholder="Seleccione un almacén"
+                                    @change="getAlmacenProductos" />
+                            </div>
+
+                            <div class="p-col-12 p-md-6">
+                                <label class="p-d-block">Buscar articulo</label>
+                                <div class="p-inputgroup">
+                                    <InputText v-model="codigo" placeholder="Codigo del articulo"
+                                        :disabled="!selectedAlmacen" @keyup="buscarArticulo()" />
+                                    <Button icon="pi pi-search" :disabled="!selectedAlmacen" @click="abrirModal" />
                                 </div>
+                            </div>
+                        </div>
 
-                                <template v-if="arraySeleccionado && arraySeleccionado.id">
-                                    <div class="col-md-12">
-                                        <div class="card">
-                                            <div class="card-body d-flex flex-wrap">
-                                                <!-- Left side -->
-                                                <div class="flex-shrink-0" style="flex-basis: 200px;">
-                                                    <h3 style="margin:0px">{{ arraySeleccionado.nombre }}</h3>
-                                                    <span class="badge bg-primary">Medida: {{ arraySeleccionado.medida
-                                                        }}</span>
-                                                    <span class="badge bg-primary">Línea: {{
-                                                        arraySeleccionado.nombre_categoria }}</span>
-                                                    <img v-if="arraySeleccionado.fotografia"
-                                                        :src="'img/articulo/' + arraySeleccionado.fotografia + '?t=' + new Date().getTime()"
-                                                        width="150" height="150" ref="imagen" class="card-img my-3" />
-                                                    <img v-else src="img/productoSinImagen.png" alt="Imagen del Card"
-                                                        width="150" height="150" class="card-img my-3" />
-                                                    <div class="alert" :class="{
-                                                        'alert-success': calcularStockDisponible > 0,
-                                                        'alert-warning': calcularStockDisponible <= 0
-                                                    }" role="alert">
-                                                        <p style="margin:0px">Stock disponible</p>
-                                                        <b>{{ calcularStockDisponible }} Unidades</b>
+                        <div v-if="arraySeleccionado && arraySeleccionado.id" class="p-grid">
+                            <div class="p-col-12">
+                                <Card>
+                                    <template #content>
+                                        <div class="p-grid">
+                                            <div class="p-col-12 p-md-4">
+                                                <h3>{{ arraySeleccionado.nombre }}</h3>
+                                                <Tag :value="'Medida: ' + arraySeleccionado.medida" class="p-mr-2" />
+                                                <Tag :value="'Línea: ' + arraySeleccionado.nombre_categoria" />
+                                                <img v-if="arraySeleccionado.fotografia"
+                                                    :src="'img/articulo/' + arraySeleccionado.fotografia + '?t=' + new Date().getTime()"
+                                                    width="150" height="150" class="p-mt-3" />
+                                                <img v-else src="img/productoSinImagen.png" alt="Imagen del Card"
+                                                    width="150" height="150" class="p-mt-3" />
+                                                <Message :severity="calcularStockDisponible > 0 ? 'success' : 'warn'"
+                                                    class="p-mt-3">
+                                                    <p>Stock disponible</p>
+                                                    <b>{{ calcularStockDisponible }} Unidades</b>
+                                                </Message>
+                                            </div>
+                                            <div class="p-col-12 p-md-8">
+                                                <div class="p-field">
+                                                    <label>Tipo de venta <span class="p-error">*</span></label>
+                                                    <Dropdown v-model="unidadPaquete" :options="[
+                                                        { label: 'Por paquete', value: arraySeleccionado.unidad_envase },
+                                                        { label: 'Por unidad', value: '1' }
+                                                    ]" optionLabel="label" optionValue="value" />
+                                                </div>
+                                                <div class="p-field">
+                                                    <label>Cantidad <span class="p-error">*</span></label>
+                                                    <div class="p-inputgroup">
+                                                        <Button icon="pi pi-minus"
+                                                            @click="cantidad = Math.max(1, cantidad - 1)" />
+                                                        <InputNumber v-model="cantidad" :min="1" />
+                                                        <Button icon="pi pi-plus" @click="cantidad++" />
                                                     </div>
                                                 </div>
-                                                <!-- Right side -->
-                                                <div class="flex-grow-1 ms-3" style="flex-basis: 300px;">
-                                                    <div class="form-group">
-                                                        <label class="font-weight-bold">Tipo de venta <span
-                                                                class="text-danger">*</span></label>
-                                                        <select class="form-select" v-model="unidadPaquete"
-                                                            aria-label="Default select example">
-                                                            <option :value="arraySeleccionado.unidad_envase">Por paquete
-                                                            </option>
-                                                            <option value="1">Por unidad</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="form-group mt-3">
-                                                        <label class="font-weight-bold">Cantidad <span
-                                                                class="text-danger">*</span></label>
-                                                        <div class="input-group">
-                                                            <button class="btn btn-outline-secondary" type="button"
-                                                                @click="cantidad = Math.max(1, cantidad - 1)">-</button>
-                                                            <input type="number" id="cantidad" min="1"
-                                                                class="form-control text-center" v-model="cantidad" />
-                                                            <button class="btn btn-outline-secondary" type="button"
-                                                                @click="cantidad++">+</button>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group mt-3">
-                                                        <h3 v-if="arrayPromocion && arrayPromocion.id"
-                                                            style="display:flex;align-items:center;margin:0px;">
-                                                            <b v-if="arrayPromocion.porcentaje == 100">GRATIS</b>
-                                                            <b v-else>{{
-                                                                (calcularPrecioConDescuento(resultadoMultiplicacion,
-                                                                    arrayPromocion.porcentaje) *
-                                                                    parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                                    monedaVenta[1] }}</b>
-                                                            <s style="font-size:15px" class="lead">{{
-                                                                calcularPrecioConDescuento(resultadoMultiplicacion *
-                                                                    parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                                    monedaVenta[1] }}</s>
-                                                        </h3>
-                                                        <h3 v-else style="display:flex;align-items:center;margin:0px;">
-                                                            <b>{{ calcularPrecioConDescuento(resultadoMultiplicacion *
-                                                                parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                                    monedaVenta[1] }}</b>
-                                                        </h3>
-                                                    </div>
-                                                    <div class="form-group d-flex mt-3">
-                                                        <button @click="agregarDetalle()"
-                                                            class="btn btn-success flex-fill me-2">
-                                                            <i class="icon-plus"></i> Agregar
-                                                        </button>
-                                                        <button @click="eliminarSeleccionado()"
-                                                            class="btn btn-danger flex-fill">
-                                                            <i class="icon-minus"></i> Eliminar
-                                                        </button>
-                                                    </div>
+                                                <div class="p-field">
+                                                    <h3 v-if="arrayPromocion && arrayPromocion.id">
+                                                        <span v-if="arrayPromocion.porcentaje == 100">GRATIS</span>
+                                                        <span v-else>
+                                                            {{ (calcularPrecioConDescuento(resultadoMultiplicacion,
+                                                                arrayPromocion.porcentaje) *
+                                                                parseFloat(monedaVenta[0])).toFixed(2) }}
+                                                            {{ monedaVenta[1] }}
+                                                        </span>
+                                                        <small class="p-ml-2">
+                                                            <s>{{ calcularPrecioConDescuento(resultadoMultiplicacion *
+                                                                parseFloat(monedaVenta[0])).toFixed(2) }}
+                                                                {{ monedaVenta[1] }}
+                                                            </s>
+                                                        </small>
+                                                    </h3>
+                                                    <h3 v-else>
+                                                        {{ calcularPrecioConDescuento(resultadoMultiplicacion *
+                                                            parseFloat(monedaVenta[0])).toFixed(2) }}
+                                                        {{ monedaVenta[1] }}
+                                                    </h3>
+                                                </div>
+                                                <div class="p-field">
+                                                    <Button label="Agregar" icon="pi pi-plus" @click="agregarDetalle"
+                                                        class="p-mr-2" />
+                                                    <Button label="Eliminar" icon="pi pi-trash"
+                                                        @click="eliminarSeleccionado" class="p-button-danger" />
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </template>
-
-                                <div class="p-grid p-m-3">
-                                    <div class="p-col-12">
-                                        <DataTable :value="arrayDetalle" class="p-datatable-sm p-datatable-gridlines">
-                                            <Column field="opciones" header="Opciones" style="width: 10%">
-                                                <template v-slot:body="slotProps">
-                                                    <button v-if="slotProps.data.medida != 'KIT'"
-                                                        @click="eliminarDetalle(slotProps.data.id)" type="button"
-                                                        class="btn btn-danger btn-sm">
-                                                        <i class="icon-close"></i>
-                                                    </button>
-                                                    <button v-else @click="eliminarKit(slotProps.data.idkit)"
-                                                        type="button" class="btn btn-danger btn-sm">
-                                                        <i class="icon-close"></i>
-                                                    </button>
-                                                </template>
-                                            </Column>
-                                            <Column field="articulo" header="Artículo" style="width: 30%" />
-                                            <Column field="precioUnidad" header="Precio Unidad" style="width: 15%">
-                                                <template v-slot:body="slotProps">
-                                                    {{ (slotProps.data.precioseleccionado *
-                                                        parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
-                                                </template>
-                                            </Column>
-                                            <Column field="unidades" header="Unidades" style="width: 15%">
-  <template v-slot:body="slotProps">
-    <input type="number" 
-           v-model="slotProps.data.cantidad" 
-           min="1"
-           @input="actualizarDetalle(slotProps.data.id)"
-           class="form-control text-center"
-           style="border: none; outline: none; width: 60px;" />
-  </template>
-</Column>
-                                            <Column field="total" header="Total" style="width: 20%">
-                                                <template v-slot:body="slotProps">
-                                                    {{ (slotProps.data.precioseleccionado * slotProps.data.cantidad *
-                                                        parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
-                                                </template>
-                                            </Column>
-                                        </DataTable>
-                                    </div>
-                                </div>
-
-                                <div class="p-grid">
-                                    <div class="p-col-12 p-md-8"></div>
-                                    <div class="p-col-12 p-md-4" style="text-align: right;">
-                                        <h3>Total Neto: {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                            monedaVenta[1] }}</h3>
-                                    </div>
-                                </div>
+                                    </template>
+                                </Card>
                             </div>
+                        </div>
 
-                            <div v-show="step === 3" class="step-content">
+                        <DataTable :value="arrayDetalle" class="p-mt-3">
+                            <Column header="Opciones" style="width: 10%">
+                                <template #body="slotProps">
+                                    <Button icon="pi pi-trash" class="p-button-danger p-button-sm"
+                                        @click="slotProps.data.medida != 'KIT' ? eliminarDetalle(slotProps.data.id) : eliminarKit(slotProps.data.idkit)" />
+                                </template>
+                            </Column>
+                            <Column field="articulo" header="Artículo" style="width: 30%" />
+                            <Column field="precioUnidad" header="Precio Unidad" style="width: 15%">
+                                <template #body="slotProps">
+                                    {{ (slotProps.data.precioseleccionado * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                        monedaVenta[1] }}
+                                </template>
+                            </Column>
+                            <Column field="unidades" header="Unidades" style="width: 15%">
+                                <template #body="slotProps">
+                                    <InputNumber v-model="slotProps.data.cantidad" :min="1"
+                                        @input="actualizarDetalle(slotProps.data.id)" />
+                                </template>
+                            </Column>
+                            <Column field="total" header="Total" style="width: 20%">
+                                <template #body="slotProps">
+                                    {{ (slotProps.data.precioseleccionado * slotProps.data.cantidad *
+                                        parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                                </template>
+                            </Column>
+                        </DataTable>
+
+                        <div class="p-grid p-mt-3">
+                            <div class="p-col-12 p-md-8"></div>
+                            <div class="p-col-12 p-md-4" style="text-align: right;">
+                                <h3>Total Neto: {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                    monedaVenta[1] }}</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-show="step === 3" class="step-content">
                                 <div class="d-flex justify-content-center mb-3">
                                     <div class="form-group">
                                         <div class="d-flex">
@@ -692,140 +552,128 @@
                                     :disabled="step === 3">Siguiente</button>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="modal " tabindex="-1" :class="{ mostrar: modal }" role="dialog"
-                    aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
-                    <div class="modal-dialog modal-primary modal-lg" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" v-text="tituloModal"></h4>
-                                <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <div>
-                                    <b-tabs content-class="mt-3">
-                                        <b-tab title="Articulos" active>
-                                            <template>
-                                                <div class="form-group row">
-                                                    <div class="col-md-6">
-                                                        <div class="input-group">
-                                                            <select class="form-control col-md-3" v-model="criterioA">
-                                                                <option value="nombre">Nombre</option>
-                                                                <option value="descripcion">Descripción</option>
-                                                                <option value="codigo">Código</option>
-                                                            </select>
-                                                            <input type="text" v-model="buscarA"
-                                                                @keyup="listarArticulo(buscarA, criterioA)"
-                                                                class="form-control" placeholder="Texto a buscar" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="table-responsive">
-                                                    <table class="table table-bordered table-striped table-sm">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Opciones</th>
-                                                                <th>Código</th>
-                                                                <th>Nombre</th>
-                                                                <th>Categoría</th>
-                                                                <th>Precio Venta</th>
-                                                                <th>Stock</th>
-                                                                <th>Estado</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr v-for="articulo in arrayArticulo" :key="articulo.id">
-                                                                <td>
-                                                                    <button type="button"
-                                                                        @click="agregarDetalleModal(articulo)"
-                                                                        class="btn btn-success btn-sm">
-                                                                        <i class="icon-check"></i>
-                                                                    </button>
-                                                                </td>
-                                                                <td v-text="articulo.codigo"></td>
-                                                                <td v-text="articulo.nombre"></td>
-                                                                <td v-text="articulo.nombre_categoria"></td>
-                                                                <td>
-                                                                    {{
-                                                                        (
-                                                                            articulo.precio_venta *
-                                                                            parseFloat(monedaVenta[0])
-                                                                        ).toFixed(2)
-                                                                    }}
-                                                                    {{ monedaVenta[1] }}
-                                                                </td>
-                                                                <td v-text="articulo.saldo_stock"></td>
-                                                                <td>
-                                                                    <div v-if="articulo.condicion">
-                                                                        <span class="badge badge-success">Activo</span>
-                                                                    </div>
-                                                                    <div v-else>
-                                                                        <span
-                                                                            class="badge badge-danger">Desactivado</span>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </template>
-                                        </b-tab>
+                    
+               
+              
+        
+             </Dialog>
+            
+        </template>
+        
+        <template>
+            <Dialog :visible="modal" :containerStyle="{ width: '800px' }" style="padding-top: 35px;" :modal="true"
+                :closable="false">
+                <template #header>
+                    <h3>{{ tituloModal }}</h3>
+                </template>
 
-
-
-                                    </b-tabs>
+                <TabView>
+                    <TabPanel header="Articulos">
+                        <div class="p-grid">
+                            <div class="p-col-6">
+                                <div class="p-inputgroup">
+                                    <Dropdown v-model="criterioA" :options="criterioOptions" optionLabel="label"
+                                        optionValue="value" class="p-col-4" />
+                                    <InputText v-model="buscarA" placeholder="Texto a buscar"
+                                        @input="listarArticulo(buscarA, criterioA)" class="p-col-8" />
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" @click="cerrarModal()">
-                                    Cerrar
-                                </button>
-                                <button type="button" v-if="tipoAccion == 1" class="btn btn-primary"
-                                    @click="registrarPersona()">
-                                    Guardar
-                                </button>
-                                <button type="button" v-if="tipoAccion == 2" class="btn btn-primary"
-                                    @click="actualizarPersona()">
-                                    Actualizar
-                                </button>
-                            </div>
                         </div>
-                        <!-- /.modal-content -->
-                    </div>
-                    <!-- /.modal-dialog -->
-                </div>
-            </div>
+
+                        <DataTable :value="arrayArticulo" :paginator="true" :rows="10" class="p-mt-2">
+                            <Column header="Opciones">
+                                <template #body="slotProps">
+                                    <Button icon="pi pi-check" class="p-button-success p-button-sm"
+                                        @click="agregarDetalleModal(slotProps.data)" />
+                                </template>
+                            </Column>
+                            <Column field="codigo" header="Código" />
+                            <Column field="nombre" header="Nombre" />
+                            <Column field="nombre_categoria" header="Categoría" />
+                            <Column header="Precio Venta">
+                                <template #body="slotProps">
+                                    {{ (slotProps.data.precio_venta * parseFloat(monedaVenta[0])).toFixed(2) }} {{
+                                        monedaVenta[1] }}
+                                </template>
+                            </Column>
+                            <Column field="saldo_stock" header="Stock" />
+                            <Column header="Estado">
+                                <template #body="slotProps">
+                                    <Tag :severity="slotProps.data.condicion ? 'success' : 'danger'"
+                                        :value="slotProps.data.condicion ? 'Activo' : 'Desactivado'" />
+                                </template>
+                            </Column>
+                        </DataTable>
+                    </TabPanel>
+                </TabView>
+
+                <template #footer>
+                    <Button label="Cerrar" icon="pi pi-times" @click="cerrarModal" class="p-button-secondary" />
+                    <Button v-if="tipoAccion === 1" label="Guardar" icon="pi pi-check" @click="registrarPersona" />
+                    <Button v-if="tipoAccion === 2" label="Actualizar" icon="pi pi-check" @click="actualizarPersona" />
+                </template>
+            </Dialog>
         </template>
-        <!--##################---HASTA AQUI---####################-->
     </main>
 </template>
 
 <script>
-import Button from 'primevue/button';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
 import Dropdown from 'primevue/dropdown';
-import InputNumber from 'primevue/inputnumber';
-import InputText from 'primevue/inputtext';
 import Swal from 'sweetalert2';
-import vSelect from "vue-select";
-import { TileSpinner } from "vue-spinners";
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Paginator from 'primevue/paginator';
+import Card from 'primevue/card';
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
+import Panel from 'primevue/panel';
+import Steps from 'primevue/steps';
+import Dialog from 'primevue/dialog';
+import Message from 'primevue/message';
+import Tag from 'primevue/tag';
+import SelectButton from 'primevue/selectbutton';
+
 export default {
+    components: {
+        Dropdown,
+        DataTable,
+        Column,
+        Button,
+        Paginator,
+        Card,
+        InputText,
+        Button,
+        Panel,
+        Steps,
+        Message,
+        Dialog,
+        Tag,
+        SelectButton,
+    },
     data() {
         return {
-            opcionPago: '',
-            tipoVenta: '',
-            mostrarSpinner: false,
-            selectedAlmacen: null,
-
-            step: 1,
-            modal2: false,
-            opcionPago: "",
-            modal: false,
-            zIndexBase: 1050,
+            opcionesPago: [
+        { label: 'Efectivo', value: 'efectivo' },
+        { label: 'QR', value: 'qr' }
+      ],
+      criterioOptions: [
+        { label: 'Nombre', value: 'nombre' },
+        { label: 'Descripción', value: 'descripcion' },
+        { label: 'Código', value: 'codigo' }
+      ],
+      isDialogVisible: false,
+      tipoComprobanteOptions: [
+        { name: 'RECIBO', code: 'RESIVO' }
+      ],
+      opcionPago: '',
+      tipoVenta: '',
+      mostrarSpinner: false,
+      selectedAlmacen: null,
+      idrol: null,
+      step: 1,
+      modal2: false,
+      modal: false,
+      zIndexBase: 1050,
             //qr
             alias: '',
             montoQR: 0,
@@ -892,18 +740,14 @@ export default {
             arrayDetalle: [],
             arrayProductos: [],
             listado: 1,
-            modal: 0,
             tituloModal: "",
             tipoAccion: 0,
             errorVenta: 0,
             errorMostrarMsjVenta: [],
             pagination: {
                 total: 0,
-                current_page: 0,
-                per_page: 0,
-                last_page: 0,
-                from: 0,
-                to: 0,
+                current_page: 1,
+                last_page: 0, // Asegúrate de actualizar este valor al obtener datos
             },
             offset: 3,
             criterio: "",
@@ -955,7 +799,7 @@ export default {
             precio_tres: "",
             precio_cuatro: "",
             //-----MODAL 2---
-            modal2: 0,
+
             tituloModal2: "",
             tipoAccion2: "",
 
@@ -996,17 +840,6 @@ export default {
                 newDocumento === "99002" || newDocumento === "99003";
         },
     },
-    components: {
-        TileSpinner,
-        vSelect,
-        Dropdown,
-        InputText,
-        Button,
-        InputNumber,
-        DataTable,
-        Column,
-        Button,
-    },
     computed: {
         calcularStockDisponible() {
             return this.unidadPaquete == 1
@@ -1031,30 +864,23 @@ export default {
         },
 
         //Calcula los elementos de la paginación
-        pagesNumber: function () {
-            if (!this.pagination.to) {
-                return [];
-            }
-
-            var from = this.pagination.current_page - this.offset;
+        pagesNumber() {
+            let from = this.pagination.current_page - 2;
             if (from < 1) {
                 from = 1;
             }
-
-            var to = from + this.offset * 2;
+            let to = from + 4;
             if (to >= this.pagination.last_page) {
                 to = this.pagination.last_page;
             }
-
-            var pagesArray = [];
-            while (from <= to) {
-                pagesArray.push(from);
-                from++;
+            let pagesArray = [];
+            for (let page = from; page <= to; page++) {
+                pagesArray.push(page);
             }
             return pagesArray;
         },
 
-        calcularTotal: function () {
+        calcularTotal() {
             var resultado = 0.0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
                 resultado +=
@@ -1070,7 +896,7 @@ export default {
             return resultado;
         },
 
-    
+
         badgeSeverity() {
             if (this.estadoTransaccion && this.estadoTransaccion.objeto.estadoActual === 'PENDIENTE') {
                 return 'danger'; // Rojo para estado PENDIENTE
@@ -1082,22 +908,8 @@ export default {
         }
     },
 
-  methods: {
-    calcularTotal() {
-      var resultado = 0.0;
-      for (var i = 0; i < this.arrayDetalle.length; i++) {
-        resultado +=
-          this.arrayDetalle[i].precioseleccionado *
-          this.arrayDetalle[i].cantidad -
-          (this.arrayDetalle[i].precioseleccionado *
-            this.arrayDetalle[i].cantidad *
-            this.arrayDetalle[i].descuento) /
-          100;
-      }
-      resultado -= this.descuentoAdicional;
-      //resultado -= this.descuentoGiftCard;
-      return parseFloat(resultado.toFixed(2));
-    },
+    methods: {
+
         generarCuotas() {
             this.cuotas = [];
             const fechaHoy = new Date();
@@ -1204,9 +1016,7 @@ export default {
                 this.nextStep();
             }
         },
-        abrirModal() {
-            this.showModal = true;
-        },
+
         cerrarModal2() {
             this.modal2 = false;
         },
@@ -1300,7 +1110,7 @@ export default {
         },
         abrirTipoVenta() {
             if (this.idtipo_venta == 1) {
-                this.modal2 = 1;
+                this.modal2 = true;
                 this.cliente = this.nombreCliente;
                 this.tipoAccion2 = 1;
                 this.scrollToTop();
@@ -1623,13 +1433,13 @@ export default {
             return diasRestantes;
         },
         actualizarDetalle(index) {
-        if (this.arrayDetalle[index] && typeof this.arrayDetalle[index].precioseleccionado !== 'undefined' && typeof this.arrayDetalle[index].cantidad !== 'undefined') {
-            this.arrayDetalle[index].total = (this.arrayDetalle[index].precioseleccionado * this.arrayDetalle[index].cantidad).toFixed(2);
-            this.calcularTotal(); // Asegúrate de recalcular el total después de actualizar
-        } else {
-            console.error('Datos inválidos en actualizarDetalle para el índice:', index);
-        }
-    },
+            if (this.arrayDetalle[index] && typeof this.arrayDetalle[index].precioseleccionado !== 'undefined' && typeof this.arrayDetalle[index].cantidad !== 'undefined') {
+                this.arrayDetalle[index].total = (this.arrayDetalle[index].precioseleccionado * this.arrayDetalle[index].cantidad).toFixed(2);
+                this.calcularTotal(); // Asegúrate de recalcular el total después de actualizar
+            } else {
+                console.error('Datos inválidos en actualizarDetalle para el índice:', index);
+            }
+        },
 
         actualizarDetalleDescuento(index) {
             this.calcularTotal(index);
@@ -1837,10 +1647,13 @@ export default {
         pdfVenta(id) {
             window.open("/venta/pdf/" + id, "_blank");
         },
+        onPageChange(event) {
+            let page = event.page + 1; // PrimeVue pages are 0-based, while your logic uses 1-based
+            this.cambiarPagina(page, this.buscar, this.criterio);
+        },
         cambiarPagina(page, buscar, criterio) {
-            let me = this;
-            me.pagination.current_page = page;
-            me.listarVenta(page, buscar, criterio);
+            this.pagination.current_page = page;
+            this.listarVenta(page, buscar, criterio);
         },
         encuentra(id) {
             var sw = 0;
@@ -1852,13 +1665,13 @@ export default {
             return sw;
         },
         eliminarDetalle(id) {
-    const index = this.arrayDetalle.findIndex(item => item.id === id);
-    if (index !== -1) {
-        this.arrayDetalle.splice(index, 1);
-        this.arrayProductos.splice(index, 1);
-        this.calcularTotal();
-    }
-},
+            const index = this.arrayDetalle.findIndex(item => item.id === id);
+            if (index !== -1) {
+                this.arrayDetalle.splice(index, 1);
+                this.arrayProductos.splice(index, 1);
+                this.calcularTotal();
+            }
+        },
         eliminarKit(id) {
             const indicesEliminar = [];
             for (let i = 0; i < this.arrayDetalle.length; i++) {
@@ -1875,72 +1688,72 @@ export default {
         },
 
         agregarDetalle() {
-    if (this.encuentra(this.arraySeleccionado.id)) {
-        swal({
-            type: "error",
-            title: "Error...",
-            text: "Este Artículo ya se encuentra agregado!",
-        });
-        return;
-    }
-    
-    if (this.saldosNegativos === 0 && this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete) {
-        swal({
-            type: "error",
-            title: "Error...",
-            text: "No hay stock disponible!",
-        });
-        return;
-    }
-    
-    const precioUnitario = parseFloat(this.precioseleccionado);
-    const cantidad = this.cantidad * this.unidadPaquete;
-    const descuento = (precioUnitario * cantidad * (this.descuentoProducto / 100)).toFixed(2);
-    const total = (precioUnitario * cantidad - descuento).toFixed(2);
-    
-    const nuevoDetalle = {
-        id: Date.now(),
-        idkit: -1,
-        idarticulo: this.arraySeleccionado.id,
-        articulo: this.arraySeleccionado.nombre,
-        medida: this.arraySeleccionado.medida,
-        unidad_envase: this.arraySeleccionado.unidad_envase,
-        cantidad: cantidad,
-        cantidad_paquetes: this.arraySeleccionado.unidad_envase,
-        precio: precioUnitario,
-        descuento: this.descuentoProducto,
-        stock: this.arraySeleccionado.saldo_stock,
-        precioseleccionado: precioUnitario,
-        total: total
-    };
-    
-    this.arrayDetalle.push(nuevoDetalle);
-    
-    const nuevoProducto = {
-        actividadEconomica: 461021,
-        codigoProductoSin: this.arraySeleccionado.codigoProductoSin,
-        codigoProducto: this.arraySeleccionado.codigo,
-        descripcion: this.arraySeleccionado.nombre,
-        cantidad: cantidad,
-        unidadMedida: this.arraySeleccionado.codigoClasificador,
-        precioUnitario: precioUnitario.toFixed(2),
-        montoDescuento: descuento,
-        subTotal: total,
-        numeroSerie: null,
-        numeroImei: null,
-    };
-    
-    this.arrayProductos.push(nuevoProducto);
-    
-    this.precioBloqueado = true;
-    this.arraySeleccionado = [];
-    this.cantidad = 1;
-    this.unidadPaquete = 1;
-    this.codigo = "";
-    this.descuentoProducto = 0;
-    
-    this.calcularTotal();
-},
+            if (this.encuentra(this.arraySeleccionado.id)) {
+                swal({
+                    type: "error",
+                    title: "Error...",
+                    text: "Este Artículo ya se encuentra agregado!",
+                });
+                return;
+            }
+
+            if (this.saldosNegativos === 0 && this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete) {
+                swal({
+                    type: "error",
+                    title: "Error...",
+                    text: "No hay stock disponible!",
+                });
+                return;
+            }
+
+            const precioUnitario = parseFloat(this.precioseleccionado);
+            const cantidad = this.cantidad * this.unidadPaquete;
+            const descuento = (precioUnitario * cantidad * (this.descuentoProducto / 100)).toFixed(2);
+            const total = (precioUnitario * cantidad - descuento).toFixed(2);
+
+            const nuevoDetalle = {
+                id: Date.now(),
+                idkit: -1,
+                idarticulo: this.arraySeleccionado.id,
+                articulo: this.arraySeleccionado.nombre,
+                medida: this.arraySeleccionado.medida,
+                unidad_envase: this.arraySeleccionado.unidad_envase,
+                cantidad: cantidad,
+                cantidad_paquetes: this.arraySeleccionado.unidad_envase,
+                precio: precioUnitario,
+                descuento: this.descuentoProducto,
+                stock: this.arraySeleccionado.saldo_stock,
+                precioseleccionado: precioUnitario,
+                total: total
+            };
+
+            this.arrayDetalle.push(nuevoDetalle);
+
+            const nuevoProducto = {
+                actividadEconomica: 461021,
+                codigoProductoSin: this.arraySeleccionado.codigoProductoSin,
+                codigoProducto: this.arraySeleccionado.codigo,
+                descripcion: this.arraySeleccionado.nombre,
+                cantidad: cantidad,
+                unidadMedida: this.arraySeleccionado.codigoClasificador,
+                precioUnitario: precioUnitario.toFixed(2),
+                montoDescuento: descuento,
+                subTotal: total,
+                numeroSerie: null,
+                numeroImei: null,
+            };
+
+            this.arrayProductos.push(nuevoProducto);
+
+            this.precioBloqueado = true;
+            this.arraySeleccionado = [];
+            this.cantidad = 1;
+            this.unidadPaquete = 1;
+            this.codigo = "";
+            this.descuentoProducto = 0;
+
+            this.calcularTotal();
+        },
 
         agregarDetalleModal(data) {
             //this.scrollToSection();
@@ -2033,44 +1846,44 @@ export default {
             this.idAlmacen = event.value;
         },
         validarVenta() {
-    let me = this;
-    me.errorVenta = 0;
-    me.errorMostrarMsjVenta = [];
+            let me = this;
+            me.errorVenta = 0;
+            me.errorMostrarMsjVenta = [];
 
-    // Verificar stock de cada artículo
-    me.arrayDetalle.forEach(function (x) {
-        if (x.cantidad > x.stock) {
-            let art = `${x.articulo}: Stock insuficiente`;
-            me.errorMostrarMsjVenta.push(art);
-        }
-    });
+            // Verificar stock de cada artículo
+            me.arrayDetalle.forEach(function (x) {
+                if (x.cantidad > x.stock) {
+                    let art = `${x.articulo}: Stock insuficiente`;
+                    me.errorMostrarMsjVenta.push(art);
+                }
+            });
 
-    // Verificar si se seleccionó el tipo de comprobante
-    if (me.tipo_comprobante == 0)
-        me.errorMostrarMsjVenta.push("Seleccione el Comprobante");
+            // Verificar si se seleccionó el tipo de comprobante
+            if (me.tipo_comprobante == 0)
+                me.errorMostrarMsjVenta.push("Seleccione el Comprobante");
 
-    // Verificar si se ingresó el impuesto
-    if (!me.impuesto)
-        me.errorMostrarMsjVenta.push("Ingrese el impuesto de compra");
+            // Verificar si se ingresó el impuesto
+            if (!me.impuesto)
+                me.errorMostrarMsjVenta.push("Ingrese el impuesto de compra");
 
-    // Verificar si hay detalles en la venta
-    if (me.arrayDetalle.length <= 0)
-        me.errorMostrarMsjVenta.push("Ingrese detalles");
+            // Verificar si hay detalles en la venta
+            if (me.arrayDetalle.length <= 0)
+                me.errorMostrarMsjVenta.push("Ingrese detalles");
 
-    // Verificar si hay errores
-    if (me.errorMostrarMsjVenta.length) {
-        me.errorVenta = 1;
-        
-        // Mostrar todos los errores en un solo mensaje de SweetAlert
-        swal({
-            type: "error",
-            title: "Error en la venta",
-            text: me.errorMostrarMsjVenta.join("\n"),
-        });
-    }
+            // Verificar si hay errores
+            if (me.errorMostrarMsjVenta.length) {
+                me.errorVenta = 1;
 
-    return me.errorVenta === 0;
-},
+                // Mostrar todos los errores en un solo mensaje de SweetAlert
+                swal({
+                    type: "error",
+                    title: "Error en la venta",
+                    text: me.errorMostrarMsjVenta.join("\n"),
+                });
+            }
+
+           return true;
+        },
         aplicarDescuento() {
             const descuentoGiftCard = this.descuentoGiftCard;
             const numeroTarjeta = this.numeroTarjeta;
@@ -2285,31 +2098,31 @@ export default {
         },
 
         async registrarVenta(idtipo_pago) {
-            if (this.validarVenta()) {
-                this.prepararDatosCliente();
-                await this.buscarOCrearCliente();
+      if (this.validarVenta()) {
+        this.prepararDatosCliente();
+        await this.buscarOCrearCliente();
 
-                const ventaData = this.prepararDatosVenta(idtipo_pago);
+        const ventaData = this.prepararDatosVenta(idtipo_pago);
 
-                try {
-                    this.mostrarSpinner = true;
-                    const response = await axios.post("/venta/registrar", ventaData);
+        try {
+          this.mostrarSpinner = true;
+          const response = await axios.post("/venta/registrar", ventaData);
 
-                    if (response.data.id > 0) {
-                        this.manejarVentaExitosa(response.data.id);
-                    } else {
-                        this.manejarErrorVenta(response.data);
-                    }
-                } catch (error) {
-                    console.error("Error al registrar venta:", error);
-                    this.ejecutarFlujoCompleto();
-                } finally {
-                    this.mostrarSpinner = false;
-                }
-            }
-        },
+          if (response.data.id > 0) {
+            this.manejarVentaExitosa(response.data.id);
+          } else {
+            this.manejarErrorVenta(response.data);
+          }
+        } catch (error) {
+          console.error("Error al registrar venta:", error);
+          this.ejecutarFlujoCompleto();
+        } finally {
+          this.mostrarSpinner = false;
+        }
+      }
+    },
 
-   
+
 
 
         cambiarProducto(index, nuevoProducto) {
@@ -2326,9 +2139,7 @@ export default {
             }
         },
 
-        calcularTotal() {
-    return this.arrayDetalle.reduce((sum, item) => sum + parseFloat(item.total), 0);
-},
+
 
         prepararDatosCliente() {
             if (!this.nombreCliente.trim()) {
@@ -2352,18 +2163,18 @@ export default {
             };
 
             if (this.tipoVenta === 'credito') {
-                const totalCredito = this.primera_cuota 
-            ? this.calcularTotal - this.primer_precio_cuota 
-            : this.calcularTotal;
+                const totalCredito = this.primera_cuota
+                    ? this.calcularTotal - this.primer_precio_cuota
+                    : this.calcularTotal;
 
-        let cuotasActualizadas = [...this.cuotas];
-        if (this.primera_cuota) {
-            cuotasActualizadas[0] = {
-                ...cuotasActualizadas[0],
-                totalCancelado: this.primer_precio_cuota,
-                estado: 'Pagado'
-            };
-        }
+                let cuotasActualizadas = [...this.cuotas];
+                if (this.primera_cuota) {
+                    cuotasActualizadas[0] = {
+                        ...cuotasActualizadas[0],
+                        totalCancelado: this.primer_precio_cuota,
+                        estado: 'Pagado'
+                    };
+                }
                 return {
                     ...datosComunes,
                     idpersona: this.idcliente,
@@ -2372,8 +2183,8 @@ export default {
                     totalCredito: this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal,
                     estadoCredito: "Pendiente",
                     cuotaspago: cuotasActualizadas,
-            primer_precio_cuota: this.primer_precio_cuota,
-            primera_cuota_pagada: this.primera_cuota
+                    primer_precio_cuota: this.primer_precio_cuota,
+                    primera_cuota_pagada: this.primera_cuota
                 };
             } else if (this.tipo_comprobante === "RESIVO") {
                 return { ...datosComunes, resivo: this.resivo };
@@ -2434,11 +2245,7 @@ export default {
                 recibido: 0
             });
         },
-        handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                this.registrarVenta(this.idtipo_pago);
-            }
-        },
+
         eliminarVenta(idVenta) {
             axios.delete('/venta/eliminarVenta/' + idVenta)
                 .then(function (response) {
@@ -2544,12 +2351,14 @@ export default {
             this.tituloModal = "";
         },
         abrirModal() {
+
             this.scrollToTop();
             this.listarArticulo("", "nombre");
             this.selectAlmacen();
             this.arrayArticulo = [];
-            this.modal = 1;
+            this.modal = true;
             this.tituloModal = "Seleccione los articulos que desee";
+            console.log("entro siii");
         },
         advertenciaFechaVencimiento() {
             swal({
@@ -2626,7 +2435,7 @@ export default {
 
 
         cerrarModal2() {
-            this.modal2 = 0;
+            this.modal2 = false;
             this.tituloModal2 = "";
             this.idtipo_pago = "";
             this.tipoPago = "";
@@ -2715,325 +2524,30 @@ export default {
 };
 </script>
 <style scoped>
-.selected {
-    background-color: rgba(5, 75, 122, 0.1);
-    /* Ajusta el último valor para cambiar la opacidad */
-    font-weight: 100;
-    color: #054b7a;
-    border: 1px solid #054b7a;
-    transition: all 0.5s ease;
-}
-
-/* #054b7a; */
-.efectivo {
-    color: #38e411;
-    transition: all 0.3s ease;
-}
-
-.qr {
-    transition: all 0.3s ease;
-
-    color: #054b7a;
-}
-
-.transferencia {
-    transition: all 0.3s ease;
-
-    color: #054b7a;
-}
-
-.modal-content {
-    width: 100% !important;
-    position: absolute !important;
-}
-
-.mostrar {
-    display: list-item !important;
-    opacity: 1 !important;
-    position: absolute !important;
-    background-color: #3c29297a !important;
-}
-
-.div-error {
+.step-indicators {
     display: flex;
-    justify-content: center;
-}
-
-.text-error {
-    color: red !important;
-    font-weight: bold;
-}
-
-@media (min-width: 600px) {
-    .btnagregar {
-        margin-top: 2rem;
-    }
-}
-
-.card-img {
-    width: auto;
-    height: 200px;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-}
-
-.spinner-container {
-    position: relative;
-}
-
-.spinner-container>* {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.spinner-message {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translate(-50%, -170%);
-    z-index: 1;
-}
-
-/* Global styles */
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f8f9fa;
-    color: #495057;
-}
-
-.card-body {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Form styles */
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    font-weight: bold;
-    color: #343a40;
-}
-
-.form-control,
-.form-select {
-    border-radius: 4px;
-}
-
-input[readonly] {
-    background-color: #e9ecef;
-}
-
-/* Custom select component */
-.v-select {
-    width: 100%;
-}
-
-.v-select .vs__dropdown-toggle {
-    border-radius: 4px;
-}
-
-.v-select .vs__selected-options {
-    padding: 0.375rem 0.75rem;
-}
-
-.v-select .vs__dropdown-menu {
-    border-radius: 4px;
-}
-
-/* Table styles */
-.table {
-    margin-bottom: 0;
-}
-
-.table thead th {
-    background-color: #343a40;
-    color: #ffffff;
-}
-
-.table tbody td {
-    vertical-align: middle;
-}
-
-/* Badge styles */
-.badge.bg-primary {
-    background-color: #007bff;
-    color: #ffffff;
-    margin-right: 5px;
-}
-
-.text-danger {
-    color: #dc3545 !important;
-}
-
-/* Button styles */
-
-
-.btn-primary:hover,
-.btn-secondary:hover,
-.btn-danger:hover {
-    opacity: 0.85;
-}
-
-/* Alert styles */
-.alert {
-    text-align: center;
-    font-weight: bold;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.alert-warning {
-    background-color: #fff3cd;
-    color: #856404;
-}
-
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-/* Miscellaneous */
-input[type="number"] {
-    text-align: center;
-}
-
-.text-right {
-    text-align: right !important;
-}
-
-.lead {
-    font-size: 1.25rem;
-}
-
-
-
-body {
-    font-family: 'Roboto', sans-serif;
-    /* Ejemplo de fuente de Google Fonts */
-}
-
-label {
-    font-weight: 500;
-    /* Añadir un poco de grosor a las etiquetas */
-}
-
-input,
-select {
-    border-radius: 4px;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    background-color: #f8f8f8;
-    transition: border-color 0.3s ease;
-}
-
-input:focus,
-select:focus {
-    outline: none;
-    border-color: #4d90fe;
-}
-
-.text-danger {
-    color: #d32f2f;
-}
-
-input:required {
-    border-color: #d32f2f;
-}
-
-.linear-stepper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 2px 0;
-    position: relative;
-}
-
-.step-container {
-    display: flex;
-    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
 .step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0 10px;
-    opacity: 0.5;
-    position: relative;
-}
-
-.step.active,
-.step.completed {
-    opacity: 1;
-}
-
-.step-number {
-    width: 35px;
-    height: 35px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     background-color: #ccc;
-    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 18px;
-    z-index: 1;
 }
 
-.step.active .step-number {
+.step.active {
     background-color: #007bff;
+    color: white;
 }
 
-.step.completed .step-number {
-    background-color: #34bc9b;
+.step.completed {
+    background-color: #28a745;
+    color: white;
 }
-
-.step-line {
-    height: 3px;
-    width: 40px;
-    background-color: #ccc;
-    transition: background-color 0.3s;
-    z-index: 0;
-}
-
-.step.completed+.step-line {
-    background-color: #34bc9b;
-}
-
-.step.active+.step-line {
-    background-color: #007bff;
-}
-
-.step-name {
-    margin-top: 10px;
-}
-
-
-
-.card-body {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-}
-
-.card-img {
-    max-width: 100%;
-    height: auto;
-}
-
-.p-button-sm .p-button-icon {
-    font-size: 1.2rem !important;
-}
-
-
 </style>
