@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DetalleIngreso;
 use App\Ingreso;
 use App\IngresoCuota;
 use Illuminate\Http\Request;
@@ -77,12 +78,7 @@ class IngresoCuotaController extends Controller
             ->get();
 
         $ingresos = $ingresos->map(function ($ingreso) {
-            $ingreso->saldo_restante = number_format(
-                $ingreso->saldo_restante,
-                2,
-                ".",
-                ""
-            );
+            $ingreso->saldo_restante = number_format($ingreso->saldo_restante,2,".", "");
             return $ingreso;
         });
 
@@ -147,9 +143,9 @@ class IngresoCuotaController extends Controller
         try {
             DB::beginTransaction();
 
-            /*if (!isset($request->form) || !is_array($request->form)) {
+            if (!isset($request->form) || !is_array($request->form)) {
                 throw new \Exception("Los datos del formulario no son válidos");
-            }*/
+            }
 
             $cuota = IngresoCuota::findOrFail($request->id);
 
@@ -177,20 +173,17 @@ class IngresoCuotaController extends Controller
             $cuota->total_cancelado = $request->form["pago_actual"];
             $cuota->saldo_restante = 0;
             $cuota->fecha_cancelado = $request->form["fecha_pago"];
-            $cuota->tipo_pago_cuota =
-                $request->form["tipo_pago_cuota"]["nombre"];
+            $cuota->tipo_pago_cuota = $request->form["tipo_pago_cuota"]["nombre"];
             $cuota->estado = "Pagado";
             $cuota->save();
 
             $ingreso = Ingreso::findOrFail($cuota->idingreso);
-            $todasCuotasPagadas =
-                $ingreso->cuotas()->where("estado", "!=", "Pagado")->counr() ===
-                0;
+            $todasCuotasPagadas = $ingreso->cuotas()->where("estado", "!=", "Pagado")->count() === 0;
 
-            if ($todasCuotasPagadas) {
+            /*if ($todasCuotasPagadas) {
                 $ingreso->estado_pagado = "Pagado";
                 $ingreso->save();
-            }
+            }*/
 
             DB::commit();
 
@@ -209,6 +202,34 @@ class IngresoCuotaController extends Controller
                 500
             );
         }
+    }
+
+    public function listarDetalleIngreso(Request $request)
+    {
+        if (!$request->ajax()) {
+            return redirect("/");
+        }
+
+        $id = $request->id;
+
+        $ingreso = Ingreso::findOrFail($id);
+
+    $articulos = $ingreso->detalles()->with('articulo')->get()->map(function ($detalle) {
+        return [
+            'id' => $detalle->articulo->id,
+            'nombre' => $detalle->articulo->nombre,
+            'cantidad' => $detalle->cantidad,
+            'precio' => $detalle->precio,
+            'descuento' => $detalle->descuento
+        ];
+    });
+
+    $data = [
+        'ingreso' => $ingreso,
+        'articulos' => $articulos
+    ];
+
+    return response()->json($data);
     }
 
     /**

@@ -1,9 +1,9 @@
 <?php
- 
+
 namespace App;
- 
+
 use Illuminate\Database\Eloquent\Model;
- 
+
 class Ingreso extends Model
 {
     protected $fillable = [
@@ -18,21 +18,22 @@ class Ingreso extends Model
         'estado',
         'idcaja',
         'descuento_global'
-     ];
-     public function usuario()
-     {
-         return $this->belongsTo('App\User');
-     }
-     public function proveedor()
-     {
-         return $this->belongsTo('App\Proveedor');
-     }
-     
-     public function caja(){
+    ];
+    public function usuario()
+    {
+        return $this->belongsTo('App\User');
+    }
+
+    /*public function proveedor()
+    {
+        return $this->belongsTo('App\Proveedor');
+    }*/
+
+    public function caja(){
         return $this->belongsTo('App\Caja', 'id');
     }
     
-     public function detallesIngreso()
+    public function detallesIngreso()
     {
         return $this->hasMany(DetalleIngreso::class, 'idarticulo');
     }
@@ -41,5 +42,16 @@ class Ingreso extends Model
     {
         return $this->hasMany(IngresoCuota::class, 'idingreso');
     }
-  
+
+
+    public function detalles()
+    {
+        return $this->hasMany(DetalleIngreso::class, 'idingreso');
+    }
+
+    public function proveedor()
+    {
+        return $this->belongsTo(Proveedor::class, 'idproveedor');
+    }
+
 }

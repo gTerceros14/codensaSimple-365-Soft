@@ -1,9 +1,9 @@
 <?php
- 
+
 namespace App;
- 
+
 use Illuminate\Database\Eloquent\Model;
- 
+
 class DetalleIngreso extends Model
 {
     protected $table = 'detalle_ingresos';
@@ -15,5 +15,10 @@ class DetalleIngreso extends Model
         'descuento'
     ];
     public $timestamps = false;
- 
+
+    public function articulo()
+    {
+        return $this->belongsTo(Articulo::class, 'idarticulo');
+    }
+
 }
