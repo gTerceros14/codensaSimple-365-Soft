@@ -10,6 +10,7 @@ import Button from "primevue/button";
 import Tag from "primevue/tag";
 import Dialog from "primevue/dialog";
 import Dropdown from "primevue/dropdown";
+import Toast from 'primevue/toast';
 
 export default {
   setup() {
@@ -20,6 +21,7 @@ export default {
 
   data() {
     return {
+      submitted: false,
       array_ingresos: [],
       array_cuotas: [],
       displayListaCuotas: false,
@@ -39,6 +41,26 @@ export default {
     };
   },
 
+  validations() {
+    return {
+      form: {
+        fecha_pago: {
+          required
+        },
+        tipo_pago_cuota: {
+          required
+        },
+        cuota_actual: {
+          required
+        },
+        pago_actual: {
+          required,
+          minValueValue: minValue(1),
+        },
+      }
+    }
+  },
+
   components: {
     Panel,
     DataTable,
@@ -50,6 +72,7 @@ export default {
     Dialog,
     InputNumber,
     Dropdown,
+    Toast,
   },
 
   computed: {},
@@ -57,6 +80,7 @@ export default {
   watch: {},
 
   methods: {
+
     listarIngresosCuotas() {
       let me = this;
       var url = "/ingresoCuotas/listarCuotas";
@@ -82,8 +106,10 @@ export default {
 
           this.array_cuotas = cuotas.map((cuota, index) => ({
             ...cuota,
+
             fecha_pago: cuota.fecha_pago.split(" ")[0],
             enumeracion: index + 1,
+            fecha_cancelado: cuota.fecha_cancelado? cuota.fecha_cancelado.split(" ")[0]: null,
           }));
         }
       } catch (error) {
@@ -102,12 +128,13 @@ export default {
 
     closeModalListaCuotas() {
       this.displayListaCuotas = false;
+      this.array_cuotas = [];
     },
 
     openModalPagoCuota(data) {
       this.displayListaCuotas = false;
       this.displayPagarCuota = true;
-      this.form.cuota_actual = data.precio_cuota;
+      this.form.cuota_actual = Number(data.precio_cuota);
       this.idCuotaActual = data.id;
 
       const fechaActual = new Date();
@@ -118,7 +145,18 @@ export default {
       this.displayPagarCuota = false;
     },
 
+    validarFormPagoCuota() {
+      return this.v$.form.$invalid;
+    },
+
     async pagarCuota() {
+
+      this.submitted = true;
+
+      if (this.validarFormPagoCuota()) {
+        return;
+      }
+
       try {
         const response = await axios.post("/ingresoCuotas/pagarCuota", {
           id: this.idCuotaActual,
@@ -133,11 +171,12 @@ export default {
           });
           this.closeModalPagoCuota();
           this.listarIngresosCuotas();
-        } else {
+        } 
+        if (response.data.status === "error") {
           this.$toast.add({
             severity: "error",
             summary: "Error",
-            detail: "No se pudo procesar el pago",
+            detail: 'hola',
             life: 3000,
           });
         }
@@ -146,7 +185,37 @@ export default {
         this.$toast.add({
           severity: "error",
           summary: "Error",
-          detail: "Ocurrio un error al proccesar el pago",
+          detail: "Ocurrio un error al procesar el pago",
+          life: 3000,
+        });
+      }
+    },
+
+    cancelarPagoCuota() {
+      this.submitted = false;
+
+      this.displayListaCuotas = true;
+      this.displayPagarCuota = false;
+      this.form.cuota_actual = null;
+      this.form.fecha_pago = null;
+      this.form.pago_actual = null;
+      this.form.tipo_pago_cuota = null;
+
+      this.idCuotaActual = null;
+    },
+
+    async listarDetallesIngreso(ingresoId) {
+      try {
+        const response = await axios.get(
+          "/ingresoCuotas/listarDetallesIngreso?id=" + ingresoId
+        );
+        console.log("detalles:", response.data);
+      } catch (error) {
+        console.log(error);
+        this.$toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Ocurrio un error al recuperar los datos",
           life: 3000,
         });
       }

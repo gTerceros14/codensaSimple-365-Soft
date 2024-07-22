@@ -402,6 +402,10 @@ Route::group(["middleware" => ["auth"]], function () {
             "/ingresoCuotas/pagarCuota",
             "IngresoCuotaController@pagarCuota"
         );
+        Route::get(
+            "/ingresoCuotas/listarDetallesIngreso",
+            "IngresoCuotaController@listarDetalleIngreso"
+        );
 
         Route::get("/ingreso", "IngresoController@index");
         Route::post("/ingreso/registrar", "IngresoController@store");
