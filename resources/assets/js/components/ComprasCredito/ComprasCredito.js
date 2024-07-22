@@ -24,8 +24,10 @@ export default {
       submitted: false,
       array_ingresos: [],
       array_cuotas: [],
+      array_detalles_ingreso: [],
       displayListaCuotas: false,
       displayPagarCuota: false,
+      displayMostrarDetalles: false,
       lista_tipo_pago_cuotas: [
         { nombre: "Efectivo" },
         { nombre: "Tarjeta" },
@@ -37,6 +39,10 @@ export default {
         tipo_pago_cuota: null,
         cuota_actual: null,
         pago_actual: null,
+      },
+      cabecera: {
+        nombre_proveedor: null,
+
       },
     };
   },
@@ -172,14 +178,6 @@ export default {
           this.closeModalPagoCuota();
           this.listarIngresosCuotas();
         } 
-        if (response.data.status === "error") {
-          this.$toast.add({
-            severity: "error",
-            summary: "Error",
-            detail: 'hola',
-            life: 3000,
-          });
-        }
       } catch (error) {
         console.log(error);
         this.$toast.add({
@@ -194,7 +192,7 @@ export default {
     cancelarPagoCuota() {
       this.submitted = false;
 
-      this.displayListaCuotas = true;
+      this.displayListaCuotas = false;
       this.displayPagarCuota = false;
       this.form.cuota_actual = null;
       this.form.fecha_pago = null;
@@ -204,12 +202,16 @@ export default {
       this.idCuotaActual = null;
     },
 
-    async listarDetallesIngreso(ingresoId) {
+    async listarDetallesIngreso(data) {
       try {
         const response = await axios.get(
-          "/ingresoCuotas/listarDetallesIngreso?id=" + ingresoId
+          "/ingresoCuotas/listarDetallesIngreso?id=" + data.id
         );
-        console.log("detalles:", response.data);
+
+        if (response.data.status === "success") {
+          this.array_detalles_ingreso = response.data.articulos;
+        }
+
       } catch (error) {
         console.log(error);
         this.$toast.add({
@@ -219,6 +221,15 @@ export default {
           life: 3000,
         });
       }
+    },
+
+    openModalMostrarDetalle(ingresoId) {
+      this.displayMostrarDetalles = true;
+      this.listarDetallesIngreso(ingresoId);
+    },
+
+    openModalMostrarDetalle() {
+      this.displayMostrarDetalles = false;
     },
   },
 

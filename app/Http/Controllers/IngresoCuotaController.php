@@ -85,7 +85,7 @@ class IngresoCuotaController extends Controller
         return response()->json(
             [
                 "status" => "success",
-                "message" => "Ingresos obtenidos con éxito",
+                "message" => "Ingresos obtenidos con exito",
                 "ingresos" => $ingresos,
             ],
             200
@@ -144,7 +144,7 @@ class IngresoCuotaController extends Controller
             DB::beginTransaction();
 
             if (!isset($request->form) || !is_array($request->form)) {
-                throw new \Exception("Los datos del formulario no son válidos");
+                throw new \Exception("Los datos del formulario no son validos");
             }
 
             $cuota = IngresoCuota::findOrFail($request->id);
@@ -187,10 +187,13 @@ class IngresoCuotaController extends Controller
 
             DB::commit();
 
-            return response()->json([
+            return response()->json(
+                [
                 "status" => "success",
                 "message" => "Cuota pagada exitosamente",
-            ]);
+                ],
+                400
+            );
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(
@@ -210,26 +213,47 @@ class IngresoCuotaController extends Controller
             return redirect("/");
         }
 
-        $id = $request->id;
+        try {
+            $id = $request->id;
 
-        $ingreso = Ingreso::findOrFail($id);
+            $ingreso = Ingreso::findOrFail($id);
 
-    $articulos = $ingreso->detalles()->with('articulo')->get()->map(function ($detalle) {
-        return [
-            'id' => $detalle->articulo->id,
-            'nombre' => $detalle->articulo->nombre,
-            'cantidad' => $detalle->cantidad,
-            'precio' => $detalle->precio,
-            'descuento' => $detalle->descuento
-        ];
-    });
+            $articulos = $ingreso->detalles()->with('articulo')->get()->map(function ($detalle) {
+                return [
+                    'id' => $detalle->articulo->id,
+                    'nombre' => $detalle->articulo->nombre,
+                    'cantidad' => $detalle->cantidad,
+                    'precio' => $detalle->precio,
+                    'descuento' => $detalle->descuento
+                ];
+            });
 
-    $data = [
-        'ingreso' => $ingreso,
-        'articulos' => $articulos
-    ];
+            $data = [
+                'ingreso' => $ingreso,
+                'articulos' => $articulos
+            ];
 
-    return response()->json($data);
+            return response()->json(
+                [
+                    "status" => "success",
+                    "message" => "Datos recuperados con exito",
+                    "data" => $data,
+                ],
+                400
+            );
+
+        } catch(\Exception $e) {
+            return response()->json(
+                [
+                    "status" => "error",
+                    "message" =>
+                        "Error al recuperar datos: " . $e->getMessage(),
+                ],
+                500
+            );
+        }
+
+        
     }
 
     /**

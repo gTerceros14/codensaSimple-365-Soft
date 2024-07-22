@@ -256,6 +256,46 @@ class ArticuloController extends Controller
         return ['articulos' => $articulos
         ];
     }
+
+    public function buscadorGlobal(Request $request)
+    {
+        if (!$request->ajax()) {
+            return redirect('/');
+        }
+
+        $idProveedor = $request->input('idProveedor');
+        $filtro = $request->input('buscar');
+
+        $campos = [
+            'articulos.id',
+            'articulos.codigo',
+            'articulos.nombre',
+            'articulos.precio_costo_unid',
+            'articulos.precio_costo_paq',
+            'articulos.unidad_envase',
+            'personas.nombre as nombre_proveedor',
+            'categorias.nombre as nombre_categoria'
+        ];
+
+        $query = Articulo::select($campos)
+            ->join('categorias', 'articulos.idcategoria','=','categorias.id')
+            ->join('proveedores', 'articulos.idproveedor','=','proveedores.id')
+            ->join('personas', 'proveedores.id','=','personas.id')
+            ->where('idproveedor', $idProveedor)
+            ->orderBy('articulos.id', 'desc');
+
+        if ($filtro) {
+            $query->where(function($q) use ($filtro) {
+                $q->where('articulos.nombre', 'like', '%' . $filtro . '%')
+                ->orWhere('articulos.codigo', 'like', '%' . $filtro . '%');
+            });
+        }
+
+        $productos = $query->paginate(10);
+
+        return response()->json([ "articulos" => $productos]);
+    }
+
     public function listarArticulo(Request $request)
     {
         if (!$request->ajax())

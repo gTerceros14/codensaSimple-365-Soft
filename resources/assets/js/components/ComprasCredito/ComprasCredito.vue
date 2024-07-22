@@ -36,7 +36,7 @@
                             type="button"
                             class="p-button-success p-button-sm"
                             icon="pi pi-eye"
-                            @click="listarDetallesIngreso(slotProps.data.id)"
+                            @click="listarDetallesIngreso(slotProps.data)"
                         ></Button>
                         <Button
                             type="button"
@@ -79,7 +79,7 @@
                 :visible.sync="displayListaCuotas"
                 :modal="true"
                 position="center"
-                :containerStyle="{ width: '60vw' }"
+                :containerStyle="{ width: '55vw' }"
                 @hide="closeModalListaCuotas"
             >
                 <DataTable
@@ -159,7 +159,7 @@
                 :modal="true"
                 position="center"
                 :contentStyle="{ overflow: 'visible' }"
-                :containerStyle="{ width: '50vw' }"
+                :containerStyle="{ width: '30vw' }"
                 @hide="cancelarPagoCuota"
             >
                 <div class="p-fluid p-formgrid p-grid">
@@ -242,6 +242,35 @@
                         class="p-button-sm p-button-help"
                         autofocus
                         @click="pagarCuota"
+                    />
+                </template>
+            </Dialog>
+        </div>
+
+        <div class="div-detalles">
+            <Dialog
+                header="Detalles de la Compra"
+                :visible.sync="displayPagarCuota"
+                :modal="true"
+                position="center"
+                :contentStyle="{ overflow: 'visible' }"
+                :containerStyle="{ width: '30vw' }"
+                @hide="cancelarPagoCuota"
+            >
+
+                <template #footer>
+                    <Button
+                        label="Cancelar"
+                        icon="pi pi-times"
+                        class="p-button-sm p-button-danger"
+                        @click="openModalMostrarDetalle"
+                    />
+                    <Button
+                        label="Abonar"
+                        icon="pi pi-check-square"
+                        class="p-button-sm p-button-help"
+                        autofocus
+                        @click="openModalMostrarDetalle"
                     />
                 </template>
             </Dialog>
