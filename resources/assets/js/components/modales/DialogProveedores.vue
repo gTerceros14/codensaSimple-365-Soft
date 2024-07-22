@@ -1,6 +1,6 @@
 <template>
     <main class="main">
-        <Dialog header="Proveedores" :visible.sync="modal1" :modal="true" :containerStyle="{width: '700px'}" :closable="false" :closeOnEscape="false">
+        <Dialog header="Proveedores" :visible.sync="modal1" :modal="true" :containerStyle="{width: '700px', height: '650px'}" :closable="false" :closeOnEscape="false">
                 <div class="toolbar-container">
                     <div class="toolbar">
                         <Button label="Nuevo" icon="pi pi-plus" @click="abrirModal('persona', 'registrar')" class="p-button-secondary p-button-sm"/>
@@ -127,7 +127,7 @@ export default {
                 contacto: '',
                 telefono_contacto: ''
             },
-            modal1: false,
+            modal1: this.visible,
             errores: {},
             buscar: '',
             tipoAccion : 0,
@@ -145,12 +145,6 @@ export default {
             ],
         };
     },
-    watch: {
-    visible(newVal) {
-      this.modal1 = newVal; 
-      console.log("modal1",this.visible)// Asignar valor de prop a variable interna
-    }
-  },
     methods: {
         closeDialog() {
             this.$emit('close');

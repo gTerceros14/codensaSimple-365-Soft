@@ -639,6 +639,7 @@ Route::group(["middleware" => ["auth"]], function () {
 
         //ALMACENES
         Route::get("/almacen", "AlmacenController@index");
+        Route::get("/almacennewview", "AlmacenController@index2");
         Route::post("/almacen/registrar", "AlmacenController@store");
         Route::put("/almacen/editar", "AlmacenController@update");
 

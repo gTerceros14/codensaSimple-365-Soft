@@ -112,7 +112,7 @@ export default {
     },
     data() {
         return {
-            modal1: false,
+            modal1: this.visible,
             modal: false,
             arrayCategoria: [],
             nombre:'',
@@ -129,12 +129,6 @@ export default {
                 { nombre: 'Marca B', codigo: '002' },
             ],
         };
-    },
-    watch: {
-        visible(newVal) {
-            this.modal1 = newVal; 
-            console.log("modal1",this.visible)// Asignar valor de prop a variable interna
-        }
     },
     methods: {
         closeDialog() {

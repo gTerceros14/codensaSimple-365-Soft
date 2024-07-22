@@ -122,7 +122,7 @@ export default {
     },
     data() {
         return {
-            modal1: false,
+            modal1: this.visible,
             modal: false,
             buscar: '',
             arrayCategoria:[],
@@ -137,12 +137,6 @@ export default {
             lineaSeleccionado: null,
         };
     },
-    watch: {
-    visible(newVal) {
-      this.modal1 = newVal; 
-      console.log("modal1",this.visible)// Asignar valor de prop a variable interna
-    }
-  },
     methods: {
         closeDialog() {
             this.$emit('close');

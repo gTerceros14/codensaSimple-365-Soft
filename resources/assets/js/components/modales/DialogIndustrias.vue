@@ -113,7 +113,7 @@ export default {
     data() {
         return {
             industria_id: 0,
-            modal1: false,
+            modal1: this.visible,
             modal: false,
             tituloModal: 'Registrar industria',
             tipoAccion: 1,
@@ -124,11 +124,6 @@ export default {
             nombreError: '',
             industriaSeleccionado : null,
         };
-    },
-    watch: {
-        visible(newVal) {
-            this.modal1 = newVal; 
-        }
     },
     methods: {
         closeDialog() {

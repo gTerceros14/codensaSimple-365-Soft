@@ -120,7 +120,7 @@ export default {
     },
     data() {
         return {
-            modal1: false,
+            modal1: this.visible,
             modal: false,
             arrayCategoria: [],
             medida_id: 0,
@@ -135,12 +135,6 @@ export default {
             codigoClasificadorError: '',
             medidaSeleccionado: null
         };
-    },
-    watch: {
-        visible(newVal) {
-            this.modal1 = newVal; 
-            console.log("modal1",this.visible)// Asignar valor de prop a variable interna
-        }
     },
     methods: {
         closeDialog() {

@@ -74,14 +74,9 @@ export default {
             nombreError: '',
             tituloModal: 'Registrar Grupo',
             modal: false,
-            modal1: false,
+            modal1: this.visible,
             grupoSeleccionado : null,
         };
-    },
-    watch: {
-        visible(newVal) {
-            this.modal1 = newVal; 
-        }
     },
     methods: {
         closeDialog() {
