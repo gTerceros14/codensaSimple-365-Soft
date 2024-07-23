@@ -19,6 +19,7 @@ import SplitButton from 'primevue/splitbutton';
 import Dialog from 'primevue/dialog';
 import Menu from 'primevue/menu';
 import Badge from 'primevue/badge';
+import Tag from 'primevue/tag';
 
 export default {
     setup () {
@@ -168,6 +169,7 @@ export default {
         Dialog,
         Menu,
         Badge,
+        Tag,
     },
 
     computed: {
@@ -332,6 +334,7 @@ export default {
                     descuento_global: this.descuentoGlobal,
                     form_cuotas: this.form_cuotas,
                     cuotaData: this.array_cuotas_calculadas,
+                    estado: (this.tipoCompra.id === 2)? 'Pendiente': 'Pagado',
                 });
 
                 if (compraResponse.data.status === 'success') {
@@ -397,13 +400,20 @@ export default {
                     total_cancelado: cuotaInicial.toFixed(2),
                     saldo_restante: (saldoRestante - cuotaInicial).toFixed(2),
                     fecha_cancelado: fechaActual.toISOString().split('T')[0],
-                    estado: 'Pagado'
+                    estado: 'Cuota Inicial'
                 });
 
                 saldoRestante -= cuotaInicial;
 
                 for (let i = 1; i <= numCuotas; i++) {
-                    fechaActual.setDate(fechaActual.getDate() + frecuenciaPagos);
+                    let diasRestantes = frecuenciaPagos;
+                    do {
+                        fechaActual.setDate(fechaActual.getDate() + 1);
+                        if (fechaActual.getDay() !== 0) { // 0 es domingo
+                            diasRestantes--;
+                        }
+                    } while (diasRestantes > 0);
+
                     saldoRestante -= montoPorCuota;
 
                     this.array_cuotas_calculadas.push({
@@ -574,6 +584,11 @@ export default {
 
                 if (compraResponse.data.status === 'success') {
                     this.$set(this.array_articulos_seleccionados, index, newData);
+                    if (this.buscadorArticulos == null) {
+                        this.listarArticulo('');
+                    } else {
+                        this.listarArticulo(this.buscadorArticulos);
+                    }
                     this.$toast.add({severity:'success', summary: 'Actualizado', detail: compraResponse.data.message, life: 3000});
                 }
 
@@ -603,13 +618,17 @@ export default {
         },
 
         eliminarArticuloListaCompleta(articulo) {
-            this.array_articulos_completo = this.array_articulos_completo.filter(a => a.id !== articulo.id);
-            this.eliminarArticuloSeleccionado(articulo);
+            if (articulo && articulo.id) {
+                this.array_articulos_completo = this.array_articulos_completo.filter(a => a.id !== articulo.id);
+                this.array_articulos_seleccionados = this.array_articulos_seleccionados.filter(a => a.id !== articulo.id);
+            }
         },
 
         eliminarArticuloSeleccionado(articulo) {
-            this.array_articulos_seleccionados = this.array_articulos_seleccionados.filter(a => a.id !== articulo.id);
-            this.eliminarArticuloListaCompleta(articulo);
+            if (articulo && articulo.id) {
+                this.array_articulos_seleccionados = this.array_articulos_seleccionados.filter(a => a.id !== articulo.id);
+                this.array_articulos_completo = this.array_articulos_completo.filter(a => a.id !== articulo.id);
+            }
         },
 
         async validarPaginaActual() {

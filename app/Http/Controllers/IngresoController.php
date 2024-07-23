@@ -281,32 +281,24 @@ class IngresoController extends Controller
             }
 
             $ingreso = new Ingreso();
-            $ingreso->idproveedor =
-                $request->form["proveedorSeleccionado"]["id"] ?? null;
+            $ingreso->idproveedor = $request->form["proveedorSeleccionado"]["id"] ?? null;
             $ingreso->idusuario = $request->usuario_actual_id ?? auth()->id();
-            $ingreso->tipo_comprobante =
-                $request->form["tipo_comprobante"]["nombre"] ??
-                "No especificado";
-            $ingreso->serie_comprobante =
-                $request->form["serie_comprobante"] ?? "No especificado";
-            $ingreso->num_comprobante =
-                $request->form["num_comprobante"] ?? "No especificado";
+            $ingreso->tipo_comprobante = $request->form["tipo_comprobante"]["nombre"] ?? "No especificado";
+            $ingreso->serie_comprobante = $request->form["serie_comprobante"] ?? "No especificado";
+            $ingreso->num_comprobante = $request->form["num_comprobante"] ?? "No especificado";
             $ingreso->fecha_hora = now();
             $ingreso->impuesto = 0;
             $ingreso->total = $request->saldoTotalCompra ?? 0;
             $ingreso->tipoCompra = $request->tipoCompra["id"] ?? null;
-            $ingreso->frecuencia_cuotas =
-                $request->form_cuotas["frecuencia_pagos"] ?? 0;
-            $ingreso->estado = true;
+            $ingreso->frecuencia_cuotas = $request->form_cuotas["frecuencia_pagos"] ?? 0;
+            $ingreso->estado = $request->estado;
+            $ingreso->condicion = true;
             $ingreso->idalmacen = $request->almacenSeleccionado["id"] ?? null;
             $ingreso->idcaja = $ultimaCaja->id;
             $ingreso->descuento_global = $request->descuento_global ?? 0;
             $ingreso->num_cuotas = $request->form_cuotas["num_cuotas"] ?? 0;
-            $ingreso->cuota_inicial =
-                $request->form_cuotas["cuota_inicial"] ?? 0;
-            $ingreso->tipo_pago_cuota =
-                $request->form_cuotas["tipoPagoCuotaSeleccionado"]["nombre"] ??
-                "Ninguna";
+            $ingreso->cuota_inicial = $request->form_cuotas["cuota_inicial"] ?? 0;
+            $ingreso->tipo_pago_cuota = $request->form_cuotas["tipoPagoCuotaSeleccionado"]["nombre"] ?? "Ninguna";
             $ingreso->save();
 
             if ($ingreso->tipoCompra == 2) {

@@ -142,6 +142,7 @@
                                     scrollHeight="40vh"
                                     tableStyle="height:40vh"
                                     showGridlines
+                                    :rowHover="true"
                                 >
                                     <template #header>
                                         <div class="tablas-articulos-header">
@@ -206,8 +207,8 @@
                                 @row-expand="onRowExpand"
                                 @row-collapse="onRowCollapse"
                                 responsiveLayout="scroll"
-                                tableStyle="height: 33vh"
                                 class="p-datatable-sm"
+                                tableStyle="height: 40vh"
                             >
                                 <Column :expander="true" :headerStyle="{'width': '5%'}" />
                                 <Column field="codigo" header="Codigo" :sortable="true" :styles="{width:'5%'}"></Column>
@@ -232,9 +233,7 @@
                                 <template #empty>
                                     <div class="imagen-tabla-vacia">
                                         <img src="img/iconos/carrito-de-compras-final.png" alt="Articulo sin foto" class="product-image" />
-                                    </div>
-                                    <div style="padding-top: 15px; display: flex; justify-content: center;">
-                                        <h5>Sin artículos seleccionados ...</h5>
+                                        <h5 style="margin-top: 15px;">Sin artículos seleccionados ...</h5>
                                     </div>
                                 </template>
 
@@ -504,14 +503,17 @@
 
                 <div class="card">
                     <DataTable
+                        ref="dt-cuotas"
                         :value="array_cuotas_calculadas"
-                        :paginator="true"
-                        tableStyle="height: 33vh"
-                        class="p-datatable-sm"
-                        :rows="5"
+                        :paginator="false"
                         dataKey="id"
+                        class="p-datatable-sm"
                         :rowHover="true"
                         responsiveLayout="scroll"
+                        :scrollable="true"
+                        scrollHeight="37vh"
+                        tableStyle="height:37vh"
+                        showGridlines
                     >
                         <template #empty>
                             <div class="imagen-tabla-vacia">
@@ -526,14 +528,33 @@
                         <Column field="total_cancelado" header="Total Cancelado" ></Column>
                         <Column field="saldo_restante" header="Saldo Restante" ></Column>
                         <Column field="fecha_cancelado" header="Fecha Cancelado" ></Column>
-                        <Column field="estado" header="Estado"></Column>
+                        <Column header="Estado">
+                            <template #body="slotProps">
+                                <Tag
+                                    v-if="slotProps.data.estado == 'Cuota Inicial'"
+                                    class="mr-2"
+                                    severity="danger"
+                                    :value="slotProps.data.estado"
+                                />
+                                <Tag
+                                    v-else
+                                    class="mr-2"
+                                    severity="warning"
+                                    :value="slotProps.data.estado"
+                                />
+                            </template>
+                        </Column>
+
+                        <template #paginatorend>
+                            <Button label="Registrar Compra" icon="pi pi-check-square" @click="registrarCompra" class="p-button-sm p-button-help" autofocus />
+                        </template>
 
                     </DataTable>
                 </div>
 
                 <template #footer>
                     <Button label="Cancelar" icon="pi pi-times" @click="closeComprasCredito" class="p-button-sm p-button-danger"/>
-                    <Button label="Registrar Compra" icon="pi pi-check-square" @click="registrarCompra" class="p-button-sm p-button-help" autofocus />
+                    <Button label="Registrar Compra" icon="pi pi-check-square" @click="registrarCompra" class="p-button-sm p-button-help" />
                 </template>
             </Dialog>
         </div>
