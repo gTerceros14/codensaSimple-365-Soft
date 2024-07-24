@@ -55,6 +55,7 @@ Route::group(["middleware" => ["auth"]], function () {
         );
 
         Route::get("/proveedor", "ProveedorController@index");
+        Route::get('/proveedornewview', 'ProveedorController@index2');
         Route::post("/proveedor/registrar", "ProveedorController@store");
         Route::put("/proveedor/actualizar", "ProveedorController@update");
         Route::get(
@@ -623,9 +624,10 @@ Route::group(["middleware" => ["auth"]], function () {
             "TransferenciaController@store"
         );
         //grupo
-        Route::get("/grupos", "GrupoController@index");
-        Route::post("/grupos/registrar", "GrupoController@store");
-        Route::put("/grupos/actualizar", "GrupoController@update");
+        Route::get('/grupos', 'GrupoController@index');
+        Route::get('/gruposnewview', 'GrupoController@index2');
+        Route::post('/grupos/registrar', 'GrupoController@store');
+        Route::put('/grupos/actualizar', 'GrupoController@update');
 
         Route::get("/grupo/exportexcel", "GrupoController@excelGrupo")->name(
             "exportar_excel"
@@ -643,6 +645,7 @@ Route::group(["middleware" => ["auth"]], function () {
 
         //ALMACENES
         Route::get("/almacen", "AlmacenController@index");
+        Route::get("/almacennewview", "AlmacenController@index2");
         Route::post("/almacen/registrar", "AlmacenController@store");
         Route::put("/almacen/editar", "AlmacenController@update");
 
