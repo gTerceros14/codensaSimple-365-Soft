@@ -17,6 +17,10 @@
                 dataKey="id"
                 :rowHover="true"
                 responsiveLayout="scroll"
+                showGridlines
+                :scrollable="true"
+                scrollHeight="76vh"
+                tableStyle="height:76vh"
             >
                 <!--<template #header>
                     <div class="flex justify-content-between align-items-center">
