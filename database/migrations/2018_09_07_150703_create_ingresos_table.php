@@ -19,7 +19,7 @@ class CreateIngresosTable extends Migration
             $table->foreign('idproveedor')->references('id')->on('proveedores');
             $table->integer('idusuario')->unsigned();
             $table->foreign('idusuario')->references('id')->on('users');
-            $table->string('tipo_comprobante', 20);
+            $table->string('tipo_comprobante');
             $table->string('serie_comprobante')->nullable();
             $table->string('num_comprobante')->nullable();
             $table->dateTime('fecha_hora');
@@ -30,7 +30,8 @@ class CreateIngresosTable extends Migration
             $table->integer('frecuencia_cuotas')->nullable();
             $table->decimal('cuota_inicial', 11, 2)->nullable();
             $table->string('tipo_pago_cuota')->nullable();
-            $table->boolean('estado');
+            $table->boolean('condicion');
+            $table->string('estado');
             $table->integer('idalmacen')->unsigned()->nullable();
             $table->foreign('idalmacen')->references('id')->on('almacens');
             $table->integer('idcaja')->unsigned();
@@ -39,7 +40,7 @@ class CreateIngresosTable extends Migration
             $table->timestamps();
         });
     }
- 
+
     /**
      * Reverse the migrations.
      *

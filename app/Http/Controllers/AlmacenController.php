@@ -47,6 +47,37 @@ class AlmacenController extends Controller
             'almacenes' => $almacenes
         ];
     }
+
+    public function buscadorAlmacen(Request $request)
+    {
+        if (!$request->ajax()) {
+            return redirect('/');
+        }
+
+        $nombre = $request->input('buscar');
+        $campos = [
+            'id',
+            'nombre_almacen',
+            'condicion'
+        ];
+
+        $almacenes = Almacen::where('almacens.nombre_almacen', 'like', '%' . $nombre . '%')
+                            ->where('condicion', 1)
+                            ->select($campos)
+                            ->paginate(3);
+
+        return [
+            'pagination' => [
+                'total' => $almacenes->total(),
+                'current_page' => $almacenes->currentPage(),
+                'per_page' => $almacenes->perPage(),
+                'last_page' => $almacenes->lastPage(),
+                'from' => $almacenes->firstItem(),
+                'to' => $almacenes->lastItem(),
+            ],
+            'almacenes' => $almacenes
+        ];
+    }
     public function index2(Request $request)
     {
         if (!$request->ajax()) {

@@ -203,6 +203,8 @@ Route::group(["middleware" => ["auth"]], function () {
             "/articulo/buscarArticulo",
             "ArticuloController@buscarArticulo"
         );
+        Route::get("/articulo/buscadorGlobal", "ArticuloController@buscadorGlobal");
+        Route::get("/almacen/buscador", "AlmacenController@buscadorAlmacen");
         Route::get(
             "/articulo/listarArticulo",
             "ArticuloController@listarArticulo"
