@@ -42,7 +42,15 @@ export default {
       },
       cabecera: {
         nombre_proveedor: null,
-
+        tipo_comprobante: null,
+        serie_comprobante: null,
+        num_comprobante: null,
+        fecha_hora: null,
+        total: null,
+        cuota_inicial: null,
+        tipo_pago_inicial: null,
+        nombre_almacen: null,
+        descuento_global: null,
       },
     };
   },
@@ -89,7 +97,7 @@ export default {
 
     listarIngresosCuotas() {
       let me = this;
-      var url = "/ingresoCuotas/listarCuotas";
+      var url = "/ingresoCuotas/listarIngresos";
       axios
         .get(url)
         .then(function (response) {
@@ -163,6 +171,16 @@ export default {
         return;
       }
 
+      if (this.form.cuota_actual != this.form.pago_actual) {
+        this.$toast.add({
+            severity: "error",
+            summary: "Error",
+            detail: "Monto a pagar debe ser igual al Cuota actual",
+            life: 3000,
+          });
+        return;
+      }
+
       try {
         const response = await axios.post("/ingresoCuotas/pagarCuota", {
           id: this.idCuotaActual,
@@ -209,7 +227,25 @@ export default {
         );
 
         if (response.data.status === "success") {
-          this.array_detalles_ingreso = response.data.articulos;
+          let ingreso = response.data.datos.ingreso;
+          this.cabecera = {
+            nombre_proveedor: data.proveedor,
+            tipo_comprobante: ingreso.tipo_comprobante,
+            serie_comprobante: ingreso.serie_comprobante,
+            num_comprobante: ingreso.num_comprobante,
+            fecha_hora: ingreso.fecha_hora,
+            total: ingreso.total,
+            cuota_inicial: ingreso.cuota_inicial,
+            tipo_pago_inicial: ingreso.tipo_pago_cuota,
+            nombre_almacen: data.nombre_almacen,
+            descuento_global: ingreso.descuento_global,
+          },
+
+          this.array_detalles_ingreso = response.data.datos.articulos;
+
+          this.displayMostrarDetalles = true;
+
+          console.log('cabecera',this.cabecera);
         }
 
       } catch (error) {
@@ -223,13 +259,39 @@ export default {
       }
     },
 
-    openModalMostrarDetalle(ingresoId) {
-      this.displayMostrarDetalles = true;
-      this.listarDetallesIngreso(ingresoId);
+    closeModalMostrarDetalle() {
+      this.cabecera = {
+        nombre_proveedor: null,
+        tipo_comprobante: null,
+        serie_comprobante: null,
+        num_comprobante: null,
+        fecha_hora: null,
+        total: null,
+        cuota_inicial: null,
+        tipo_pago_inicial: null,
+        nombre_almacen: null,
+        descuento_global: null,
+      },
+      this.array_detalles_ingreso = [];
+      this.displayMostrarDetalles = false;
     },
 
-    openModalMostrarDetalle() {
-      this.displayMostrarDetalles = false;
+    getDialogPosition() {
+      console.log('direccion',window.innerWidth <= 768 ? 'right' : 'center')
+      return window.innerWidth <= 768 ? 'right' : 'center';
+    },
+
+    getDialogStyle(desktopWidth = '55vw') {
+      if (window.innerWidth <= 768) {
+          console.log('style',window.innerWidth <= 768)
+          return { width: '100vw', height: '100vh' };
+      } else if (window.innerWidth <= 1366) {
+          console.log('style',window.innerWidth <= 1366)
+          return { width: '80vw' };
+      } else {
+          console.log('style',desktopWidth)
+          return { width: desktopWidth };
+      }
     },
   },
 

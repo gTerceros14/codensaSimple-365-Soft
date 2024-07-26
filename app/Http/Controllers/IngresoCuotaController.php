@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\DetalleIngreso;
 use App\Ingreso;
 use App\IngresoCuota;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -90,6 +91,73 @@ class IngresoCuotaController extends Controller
             ],
             200
         );
+    }
+
+    public function listarComprasCredito(Request $request)
+    {
+        if (!$request->ajax()) {
+            return redirect("/");
+        }
+
+        try {
+            $comprasCredito = DB::table('ingresos')
+                ->join('proveedores', 'ingresos.idproveedor', '=', 'proveedores.id')
+                ->join('personas as proveedores_personas', 'proveedores.id', '=', 'proveedores_personas.id')
+                ->join('users', 'ingresos.idusuario', '=', 'users.id')
+                ->join('personas as usuarios', 'users.id', '=', 'usuarios.id')
+                ->leftJoin('ingresos_cuotas', 'ingresos.id', '=', 'ingresos_cuotas.idingreso')
+                ->leftJoin('almacens', 'ingresos.idalmacen', '=', 'almacens.id')
+                ->select(
+                    'ingresos.id',
+                    'ingresos.tipo_comprobante',
+                    'ingresos.fecha_hora',
+                    'ingresos.cuota_inicial',
+                    'proveedores_personas.nombre as proveedor',
+                    'usuarios.nombre as usuario',
+                    'ingresos.total as total_compra',
+                    DB::raw('SUM(ingresos_cuotas.total_cancelado) as total_pagado'),
+                    DB::raw('COUNT(CASE WHEN ingresos_cuotas.estado = "Pendiente" THEN 1 END) as cuotas_pendientes'),
+                    DB::raw('CONCAT(COUNT(CASE WHEN ingresos_cuotas.estado = "Pagado" THEN 1 END), "/", ingresos.num_cuotas) as num_cuotas'),
+                    'ingresos.estado as estado_compra',
+                    DB::raw('SUM(CASE WHEN ingresos_cuotas.estado = "Pendiente" THEN ingresos_cuotas.precio_cuota ELSE 0 END) as total_restante'),
+                    'almacens.nombre_almacen as nombre_almacen'
+                )
+                ->where('ingresos.tipoCompra', 2)
+                ->groupBy(
+                    'ingresos.id',
+                    'ingresos.tipo_comprobante',
+                    'ingresos.fecha_hora',
+                    'ingresos.cuota_inicial',
+                    'proveedores_personas.nombre',
+                    'usuarios.nombre',
+                    'ingresos.total',
+                    'ingresos.num_cuotas',
+                    'ingresos.estado',
+                    'almacens.nombre_almacen'
+                )
+                ->orderBy("ingresos.id", "desc")
+                ->get();
+
+            return response()->json([
+                "status" => "success",
+                "message" => "Ingresos obtenidos con exito",
+                "ingresos" => $comprasCredito]);
+
+        } catch (QueryException $e) {
+            return response()->json(
+                [
+                    "status" => "error",
+                    "message" => 'Error al ejecutar la consulta: ' . $e->getMessage()
+                ],
+                500);
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    "status" => "error",
+                    "message" => 'Ha ocurrido un error inesperado: ' . $e->getMessage()
+                ],
+                500);
+        }
     }
 
     public function getCuotasByIngreso(Request $request)
@@ -178,12 +246,15 @@ class IngresoCuotaController extends Controller
             $cuota->save();
 
             $ingreso = Ingreso::findOrFail($cuota->idingreso);
-            $todasCuotasPagadas = $ingreso->cuotas()->where("estado", "!=", "Pagado")->count() === 0;
+            $todasCuotasPagadas = $ingreso->cuotas()
+                ->where("estado", "!=", "Pagado")
+                ->where("estado", "!=", "Cuota Inicial")
+                ->count();
 
-            /*if ($todasCuotasPagadas) {
-                $ingreso->estado_pagado = "Pagado";
+            if ($todasCuotasPagadas === 0) {
+                $ingreso->estado = "Pagado";
                 $ingreso->save();
-            }*/
+            }
 
             DB::commit();
 
@@ -192,7 +263,7 @@ class IngresoCuotaController extends Controller
                 "status" => "success",
                 "message" => "Cuota pagada exitosamente",
                 ],
-                400
+                200
             );
         } catch (\Exception $e) {
             DB::rollback();
@@ -237,9 +308,9 @@ class IngresoCuotaController extends Controller
                 [
                     "status" => "success",
                     "message" => "Datos recuperados con exito",
-                    "data" => $data,
+                    "datos" => $data,
                 ],
-                400
+                200
             );
 
         } catch(\Exception $e) {
