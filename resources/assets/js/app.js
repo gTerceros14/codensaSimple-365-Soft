@@ -56,6 +56,10 @@ Vue.component(
   require("./components/productos/ImportarExcel.vue"),
 );
 Vue.component(
+  "ImportarExcelNewView",
+  require("./components/productos/ImportarExcelNewView.vue"),
+);
+Vue.component(
   "ImportarExcelInventario",
   require("./components/productos/ImportarExcelInventario.vue"),
 );

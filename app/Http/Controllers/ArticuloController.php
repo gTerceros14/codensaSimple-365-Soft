@@ -124,7 +124,12 @@ class ArticuloController extends Controller
                     'articulos.codigo_alfanumerico',
                     'articulos.descripcion_fabrica'
                 )
-                ->where('articulos.' . $criterio, 'like', '%' . $buscar . '%')
+                ->where('articulos.nombre', 'like', '%' . $buscar . '%')
+                ->orWhere('articulos.descripcion', 'like', '%' . $buscar . '%')
+                ->orWhere('personas.nombre', 'like', '%' . $buscar . '%')
+                ->orWhere('categorias.nombre', 'like', '%' . $buscar . '%')
+                ->orWhere('industrias.nombre', 'like', '%' . $buscar . '%')
+                ->orWhere('marcas.nombre', 'like', '%' . $buscar . '%')
                 ->distinct()
                 ->orderBy('articulos.id', 'desc')->paginate(6);
         }

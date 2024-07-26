@@ -1,7 +1,7 @@
 <template>
     <main class="main">
         <Dialog
-            header="Marcas"
+            header="Industrias"
             :visible.sync="modal1"
             :modal="true"
             :containerStyle="{ width: '700px' }"
@@ -27,6 +27,7 @@
                     placeholder="Texto a buscar"
                     class="p-inputtext-sm"
                     v-model="buscar"
+                    @keyup="buscarIndustria"
                     
                 />
                 </span>
@@ -197,6 +198,9 @@ export default {
             }
 
             return false;
+        },
+        buscarIndustria(){
+            this.listarIndustria(1,this.buscar,this.criterio)
         },
         listarIndustria(page, buscar, criterio) {
           let url = '/industrianewview?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;

@@ -10,12 +10,14 @@
             <div class="toolbar-container">
                 <div class="toolbar">
                     <Button label="Nuevo" icon="pi pi-plus" class="p-button-secondary p-button-sm" @click="abrirModal('articulo', 'registrar')"/>
-                    <Button label="Reporte" icon="pi pi-file" class="p-button-success p-button-sm" />
-                    <Button label="Importar" icon="pi pi-upload" class="p-button-help p-button-sm" />
+                    <Button label="Reporte" icon="pi pi-file" class="p-button-success p-button-sm" @click="cargarPdf()" />
+                    <Button label="Importar" icon="pi pi-upload" class="p-button-help p-button-sm" @click="abrirDialogos('Importar')" />
                 </div>
-                <div class="searchbar">
-                    <InputText v-model="searchText" placeholder="Texto a buscar" class="p-inputtext-sm" />
-                    <Button label="Buscar" icon="pi pi-search" @click="search" class="p-button-help p-button-sm" />
+                <div class="search-bar">
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-search" />
+                        <InputText v-model="buscar" placeholder="Texto a buscar" class="p-inputtext-sm" @keyup="buscarArticulo" />
+                    </span>
                 </div>
             </div>
             <DataTable :value="arrayArticulo" class="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll">
@@ -141,7 +143,7 @@
                         <div class="p-inputgroup ">
                             <InputText id="proveedor" v-model="proveedorSeleccionado.nombre"  placeholder="Seleccione un proveedor" class="form-control p-inputtext-sm bold-input" disabled 
                                         :class="{'p-invalid' : errores.idproveedor}"  @input="validarCampo('codigo')"     />
-                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirProveedores" />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirDialogos('Proveedores')" />
                         </div>
                         <small class="p-error" v-if="errores.idproveedor"><strong>{{ errores.idproveedor }}</strong></small>
 
@@ -153,7 +155,7 @@
                         <div class="p-inputgroup">
                             <InputText id="linea"  v-model="lineaSeleccionado.nombre" placeholder="Seleccione una línea" class="form-control p-inputtext-sm bold-input" disabled
                                         :class="{'p-invalid' : errores.idcategoria}" />
-                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirLineas" />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirDialogos('Lineas')" />
                         </div>
                         <small class="p-error" v-if="errores.idcategoria"><strong>{{ errores.idcategoria }}</strong></small>
 
@@ -163,7 +165,7 @@
                         <div class="p-inputgroup">
                             <InputText id="marca"  v-model="marcaSeleccionado.nombre" placeholder="Seleccione una marca" class="form-control p-inputtext-sm bold-input" disabled 
                                         :class="{'p-invalid' : errores.idmarca}"  />
-                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirMarcas" />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirDialogos('Marcas')" />
                         </div>
                         <small class="p-error" v-if="errores.idmarca"><strong>{{ errores.idmarca }}</strong></small>
 
@@ -175,7 +177,7 @@
                         <div class="p-inputgroup">
                             <InputText id="industria" v-model="industriaSeleccionado.nombre"  placeholder="Seleccione una industria" class="form-control p-inputtext-sm bold-input" disabled 
                                          :class="{'p-invalid' : errores.idindustria}"/>
-                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirIndustrias" />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirDialogos('Industrias')" />
                         </div>
                         <small class="p-error" v-if="errores.idindustria"><strong>{{ errores.idindustria }}</strong></small>
 
@@ -185,7 +187,7 @@
                         <div class="p-inputgroup">
                             <InputText id="grupoFamilia"  v-model="grupoSeleccionado.nombre_grupo" placeholder="Seleccione un grupo" class="form-control p-inputtext-sm bold-input" disabled 
                                             :class="{'p-invalid' : errores.idgrupo}"/>
-                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirGrupos" />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirDialogos('Grupos')" />
                         </div>
                         <small class="p-error" v-if="errores.idgrupo"><strong>{{ errores.idgrupo }}</strong></small>
 
@@ -218,7 +220,7 @@
                         <div class="p-inputgroup">
                             <InputText id="medida" v-model="medidaSeleccionado.descripcion_medida"  placeholder="Seleccione una medida" class="form-control p-inputtext-sm bold-input" disabled 
                                     :class="{'p-invalid' : errores.idmedida}"/>
-                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirMedidas" />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirDialogos('Medidas')" />
                         </div>
                         <small class="p-error" v-if="errores.idmedida"><strong>{{ errores.idmedida }}</strong></small>
                     </div>
@@ -300,7 +302,7 @@
                         <div class="p-inputgroup">
                             <InputText id="almacen" v-model="almacenSeleccionado.nombre_almacen" placeholder="Seleccione un almacen" class="form-control p-inputtext-sm bold-input" disabled
                                 :class="{'p-invalid' : erroresinventario.AlmacenSeleccionado}" />
-                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirAlmacen" />
+                            <Button label="..." class="p-button-primary p-button-sm" @click="abrirDialogos('Almacen')" />
                         </div>
                         <small class="p-error" v-if="erroresinventario.AlmacenSeleccionado"><strong>{{ erroresinventario.AlmacenSeleccionado }}</strong></small>
 
@@ -337,13 +339,15 @@
         </Dialog>
 
         <!-- MODALES DINÁMICOS -->
-        <DialogProveedores v-if="mostrarDialogoProveedores" :visible.sync="mostrarDialogoProveedores" @close="cerrarDialogoProveedores" @proveedor-seleccionado="manejarProveedorSeleccionado" />
-        <DialogLineas v-if="mostrarDialogoLineas" :visible.sync="mostrarDialogoLineas" @close="cerrarDialogoLineas" @linea-seleccionado="manejarLineaSeleccionado"/>
-        <DialogMarcas v-if="mostrarDialogoMarcas" :visible.sync="mostrarDialogoMarcas" @close="cerrarDialogoMarcas" @marca-seleccionado="manejarMarcaSeleccionado"/>
-        <DialogIndustrias v-if="mostrarDialogoIndustrias" :visible.sync="mostrarDialogoIndustrias" @close="cerrarDialogoIndustrias" @industria-seleccionado="manejarIndustriaSeleecionado"/>
-        <DialogGrupos v-if="mostrarDialogoGrupos" :visible.sync="mostrarDialogoGrupos" @close="cerrarDialogoGrupos" @grupo-seleccionado="manejarGrupoSeleccionado"/>
-        <DialogMedidas v-if="mostrarDialogoMedidas" :visible.sync="mostrarDialogoMedidas" @close="cerrarDialogoMedidas" @medida-seleccionado="manejarMedidaSeleccionado"/>
-        <DialogAlmacenes v-if="mostrarDialogoAlmacen" :visible.sync="mostrarDialogoAlmacen" @close="cerrarDialogoAlmacen" @almacen-seleccionado="manejarAlmacenSeleccionado"/>
+        <DialogProveedores v-if="mostrarDialogoProveedores" :visible.sync="mostrarDialogoProveedores" @close="cerrarDialogos('Proveedores')" @proveedor-seleccionado="manejarProveedorSeleccionado" />
+        <DialogLineas v-if="mostrarDialogoLineas" :visible.sync="mostrarDialogoLineas" @close="cerrarDialogos('Lineas')" @linea-seleccionado="manejarLineaSeleccionado"/>
+        <DialogMarcas v-if="mostrarDialogoMarcas" :visible.sync="mostrarDialogoMarcas" @close="cerrarDialogos('Marcas')" @marca-seleccionado="manejarMarcaSeleccionado"/>
+        <DialogIndustrias v-if="mostrarDialogoIndustrias" :visible.sync="mostrarDialogoIndustrias" @close="cerrarDialogos('Industrias')" @industria-seleccionado="manejarIndustriaSeleecionado"/>
+        <DialogGrupos v-if="mostrarDialogoGrupos" :visible.sync="mostrarDialogoGrupos" @close="cerrarDialogos('Grupos')" @grupo-seleccionado="manejarGrupoSeleccionado"/>
+        <DialogMedidas v-if="mostrarDialogoMedidas" :visible.sync="mostrarDialogoMedidas" @close="cerrarDialogos('Medidas')" @medida-seleccionado="manejarMedidaSeleccionado"/>
+        <DialogAlmacenes v-if="mostrarDialogoAlmacen" :visible.sync="mostrarDialogoAlmacen" @close="cerrarDialogos('Almacen')" @almacen-seleccionado="manejarAlmacenSeleccionado"/>
+        <ImportarExcelNewView v-if="mostrarDialogoImportar" :visible.sync="mostrarDialogoImportar" @cerrar="cerrarDialogos('Importar')"/>
+
     </main>
 </template>
 
@@ -370,6 +374,7 @@ import InputSwitch from 'primevue/inputswitch';
 import Calendar from 'primevue/calendar';
 import VueBarcode from 'vue-barcode';
 import { esquemaArticulos, esquemaInventario } from '../constants/validations';
+import ImportarExcelNewView from './productos/ImportarExcelNewView.vue';
 
 export default {
     components: {
@@ -393,11 +398,11 @@ export default {
         DialogIndustrias,
         DialogGrupos,
         DialogMedidas,
-        DialogAlmacenes
+        DialogAlmacenes,
+        ImportarExcelNewView
     },
     data() {
         return {
-            searchText: '',
             criterio: 'nombre',
             buscar: '',
             arrayArticulo: [], // Datos del artículo
@@ -451,6 +456,7 @@ export default {
             mostrarDialogoGrupos: false,
             mostrarDialogoMedidas: false,
             mostrarDialogoAlmacen: false,
+            mostrarDialogoImportar: false,
             proveedorSeleccionado: [],
             lineaSeleccionado: [],
             marcaSeleccionado: [],
@@ -459,10 +465,10 @@ export default {
             medidaSeleccionado: [],
             almacenSeleccionado: [],
             precios: [],
-            precio_uno: 0,
-            precio_dos: 0,
-            precio_tres: 0,
-            precio_cuatro: 0,
+            precio_uno: null,
+            precio_dos: null,
+            precio_tres: null,
+            precio_cuatro: null,
             monedaPrincipal: [],
 
             //CONFIGURACIONES
@@ -470,8 +476,6 @@ export default {
             mostrarProveedores: '',
             mostrarCostos: '',
             rolUsuario: '',
-
-            modalImportar: 0,
             articulo_id: 0,
             idcategoria: 0,
             idmarca: 0,
@@ -661,63 +665,66 @@ export default {
             }
 
         },
-
-        abrirProveedores() {
-            this.mostrarDialogoProveedores = true;
-            this.dialogVisible= false;
-        },
-        cerrarDialogoProveedores() {
-            this.mostrarDialogoProveedores = false;
+        abrirDialogos(dialogo){
+            switch (dialogo){
+                case 'Proveedores':
+                    this.mostrarDialogoProveedores = true;
+                    break;
+                case 'Lineas':
+                    this.mostrarDialogoLineas = true;
+                    break;
+                case 'Marcas':
+                    this.mostrarDialogoMarcas = true;
+                    break;
+                case 'Industrias':
+                    this.mostrarDialogoIndustrias = true;
+                    break;
+                case 'Grupos':
+                    this.mostrarDialogoGrupos = true;
+                    break;
+                case 'Medidas':
+                    this.mostrarDialogoMedidas = true;
+                    break;
+                case 'Almacen':
+                    this.mostrarDialogoAlmacen = true;
+                    this.dialogVisible= false;
+                    break;
+                case 'Importar':
+                    this.mostrarDialogoImportar = true;
+                    break;
+            }
+            this.dialogVisible = false;
+        }, 
+        cerrarDialogos(dialogo) {
+            switch (dialogo) {
+                case 'Proveedores':
+                    this.mostrarDialogoProveedores = false;
+                    break;
+                case 'Lineas':
+                    this.mostrarDialogoLineas = false;
+                    break;
+                case 'Marcas':
+                    this.mostrarDialogoMarcas = false;
+                    break;
+                case 'Industrias':
+                    this.mostrarDialogoIndustrias = false;
+                    break;
+                case 'Grupos':
+                    this.mostrarDialogoGrupos = false;
+                    break;
+                case 'Medidas':
+                    this.mostrarDialogoMedidas = false;
+                    break;
+                case 'Almacen':
+                    this.mostrarDialogoAlmacen = false;
+                    break;
+                case 'Importar':
+                    this.mostrarDialogoImportar = false;
+                    this.listarArticulo(1, '', 'nombre');
+                    break;
+            }
             this.dialogVisible = true;
-        },
-        abrirLineas() {
-            this.mostrarDialogoLineas = true;
-            this.dialogVisible= false;
-        },
-        cerrarDialogoLineas() {
-            this.mostrarDialogoLineas = false;
-            this.dialogVisible = true;
-        },
-        abrirMarcas() {
-            this.mostrarDialogoMarcas = true;
-            this.dialogVisible= false;
-        },
-        cerrarDialogoMarcas() {
-            this.mostrarDialogoMarcas = false;
-            this.dialogVisible= true;
-        },
-        abrirIndustrias() {
-            this.mostrarDialogoIndustrias = true;
-            this.dialogVisible= false;
-        },
-        cerrarDialogoIndustrias() {
-            this.mostrarDialogoIndustrias = false;
-            this.dialogVisible= true;
-        },
-        abrirGrupos() {
-            this.mostrarDialogoGrupos = true;
-            this.dialogVisible= false;
-        },
-        cerrarDialogoGrupos() {
-            this.mostrarDialogoGrupos = false;
-            this.dialogVisible= true;
-        },
-        abrirMedidas() {
-            this.mostrarDialogoMedidas = true;
-            this.dialogVisible= false;
-        },
-        cerrarDialogoMedidas() {
-            this.mostrarDialogoMedidas = false;
-            this.dialogVisible= true;
-        },
-        abrirAlmacen() {
-            this.mostrarDialogoAlmacen = true;
-            this.dialogVisible= false;
-        },
-        cerrarDialogoAlmacen() {
-            this.mostrarDialogoAlmacen = false;
-            this.dialogVisible= true;
-        },
+        }, 
         listarPrecio() {
             let me = this;
             var url = '/precios';
@@ -729,8 +736,8 @@ export default {
                 console.log(error);
             });
         },
-        search() {
-            // Lógica para la búsqueda
+        buscarArticulo(){
+            this.listarArticulo(1,this.buscar)
         },
         asignarCampos() {
             this.datosFormulario.idcategoria = this.lineaSeleccionado.id
@@ -880,13 +887,7 @@ export default {
                     console.log(error);
                 });
         },
-        abrirModalImportar() {
-            this.modalImportar = 1;
-        },
-        cerrarModalImportar() {
-            this.modalImportar = 0;
-            this.listarArticulo(1, '', 'nombre');
-        },
+
         calculatePages: function (paginationObject, offset) {
             if (!paginationObject.to) {
                 return [];
@@ -983,9 +984,8 @@ export default {
                 me.cerrarModal();
                 me.listarArticulo(1, '', 'nombre');
                 me.toastSuccess("Articulo registrado correctamente");
-
-                if (me.agregarStock) {
-
+                console.log("stock ???",me.agregarStock);
+                if (me.agregarStock == true) {
                     let arrayArticulos = [
                         {
                             idarticulo: me.idarticulo,
@@ -994,8 +994,10 @@ export default {
                             fecha_vencimiento: me.fechaVencimientoAlmacen
                         }
                     ];
+                    console.log("registrar inventario qefqe",arrayArticulos)
                     return axios.post('/inventarios/registrar', { inventarios: arrayArticulos });
                 }
+                
             }).then(function (response) {
                 if (response) {
                     console.log(response.data);
@@ -1152,7 +1154,6 @@ export default {
             this.almacenSeleccionado=[];
             this.unidadStock='',
             this.fechaVencimientoSeleccion = false;
-            this.agregarStock = false;
             this.fechaVencimientoAlmacen = '',
             this.errorArticulo = 0;
             this.idmedida = 0;
@@ -1172,7 +1173,7 @@ export default {
                                 {
                                     this.dialogVisible = true;
                                     this.tituloModal = 'Registrar Artículo';
-
+                                    this.agregarStock=false;
                                     this.tipoAccion = 1;
                                     this.fotografia = '';
 
@@ -1180,16 +1181,16 @@ export default {
                                         nombre: '',
                                         descripcion: '',
                                         nombre_generico: '',
-                                        unidad_envase: 0,
-                                        precio_costo_unid: 0,
-                                        precio_costo_paq: 0,
-                                        precio_venta: 0,
-                                        precio_uno: 0,
-                                        precio_dos: 0,
-                                        precio_tres: 0,
-                                        precio_cuatro: 0,
-                                        stock: 0,
-                                        costo_compra: 0,
+                                        unidad_envase: null,
+                                        precio_costo_unid: null,
+                                        precio_costo_paq: null,
+                                        precio_venta: null,
+                                        precio_uno: null,
+                                        precio_dos: null,
+                                        precio_tres: null,
+                                        precio_cuatro: null,
+                                        stock: null,
+                                        costo_compra: null,
                                         codigo: '',
                                         codigo_alfanumerico: '',
                                         descripcion_fabrica: '',
@@ -1206,6 +1207,7 @@ export default {
                             case 'actualizar':
                                 {
                                     console.log("DATA ACTUALIZAR",data)
+                                    this.agregarStock=false;
                                     this.dialogVisible = true;
                                     this.tituloModal = 'Actualizar Artículo';
                                     this.tipoAccion = 2;
@@ -1326,17 +1328,29 @@ export default {
     margin-left: 8px;
 }
 .toolbar-container {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
+
 .toolbar {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
 }
-.searchbar {
-    display: flex;
-    align-items: center;
+.search-bar {
+  flex-grow: 0.5;
+  display: flex;
+  align-items: center;    
+  justify-content: flex-start;
+}
+.search-bar .p-input-icon-left {
+  width: 100%;
+}
+.search-bar .p-inputtext-sm {
+  width: 100%;
 }
 .form-group {
     margin-bottom: 15px;
@@ -1360,5 +1374,18 @@ export default {
     justify-content: space-evenly;
     align-items: center;
 }
-
+@media (max-width: 768px) {
+    .toolbar-container {
+    flex-direction: column;
+    align-items: flex-start;
+    }
+    .toolbar {
+        margin-bottom: 10px;
+        justify-content: space-between;
+    }
+    .searchbar {
+        margin-bottom: 10px;
+        order: 1; /* Esto asegura que la barra de búsqueda esté abajo en vista móvil */
+    }
+  }
 </style>

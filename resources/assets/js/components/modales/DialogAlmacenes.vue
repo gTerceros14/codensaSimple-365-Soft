@@ -50,7 +50,7 @@
                 </div>
                 <div class="p-field p-col-12 p-md-6">
                     <label for="encargados">Encargados *</label>
-                    <AutoComplete :multiple="true" v-model="usuariosSeleccionados" :suggestions="arrayUsuario" :dropdown="true" @complete="selectUsuario($event)"  @item-select="actualizarEncargados" @item-unselect="actualizarEncargados" field="nombre" :class="{ 'p-invalid': errores.encargado }" @input="validarCampo('encargado')"/>
+                    <AutoComplete :multiple="true" v-model="usuariosSeleccionados" :suggestions="arrayUsuario" :dropdown="true" @complete="selectUsuario($event)"  @item-select="actualizarEncargados" @item-unselect="actualizarEncargados" field="nombre" :class="{ 'p-invalid': errores.encargado }" @input="validarCampo('encargado')" placeholder="Buscar Usuarios..."/>
                     <small v-if="errores.encargado" class="p-error">{{ errores.encargado }}</small>
                 </div>
                 <div class="p-field p-col-12 p-md-6">
@@ -60,7 +60,7 @@
                 </div>
                 <div class="p-field p-col-12 p-md-6">
                     <label for="sucursal">Sucursal *</label>
-                    <AutoComplete class="p-inputtext-sm" v-model="sucursalSeleccionado" :suggestions="arraySucursal" @complete="selectSucursal($event)" @item-select="getDatosSucursales" :dropdown="true" field="nombre" forceSelection :class="{ 'p-invalid': errores.sucursal }" />
+                    <AutoComplete class="p-inputtext-sm" v-model="sucursalSeleccionado" :suggestions="arraySucursal" @complete="selectSucursal($event)" @item-select="getDatosSucursales" :dropdown="true" field="nombre" forceSelection :class="{ 'p-invalid': errores.sucursal }" placeholder="Buscar Sucursales..." />
                     <small v-if="errores.sucursal" class="p-error">{{ errores.sucursal }}</small>
                 </div>
                 <div class="p-field p-col-12 p-md-6">
@@ -258,6 +258,7 @@ export default {
         },
         async validarCampo(campo) {
             try {
+                console.log("formulario",this.datosFormulario)
                 await esquemaAlmacen.validateAt(campo, this.datosFormulario);
                 this.errores[campo] = null;
             } catch (error) {
@@ -395,6 +396,7 @@ export default {
             this.errores = {};
             this.sucursalSeleccionado = "";
             this.usuarioSeleccionado = "";
+            this.usuariosSeleccionados='';
         },
     },
     mounted(){
