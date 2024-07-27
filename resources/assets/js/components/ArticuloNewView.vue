@@ -229,7 +229,7 @@
                     <div class="col-md-6">
                         <label class="font-weight-bold" for="preciounitario">Precio Unitario <span class="text-danger">*</span></label>
                         <div class="p-inputgroup">
-                            <InputNumber id="preciounitario"  v-model="datosFormulario.precio_costo_unid" placeholder="Sin decimales" class=" p-inputtext-sm bold-input" 
+                            <InputNumber id="preciounitario"  v-model="datosFormulario.precio_costo_unid" placeholder="Sin decimales" class=" p-inputtext-sm bold-input"  mode="decimal" :minFractionDigits="2" 
                                         :class="{'p-invalid' : errores.precio_costo_unid}" @input="validarCampo('precio_costo_unid')" />
                             <Button label="Calcular" class="p-button-primary p-button-sm" @click="calcularPrecioCostoUnid" />
                         </div>
@@ -239,7 +239,7 @@
                     <div class="col-md-6">
                         <label class="font-weight-bold"  for="preciopaquete">Precio Paquete <span class="text-danger">*</span></label>
                         <div class="p-inputgroup">
-                            <InputNumber id="preciopaquete"  v-model="datosFormulario.precio_costo_paq" placeholder="Sin decimales" class=" p-inputtext-sm bold-input" 
+                            <InputNumber id="preciopaquete"  v-model="datosFormulario.precio_costo_paq" placeholder="Sin decimales" class=" p-inputtext-sm bold-input"  mode="decimal" :minFractionDigits="2" 
                                             :class="{'p-invalid' : errores.precio_costo_paq}" @input="validarCampo('precio_costo_paq')"/>
                             <Button label="Calcular" class="p-button-primary p-button-sm" @click="calcularPrecioCostoPaq" />
                         </div>
@@ -251,7 +251,7 @@
                     <div class="col-md-6">
                         <label class="font-weight-bold" for="costocompra">Costo compra <span class="text-danger">*</span></label>
                         <div class="p-inputgroup">
-                            <InputNumber id="costocompra"  v-model="datosFormulario.costo_compra" placeholder="Sin decimales" class=" p-inputtext-sm bold-input" 
+                            <InputNumber id="costocompra"  v-model="datosFormulario.costo_compra" placeholder="Sin decimales" class=" p-inputtext-sm bold-input"  mode="decimal" :minFractionDigits="2" 
                                     :class="{'p-invalid' : errores.costo_compra}" @input="validarCampo('costo_compra')"/>                            
                         </div>
                         <small class="p-error" v-if="errores.costo_compra"><strong>{{ errores.costo_compra }}</strong></small>
@@ -260,8 +260,8 @@
                     <div class="col-md-6">
                         <label class="font-weight-bold"  for="precioventa">Precio Venta <span class="text-danger">*</span></label>
                         <div class="p-inputgroup">
-                            <InputNumber id="precioventa"  v-model="datosFormulario.precio_venta" placeholder="Sin decimales" class=" p-inputtext-sm bold-input" 
-                                        :class="{'p-invalid' : errores.precio_venta}" @input="validarCampo('precio_venta')" />                        
+                            <InputNumber id="precioventa"  v-model="datosFormulario.precio_venta" placeholder="Sin decimales" class=" p-inputtext-sm bold-input"  mode="decimal" :minFractionDigits="2" 
+                                        :class="{'p-invalid' : errores.precio_venta}" @input="validarCampo('precio_venta')" :maxFracionDigits="2"  />                        
                         </div>
                         <small class="p-error" v-if="errores.precio_venta"><strong>{{ errores.precio_venta }}</strong></small>   
 
@@ -282,7 +282,7 @@
                     <div class="col-md-4">
                         <label class="font-weight-bold" for="cantidadStock">Cantidad Stock <span class="text-danger">*</span></label>
                         <div class="p-inputgroup">
-                            <InputNumber id="cantidadStock" v-model="unidadStock" placeholder="Ej: 10" class="p-inputtext-sm"
+                            <InputNumber id="cantidadStock" v-model="unidadStock" placeholder="Ej: 10" class="p-inputtext-sm"  mode="decimal"
                                         :class="{'p-invalid' : erroresinventario.unidadStock}" @input="validarCampoInventario('unidadStock')"/>
                         </div>
                         <small class="p-error" v-if="erroresinventario.unidadStock"><strong>{{ erroresinventario.unidadStock }}</strong></small>   
@@ -313,10 +313,10 @@
                     <div class="p-col-6 custom-precios">
                         <label class="p-mr-2 p-text-bold" style="width: 100px;">{{ precio.nombre_precio }}:</label>
                         <div class="p-inputgroup p-mr-2" style="width: 150px;">
-                            <InputNumber v-if="index === 0" placeholder="Precio" v-model="precio_uno" mode="decimal" class="p-inputtext-sm" />
-                            <InputNumber v-if="index === 1" placeholder="Precio" v-model="precio_dos" mode="decimal" class="p-inputtext-sm" />
-                            <InputNumber v-if="index === 2" placeholder="Precio" v-model="precio_tres" mode="decimal"  class="p-inputtext-sm" />
-                            <InputNumber v-if="index === 3" placeholder="Precio" v-model="precio_cuatro" mode="decimal"  class="p-inputtext-sm" />
+                            <InputNumber v-if="index === 0" placeholder="Precio" v-model="precio_uno"  mode="decimal" :minFractionDigits="2" :maxFracionDigits="2"  class="p-inputtext-sm" />
+                            <InputNumber v-if="index === 1" placeholder="Precio" v-model="precio_dos"  mode="decimal" :minFractionDigits="2"  :maxFracionDigits="2" class="p-inputtext-sm" />
+                            <InputNumber v-if="index === 2" placeholder="Precio" v-model="precio_tres"  mode="decimal"  :minFractionDigits="2"  :maxFracionDigits="2" class="p-inputtext-sm" />
+                            <InputNumber v-if="index === 3" placeholder="Precio" v-model="precio_cuatro"  mode="decimal"  :minFractionDigits="2" :maxFracionDigits="2" class="p-inputtext-sm" />
                             <span class="p-inputgroup-addon">{{ monedaPrincipal[1] }}</span>
                         </div>
                     </div>
@@ -771,7 +771,6 @@ export default {
             return (precio / parseFloat(this.monedaPrincipal))
         },
         async validarCampo(campo) {
-            this.asignarCampos();
             try {
                 await esquemaArticulos.validateAt(campo, this.datosFormulario);
                 this.errores[campo] = null;
@@ -839,6 +838,10 @@ export default {
                 // Actualización del artículo
                 try {
                     this.datosFormulario.fotografia = this.fotografia;
+                    if (this.tipo_stock == "paquetes") {
+                        this.datosFormulario.stock = this.datosFormulario.unidad_envase * this.datosFormulario.stock;
+                        console.log("paquetes ",this.datosFormulario.stock)
+                    }
                     await this.actualizarArticulo(this.datosFormulario);
                     console.log("Actualización de artículo exitosa");
                 } catch (error) {
@@ -846,6 +849,7 @@ export default {
                 }
             } else if (validacionExitosa || validacionInventarioExitosa) {
                 // Registro del artículo
+                console.log("TIPO STOCK ",this.tipo_stock)
                 this.datosFormulario.fotografia = this.fotografia;
                 if (this.tipo_stock == "paquetes") {
                     this.datosFormulario.stock = this.datosFormulario.unidad_envase * this.datosFormulario.stock;
@@ -1151,10 +1155,7 @@ export default {
             this.proveedorSeleccionado=[];
             this.grupoSeleccionado=[];
             this.medidaSeleccionado=[];
-            this.almacenSeleccionado=[];
-            this.unidadStock='',
             this.fechaVencimientoSeleccion = false;
-            this.fechaVencimientoAlmacen = '',
             this.errorArticulo = 0;
             this.idmedida = 0;
             this.costo_compra = '';
