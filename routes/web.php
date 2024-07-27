@@ -397,6 +397,10 @@ Route::group(["middleware" => ["auth"]], function () {
             "IngresoCuotaController@index"
         );
         Route::get(
+            "/ingresoCuotas/listarIngresos",
+            "IngresoCuotaController@listarComprasCredito"
+        );
+        Route::get(
             "/ingresoCuotas/cuotasPorIngreso",
             "IngresoCuotaController@getCuotasByIngreso"
         );

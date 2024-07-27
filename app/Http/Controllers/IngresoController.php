@@ -319,8 +319,10 @@ class IngresoController extends Controller
                     $cuota->precio_cuota = $cuotaObj["precio_cuota"] ?? 0;
                     $cuota->total_cancelado = $cuotaObj["total_cancelado"] ?? 0;
                     $cuota->saldo_restante = $cuotaObj["saldo_restante"] ?? 0;
-                    $cuota->fecha_cancelado =
-                        $cuotaObj["fecha_cancelado"] ?? null;
+                    $cuota->fecha_cancelado = $cuotaObj["fecha_cancelado"] ?? null;
+                    if ($cuotaObj["estado"] == "Cuota Inicial") {
+                        $cuota->tipo_pago_cuota = $request->form_cuotas["tipoPagoCuotaSeleccionado"]["nombre"] ?? "Ninguna";
+                    }
                     $cuota->estado = $cuotaObj["estado"] ?? "Pendiente";
                     $cuota->save();
                 }

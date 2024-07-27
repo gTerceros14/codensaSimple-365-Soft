@@ -258,20 +258,6 @@ export default {
                 return;
             }
 
-            /*const articulos_invalidos = this.array_articulos_completo.filter(
-                articulo => !articulo.fecha_vencimiento || articulo.unidades <= 0
-            );
-
-            if (articulos_invalidos.length > 0) {
-                this.$toast.add({
-                severity:'error',
-                summary: 'Error de validación',
-                detail: 'Hay artículos sin fecha de vencimiento o con cantidad inválida',
-                life: 3000
-                });
-                return;
-            }*/
-
             const articulosSinFechaVencimiento = this.array_articulos_completo.filter(
                 articulo => this.verificarFechaVencimiento(articulo)
             );
