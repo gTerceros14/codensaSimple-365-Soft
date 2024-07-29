@@ -550,7 +550,7 @@ export default {
                 { field: 'descripcion', header: 'DESCRIPCION' },
                 { field: 'condicion', header: 'CONTROLADO', type: 'badge' },
                 { field: 'nombre_grupo', header: 'GRUPO/FAMILIA' },
-                { field: 'fotografia', header: 'Estado', type: 'image' }
+                { field: 'fotografia', header: 'FOTOGRAFIA', type: 'image' }
             ]
         };
     },
