@@ -12,10 +12,10 @@
     <categoria></categoria>
 </template>
 
-<template v-if="menu==2">
+<!--<template v-if="menu==2">
     <articulo></articulo>
 </template>
-
+-->
 <template v-if="menu==3">
     <ingreso></ingreso>
 </template>
@@ -260,7 +260,7 @@
 <template v-if="menu==18">
     <marcanewview></marcanewview>
 </template>
-<template v-if="menu==71">
+<template v-if="menu==2">
     <articulonewview></articulonewview>
 </template>
 @elseif (Auth::user()->idrol == 2)

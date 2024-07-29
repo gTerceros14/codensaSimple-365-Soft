@@ -608,7 +608,7 @@ export default {
                 ...dynamicColumns,
                 ...this.headers.slice(index)
             ];
-            console.log("RESULTS COMPUTED ",dynamicColumns)
+            console.log("RESULTS COMPUTED ",index)
             return result;
         }
     },
