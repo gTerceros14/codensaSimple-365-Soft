@@ -406,34 +406,45 @@
                                 </div>
 
                                 <div v-else-if="opcionPago === 'qr'">
-                                    <div class="p-grid p-jc-center">
-                                        <div class="p-col-8">
-                                            <InputText v-model="alias" type="hidden" />
-                                            <div class="p-field">
-                                                <label for="montoEfectivo">Monto:</label>
-                                                <span class="p-text-bold">{{ montoEfectivo = (calcularTotal).toFixed(2)
-                                                    }}</span>
-                                            </div>
-                                            <Button label="Generar QR" icon="pi pi-qrcode" @click="generarQr"
-                                                class="p-mb-2" />
-                                            <div v-if="qrImage" class="p-text-center p-mb-2">
-                                                <Image :src="qrImage" alt="Código QR" />
-                                            </div>
-                                            <Button v-if="qrImage" label="Verificar Estado de Pago"
-                                                icon="pi pi-check-circle" @click="verificarEstado"
-                                                class="p-button-secondary p-mb-2" />
-                                            <div v-if="estadoTransaccion" class="p-card p-p-2">
-                                                <div class="p-text-bold">Estado Actual:</div>
-                                                <div>
-                                                    <span :class="'p-tag p-tag-' + badgeSeverity">{{
-                                                        estadoTransaccion.objeto.estadoActual }}</span>
+                                            <div class="container">
+                                                <div class="row justify-content-center">
+                                                    <div class="col-md-8">
+                                                        <div class="form-group">
+                                                            <input v-model="alias" readonly style="display: none;" />
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="montoEfectivo">Monto:</label>
+                                                            <span class="font-weight-bold">{{ montoEfectivo =
+                                                            (calcularTotal).toFixed(2) }}</span>
+                                                        </div>
+                                                        <button class="btn btn-primary mb-2" @click="generarQr">Generar
+                                                            QR</button>
+                                                        <div v-if="qrImage" class="mb-2 text-center">
+                                                            <img :src="qrImage" alt="Código QR" class="img-fluid" />
+                                                        </div>
+                                                        <button class="btn btn-secondary mb-2" @click="verificarEstado"
+                                                            v-if="qrImage">Verificar
+                                                            Estado
+                                                            de
+                                                            Pago</button>
+                                                        <div v-if="estadoTransaccion" class="card p-2">
+                                                            <div class="font-weight-bold">Estado Actual:</div>
+                                                            <div>
+                                                                <span :class="'badge badge-' + badgeSeverity">{{
+                                                                    estadoTransaccion.objeto.estadoActual
+                                                                }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <Button 
+      @click="registrarVenta(7)" 
+      label="Registrar Pago" 
+      icon="pi pi-check" 
+      class="p-button-success"
+    />
                                                 </div>
                                             </div>
-                                            <Button label="Registrar Pago" icon="pi pi-check"
-                                                class="p-button-success p-mt-2" @click="registrarVenta(7)" />
                                         </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
