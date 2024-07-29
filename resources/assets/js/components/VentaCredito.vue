@@ -1,6 +1,6 @@
 <template>
     <div class="main">
-        <div class="container-fluid">
+
             <Card style="padding-top:15px">
 
                 <template #header>
@@ -64,12 +64,12 @@
                     <Paginator :rows="pagination.per_page" :totalRecords="pagination.total" :first="pagination.current_page - 1" @page="onPageChange($event)" />
                 </template>
             </Card>
-        </div>
+
 
         <Dialog 
     :visible.sync="modalDetalle" 
     :modal="true" 
-    :containerStyle="{width: '70vw'}"
+    :containerStyle="{width: '800px'}"
     :closable="true" 
     :dismissableMask="true"
     :closeOnEscape="true"
@@ -138,14 +138,13 @@
 
 <script>
 
-import Toast from 'primevue/toast';
-import Card from 'primevue/card';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
 import Button from 'primevue/button';
+import Card from 'primevue/card';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
-import Dialog from 'primevue/dialog';
 import Paginator from 'primevue/paginator';
 import Panel from 'primevue/panel';
 export default {

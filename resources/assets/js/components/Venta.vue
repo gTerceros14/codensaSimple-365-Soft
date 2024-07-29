@@ -3,24 +3,41 @@
         <!-- Breadcrumb -->
         <Panel header="Venta">
             <template #header>
-                <div class="p-d-flex p-jc-between p-ai-center moto-header">
-                    <h2 class="p-m-0">
+                <div class="moto-header p-d-flex p-flex-column p-flex-md-row p-jc-between p-ai-center">
+                    <h2 class="p-m-0 p-mt-3 p-mt-md-0">
                         <i class="pi pi-motorcycle p-mr-2"></i>
                         Ventas
                     </h2>
-                    <Button @click="abrirTipoVenta" label="Nueva Venta" icon="pi pi-plus" class="p-button-success" />
                 </div>
             </template>
 
             <!-- Buscador -->
-            <div class="p-mb-4">
-                <span class="p-input-icon-left p-input-icon-right">
-                    <i class="pi pi-search" />
-                    <InputText v-model="buscar" @input="buscarVenta" placeholder="Buscar venta..."
-                        class="p-inputtext-lg moto-search" />
-                    <i class="pi pi-times" v-if="buscar" @click="buscar = ''; buscarVenta()" style="cursor: pointer;" />
-                </span>
-            </div>
+            <div class="p-d-flex p-flex-column p-flex-md-row p-ai-start p-ai-md-center p-mb-4">
+    <Button
+        @click="abrirTipoVenta"
+        label="Nueva Venta"
+        icon="pi pi-plus"
+        class="p-button-success p-mb-3 p-mb-md-0 p-mr-md-3 p-button-lg p-w-100 p-w-md-auto"
+    />
+    <span class="p-input-icon-left p-input-icon-right p-w-100">
+        <i class="pi pi-search" />
+        <InputText
+            v-model="buscar"
+            @input="buscarVenta"
+            placeholder="Buscar venta..."
+            class="p-inputtext-lg moto-search p-w-100"
+        />
+        <i
+            class="pi pi-times"
+            v-if="buscar"
+            @click="
+                buscar = '';
+                buscarVenta();
+            "
+            style="cursor: pointer"
+        />
+    </span>
+</div>
 
             <!-- Listado de Ventas -->
             <template v-if="listado == 1">
@@ -29,13 +46,18 @@
                     <Column header="Opciones">
                         <template #body="slotProps">
                             <Button icon="pi pi-eye" @click="verVenta(slotProps.data.id)" class="p-button-sm p-mr-1"
-                                style="background-color: green; border-color: green; color: white;" />
+                                style="
+                  background-color: green;
+                  border-color: green;
+                  color: white;
+                " />
                             <template v-if="slotProps.data.estado === 'Registrado' && idrol !== 2">
                                 <Button icon="pi pi-trash" @click="desactivarVenta(slotProps.data.id)"
                                     class="p-button-sm p-button-danger p-mr-1" />
                             </template>
-                            <Button icon="pi pi-print" @click="imprimirResivo(slotProps.data.id, slotProps.data.correo)"
-                                class="p-button-sm p-button-primary p-mr-1" />
+                            <Button icon="pi pi-print" @click="
+                                imprimirResivo(slotProps.data.id, slotProps.data.correo)
+                                " class="p-button-sm p-button-primary p-mr-1" />
                         </template>
                     </Column>
                     <Column field="usuario" header="Vendedor"></Column>
@@ -46,8 +68,10 @@
                     <Column header="Total">
                         <template #body="slotProps">
                             <span class="moto-price">
-                                {{ (slotProps.data.total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
+                                {{
+                                    (slotProps.data.total * parseFloat(monedaVenta[0])).toFixed(2)
                                 }}
+                                {{ monedaVenta[1] }}
                             </span>
                         </template>
                     </Column>
@@ -60,96 +84,97 @@
 
             <!-- Ver Detalle de Venta -->
             <template v-else-if="listado == 2">
-        <Card class="shadow">
-            <template #content>
-                <div class="p-grid p-fluid border p-3 mb-3">
-                    <div class="p-col-12 p-md-9">
-                        <div class="p-field">
-                            <label>Cliente</label>
-                            <InputText v-model="cliente" disabled />
+                <Card class="shadow">
+                    <template #content>
+                        <div class="p-grid p-fluid border p-3 mb-3">
+                            <div class="p-col-12 p-md-9">
+                                <div class="p-field">
+                                    <label>Cliente</label>
+                                    <InputText v-model="cliente" disabled />
+                                </div>
+                            </div>
+                            <div class="p-col-12 p-md-3">
+                                <div class="p-field">
+                                    <label>Tipo Comprobante</label>
+                                    <InputText v-model="tipo_comprobante" disabled />
+                                </div>
+                            </div>
+                            <div class="p-col-12 p-md-3">
+                                <div class="p-field">
+                                    <label>Número Comprobante</label>
+                                    <InputText v-model="num_comprobante" disabled />
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="p-col-12 p-md-3">
-                        <div class="p-field">
-                            <label>Tipo Comprobante</label>
-                            <InputText v-model="tipo_comprobante" disabled />
+                        <DataTable :value="arrayDetalle" class="mb-3">
+                            <Column field="articulo" header="Artículo"></Column>
+                            <Column header="Precio">
+                                <template #body="slotProps">
+                                    {{
+                                        (
+                                            slotProps.data.precio * parseFloat(monedaVenta[0])
+                                    ).toFixed(2)
+                                    }}
+                                    {{ monedaVenta[1] }}
+                                </template>
+                            </Column>
+                            <Column field="cantidad" header="Cantidad"></Column>
+                            <Column header="Subtotal">
+                                <template #body="slotProps">
+                                    {{
+                                        (
+                                            slotProps.data.precio *
+                                            slotProps.data.cantidad *
+                                            parseFloat(monedaVenta[0])
+                                    ).toFixed(2)
+                                    }}
+                                    {{ monedaVenta[1] }}
+                                </template>
+                            </Column>
+                        </DataTable>
+                        <div class="p-text-right p-mb-3">
+                            <strong>Total Neto:
+                                {{ (total * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                {{ monedaVenta[1] }}</strong>
                         </div>
-                    </div>
-                    <div class="p-col-12 p-md-3">
-                        <div class="p-field">
-                            <label>Número Comprobante</label>
-                            <InputText v-model="num_comprobante" disabled />
+                        <div class="p-text-right">
+                            <Button label="Cerrar" @click="ocultarDetalle()" class="p-button-secondary" />
                         </div>
-                    </div>
-                </div>
-                <DataTable :value="arrayDetalle" class="mb-3">
-                    <Column field="articulo" header="Artículo"></Column>
-                    <Column header="Precio">
-                        <template #body="slotProps">
-                            {{ (slotProps.data.precio * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                monedaVenta[1] }}
-                        </template>
-                    </Column>
-                    <Column field="cantidad" header="Cantidad"></Column>
-                    <Column header="Subtotal">
-                        <template #body="slotProps">
-                            {{ ((slotProps.data.precio * slotProps.data.cantidad) *
-                                parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
-                        </template>
-                    </Column>
-                </DataTable>
-                <div class="p-text-right p-mb-3">
-                    <strong>Total Neto: {{ (total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
-                        }}</strong>
-                </div>
-                <div class="p-text-right">
-                    <Button label="Cerrar" @click="ocultarDetalle()" class="p-button-secondary" />
-                </div>
+                    </template>
+                </Card>
             </template>
-        </Card>
-    </template>
-
         </Panel>
         <!-- HASTA AQUI DEVOLUCIONES -->
         <template>
-            <Dialog :visible.sync="modal2" :containerStyle="{ width: '60vw' }" :modal="true" :closable="false"
+            <Dialog :visible.sync="modal2" :containerStyle="{ width: '800px' }" :modal="true" :closable="true"
                 :closeOnEscape="false">
                 <template #header>
-                    <h5 class="modal-title">Detalle Ventas</h5>
+                    <h5 class="modal-title">DETALLE VENTAS</h5>
                 </template>
                 <div class="p-fluid">
                     <div class="p-field">
                         <div class="step-indicators">
-                            <span :class="['step', { 'active': step === 1, 'completed': step > 1 }]">1</span>
-                            <span :class="['step', { 'active': step === 2, 'completed': step > 2 }]">2</span>
-                            <span :class="['step', { 'active': step === 3 }]">3</span>
+                            <span :class="['step', { active: step === 1, completed: step > 1 }]">1</span>
+                            <span :class="['step', { active: step === 2, completed: step > 2 }]">2</span>
+                            <span :class="['step', { active: step === 3 }]">3</span>
                         </div>
                     </div>
                     <div v-if="step === 1" class="step-content p-fluid">
                         <div class="p-grid p-formgrid p-mb-3">
                             <div class="p-col-12 p-md-4">
-                                <span class="p-float-label">
-                                    <InputText id="documento" v-model="documento"
-                                        @keyup.enter="buscarClientePorDocumento" />
-                                    <label for="documento">Documento <span class="p-error">*</span></label>
-                                </span>
+                                <InputText id="documento" v-model="documento" @input="checkDocumento" maxlength="7" />
+                                <label for="documento">DOCUMENTO <span class="p-error">*</span></label>
+                            </div>
+                            <div class="p-col-12 p-md-4">
+                                <InputText id="nombreCliente" v-model="nombreCliente"
+                                    :disabled="!nombreClienteEditable" />
+                                <label for="nombreCliente">CLIENTE <span class="p-error">*</span></label>
                             </div>
 
                             <div class="p-col-12 p-md-4">
-                                <span class="p-float-label">
-                                    <InputText id="nombreCliente" v-model="nombreCliente"
-                                        :disabled="!nombreClienteEditable" />
-                                    <label for="nombreCliente">Cliente <span class="p-error">*</span></label>
-                                </span>
-                            </div>
-
-                            <div class="p-col-12 p-md-4">
-                                <span class="p-float-label">
-                                    <Dropdown id="tipoComprobante" v-model="tipo_comprobante"
-                                        :options="tipoComprobanteOptions" optionLabel="name" optionValue="code" />
-                                    <label for="tipoComprobante">Tipo de comprobante <span
-                                            class="p-error">*</span></label>
-                                </span>
+                                <Dropdown id="tipoComprobante" v-model="tipo_comprobante"
+                                    :options="tipoComprobanteOptions" optionLabel="name" optionValue="code" />
+                                <label for="tipoComprobante">COMPROBANTE <span class="p-error">*</span></label>
                             </div>
                         </div>
 
@@ -161,7 +186,7 @@
                         <InputText v-model="email" type="hidden" />
                         <InputText v-model="num_comprob" type="hidden" disabled />
                     </div>
-                 
+
                     <div v-if="step === 2" class="step-content">
                         <!-- Header Section -->
                         <div class="p-fluid p-grid">
@@ -183,87 +208,115 @@
                         </div>
 
                         <!-- Product Details Section -->
-                        <div v-if="arraySeleccionado && Object.keys(arraySeleccionado).length > 0" class="p-mt-4">
-                            <Card class="product-card">
-                                
-                                <template #content>
-                                    <div class="p-grid">
-                                        <h2 class="product-title p-mt-3">{{ arraySeleccionado.nombre }}</h2>
-                                        <!-- Product Image and Basic Info -->
-                                        <div class="p-col-12 p-lg-6">
-                                            <div class="product-image-container">
-                                                <img :src="arraySeleccionado.fotografia ? `img/articulo/${arraySeleccionado.fotografia}?t=${new Date().getTime()}` : 'img/productoSinImagen.png'"
-                                                    :alt="arraySeleccionado.nombre" class="product-image" />
-                                            </div>
-                                            
-                                           
-                                        </div>
-
-                                        <!-- Product Pricing and Purchase Options -->
-                                        <div class="p-col-12 p-lg-6">
-                                            <div class="stock-info p-mb-3">
-                                                <i :class="calcularStockDisponible > 0 ? 'pi pi-check-circle' : 'pi pi-exclamation-triangle'"
-                                                    :style="{ color: calcularStockDisponible > 0 ? 'var(--green-500)' : 'var(--yellow-500)' }"></i>
-                                                <span>{{ calcularStockDisponible > 0 ? 'En stock' : 'Bajo stock'
-                                                    }}</span>
-                                                <strong>{{ calcularStockDisponible }} Unidades
-                                                    disponibles</strong>
-                                            </div>
-
-                                            <div class="product-price p-mb-4">
-                                                <h2 v-if="arrayPromocion && arrayPromocion.id">
-                                                    <span v-if="arrayPromocion.porcentaje == 100"
-                                                        class="promo-price">GRATIS</span>
-                                                    <span v-else>
-                                                        <span class="promo-price">{{
-                                                            formatearPrecio(calcularPrecioConDescuento(arraySeleccionado.precio_venta,
-                                                                arrayPromocion.porcentaje)) }}</span>
-                                                        <small class="original-price">
-                                                            <s>{{
-                                                                formatearPrecio(arraySeleccionado.precio_venta)
-                                                                }}</s>
-                                                        </small>
-                                                    </span>
-                                                </h2>
-                                                <h2 v-else class="regular-price">
-                                                    {{ formatearPrecio(arraySeleccionado.precio_venta) }}
-                                                </h2>
-                                            </div>
-
-                                            <div class="purchase-options">
-                                                <div class="p-field p-mb-3">
-                                                    <label>Tipo de venta</label>
-                                                    <Dropdown v-model="unidadPaquete" :options="[
-                                                        { label: 'Por paquete', value: arraySeleccionado.unidad_envase },
-                                                        { label: 'Por unidad', value: '1' }
-                                                    ]" optionLabel="label" optionValue="value" class="w-full" />
+                        <div v-if="
+                            arraySeleccionado && Object.keys(arraySeleccionado).length > 0
+                        " class="p-mt-4">
+                            <template>
+                                <Card class="product-card">
+                                    <template #content>
+                                        <div class="p-grid">
+                                            <h2 class="product-title p-col-12 p-mb-3">
+                                                {{ arraySeleccionado.nombre }}
+                                            </h2>
+                                            <div class="p-col-12 p-md-6 p-lg-6">
+                                                <div class="product-image-container">
+                                                    <img :src="arraySeleccionado.fotografia
+                                                            ? `img/articulo/${arraySeleccionado.fotografia}?t=${new Date().getTime()}`
+                                                            : 'img/productoSinImagen.png'
+                                                        " :alt="arraySeleccionado.nombre" class="product-image" />
                                                 </div>
-
-                                                <template>
-                                                    <div class="p-inputgroup"
-                                                        style="display: flex; justify-content: center; align-items: center;">
-                                                        <InputNumber v-model="cantidad" :min="1" showButtons
-                                                            buttonLayout="horizontal"
-                                                            decrementButtonClass="p-button-danger"
-                                                            incrementButtonClass="p-button-success"
-                                                            incrementButtonIcon="pi pi-plus"
-                                                            decrementButtonIcon="pi pi-minus"
-                                                            style="flex-grow: 0; width: auto;" />
+                                            </div>
+                                            <div class="p-col-12 p-md-6 p-lg-6">
+                                                <div class="stock-info p-mb-3">
+                                                    <i :class="calcularStockDisponible > 0
+                                                            ? 'pi pi-check-circle'
+                                                            : 'pi pi-exclamation-triangle'
+                                                        " :style="{
+                                color:
+                                    calcularStockDisponible > 0
+                                        ? 'var(--green-500)'
+                                        : 'var(--yellow-500)',
+                            }"></i>
+                                                    <span>{{
+                                                        calcularStockDisponible > 0
+                                                            ? "En stock"
+                                                        : "Bajo stock"
+                                                        }}</span>
+                                                    <strong>{{ calcularStockDisponible }} Unidades
+                                                        disponibles</strong>
+                                                </div>
+                                                <div class="product-price p-mb-4">
+                                                    <h2 v-if="arrayPromocion && arrayPromocion.id">
+                                                        <span v-if="arrayPromocion.porcentaje == 100"
+                                                            class="promo-price">GRATIS</span>
+                                                        <span v-else>
+                                                            <span class="promo-price">{{
+                                                                formatearPrecio(
+                                                                    calcularPrecioConDescuento(
+                                                                        arraySeleccionado.precio_venta,
+                                                                arrayPromocion.porcentaje
+                                                                )
+                                                                )
+                                                                }}</span>
+                                                            <small class="original-price">
+                                                                <s>{{
+                                                                    formatearPrecio(
+                                                                        arraySeleccionado.precio_venta
+                                                                    )
+                                                                    }}</s>
+                                                            </small>
+                                                        </span>
+                                                    </h2>
+                                                    <h2 v-else class="regular-price">
+                                                        {{
+                                                            formatearPrecio(arraySeleccionado.precio_venta)
+                                                        }}
+                                                    </h2>
+                                                </div>
+                                                <div class="purchase-options">
+                                                    <div class="p-grid p-fluid">
+                                                        <div class="p-col-6">
+                                                            <div class="p-field">
+                                                                <label>Tipo de venta</label>
+                                                                <Dropdown v-model="unidadPaquete" :options="[
+                                                                    {
+                                                                        label: 'Por paquete',
+                                                                        value: arraySeleccionado.unidad_envase,
+                                                                    },
+                                                                    { label: 'Por unidad', value: '1' },
+                                                                ]" optionLabel="label" optionValue="value" class="w-full" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <div class="p-field">
+                                                                <label>Cantidad</label>
+                                                                <div class="p-inputgroup">
+                                                                    <InputNumber v-model="cantidad" :min="1" showButtons
+                                                                        buttonLayout="horizontal"
+                                                                        decrementButtonClass="p-button-danger"
+                                                                        incrementButtonClass="p-button-success"
+                                                                        incrementButtonIcon="pi pi-plus"
+                                                                        decrementButtonIcon="pi pi-minus" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="p-col-12">
+                                                            <div class="p-d-flex p-jc-center p-mt-3">
+                                                                <Button label="Agregar" icon="pi pi-shopping-cart"
+                                                                    @click="agregarDetalle"
+                                                                    class="p-button-success p-mr-2" />
+                                                                <Button label="Eliminar" icon="pi pi-trash"
+                                                                    @click="eliminarSeleccionado"
+                                                                    class="p-button-danger" />
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </template>
-
-                                                <div class="action-buttons">
-                                                    <Button label="Agregar " icon="pi pi-shopping-cart"
-                                                        @click="agregarDetalle"
-                                                        class="p-button-success p-mr-2 p-mb-2" />
-                                                    <Button label="Eliminar" icon="pi pi-trash"
-                                                        @click="eliminarSeleccionado" class="p-button-danger p-mb-2" />
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </template>
-                            </Card>
+                                    </template>
+                                </Card>
+                            </template>
                         </div>
 
                         <!-- Cart Table -->
@@ -271,16 +324,23 @@
                             <DataTable :value="arrayDetalle" class="p-mt-3">
                                 <Column header="Opciones" style="width: 10%">
                                     <template #body="slotProps">
-                                        <Button icon="pi pi-trash" class="p-button-danger p-button-sm"
-                                            @click="slotProps.data.medida != 'KIT' ? eliminarDetalle(slotProps.data.id) : eliminarKit(slotProps.data.idkit)" />
+                                        <Button icon="pi pi-trash" class="p-button-danger p-button-sm" @click="
+                                            slotProps.data.medida != 'KIT'
+                                                ? eliminarDetalle(slotProps.data.id)
+                                                : eliminarKit(slotProps.data.idkit)
+                                            " />
                                     </template>
                                 </Column>
                                 <Column field="articulo" header="Artículo" style="width: 30%" />
                                 <Column field="precioUnidad" header="Precio Unidad" style="width: 15%">
                                     <template #body="slotProps">
-                                        {{ (slotProps.data.precioseleccionado * parseFloat(monedaVenta[0])).toFixed(2)
-                                        }} {{
-                                            monedaVenta[1] }}
+                                        {{
+                                            (
+                                                slotProps.data.precioseleccionado *
+                                                parseFloat(monedaVenta[0])
+                                        ).toFixed(2)
+                                        }}
+                                        {{ monedaVenta[1] }}
                                     </template>
                                 </Column>
                                 <Column field="unidades" header="Unidades" style="width: 10%">
@@ -294,8 +354,14 @@
                                 </Column>
                                 <Column field="total" header="Total" style="width: 20%">
                                     <template #body="slotProps">
-                                        {{ (slotProps.data.precioseleccionado * slotProps.data.cantidad *
-                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                                        {{
+                                            (
+                                                slotProps.data.precioseleccionado *
+                                                slotProps.data.cantidad *
+                                                parseFloat(monedaVenta[0])
+                                        ).toFixed(2)
+                                        }}
+                                        {{ monedaVenta[1] }}
                                     </template>
                                 </Column>
                             </DataTable>
@@ -305,8 +371,11 @@
                         <div class="p-grid p-mt-3">
                             <div class="p-col-12 p-md-8"></div>
                             <div class="p-col-12 p-md-4 p-text-right">
-                                <h3>Total Neto: {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                    monedaVenta[1] }}</h3>
+                                <h3>
+                                    Total Neto:
+                                    {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                    {{ monedaVenta[1] }}
+                                </h3>
                             </div>
                         </div>
                     </div>
@@ -315,17 +384,19 @@
                         <div class="d-flex justify-content-center mb-3">
                             <div class="form-group">
                                 <div class="d-flex">
-                                    <button class="btn btn-lg me-3"
-                                        :class="{ 'btn-primary': tipoVenta === 'contado', 'btn-outline-primary': tipoVenta !== 'contado' }"
-                                        @click="seleccionarTipoVenta('contado')">
+                                    <button class="btn btn-lg me-3" :class="{
+                                        'btn-primary': tipoVenta === 'contado',
+                                        'btn-outline-primary': tipoVenta !== 'contado',
+                                    }" @click="seleccionarTipoVenta('contado')">
                                         <div class="d-flex flex-column align-items-center">
                                             <i class="fa fa-money fa-2x mb-2"></i>
                                             <span>Contado</span>
                                         </div>
                                     </button>
-                                    <button class="btn btn-lg"
-                                        :class="{ 'btn-primary': tipoVenta === 'credito', 'btn-outline-primary': tipoVenta !== 'credito' }"
-                                        @click="seleccionarTipoVenta('credito')">
+                                    <button class="btn btn-lg" :class="{
+                                        'btn-primary': tipoVenta === 'credito',
+                                        'btn-outline-primary': tipoVenta !== 'credito',
+                                    }" @click="seleccionarTipoVenta('credito')">
                                         <div class="d-flex flex-column align-items-center">
                                             <i class="fa fa-credit-card fa-2x mb-2"></i>
                                             <span>Crédito</span>
@@ -363,7 +434,8 @@
                                                                     class="pi pi-money-bill p-mr-2" /> Monto
                                                                 Recibido:</label>
                                                             <div class="p-inputgroup">
-                                                                <span class="p-inputgroup-addon">{{ monedaVenta[1]
+                                                                <span class="p-inputgroup-addon">{{
+                                                                    monedaVenta[1]
                                                                     }}</span>
                                                                 <InputNumber id="montoEfectivo" v-model="recibido"
                                                                     placeholder="Ingrese el monto recibido" />
@@ -371,10 +443,13 @@
                                                         </div>
                                                         <div class="p-field">
                                                             <label for="cambioRecibir"><i class="pi pi-sync p-mr-2" />
-                                                                Cambio a Entregar:</label>
-                                                            <InputText id="cambioRecibir"
-                                                                :value="(recibido - calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)"
-                                                                readonly />
+                                                                Cambio a
+                                                                Entregar:</label>
+                                                            <InputText id="cambioRecibir" :value="(
+                                                                    recibido -
+                                                                    calcularTotal * parseFloat(monedaVenta[0])
+                                                                ).toFixed(2)
+                                                                " readonly />
                                                         </div>
                                                     </div>
                                                 </template>
@@ -385,17 +460,24 @@
                                                 <template #content>
                                                     <h5>Detalle de Venta</h5>
                                                     <div class="p-d-flex p-jc-between p-mb-2">
-                                                        <span><i class="pi pi-dollar p-mr-2" /> Monto Total:</span>
-                                                        <span class="p-text-bold">{{ (calcularTotal *
-                                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
-                                                            }}</span>
+                                                        <span><i class="pi pi-dollar p-mr-2" /> Monto
+                                                            Total:</span>
+                                                        <span class="p-text-bold">{{
+                                                            (
+                                                                calcularTotal * parseFloat(monedaVenta[0])
+                                                            ).toFixed(2)
+                                                            }}
+                                                            {{ monedaVenta[1] }}</span>
                                                     </div>
                                                     <div class="p-d-flex p-jc-between">
                                                         <span><i class="pi pi-money-bill p-mr-2" /> Total a
                                                             Pagar:</span>
-                                                        <span class="p-text-bold p-text-xl">{{ (calcularTotal *
-                                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
-                                                            }}</span>
+                                                        <span class="p-text-bold p-text-xl">{{
+                                                            (
+                                                                calcularTotal * parseFloat(monedaVenta[0])
+                                                            ).toFixed(2)
+                                                            }}
+                                                            {{ monedaVenta[1] }}</span>
                                                     </div>
                                                 </template>
                                             </Card>
@@ -406,45 +488,42 @@
                                 </div>
 
                                 <div v-else-if="opcionPago === 'qr'">
-                                            <div class="container">
-                                                <div class="row justify-content-center">
-                                                    <div class="col-md-8">
-                                                        <div class="form-group">
-                                                            <input v-model="alias" readonly style="display: none;" />
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="montoEfectivo">Monto:</label>
-                                                            <span class="font-weight-bold">{{ montoEfectivo =
-                                                            (calcularTotal).toFixed(2) }}</span>
-                                                        </div>
-                                                        <button class="btn btn-primary mb-2" @click="generarQr">Generar
-                                                            QR</button>
-                                                        <div v-if="qrImage" class="mb-2 text-center">
-                                                            <img :src="qrImage" alt="Código QR" class="img-fluid" />
-                                                        </div>
-                                                        <button class="btn btn-secondary mb-2" @click="verificarEstado"
-                                                            v-if="qrImage">Verificar
-                                                            Estado
-                                                            de
-                                                            Pago</button>
-                                                        <div v-if="estadoTransaccion" class="card p-2">
-                                                            <div class="font-weight-bold">Estado Actual:</div>
-                                                            <div>
-                                                                <span :class="'badge badge-' + badgeSeverity">{{
-                                                                    estadoTransaccion.objeto.estadoActual
-                                                                }}</span>
-                                                            </div>
-                                                        </div>
+                                    <div class="container">
+                                        <div class="row justify-content-center">
+                                            <div class="col-md-8">
+                                                <div class="form-group">
+                                                    <input v-model="alias" readonly style="display: none" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="montoEfectivo">Monto:</label>
+                                                    <span class="font-weight-bold">{{
+                                                        (montoEfectivo = calcularTotal.toFixed(2))
+                                                        }}</span>
+                                                </div>
+                                                <button class="btn btn-primary mb-2" @click="generarQr">
+                                                    Generar QR
+                                                </button>
+                                                <div v-if="qrImage" class="mb-2 text-center">
+                                                    <img :src="qrImage" alt="Código QR" class="img-fluid" />
+                                                </div>
+                                                <button class="btn btn-secondary mb-2" @click="verificarEstado"
+                                                    v-if="qrImage">
+                                                    Verificar Estado de Pago
+                                                </button>
+                                                <div v-if="estadoTransaccion" class="card p-2">
+                                                    <div class="font-weight-bold">Estado Actual:</div>
+                                                    <div>
+                                                        <span :class="'badge badge-' + badgeSeverity">{{
+                                                            estadoTransaccion.objeto.estadoActual
+                                                            }}</span>
                                                     </div>
-                                                    <Button 
-      @click="registrarVenta(7)" 
-      label="Registrar Pago" 
-      icon="pi pi-check" 
-      class="p-button-success"
-    />
                                                 </div>
                                             </div>
+                                            <Button @click="registrarVenta(7)" label="Registrar Pago" icon="pi pi-check"
+                                                class="p-button-success" />
                                         </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -468,8 +547,12 @@
                                 <div class="p-col-4">
                                     <div class="p-field">
                                         <label class="font-weight-bold">Total</label>
-                                        <div>{{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                            monedaVenta[1] }}</div>
+                                        <div>
+                                            {{
+                                                (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)
+                                            }}
+                                            {{ monedaVenta[1] }}
+                                        </div>
                                         <Button label="GENERAR CUOTAS" @click="generarCuotas"
                                             class="p-button-success" />
                                     </div>
@@ -503,31 +586,53 @@
                                 </Column>
                                 <Column field="fecha_pago" header="Fecha Pago">
                                     <template #body="slotProps">
-                                        {{ new Date(slotProps.data.fecha_pago).toLocaleDateString('es-ES') }}
+                                        {{
+                                            new Date(slotProps.data.fecha_pago).toLocaleDateString(
+                                                "es-ES"
+                                        )
+                                        }}
                                     </template>
                                 </Column>
                                 <Column field="precio_cuota" header="Precio Cuota">
                                     <template #body="slotProps">
-                                        {{ (slotProps.data.precio_cuota * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                            monedaVenta[1] }}
+                                        {{
+                                            (
+                                                slotProps.data.precio_cuota * parseFloat(monedaVenta[0])
+                                        ).toFixed(2)
+                                        }}
+                                        {{ monedaVenta[1] }}
                                     </template>
                                 </Column>
                                 <Column field="totalCancelado" header="Total Cancelado">
                                     <template #body="slotProps">
-                                        {{ (slotProps.data.totalCancelado * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                            monedaVenta[1] }}
+                                        {{
+                                            (
+                                                slotProps.data.totalCancelado *
+                                                parseFloat(monedaVenta[0])
+                                        ).toFixed(2)
+                                        }}
+                                        {{ monedaVenta[1] }}
                                     </template>
                                 </Column>
                                 <Column field="saldo_restante" header="Saldo">
                                     <template #body="slotProps">
-                                        {{ (slotProps.data.saldo_restante * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                            monedaVenta[1] }}
+                                        {{
+                                            (
+                                                slotProps.data.saldo_restante *
+                                                parseFloat(monedaVenta[0])
+                                        ).toFixed(2)
+                                        }}
+                                        {{ monedaVenta[1] }}
                                     </template>
                                 </Column>
                                 <Column field="fecha_cancelado" header="Fecha Cancelado">
                                     <template #body="slotProps">
-                                        {{ slotProps.data.fecha_cancelado ? new
-                                            Date(slotProps.data.fecha_cancelado).toLocaleDateString('es-ES') : "Sin fecha"
+                                        {{
+                                            slotProps.data.fecha_cancelado
+                                                ? new Date(
+                                                    slotProps.data.fecha_cancelado
+                                                ).toLocaleDateString("es-ES")
+                                        : "Sin fecha"
                                         }}
                                     </template>
                                 </Column>
@@ -535,13 +640,14 @@
                             </DataTable>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" @click="cerrarModal3()">Volver</button>
-                                <button type="button" class="btn btn-primary"
-                                    @click="registrarVenta()">Registrar</button>
+                                <button type="button" class="btn btn-secondary" @click="cerrarModal3()">
+                                    Volver
+                                </button>
+                                <button type="button" class="btn btn-primary" @click="registrarVenta()">
+                                    Registrar
+                                </button>
                             </div>
                         </div>
-
-
                     </div>
 
                     <template>
@@ -555,16 +661,11 @@
                         </footer>
                     </template>
                 </div>
-
-
-
-
             </Dialog>
-
         </template>
 
         <template>
-            <Dialog :visible="modal" :containerStyle="{ width: '800px' }" style="padding-top: 35px;" :modal="true"
+            <Dialog :visible="modal" :containerStyle="{ width: '800px' }" style="padding-top: 35px" :modal="true"
                 :closable="true">
                 <template #header>
                     <h3>{{ tituloModal }}</h3>
@@ -595,8 +696,12 @@
                             <Column field="nombre_categoria" header="Categoría" />
                             <Column header="Precio Venta">
                                 <template #body="slotProps">
-                                    {{ (slotProps.data.precio_venta * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                        monedaVenta[1] }}
+                                    {{
+                                        (
+                                            slotProps.data.precio_venta * parseFloat(monedaVenta[0])
+                                    ).toFixed(2)
+                                    }}
+                                    {{ monedaVenta[1] }}
                                 </template>
                             </Column>
                             <Column field="saldo_stock" header="Stock" />
@@ -615,23 +720,22 @@
 </template>
 
 <script>
-import Button from 'primevue/button';
-import Card from 'primevue/card';
-import Checkbox from 'primevue/checkbox';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-import Dialog from 'primevue/dialog';
-import Dropdown from 'primevue/dropdown';
-import InputNumber from 'primevue/inputnumber';
-import InputText from 'primevue/inputtext';
-import Message from 'primevue/message';
-import Paginator from 'primevue/paginator';
-import Panel from 'primevue/panel';
-import SelectButton from 'primevue/selectbutton';
-import Steps from 'primevue/steps';
-import Tag from 'primevue/tag';
-import Swal from 'sweetalert2';
-
+import Button from "primevue/button";
+import Card from "primevue/card";
+import Checkbox from "primevue/checkbox";
+import Column from "primevue/column";
+import DataTable from "primevue/datatable";
+import Dialog from "primevue/dialog";
+import Dropdown from "primevue/dropdown";
+import InputNumber from "primevue/inputnumber";
+import InputText from "primevue/inputtext";
+import Message from "primevue/message";
+import Paginator from "primevue/paginator";
+import Panel from "primevue/panel";
+import SelectButton from "primevue/selectbutton";
+import Steps from "primevue/steps";
+import Tag from "primevue/tag";
+import Swal from "sweetalert2";
 
 export default {
     components: {
@@ -654,28 +758,25 @@ export default {
     },
     data() {
         return {
-
             tiposPagoOptions: [
-                { label: 'Efectivo', value: 'efectivo' },
-                { label: 'Tarjeta', value: 'tarjeta' },
-                { label: 'Transferencia', value: 'transferencia' }
+                { label: "Efectivo", value: "efectivo" },
+                { label: "Tarjeta", value: "tarjeta" },
+                { label: "Transferencia", value: "transferencia" },
             ],
             detalles: [],
             opcionesPago: [
-                { label: 'Efectivo', value: 'efectivo' },
-                { label: 'QR', value: 'qr' }
+                { label: "Efectivo", value: "efectivo" },
+                { label: "QR", value: "qr" },
             ],
             criterioOptions: [
-                { label: 'Nombre', value: 'nombre' },
-                { label: 'Descripción', value: 'descripcion' },
-                { label: 'Código', value: 'codigo' }
+                { label: "Nombre", value: "nombre" },
+                { label: "Descripción", value: "descripcion" },
+                { label: "Código", value: "codigo" },
             ],
             isDialogVisible: false,
-            tipoComprobanteOptions: [
-                { name: 'RECIBO', code: 'RESIVO' }
-            ],
-            opcionPago: '',
-            tipoVenta: '',
+            tipoComprobanteOptions: [{ name: "RECIBO", code: "RESIVO" }],
+            opcionPago: "",
+            tipoVenta: "",
             mostrarSpinner: false,
             selectedAlmacen: null,
             idrol: null,
@@ -684,12 +785,12 @@ export default {
             modal: false,
             zIndexBase: 1050,
             //qr
-            alias: '',
+            alias: "",
             montoQR: 0,
-            qrImage: '',
-            aliasverificacion: '',
+            qrImage: "",
+            aliasverificacion: "",
             estadoTransaccion: null,
-            currency: 'BOB', // Define tu moneda
+            currency: "BOB", // Define tu moneda
             resivo: "",
             clienteDeudas: 0,
             arrayCuotas: [],
@@ -715,8 +816,8 @@ export default {
             arrayPromocion: [],
             unidadPaquete: 1,
             tipoVentaOptions: [
-                { label: 'Por paquete', value: 1 },
-                { label: 'Por unidad', value: 0 }
+                { label: "Por paquete", value: 1 },
+                { label: "Por unidad", value: 0 },
             ],
 
             monedaVenta: [],
@@ -764,7 +865,6 @@ export default {
             criterioA: "",
             buscarA: "",
             arrayArticulo: [],
-
 
             idarticulo: 0,
             codigo: "",
@@ -852,14 +952,16 @@ export default {
             handler() {
                 this.fetchDetalles();
             },
-            deep: true
-        }
+            deep: true,
+        },
     },
     computed: {
         calcularStockDisponible() {
             return this.unidadPaquete == 1
                 ? this.arraySeleccionado.saldo_stock - this.cantidad
-                : this.arraySeleccionado.saldo_stock / this.arraySeleccionado.unidad_envase - this.cantidad;
+                : this.arraySeleccionado.saldo_stock /
+                this.arraySeleccionado.unidad_envase -
+                this.cantidad;
         },
 
         resultadoMultiplicacion() {
@@ -911,16 +1013,21 @@ export default {
             return resultado;
         },
 
-
         badgeSeverity() {
-            if (this.estadoTransaccion && this.estadoTransaccion.objeto.estadoActual === 'PENDIENTE') {
-                return 'danger'; // Rojo para estado PENDIENTE
-            } else if (this.estadoTransaccion && this.estadoTransaccion.objeto.estadoActual === 'PAGADO') {
-                return 'success'; // Verde para estado PAGADO
+            if (
+                this.estadoTransaccion &&
+                this.estadoTransaccion.objeto.estadoActual === "PENDIENTE"
+            ) {
+                return "danger"; // Rojo para estado PENDIENTE
+            } else if (
+                this.estadoTransaccion &&
+                this.estadoTransaccion.objeto.estadoActual === "PAGADO"
+            ) {
+                return "success"; // Verde para estado PAGADO
             } else {
-                return 'info'; // Otros estados
+                return "info"; // Otros estados
             }
-        }
+        },
     },
 
     methods: {
@@ -933,15 +1040,16 @@ export default {
         formatearPrecio(precio) {
             // Verificar si precio es null o undefined
             if (precio == null) {
-                return 'N/A';
+                return "N/A";
             }
 
             // Convertir precio a número si es una cadena
-            let precioNumerico = typeof precio === 'string' ? parseFloat(precio) : precio;
+            let precioNumerico =
+                typeof precio === "string" ? parseFloat(precio) : precio;
 
             // Verificar si es un número válido
             if (isNaN(precioNumerico)) {
-                return 'N/A';
+                return "N/A";
             }
 
             // Formatear el precio
@@ -949,16 +1057,17 @@ export default {
         },
         fetchDetalles() {
             if (this.arraySeleccionado && this.arraySeleccionado.id) {
-                axios.get('/venta/obtenerDetalles', {
-                    params: {
-                        id: this.arraySeleccionado.id
-                    }
-                })
-                    .then(response => {
+                axios
+                    .get("/venta/obtenerDetalles", {
+                        params: {
+                            id: this.arraySeleccionado.id,
+                        },
+                    })
+                    .then((response) => {
                         this.detalles = response.data.detalles;
                     })
-                    .catch(error => {
-                        console.error('Error fetching details:', error);
+                    .catch((error) => {
+                        console.error("Error fetching details:", error);
                     });
             }
         },
@@ -967,7 +1076,10 @@ export default {
             const fechaHoy = new Date();
 
             const montoEntero = Math.floor(this.calcularTotal / this.numero_cuotas);
-            const montoDecimal = (this.calcularTotal - montoEntero * (this.numero_cuotas - 1)).toFixed(2);
+            const montoDecimal = (
+                this.calcularTotal -
+                montoEntero * (this.numero_cuotas - 1)
+            ).toFixed(2);
 
             let fechaInicioPago;
             let saldoRestante;
@@ -977,7 +1089,7 @@ export default {
                 const primerPago = Number(this.primer_precio_cuota) || 0;
                 fechaInicioPago = fechaHoy;
                 saldoRestante = (this.calcularTotal - primerPago).toFixed(2);
-                estadoCuota = 'Pagado';
+                estadoCuota = "Pagado";
 
                 const primeraCuota = {
                     fecha_pago: `${fechaHoy.getFullYear()}-${fechaHoy.getMonth() + 1}-${fechaHoy.getDate()} ${fechaHoy.toLocaleTimeString()}`,
@@ -985,32 +1097,45 @@ export default {
                     totalCancelado: primerPago.toFixed(2),
                     saldo_restante: saldoRestante,
                     fecha_cancelado: `${fechaHoy.getFullYear()}-${fechaHoy.getMonth() + 1}-${fechaHoy.getDate()} ${fechaHoy.toLocaleTimeString()}`,
-                    estado: 'Pagado',
+                    estado: "Pagado",
                 };
 
                 this.cuotas.push(primeraCuota);
 
                 const montoRestante = this.calcularTotal - primerPago;
-                const montoEnteroRestante = Math.floor(montoRestante / (this.numero_cuotas - 1));
-                const montoDecimalRestante = (montoRestante - montoEnteroRestante * (this.numero_cuotas - 2)).toFixed(2);
+                const montoEnteroRestante = Math.floor(
+                    montoRestante / (this.numero_cuotas - 1)
+                );
+                const montoDecimalRestante = (
+                    montoRestante -
+                    montoEnteroRestante * (this.numero_cuotas - 2)
+                ).toFixed(2);
 
                 saldoRestante = montoRestante;
-                fechaInicioPago = new Date(fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000);
-                estadoCuota = 'Pendiente';
+                fechaInicioPago = new Date(
+                    fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000
+                );
+                estadoCuota = "Pendiente";
 
                 for (let i = 1; i < this.numero_cuotas; i++) {
-                    const fechaPago = new Date(fechaInicioPago.getTime() + (i - 1) * this.tiempo_diaz * 24 * 60 * 60 * 1000);
+                    const fechaPago = new Date(
+                        fechaInicioPago.getTime() +
+                        (i - 1) * this.tiempo_diaz * 24 * 60 * 60 * 1000
+                    );
                     const dia = fechaPago.getDate();
                     const mes = fechaPago.getMonth() + 1;
                     const año = fechaPago.getFullYear();
 
                     const cuota = {
                         fecha_pago: `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}`,
-                        precio_cuota: i === this.numero_cuotas - 1 ? parseFloat(montoDecimalRestante).toFixed(2) : montoEnteroRestante,
+                        precio_cuota:
+                            i === this.numero_cuotas - 1
+                                ? parseFloat(montoDecimalRestante).toFixed(2)
+                                : montoEnteroRestante,
                         totalCancelado: 0,
                         saldo_restante: saldoRestante,
                         fecha_cancelado: null,
-                        estado: 'Pendiente',
+                        estado: "Pendiente",
                     };
 
                     saldoRestante -= cuota.precio_cuota;
@@ -1019,23 +1144,31 @@ export default {
                     this.cuotas.push(cuota);
                 }
             } else {
-                fechaInicioPago = new Date(fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000);
+                fechaInicioPago = new Date(
+                    fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000
+                );
                 saldoRestante = this.calcularTotal;
-                estadoCuota = 'Pendiente';
+                estadoCuota = "Pendiente";
 
                 for (let i = 0; i < this.numero_cuotas; i++) {
-                    const fechaPago = new Date(fechaInicioPago.getTime() + i * this.tiempo_diaz * 24 * 60 * 60 * 1000);
+                    const fechaPago = new Date(
+                        fechaInicioPago.getTime() +
+                        i * this.tiempo_diaz * 24 * 60 * 60 * 1000
+                    );
                     const dia = fechaPago.getDate();
                     const mes = fechaPago.getMonth() + 1;
                     const año = fechaPago.getFullYear();
 
                     const cuota = {
                         fecha_pago: `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}`,
-                        precio_cuota: i === this.numero_cuotas - 1 ? parseFloat(montoDecimal).toFixed(2) : montoEntero,
+                        precio_cuota:
+                            i === this.numero_cuotas - 1
+                                ? parseFloat(montoDecimal).toFixed(2)
+                                : montoEntero,
                         totalCancelado: 0,
                         saldo_restante: saldoRestante,
                         fecha_cancelado: null,
-                        estado: 'Pendiente',
+                        estado: "Pendiente",
                     };
 
                     saldoRestante -= cuota.precio_cuota;
@@ -1047,8 +1180,8 @@ export default {
         },
         seleccionarTipoVenta(tipo) {
             this.tipoVenta = tipo;
-            this.idtipo_venta = tipo === 'contado' ? 1 : 2;
-            this.opcionPago = ''; // Reinicia la opción de pago al cambiar el tipo de venta
+            this.idtipo_venta = tipo === "contado" ? 1 : 2;
+            this.opcionPago = ""; // Reinicia la opción de pago al cambiar el tipo de venta
         },
         buscarVenta() {
             this.listarVenta(1, this.buscar);
@@ -1058,12 +1191,12 @@ export default {
             const errores = [];
 
             if (this.step === 2) {
-                if (!this.idAlmacen) errores.push('Seleccione un almacén');
+                if (!this.idAlmacen) errores.push("Seleccione un almacén");
             }
 
             if (errores.length > 0) {
-                const mensaje = errores.join('\n');
-                swal('Campos incompletos', mensaje, 'warning');
+                const mensaje = errores.join("\n");
+                swal("Campos incompletos", mensaje, "warning");
             } else {
                 this.nextStep();
             }
@@ -1088,35 +1221,36 @@ export default {
             this.alias = now.toLocaleString();
         },
         verificarEstado() {
-            axios.post('/qr/verificarestado', {
-                alias: this.aliasverificacion,
-            })
-                .then(response => {
+            axios
+                .post("/qr/verificarestado", {
+                    alias: this.aliasverificacion,
+                })
+                .then((response) => {
                     this.estadoTransaccion = response.data;
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error(error);
                 });
         },
 
         generarQr() {
             this.aliasverificacion = this.alias;
-            axios.post('/qr/generarqr', {
-                alias: this.alias,
-                monto: this.calcularTotal
-            })
-                .then(response => {
+            axios
+                .post("/qr/generarqr", {
+                    alias: this.alias,
+                    monto: this.calcularTotal,
+                })
+                .then((response) => {
                     const imagenBase64 = response.data.objeto.imagenQr;
                     this.qrImage = `data:image/png;base64,${imagenBase64}`;
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error(error);
                 });
 
-            this.alias = '';
+            this.alias = "";
             this.montoQR = 0;
         },
-
 
         calcularPrecioUnitario(articulo) {
             // Lógica para calcular el precio unitario según el rango total de cantidades
@@ -1172,7 +1306,7 @@ export default {
         },
 
         seleccionarTipoPago(tipo) {
-            console.log("TIPO PAGO ", tipo)
+            console.log("TIPO PAGO ", tipo);
             this.tipoPago = tipo;
             this.tituloModal2 = `TIPO DE PAGO : ${tipo}`;
             this.idtipo_pago = this.tiposPago[tipo];
@@ -1247,7 +1381,6 @@ export default {
                             });
                             this.cerrarModal();
                         });
-
                     } else {
                         swal({
                             type: "error",
@@ -1433,8 +1566,6 @@ export default {
             }
         },
 
-
-
         listarOfertaEspecial(page, buscar, criterio) {
             let me = this;
             let url = "/ofertasespeciales";
@@ -1474,24 +1605,38 @@ export default {
             );
         },
         calcularPrecioConDescuento(precioOriginal, porcentajeDescuento) {
-            const descuento = this.precioseleccionado * (this.descuentoProducto / 100);
+            const descuento =
+                this.precioseleccionado * (this.descuentoProducto / 100);
             const precioConDescuento = this.precioseleccionado - descuento;
-            const precioFinal = precioConDescuento * this.unidadPaquete * this.cantidad;
+            const precioFinal =
+                precioConDescuento * this.unidadPaquete * this.cantidad;
             return precioFinal;
         },
         calcularDiasRestantes(fechaFinal) {
             const fechaActual = new Date();
             const fechaObjetivo = new Date(fechaFinal);
             const diferenciaEnMilisegundos = fechaObjetivo - fechaActual;
-            const diasRestantes = Math.ceil(diferenciaEnMilisegundos / (1000 * 60 * 60 * 24));
+            const diasRestantes = Math.ceil(
+                diferenciaEnMilisegundos / (1000 * 60 * 60 * 24)
+            );
             return diasRestantes;
         },
         actualizarDetalle(index) {
-            if (this.arrayDetalle[index] && typeof this.arrayDetalle[index].precioseleccionado !== 'undefined' && typeof this.arrayDetalle[index].cantidad !== 'undefined') {
-                this.arrayDetalle[index].total = (this.arrayDetalle[index].precioseleccionado * this.arrayDetalle[index].cantidad).toFixed(2);
+            if (
+                this.arrayDetalle[index] &&
+                typeof this.arrayDetalle[index].precioseleccionado !== "undefined" &&
+                typeof this.arrayDetalle[index].cantidad !== "undefined"
+            ) {
+                this.arrayDetalle[index].total = (
+                    this.arrayDetalle[index].precioseleccionado *
+                    this.arrayDetalle[index].cantidad
+                ).toFixed(2);
                 this.calcularTotal(); // Asegúrate de recalcular el total después de actualizar
             } else {
-                console.error('Datos inválidos en actualizarDetalle para el índice:', index);
+                console.error(
+                    "Datos inválidos en actualizarDetalle para el índice:",
+                    index
+                );
             }
         },
 
@@ -1540,7 +1685,7 @@ export default {
 
         async obtenerDatosUsuario() {
             try {
-                const response = await axios.get('/venta');
+                const response = await axios.get("/venta");
                 this.usuarioAutenticado = response.data.usuario.usuario;
                 this.usuario_autenticado = this.usuarioAutenticado;
                 this.idrol = response.data.usuario.idrol;
@@ -1556,17 +1701,17 @@ export default {
             try {
                 const idsucursal = this.idsucursalAutenticado;
                 console.log("El idsucursal es: " + idsucursal);
-                const response = await axios.get('/obtener-ultimo-comprobante', {
+                const response = await axios.get("/obtener-ultimo-comprobante", {
                     params: {
-                        idsucursal: idsucursal
-                    }
+                        idsucursal: idsucursal,
+                    },
                 });
                 const lastComprobante = response.data.last_comprobante;
                 this.last_comprobante = lastComprobante;
                 console.log("El ultimo comprobante es: " + this.last_comprobante);
                 this.nextNumber(lastComprobante);
             } catch (error) {
-                console.error('Error al obtener el último comprobante:', error);
+                console.error("Error al obtener el último comprobante:", error);
             }
         },
 
@@ -1617,7 +1762,7 @@ export default {
                 });
         },
         selectClienteNombre(nombre) {
-            console.log("nombre ", nombre)
+            console.log("nombre ", nombre);
             let me = this;
             var url = "/cliente/selectCliente?filtro=" + nombre;
             axios
@@ -1646,15 +1791,14 @@ export default {
                 this.tipo_documento = val1.tipo_documento;
                 this.complemento_id = val1.complemento_id;
                 this.clienteDeudas = val1.cantidad_creditos;
-            }
-            else {
+            } else {
                 //console.log(val1);
-                this.email = '';
-                this.nombreCliente = '';
-                this.documento = '';
-                this.tipo_documento = '';
-                this.complemento_id = '';
-                this.clienteDeudas = '';
+                this.email = "";
+                this.nombreCliente = "";
+                this.documento = "";
+                this.tipo_documento = "";
+                this.complemento_id = "";
+                this.clienteDeudas = "";
             }
         },
         getDatosCliente2(val1) {
@@ -1670,22 +1814,25 @@ export default {
                 this.tipo_documento = val1.tipo_documento;
                 this.complemento_id = val1.complemento_id;
                 this.clienteDeudas = val1.cantidad_creditos;
-            }
-            else {
+            } else {
                 //console.log(val1);
-                this.email = '';
-                this.nombreCliente = '';
-                this.documento = '';
-                this.tipo_documento = '';
-                this.complemento_id = '';
-                this.clienteDeudas = '';
+                this.email = "";
+                this.nombreCliente = "";
+                this.documento = "";
+                this.tipo_documento = "";
+                this.complemento_id = "";
+                this.clienteDeudas = "";
             }
         },
         buscarArticulo() {
             clearTimeout(this.timer);
             this.timer = setTimeout(() => {
                 let me = this;
-                var url = "/articulo/buscarArticuloVenta?filtro=" + me.codigo + "&idalmacen=" + me.selectedAlmacen;
+                var url =
+                    "/articulo/buscarArticuloVenta?filtro=" +
+                    me.codigo +
+                    "&idalmacen=" +
+                    me.selectedAlmacen;
                 axios
                     .get(url)
                     .then(function (response) {
@@ -1719,7 +1866,7 @@ export default {
             return sw;
         },
         eliminarDetalle(id) {
-            const index = this.arrayDetalle.findIndex(item => item.id === id);
+            const index = this.arrayDetalle.findIndex((item) => item.id === id);
             if (index !== -1) {
                 this.arrayDetalle.splice(index, 1);
                 this.arrayProductos.splice(index, 1);
@@ -1751,7 +1898,10 @@ export default {
                 return;
             }
 
-            if (this.saldosNegativos === 0 && this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete) {
+            if (
+                this.saldosNegativos === 0 &&
+                this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete
+            ) {
                 swal({
                     type: "error",
                     title: "Error...",
@@ -1762,7 +1912,11 @@ export default {
 
             const precioUnitario = parseFloat(this.precioseleccionado);
             const cantidad = this.cantidad * this.unidadPaquete;
-            const descuento = (precioUnitario * cantidad * (this.descuentoProducto / 100)).toFixed(2);
+            const descuento = (
+                precioUnitario *
+                cantidad *
+                (this.descuentoProducto / 100)
+            ).toFixed(2);
             const total = (precioUnitario * cantidad - descuento).toFixed(2);
 
             const nuevoDetalle = {
@@ -1778,7 +1932,7 @@ export default {
                 descuento: this.descuentoProducto,
                 stock: this.arraySeleccionado.saldo_stock,
                 precioseleccionado: precioUnitario,
-                total: total
+                total: total,
             };
 
             this.arrayDetalle.push(nuevoDetalle);
@@ -1884,22 +2038,26 @@ export default {
 
         async obtenerAlmacenPredeterminado() {
             try {
-                const response = await axios.get('/api/configuracion/almacen-predeterminado');
+                const response = await axios.get(
+                    "/api/configuracion/almacen-predeterminado"
+                );
                 this.almacenPredeterminadoId = response.data.almacen_predeterminado_id;
-                console.log("El almacen predeterminado es : " + this.almacenPredeterminadoId);
+                console.log(
+                    "El almacen predeterminado es : " + this.almacenPredeterminadoId
+                );
 
                 this.almacenSeleccionado = this.arrayAlmacenes.find(
-                    almacen => almacen.id === this.almacenPredeterminadoId
+                    (almacen) => almacen.id === this.almacenPredeterminadoId
                 );
             } catch (error) {
-                console.error('Error al obtener el almacén predeterminado:', error);
+                console.error("Error al obtener el almacén predeterminado:", error);
             }
         },
 
         getAlmacenProductos(event) {
             this.idAlmacen = event.value;
         },
-        
+
         aplicarDescuento() {
             const descuentoGiftCard = this.descuentoGiftCard;
             const numeroTarjeta = this.numeroTarjeta;
@@ -1948,8 +2106,8 @@ export default {
             let nombreRazonSocial = document.getElementById("nombreCliente").value;
             let numeroDocumento = document.getElementById("documento").value;
             let complemento = document.getElementById("complemento_id").value;
-            let tipoDocumentoIdentidad = document.getElementById("tipo_documento")
-                .value;
+            let tipoDocumentoIdentidad =
+                document.getElementById("tipo_documento").value;
             let montoTotal = (
                 this.calcularTotal * parseFloat(this.monedaVenta[0])
             ).toFixed(2);
@@ -2090,7 +2248,9 @@ export default {
         async buscarOCrearCliente() {
             try {
                 // Primero, intenta buscar el cliente
-                const response = await axios.get(`/api/clientes/existe?documento=${this.documento}`);
+                const response = await axios.get(
+                    `/api/clientes/existe?documento=${this.documento}`
+                );
 
                 if (response.data.existe) {
                     // Si el cliente existe, usa ese ID y actualiza los datos del cliente
@@ -2100,10 +2260,10 @@ export default {
                     this.complemento_id = response.data.cliente.complemento_id;
                 } else {
                     // Si el cliente no existe, intenta crearlo
-                    const nuevoClienteResponse = await axios.post('/cliente/registrar', {
-                        'nombre': this.nombreCliente,
-                        'num_documento': this.documento,
-                        'tipo_documento': '5'
+                    const nuevoClienteResponse = await axios.post("/cliente/registrar", {
+                        nombre: this.nombreCliente,
+                        num_documento: this.documento,
+                        tipo_documento: "5",
                     });
                     this.idcliente = nuevoClienteResponse.data.id;
                 }
@@ -2135,13 +2295,8 @@ export default {
                 } finally {
                     this.mostrarSpinner = false;
                 }
-
             }
-
         },
-
-
-
 
         cambiarProducto(index, nuevoProducto) {
             if (index >= 0 && index < this.arrayDetalle.length) {
@@ -2151,13 +2306,11 @@ export default {
                     cantidad: 1,
                     precio: nuevoProducto.precio,
                     stock: nuevoProducto.stock,
-                    subtotal: nuevoProducto.precio
+                    subtotal: nuevoProducto.precio,
                 };
                 this.calcularTotal();
             }
         },
-
-
 
         prepararDatosCliente() {
             if (!this.nombreCliente.trim()) {
@@ -2180,7 +2333,7 @@ export default {
                 data: this.arrayDetalle,
             };
 
-            if (this.tipoVenta === 'credito') {
+            if (this.tipoVenta === "credito") {
                 const totalCredito = this.primera_cuota
                     ? this.calcularTotal - this.primer_precio_cuota
                     : this.calcularTotal;
@@ -2190,7 +2343,7 @@ export default {
                     cuotasActualizadas[0] = {
                         ...cuotasActualizadas[0],
                         totalCancelado: this.primer_precio_cuota,
-                        estado: 'Pagado'
+                        estado: "Pagado",
                     };
                 }
                 return {
@@ -2198,11 +2351,13 @@ export default {
                     idpersona: this.idcliente,
                     numero_cuotasCredito: this.numero_cuotas,
                     tiempo_dias_cuotaCredito: this.tiempo_diaz,
-                    totalCredito: this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal,
+                    totalCredito: this.primera_cuota
+                        ? this.calcularTotal - this.cuotas[0].totalCancelado
+                        : this.calcularTotal,
                     estadoCredito: "Pendiente",
                     cuotaspago: cuotasActualizadas,
                     primer_precio_cuota: this.primer_precio_cuota,
-                    primera_cuota_pagada: this.primera_cuota
+                    primera_cuota_pagada: this.primera_cuota,
                 };
             } else if (this.tipo_comprobante === "RESIVO") {
                 return { ...datosComunes, resivo: this.resivo };
@@ -2212,24 +2367,32 @@ export default {
         },
 
         manejarVentaExitosa(idVenta) {
-    this.listado = 1;
-    this.ejecutarFlujoCompleto();
-    this.listarVenta(1, "", "num_comprob");
-    this.cerrarModal2();
-    this.cerrarModal3();
+            this.listado = 1;
+            this.ejecutarFlujoCompleto();
+            this.listarVenta(1, "", "num_comprob");
+            this.cerrarModal2();
+            this.cerrarModal3();
 
-    if (this.tipoVenta === 'credito') {
-        swal("Venta Exitosa", "La venta a crédito se ha registrado correctamente.", "success");
-    } else {
-        this.imprimirResivo(idVenta);
-    }
+            if (this.tipoVenta === "credito") {
+                swal(
+                    "Venta Exitosa",
+                    "La venta a crédito se ha registrado correctamente.",
+                    "success"
+                );
+            } else {
+                this.imprimirResivo(idVenta);
+            }
 
-    this.reiniciarFormulario();
-},
+            this.reiniciarFormulario();
+        },
 
         manejarErrorVenta(data) {
             if (data.valorMaximo) {
-                swal("Aviso", `El valor de descuento no puede exceder el ${data.valorMaximo}`, "warning");
+                swal(
+                    "Aviso",
+                    `El valor de descuento no puede exceder el ${data.valorMaximo}`,
+                    "warning"
+                );
             } else if (data.caja_validado) {
                 swal("Aviso", data.caja_validado, "warning");
             } else {
@@ -2241,7 +2404,7 @@ export default {
             // Restablecer todos los valores del formulario
             Object.assign(this, {
                 idproveedor: 0,
-                tipo_comprobante:  "RESIVO" ,
+                tipo_comprobante: "RESIVO",
                 nombreCliente: "",
                 idcliente: 0,
                 tipo_documento: 0,
@@ -2265,10 +2428,10 @@ export default {
                 recibido: 0,
                 tipoVenta: "",
                 tipoPago: "",
-                numero_cuotas:0,
+                numero_cuotas: 0,
                 tiempo_diaz: 0,
-                primera_cuota : false,
-                cuotas : [],
+                primera_cuota: false,
+                cuotas: [],
             });
         },
         validarVenta() {
@@ -2312,28 +2475,28 @@ export default {
         },
 
         eliminarVenta(idVenta) {
-            axios.delete('/venta/eliminarVenta/' + idVenta)
+            axios
+                .delete("/venta/eliminarVenta/" + idVenta)
                 .then(function (response) {
-                    console.log('Venta eliminada correctamente:', response);
+                    console.log("Venta eliminada correctamente:", response);
                 })
                 .catch(function (error) {
-                    console.error('Error al eliminar la venta:', error);
+                    console.error("Error al eliminar la venta:", error);
                 });
         },
- 
+
         mostrarDetalle() {
-        
             let me = this;
             me.selectAlmacen();
             me.listado = 0;
 
             me.idproveedor = 0;
-            me.tipo_comprobante = 'RESIVO';
-            me.serie_comprobante = '';
+            me.tipo_comprobante = "RESIVO";
+            me.serie_comprobante = "";
             me.impuesto = 0.18;
             me.total = 0.0;
             me.idarticulo = 0;
-            me.articulo = '';
+            me.articulo = "";
             me.cantidad = 1;
             me.precio = 0;
             me.arrayDetalle = [];
@@ -2352,7 +2515,6 @@ export default {
             this.arrayProductos = [];
             this.arrayDetalle = [];
             this.precioBloqueado = false;
-
         },
         verVenta(id) {
             let me = this;
@@ -2400,7 +2562,6 @@ export default {
             this.tituloModal = "";
         },
         abrirModal() {
-
             this.scrollToTop();
             this.listarArticulo("", "nombre");
             this.selectAlmacen();
@@ -2482,7 +2643,6 @@ export default {
             console.log("Precio seleccionado:", this.precioseleccionado);
         },
 
-
         cerrarModal2() {
             this.modal2 = false;
             this.tituloModal2 = "";
@@ -2499,7 +2659,6 @@ export default {
         },
 
         calcularCambio() {
-
             const recibidoNumero = parseFloat(
                 this.recibido / parseFloat(this.monedaVenta[0])
             );
@@ -2522,33 +2681,44 @@ export default {
             }
         },
 
+        checkDocumento() {
+            if (this.documento.length === 7 && /^\d+$/.test(this.documento)) {
+                this.buscarClientePorDocumento();
+            } else {
+                this.resetearCampos();
+            }
+        },
+        resetearCampos() {
+            this.nombreCliente = "";
+            this.nombreClienteEditable = false;
+        },
         buscarClientePorDocumento() {
-            axios.get(`/api/clientes?documento=${this.documento}`)
-                .then(response => {
+            axios
+                .get(`/api/clientes?documento=${this.documento}`)
+                .then((response) => {
                     const cliente = response.data;
                     console.log(cliente);
                     this.nombreCliente = cliente.nombre;
-                    this.nombreClienteEditable = false; // Deshabilita el input si se encuentra el cliente
+                    this.nombreClienteEditable = false;
                 })
-                .catch(error => {
+                .catch((error) => {
                     if (error.response && error.response.status === 404) {
-                        this.nombreCliente = '';
-                        this.nombreClienteEditable = true; // Habilita el input si no se encuentra el cliente
+                        this.nombreCliente = "";
+                        this.nombreClienteEditable = true;
                         Swal.fire({
-                            title: 'Cliente no encontrado',
-                            text: 'No se encontró ningún cliente con el documento proporcionado.',
-                            icon: 'warning',
-                            confirmButtonText: 'Ok'
+                            title: "Cliente no encontrado",
+                            text: "No se encontró ningún cliente con el documento proporcionado.",
+                            icon: "warning",
+                            confirmButtonText: "Ok",
                         });
                     } else {
-                        console.error('Error al buscar el cliente:', error);
-                        this.nombreCliente = '';
-                        this.nombreClienteEditable = false; // Asegura que el input esté deshabilitado en caso de error
+                        console.error("Error al buscar el cliente:", error);
+                        this.resetearCampos();
                         Swal.fire({
-                            title: 'Error',
-                            text: 'Hubo un problema al buscar el cliente. Por favor, inténtelo de nuevo más tarde.',
-                            icon: 'error',
-                            confirmButtonText: 'Ok'
+                            title: "Error",
+                            text: "Hubo un problema al buscar el cliente. Por favor, inténtelo de nuevo más tarde.",
+                            icon: "error",
+                            confirmButtonText: "Ok",
                         });
                     }
                 });
@@ -2558,12 +2728,13 @@ export default {
         this.listarPrecio();
     },
     mounted() {
-        axios.get('/tu-endpoint-api')
-            .then(response => {
+        axios
+            .get("/tu-endpoint-api")
+            .then((response) => {
                 this.arraySeleccionado = response.data;
             })
-            .catch(error => {
-                console.error('Error al cargar los datos:', error);
+            .catch((error) => {
+                console.error("Error al cargar los datos:", error);
             });
         this.datosConfiguracion();
         this.selectAlmacen();
@@ -2571,13 +2742,11 @@ export default {
         //this.obtenerDatosUsuario();
         this.actualizarFechaHora();
         this.ejecutarFlujoCompleto();
-        document.addEventListener('keypress', this.handleKeyPress);
-
+        document.addEventListener("keypress", this.handleKeyPress);
     },
     beforeDestroy() {
-        document.removeEventListener('keypress', this.handleKeyPress);
-    }
-
+        document.removeEventListener("keypress", this.handleKeyPress);
+    },
 };
 </script>
 <style scoped>
