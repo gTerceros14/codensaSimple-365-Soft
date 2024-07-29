@@ -17,83 +17,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ClienteController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     if (!$request->ajax()) return redirect('/');
-
-    //     $buscar = $request->buscar;
-    //     $criterio = $request->criterio;
-
-    //     if ($buscar==''){
-    //         $personas = Persona::orderBy('id', 'desc')->paginate(6);
-    //     }
-    //     else{
-    //         $personas = Persona::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(6);
-    //     }
-
-
-    //     return [
-    //         'pagination' => [
-    //             'total'        => $personas->total(),
-    //             'current_page' => $personas->currentPage(),
-    //             'per_page'     => $personas->perPage(),
-    //             'last_page'    => $personas->lastPage(),
-    //             'from'         => $personas->firstItem(),
-    //             'to'           => $personas->lastItem(),
-    //         ],
-    //         'personas' => $personas
-    //     ];
-    // }
-    // public function index(Request $request)
-    // {
-    //     Log::info('Data', [
-    //         'usuarioid' => $request->usuarioid,
-    //         'buscar' => $request->buscar,
-    //         'criterio' => $request->criterio,
-    //     ]);
-
-    //     $buscar = $request->buscar;
-    //     $criterio = $request->criterio;
-    //     $usuarioid = $request->usuarioid;
-
-    //         $usuarios = User::join('personas', 'users.id', '=', 'personas.id')
-    //             ->select(
-    //                 'personas.id',
-    //                 'personas.nombre',
-
-    //                 'personas.tipo_documento',
-    //                 'personas.num_documento',
-    //                 'personas.direccion',
-    //                 'personas.telefono',
-    //                 'personas.email',
-
-    //                 'personas.usuario',                   
-    //             );
-    //             if (!empty($usuarioid)) {
-    //                 $usuarios = $usuarios->where('personas.usuario', '=', $usuarioid);
-    //             }
-
-    //             if (!empty($buscar)) {
-    //                 $usuarios = $usuarios->where(function ($query) use ($criterio, $buscar) {
-    //                     $query->where('personas.' . $criterio, 'like', '%' . $buscar . '%');
-    //                 });
-    //             }
-    //               // Ordenamos y paginamos los resultados
-    //             $usuarios = $usuarios->orderBy('users.id', 'desc')->paginate(4);
-
-    //             //$usuarios = $usuarios->orderBy('users.id', 'desc')->paginate(4);
-    //     return [
-    //         'pagination' => [
-    //             'total' => $usuarios->total(),
-    //             'current_page' => $usuarios->currentPage(),
-    //             'per_page' => $usuarios->perPage(),
-    //             'last_page' => $usuarios->lastPage(),
-    //             'from' => $usuarios->firstItem(),
-    //             'to' => $usuarios->lastItem(),
-    //         ],
-    //         'usuarios' => $usuarios
-    //     ];
-    // }
+   
     public function index(Request $request)
     {
         Log::info('Data', [
@@ -104,6 +28,7 @@ class ClienteController extends Controller
         $buscar = $request->buscar;
         $criterio = $request->criterio;
         $usuarioid = $request->usuarioid;
+        $perPage = $request->input('per_page', 10); // Default to 10 if not specified
 
         // Consulta para obtener personas que no son usuarios
         $usuarios = Persona::whereNotIn('id', function ($query) {
@@ -123,7 +48,7 @@ class ClienteController extends Controller
         }
 
         // Ordenar y paginar los resultados
-        $usuarios = $usuarios->orderBy('id', 'desc')->paginate(6);
+        $usuarios = $usuarios->orderBy('id', 'desc')->paginate($perPage);
 
         return [
             'pagination' => [
@@ -306,40 +231,7 @@ public function store(Request $request)
         $user = Auth::user();
         return response()->json(['user' => $user]);
     }
-    // public function selectUsuarioVendedor(Request $request){
-    //     if (!$request->ajax()) return redirect('/');
-
-    //     $buscar = $request->buscar;
-    //     $criterio = $request->criterio;
-
-    //     if ($buscar==''){
-    //         $personas = User::join('personas', 'users.id', '=', 'personas.id')
-    //             ->join('roles', 'users.idrol', '=', 'roles.id')
-    //             ->select(
-    //                 'personas.id as ID', 'personas.nombre',
-    //                 'roles.id',
-    //                 )  ->where('roles.id', '=', '2')->paginate(6);
-    //         Persona::orderBy('id', 'desc')->paginate(6);
-    //     }
-    //     else{
-    //         $personas = User::join('personas', 'users.id', '=', 'personas.id')
-    //         ->join('roles', 'users.idrol', '=', 'roles.id')
-    //         ->select(
-    //             'personas.id', 'personas.nombre',
-    //             'roles.id as ID',
-    //             )  ->where('roles.id', '=', '2')->paginate(6);        }
-
-
-    //     return [
-    //         'pagination' => [
-    //             'total'        => $personas->total(),
-    //             'current_page' => $personas->currentPage(),
-    //             'per_page'     => $personas->perPage(),
-    //             'last_page'    => $personas->lastPage(),
-    //             'from'         => $personas->firstItem(),
-    //             'to'           => $personas->lastItem(),
-    //         ],
-    //         'personas' => $personas
+   
     //     ];
     // }
 
@@ -368,6 +260,38 @@ public function store(Request $request)
             return response()->json($cliente);
         } else {
             return response()->json(null, 404);
+        }
+    }
+    public function eliminarCliente($id)
+    {
+        if (!request()->ajax()) return redirect('/');
+
+        DB::beginTransaction();
+
+        try {
+            $cliente = Persona::findOrFail($id);
+            
+            // Verificar si el cliente tiene ventas asociadas
+            $ventasAsociadas = Venta::where('idcliente', $id)->exists();
+
+            if ($ventasAsociadas) {
+                DB::rollBack();
+                return response()->json([
+                    'error' => 'No se puede eliminar el cliente porque tiene ventas asociadas.',
+                    'tipo' => 'integridad'
+                ], 422);
+            }
+
+            $cliente->delete();
+            
+            DB::commit();
+            return response()->json(['mensaje' => 'Cliente eliminado correctamente'], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Error al eliminar el cliente: ' . $e->getMessage(),
+                'tipo' => 'excepcion'
+            ], 500);
         }
     }
     
