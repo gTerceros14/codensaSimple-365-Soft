@@ -109,9 +109,6 @@
                     <li @click="menu=2" class="nav-item">
                         <a class="nav-link" href="#"><i class="fa fa-product-hunt" style="font-size: 19px;"></i> Productos</a>
                     </li>
-                    <li @click="menu=71" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Productos NUEVO</a>
-                    </li>
                     <li @click="menu=18" class="nav-item">
                         <a class="nav-link" href="#"><i class="fa fa-trademark" style="font-size: 19px;"></i> Marca</a>
                     </li>
@@ -120,6 +117,9 @@
                     </li>
                     <li @click="menu=20" class="nav-item">
                         <a class="nav-link" href="#"><i class="fa fa-industry" style="font-size: 19px;"></i> Industria</a>
+                    </li>
+                    <li @click="menu=26" class="nav-item">
+                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> Grupos</a>
                     </li>
                     <li @click="menu=27" class="nav-item">
                         <a class="nav-link" href="#"><i class="fa fa-arrows-alt" style="font-size: 19px;"></i> Medidas</a>

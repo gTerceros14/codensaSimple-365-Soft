@@ -1,0 +1,102 @@
+/* Panel */
+>>> .p-panel .p-panel-header {
+    padding: 0.75rem;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+}
+
+.panel-icon {
+    font-size: 1.5rem;
+    padding-left: 10px;
+    margin: 0;
+}
+
+>>> .p-panel-content {
+    padding: 1rem 1rem 0 1rem;
+}
+
+/* Dialog Cuotas */
+>>> .div-lista-cuota .p-dialog-header {
+    padding: 1rem 1rem 1rem 1.5rem;
+    background: #33b378;
+    color: #ffffff;
+}
+
+>>> .div-lista-cuota .p-dialog-content {
+    padding: 0.7rem 0.7rem 0 0.7rem;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+/* Dialog Pagar */
+>>> .div-pagar-cuota .p-dialog-header {
+    padding: 1rem 1rem 1rem 1.5rem;
+    background: #33b378;
+    color: #ffffff;
+}
+
+>>> .div-pagar-cuota .p-dialog-content {
+    padding: 1.5rem 1.5rem 0 1.5rem;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+>>> .div-pagar-cuota .p-dialog-footer {
+    padding: 0 1rem 1rem 1.5rem;
+}
+
+>>> .p-md-4 {
+    padding: 0 0.75rem 0 0.75rem !important;
+}
+
+/* Dialog Detalles */
+>>> .div-detalles .p-dialog-header {
+    padding: 1rem 1rem 1rem 1.5rem;
+    background: #33b378;
+    color: #ffffff;
+}
+
+>>> .div-detalles .p-dialog-content {
+    padding: 1rem 1rem 0 1rem;
+    /*border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;*/
+}
+
+>>> .div-detalles .p-dialog-footer {
+    padding: 0 0.5rem 1rem 1rem;
+}
+
+/* dropdown */
+>>> .p-dropdown-panel .p-dropdown-items {
+    padding: 0.5rem 0;
+}
+
+>>> .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+    padding: 0.5rem 1.23rem;
+}
+
+/* Correcciones */
+>>> .p-md-6 {
+    padding: 1.5rem 1rem;
+}
+
+.imagen-tabla-vacia {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 70vh;
+    width: 100%;
+}
+
+.imagen-tabla-vacia img {
+    width: 150px;
+}
+
+.product-image {
+    border-radius: 10px;
+    width: 100px;
+}

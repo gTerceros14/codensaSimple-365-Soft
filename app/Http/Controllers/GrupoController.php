@@ -38,6 +38,23 @@ class GrupoController extends Controller
             'grupos' => $grupos
         ];
     }
+    public function index2(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $buscar = $request->buscar;
+        //$criterio = $request->criterio;
+        
+        if ($buscar == '') {
+            $grupos = Grupo::orderBy('id', 'desc');
+        } else {
+            $grupos = Grupo::where('nombre_grupo', 'like', '%' . $buscar . '%')->orderBy('id', 'desc');
+        }
+        $grupos=$grupos->get();
+
+        return ['grupos' => $grupos
+        ];
+    }
     //Registrar Provedor
     public function store(Request $request)
     {

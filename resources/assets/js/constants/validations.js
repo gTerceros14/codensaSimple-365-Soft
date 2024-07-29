@@ -180,11 +180,11 @@ export const esquemaArticulos = yup.object().shape({
       "El cantidad de costo por paquete no puede ser menor o igual a 0"
     ),
 
-  /*precio_venta: yup
+  precio_venta: yup
     .number()
     .required("El precio de venta es obligatoria")
     .typeError("Debe ingresar un número válido")
-    .min(0.01, "El precio de venta no puede ser menor o igual a 0"),*/
+    .min(0.01, "El precio de venta no puede ser menor o igual a 0"),
   precio_uno: yup.number().typeError("Debe ingresar un número válido"),
   precio_dos: yup.number().typeError("Debe ingresar un número válido"),
   precio_tres: yup.number().typeError("Debe ingresar un número válido"),
@@ -195,11 +195,11 @@ export const esquemaArticulos = yup.object().shape({
     .typeError("Debe ingresar un número válido")
     .min(0.01, "El stock minimo no puede ser menor o igual a 0"),
 
-  /*costo_compra: yup
+  costo_compra: yup
     .number()
     .required("El costo de compra es obligatorio")
     .typeError("Debe ingresar un número válido")
-    .min(0.01, "El costo de compra no puede ser menor o igual a 0"),*/
+    .min(0.01, "El costo de compra no puede ser menor o igual a 0"),
 
   codigo: yup.string().required("El código es obligatorio"),
   codigo_alfanumerico: yup.string(),

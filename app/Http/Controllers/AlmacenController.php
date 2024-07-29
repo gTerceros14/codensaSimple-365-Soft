@@ -48,6 +48,63 @@ class AlmacenController extends Controller
         ];
     }
 
+    public function buscadorAlmacen(Request $request)
+    {
+        if (!$request->ajax()) {
+            return redirect('/');
+        }
+
+        $nombre = $request->input('buscar');
+        $campos = [
+            'id',
+            'nombre_almacen',
+            'condicion'
+        ];
+
+        $almacenes = Almacen::where('almacens.nombre_almacen', 'like', '%' . $nombre . '%')
+                            ->where('condicion', 1)
+                            ->select($campos)
+                            ->paginate(3);
+
+        return [
+            'pagination' => [
+                'total' => $almacenes->total(),
+                'current_page' => $almacenes->currentPage(),
+                'per_page' => $almacenes->perPage(),
+                'last_page' => $almacenes->lastPage(),
+                'from' => $almacenes->firstItem(),
+                'to' => $almacenes->lastItem(),
+            ],
+            'almacenes' => $almacenes
+        ];
+    }
+    public function index2(Request $request)
+    {
+        if (!$request->ajax()) {
+            return redirect('/');
+        }
+
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+
+        $almacenes = Almacen::join('sucursales', 'almacens.sucursal', '=', 'sucursales.id')
+            ->select('almacens.*', 'sucursales.nombre as nombre_sucursal')
+            ->when($buscar, function ($query) use ($buscar, $criterio) {
+                return $query->where('almacens.nombre_almacen', 'like', '%' . $buscar . '%')
+                    ->orWhere('sucursales.nombre', 'like', '%' . $buscar . '%');
+            })
+            ->orderBy('almacens.id', 'desc');   
+        $almacenes = $almacenes->get();
+      foreach ($almacenes as $almacen) {
+    $encargadosIds = explode(',', $almacen->encargado);
+    // Cambia 'name' a 'usuario' en la siguiente línea
+    $encargadosNombres = User::whereIn('id', $encargadosIds)->pluck('usuario')->implode(', ');
+    $almacen->encargados_nombres = $encargadosNombres;
+}
+
+        return [ 'almacenes' => $almacenes
+        ];
+    }
     public function store(Request $request)
     {
         if (!$request->ajax())
