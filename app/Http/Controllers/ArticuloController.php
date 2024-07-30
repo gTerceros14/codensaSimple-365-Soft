@@ -391,54 +391,11 @@ class ArticuloController extends Controller
         if (!$request->ajax()) {
             return redirect('/');
         }
-
+    
         $buscar = $request->buscar;
-        $criterio = $request->criterio;
         $idAlmacen = $request->idAlmacen;
         $fechaActual = now();
-
-        /*$query = Articulo::join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
-            ->join('medidas', 'articulos.idmedida', '=', 'medidas.id')
-            ->select(
-                'articulos.id',
-                'medidas.descripcion_medida',
-                'articulos.idcategoria',
-                'articulos.codigo',
-                'articulos.nombre',
-                'categorias.nombre as nombre_categoria',
-                'articulos.precio_venta',
-                'articulos.descripcion',
-                'articulos.condicion',
-                'articulos.precio_uno',
-                'articulos.precio_dos',
-                'articulos.precio_tres',
-                'articulos.precio_cuatro',
-                'articulos.fotografia',
-                'articulos.unidad_envase'
-                // 'articulos.precio_costo_unid',
-                // 'articulos.precio_costo_paq',
-            )
-            ->where('articulos.stock', '>', '0');
-
-        if ($buscar != '') {
-            $query->where('articulos.' . $criterio, 'like', '%' . $buscar . '%');
-        }
-
-        $articulos = $query->get();
-
-        $articulosConSaldo = [];
-
-        foreach ($articulos as $articulo) {
-            $saldoStock = Inventario::where('idarticulo', $articulo->id)
-                ->where('idalmacen', $idAlmacen)
-                ->where('fecha_vencimiento', '>', $fechaActual)
-                ->sum('saldo_stock');
-
-            if ($saldoStock > 0) {
-                $articulo->saldo_stock = $saldoStock;
-                $articulosConSaldo[] = $articulo;
-            }
-        }*/
+    
         $subquery = DB::table('inventarios')
             ->join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
             ->select('inventarios.idarticulo', 'inventarios.idalmacen', DB::raw('SUM(inventarios.saldo_stock) as saldo_stock'))
@@ -446,7 +403,7 @@ class ArticuloController extends Controller
             ->where('inventarios.idalmacen', '=', $idAlmacen)
             ->where('inventarios.saldo_stock', '>', 0)
             ->groupBy('inventarios.idarticulo', 'inventarios.idalmacen');
-
+    
         $articulosConSaldo = DB::table(DB::raw("({$subquery->toSql()}) as inventarios"))
             ->mergeBindings($subquery)
             ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
@@ -472,26 +429,21 @@ class ArticuloController extends Controller
             )
             ->orderBy('articulos.nombre')
             ->orderBy('almacens.nombre_almacen');
+    
         if ($buscar != '') {
-            $articulosConSaldo->where('articulos.' . $criterio, 'like', '%' . $buscar . '%');
+            $articulosConSaldo->where(function($query) use ($buscar) {
+                $query->where('articulos.codigo', 'like', '%' . $buscar . '%')
+                      ->orWhere('articulos.nombre', 'like', '%' . $buscar . '%');
+            });
         }
+    
         $articulosConSaldo = $articulosConSaldo->get();
+    
         return ['articulos' => $articulosConSaldo];
     }
 
 
 
-    /*public function listarPdf()
-    {
-        $articulos = Articulo::join('categorias', 'articulos.idcategoria', '=', 'categorias.id')
-            ->select('articulos.id', 'articulos.idcategoria', 'articulos.codigo', 'articulos.nombre', 'categorias.nombre as nombre_categoria', 'articulos.precio_venta', 'articulos.stock', 'articulos.descripcion', 'articulos.fecha_vencimiento', 'articulos.condicion')
-            ->orderBy('articulos.nombre', 'desc')->get();
-
-        $cont = Articulo::count();
-
-        $pdf = \PDF::loadView('pdf.articulospdf', ['articulos' => $articulos, 'cont' => $cont]);
-        return $pdf->download('articulos.pdf');
-    }*/
     public function listarPdf()
     {
         return Excel::download(new ProductExport, 'articulos.xlsx');

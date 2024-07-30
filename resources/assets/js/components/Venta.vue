@@ -13,31 +13,18 @@
 
             <!-- Buscador -->
             <div class="p-d-flex p-flex-column p-flex-md-row p-ai-start p-ai-md-center p-mb-4">
-    <Button
-        @click="abrirTipoVenta"
-        label="Nueva Venta"
-        icon="pi pi-plus"
-        class="p-button-success p-mb-3 p-mb-md-0 p-mr-md-3 p-button-lg p-w-100 p-w-md-auto"
-    />
-    <span class="p-input-icon-left p-input-icon-right p-w-100">
-        <i class="pi pi-search" />
-        <InputText
-            v-model="buscar"
-            @input="buscarVenta"
-            placeholder="Buscar venta..."
-            class="p-inputtext-lg moto-search p-w-100"
-        />
-        <i
-            class="pi pi-times"
-            v-if="buscar"
-            @click="
-                buscar = '';
-                buscarVenta();
-            "
-            style="cursor: pointer"
-        />
-    </span>
-</div>
+                <Button @click="abrirTipoVenta" label="Nueva Venta" icon="pi pi-plus"
+                    class="p-button-success p-mb-3 p-mb-md-0 p-mr-md-3 p-button-lg p-w-100 p-w-md-auto" />
+                <span class="p-input-icon-left p-input-icon-right p-w-100">
+                    <i class="pi pi-search" />
+                    <InputText v-model="buscar" @input="buscarVenta" placeholder="Buscar venta..."
+                        class="p-inputtext-lg moto-search p-w-100" />
+                    <i class="pi pi-times" v-if="buscar" @click="
+                        buscar = '';
+                    buscarVenta();
+                    " style="cursor: pointer" />
+                </span>
+            </div>
 
             <!-- Listado de Ventas -->
             <template v-if="listado == 1">
@@ -113,7 +100,7 @@
                                     {{
                                         (
                                             slotProps.data.precio * parseFloat(monedaVenta[0])
-                                    ).toFixed(2)
+                                        ).toFixed(2)
                                     }}
                                     {{ monedaVenta[1] }}
                                 </template>
@@ -126,7 +113,7 @@
                                             slotProps.data.precio *
                                             slotProps.data.cantidad *
                                             parseFloat(monedaVenta[0])
-                                    ).toFixed(2)
+                                        ).toFixed(2)
                                     }}
                                     {{ monedaVenta[1] }}
                                 </template>
@@ -221,58 +208,54 @@
                                             <div class="p-col-12 p-md-6 p-lg-6">
                                                 <div class="product-image-container">
                                                     <img :src="arraySeleccionado.fotografia
-                                                            ? `img/articulo/${arraySeleccionado.fotografia}?t=${new Date().getTime()}`
-                                                            : 'img/productoSinImagen.png'
+                                                        ? `img/articulo/${arraySeleccionado.fotografia}?t=${new Date().getTime()}`
+                                                        : 'img/productoSinImagen.png'
                                                         " :alt="arraySeleccionado.nombre" class="product-image" />
                                                 </div>
                                             </div>
                                             <div class="p-col-12 p-md-6 p-lg-6">
                                                 <div class="stock-info p-mb-3">
                                                     <i :class="calcularStockDisponible > 0
-                                                            ? 'pi pi-check-circle'
-                                                            : 'pi pi-exclamation-triangle'
+                                                        ? 'pi pi-check-circle'
+                                                        : 'pi pi-exclamation-triangle'
                                                         " :style="{
-                                color:
-                                    calcularStockDisponible > 0
-                                        ? 'var(--green-500)'
-                                        : 'var(--yellow-500)',
-                            }"></i>
+                                                            color:
+                                                                calcularStockDisponible > 0
+                                                                    ? 'var(--green-500)'
+                                                                    : 'var(--yellow-500)',
+                                                        }"></i>
                                                     <span>{{
                                                         calcularStockDisponible > 0
                                                             ? "En stock"
-                                                        : "Bajo stock"
-                                                        }}</span>
+                                                            : "Bajo stock"
+                                                    }}</span>
                                                     <strong>{{ calcularStockDisponible }} Unidades
                                                         disponibles</strong>
                                                 </div>
-                                                <div class="product-price p-mb-4">
-                                                    <h2 v-if="arrayPromocion && arrayPromocion.id">
-                                                        <span v-if="arrayPromocion.porcentaje == 100"
-                                                            class="promo-price">GRATIS</span>
-                                                        <span v-else>
-                                                            <span class="promo-price">{{
-                                                                formatearPrecio(
-                                                                    calcularPrecioConDescuento(
-                                                                        arraySeleccionado.precio_venta,
-                                                                arrayPromocion.porcentaje
-                                                                )
-                                                                )
-                                                                }}</span>
-                                                            <small class="original-price">
-                                                                <s>{{
-                                                                    formatearPrecio(
-                                                                        arraySeleccionado.precio_venta
-                                                                    )
-                                                                    }}</s>
-                                                            </small>
-                                                        </span>
-                                                    </h2>
-                                                    <h2 v-else class="regular-price">
-                                                        {{
-                                                            formatearPrecio(arraySeleccionado.precio_venta)
-                                                        }}
-                                                    </h2>
-                                                </div>
+                                                <div class="product-price-section">
+    <h4 class="price-title">PRECIOS:</h4>
+    <div class="product-price p-mb-4">
+        <div v-for="(precio, key) in [
+            {nombre: 'Precio Uno', valor: arraySeleccionado.precio_uno},
+            {nombre: 'Precio Dos', valor: arraySeleccionado.precio_dos},
+            {nombre: 'Precio Tres', valor: arraySeleccionado.precio_tres},
+            {nombre: 'Precio Cuatro', valor: arraySeleccionado.precio_cuatro},
+            {nombre: 'Precio Venta', valor: arraySeleccionado.precio_venta}
+        ]" :key="key" class="precio-opcion" v-if="precio.valor !== '0.0000'">
+            <input type="radio" :id="key" :value="precio.valor" v-model="precioSeleccionado" @change="seleccionarPrecio(precio.valor)">
+            <label :for="key">
+                {{ precio.nombre }}: {{ formatearPrecio(precio.valor) }}
+            </label>
+        </div>
+    </div>
+    <h4>Precio:</h4>
+    <h2 class="selected-price" v-if="precioSeleccionado">
+        {{ formatearPrecio(precioSeleccionado) }}
+    </h2>
+    <h2 class="selected-price" v-else>
+        Ningún precio seleccionado
+    </h2>
+</div>
                                                 <div class="purchase-options">
                                                     <div class="p-grid p-fluid">
                                                         <div class="p-col-6">
@@ -284,7 +267,8 @@
                                                                         value: arraySeleccionado.unidad_envase,
                                                                     },
                                                                     { label: 'Por unidad', value: '1' },
-                                                                ]" optionLabel="label" optionValue="value" class="w-full" />
+                                                                ]" optionLabel="label" optionValue="value"
+                                                                    class="w-full" />
                                                             </div>
                                                         </div>
                                                         <div class="p-col-6">
@@ -338,7 +322,7 @@
                                             (
                                                 slotProps.data.precioseleccionado *
                                                 parseFloat(monedaVenta[0])
-                                        ).toFixed(2)
+                                            ).toFixed(2)
                                         }}
                                         {{ monedaVenta[1] }}
                                     </template>
@@ -359,7 +343,7 @@
                                                 slotProps.data.precioseleccionado *
                                                 slotProps.data.cantidad *
                                                 parseFloat(monedaVenta[0])
-                                        ).toFixed(2)
+                                            ).toFixed(2)
                                         }}
                                         {{ monedaVenta[1] }}
                                     </template>
@@ -446,9 +430,9 @@
                                                                 Cambio a
                                                                 Entregar:</label>
                                                             <InputText id="cambioRecibir" :value="(
-                                                                    recibido -
-                                                                    calcularTotal * parseFloat(monedaVenta[0])
-                                                                ).toFixed(2)
+                                                                recibido -
+                                                                calcularTotal * parseFloat(monedaVenta[0])
+                                                            ).toFixed(2)
                                                                 " readonly />
                                                         </div>
                                                     </div>
@@ -466,7 +450,7 @@
                                                             (
                                                                 calcularTotal * parseFloat(monedaVenta[0])
                                                             ).toFixed(2)
-                                                            }}
+                                                        }}
                                                             {{ monedaVenta[1] }}</span>
                                                     </div>
                                                     <div class="p-d-flex p-jc-between">
@@ -476,7 +460,7 @@
                                                             (
                                                                 calcularTotal * parseFloat(monedaVenta[0])
                                                             ).toFixed(2)
-                                                            }}
+                                                        }}
                                                             {{ monedaVenta[1] }}</span>
                                                     </div>
                                                 </template>
@@ -589,7 +573,7 @@
                                         {{
                                             new Date(slotProps.data.fecha_pago).toLocaleDateString(
                                                 "es-ES"
-                                        )
+                                            )
                                         }}
                                     </template>
                                 </Column>
@@ -598,7 +582,7 @@
                                         {{
                                             (
                                                 slotProps.data.precio_cuota * parseFloat(monedaVenta[0])
-                                        ).toFixed(2)
+                                            ).toFixed(2)
                                         }}
                                         {{ monedaVenta[1] }}
                                     </template>
@@ -609,7 +593,7 @@
                                             (
                                                 slotProps.data.totalCancelado *
                                                 parseFloat(monedaVenta[0])
-                                        ).toFixed(2)
+                                            ).toFixed(2)
                                         }}
                                         {{ monedaVenta[1] }}
                                     </template>
@@ -620,7 +604,7 @@
                                             (
                                                 slotProps.data.saldo_restante *
                                                 parseFloat(monedaVenta[0])
-                                        ).toFixed(2)
+                                            ).toFixed(2)
                                         }}
                                         {{ monedaVenta[1] }}
                                     </template>
@@ -632,7 +616,7 @@
                                                 ? new Date(
                                                     slotProps.data.fecha_cancelado
                                                 ).toLocaleDateString("es-ES")
-                                        : "Sin fecha"
+                                                : "Sin fecha"
                                         }}
                                     </template>
                                 </Column>
@@ -651,71 +635,88 @@
                     </div>
 
                     <template>
-                        <footer class="footer d-flex justify-content-center">
-                            <button class="btn btn-primary mr-2" @click="prevStep" :disabled="step === 1">
-                                <i class="pi pi-chevron-left"></i> Anterior
-                            </button>
-                            <button class="btn btn-primary" @click="validarYAvanzar" :disabled="step === 3">
-                                Siguiente <i class="pi pi-chevron-right"></i>
-                            </button>
-                        </footer>
-                    </template>
+  <footer class="footer d-flex justify-content-center gap-2">
+    <Button 
+      @click="prevStep" 
+      :disabled="step === 1"
+      class="p-button-primary"
+      icon="pi pi-chevron-left"
+      iconPos="left"
+      label="Anterior"
+      :style="{ width: '150px' }" 
+    />
+    <Button 
+      @click="validarYAvanzar" 
+      :disabled="step === 3"
+      class="p-button-primary"
+      icon="pi pi-chevron-right"
+      iconPos="right"
+      label="Siguiente"
+      :style="{ width: '150px' }" 
+    />
+  </footer>
+</template>
+
                 </div>
             </Dialog>
         </template>
 
         <template>
-            <Dialog :visible="modal" :containerStyle="{ width: '800px' }" style="padding-top: 35px" :modal="true"
-                :closable="true">
-                <template #header>
-                    <h3>{{ tituloModal }}</h3>
-                </template>
+  <Dialog :visible.sync="modal" :containerStyle="{ width: '800px', paddingTop: '35px' }" modal closable>
+    <template #header>
+      <h3>{{ tituloModal }}</h3>
+    </template>
+    
+    <TabView>
+      <TabPanel header="Articulos">
+        <div class="grid">
+          <div class="col-12 md:col-6 lg:col-6">
+            <span class="p-input-icon-left w-full">
+              <i class="pi pi-search" />
+              <InputText
+                v-model="buscarA"
+                placeholder="Buscar por código o nombre"
+                @input="listarArticulo"
+                class="w-full"
+              />
+            </span>
+          </div>
+        </div>
+        <DataTable 
+          :value="arrayArticulo" 
+          :paginator="true" 
+          :rows="10"
+          class="p-datatable-sm moto-table"
+          @row-select="onRowSelect" 
+          selectionMode="single" 
+          :selection="selectedArticulo"
+    
+          breakpoint="960px"
+        >
+          <Column field="codigo" header="Código" :class="'sm:table-cell'" />
+          <Column field="nombre" header="Nombre" :class="'sm:table-cell'" />
+          <Column field="nombre_categoria" header="Categoría" :class="'hidden sm:table-cell'" />
+          <Column header="Precio Venta" :class="'hidden sm:table-cell'">
+            <template #body="slotProps">
+              {{ (slotProps.data.precio_venta * parseFloat(monedaVenta[0])).toFixed(2) }}
+              {{ monedaVenta[1] }}
+            </template>
+          </Column>
+          <Column field="saldo_stock" header="Stock" :class="'sm:table-cell'" />
+          <Column header="Estado" :class="'hidden sm:table-cell'">
+            <template #body="slotProps">
+              <Tag 
+                :severity="slotProps.data.condicion ? 'success' : 'danger'"
+                :value="slotProps.data.condicion ? 'Activo' : 'Desactivado'" 
+              />
+            </template>
+          </Column>
+        </DataTable>
+      </TabPanel>
+    </TabView>
+  </Dialog>
+</template>
 
-                <TabView>
-                    <TabPanel header="Articulos">
-                        <div class="p-grid">
-                            <div class="p-col-6">
-                                <div class="p-inputgroup">
-                                    <Dropdown v-model="criterioA" :options="criterioOptions" optionLabel="label"
-                                        optionValue="value" class="p-col-4" />
-                                    <InputText v-model="buscarA" placeholder="Texto a buscar"
-                                        @input="listarArticulo(buscarA, criterioA)" class="p-col-8" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <DataTable :value="arrayArticulo" :paginator="true" :rows="10" class="p-mt-2">
-                            <Column header="Opciones">
-                                <template #body="slotProps">
-                                    <Button icon="pi pi-check" class="p-button-success p-button-sm"
-                                        @click="agregarDetalleModal(slotProps.data)" />
-                                </template>
-                            </Column>
-                            <Column field="codigo" header="Código" />
-                            <Column field="nombre" header="Nombre" />
-                            <Column field="nombre_categoria" header="Categoría" />
-                            <Column header="Precio Venta">
-                                <template #body="slotProps">
-                                    {{
-                                        (
-                                            slotProps.data.precio_venta * parseFloat(monedaVenta[0])
-                                    ).toFixed(2)
-                                    }}
-                                    {{ monedaVenta[1] }}
-                                </template>
-                            </Column>
-                            <Column field="saldo_stock" header="Stock" />
-                            <Column header="Estado">
-                                <template #body="slotProps">
-                                    <Tag :severity="slotProps.data.condicion ? 'success' : 'danger'"
-                                        :value="slotProps.data.condicion ? 'Activo' : 'Desactivado'" />
-                                </template>
-                            </Column>
-                        </DataTable>
-                    </TabPanel>
-                </TabView>
-            </Dialog>
-        </template>
     </main>
 </template>
 
@@ -736,8 +737,11 @@ import SelectButton from "primevue/selectbutton";
 import Steps from "primevue/steps";
 import Tag from "primevue/tag";
 import Swal from "sweetalert2";
-
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
 export default {
+
+
     components: {
         Dropdown,
         DataTable,
@@ -755,9 +759,15 @@ export default {
         SelectButton,
         InputNumber,
         Checkbox,
+        TabView,
+        TabPanel,
     },
     data() {
         return {
+            precioSeleccionado: null,
+            searchTerm: '',
+            selectedArticulo: null,
+            debounceTimeout: null,
             tiposPagoOptions: [
                 { label: "Efectivo", value: "efectivo" },
                 { label: "Tarjeta", value: "tarjeta" },
@@ -1031,6 +1041,41 @@ export default {
     },
 
     methods: {
+        seleccionarPrecio(precio) {
+        this.precioSeleccionado = precio;
+    },
+    formatearPrecio(precio) {
+        // Asegúrate de que esta función esté definida y funcione correctamente
+        return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(precio);
+    },
+        onRowSelect(event) {
+      this.agregarDetalleModal(event.data);
+    },
+        debouncedSearch() {
+            clearTimeout(this.debounceTimeout);
+            this.debounceTimeout = setTimeout(() => {
+                this.performSearch();
+            }, 300); // Espera 300ms después de que el usuario deje de escribir
+        },
+        performSearch() {
+            if (this.searchTerm.length < 2) {
+                this.arrayArticulo = [];
+                return;
+            }
+
+            const url = `/articulo/listarArticuloVenta?buscar=${this.searchTerm}&idAlmacen=${this.idAlmacen}`;
+
+            axios.get(url)
+                .then(response => {
+                    this.arrayArticulo = response.data.articulos;
+                    console.log("listar articulo", response.data);
+                })
+                .catch(error => {
+                    console.error("Error en la búsqueda:", error);
+                    this.arrayArticulo = [];
+                });
+        },
+
         decrementarCantidad() {
             this.cantidad = Math.max(1, this.cantidad - 1);
         },
@@ -1889,115 +1934,115 @@ export default {
         },
 
         agregarDetalle() {
-            if (this.encuentra(this.arraySeleccionado.id)) {
-                swal({
-                    type: "error",
-                    title: "Error...",
-                    text: "Este Artículo ya se encuentra agregado!",
-                });
-                return;
-            }
+    if (this.encuentra(this.arraySeleccionado.id)) {
+        swal({
+            type: "error",
+            title: "Error...",
+            text: "Este Artículo ya se encuentra agregado!",
+        });
+        return;
+    }
 
-            if (
-                this.saldosNegativos === 0 &&
-                this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete
-            ) {
-                swal({
-                    type: "error",
-                    title: "Error...",
-                    text: "No hay stock disponible!",
-                });
-                return;
-            }
+    if (
+        this.saldosNegativos === 0 &&
+        this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete
+    ) {
+        swal({
+            type: "error",
+            title: "Error...",
+            text: "No hay stock disponible!",
+        });
+        return;
+    }
 
-            const precioUnitario = parseFloat(this.precioseleccionado);
-            const cantidad = this.cantidad * this.unidadPaquete;
-            const descuento = (
-                precioUnitario *
-                cantidad *
-                (this.descuentoProducto / 100)
-            ).toFixed(2);
-            const total = (precioUnitario * cantidad - descuento).toFixed(2);
+    if (!this.precioSeleccionado) {
+        swal({
+            type: "error",
+            title: "Error...",
+            text: "Por favor, seleccione un precio antes de agregar",
+        });
+        return;
+    }
 
-            const nuevoDetalle = {
-                id: Date.now(),
-                idkit: -1,
-                idarticulo: this.arraySeleccionado.id,
-                articulo: this.arraySeleccionado.nombre,
-                medida: this.arraySeleccionado.medida,
-                unidad_envase: this.arraySeleccionado.unidad_envase,
-                cantidad: cantidad,
-                cantidad_paquetes: this.arraySeleccionado.unidad_envase,
-                precio: precioUnitario,
-                descuento: this.descuentoProducto,
-                stock: this.arraySeleccionado.saldo_stock,
-                precioseleccionado: precioUnitario,
-                total: total,
-            };
+    const precioUnitario = parseFloat(this.precioSeleccionado);
+    const cantidad = this.cantidad * this.unidadPaquete;
+    const descuento = (
+        precioUnitario *
+        cantidad *
+        (this.descuentoProducto / 100)
+    ).toFixed(2);
+    const total = (precioUnitario * cantidad - descuento).toFixed(2);
 
-            this.arrayDetalle.push(nuevoDetalle);
+    const nuevoDetalle = {
+        id: Date.now(),
+        idkit: -1,
+        idarticulo: this.arraySeleccionado.id,
+        articulo: this.arraySeleccionado.nombre,
+        medida: this.arraySeleccionado.medida,
+        unidad_envase: this.arraySeleccionado.unidad_envase,
+        cantidad: cantidad,
+        cantidad_paquetes: this.arraySeleccionado.unidad_envase,
+        precio: precioUnitario,
+        descuento: this.descuentoProducto,
+        stock: this.arraySeleccionado.saldo_stock,
+        precioseleccionado: precioUnitario,
+        total: total,
+    };
 
-            const nuevoProducto = {
-                actividadEconomica: 461021,
-                codigoProductoSin: this.arraySeleccionado.codigoProductoSin,
-                codigoProducto: this.arraySeleccionado.codigo,
-                descripcion: this.arraySeleccionado.nombre,
-                cantidad: cantidad,
-                unidadMedida: this.arraySeleccionado.codigoClasificador,
-                precioUnitario: precioUnitario.toFixed(2),
-                montoDescuento: descuento,
-                subTotal: total,
-                numeroSerie: null,
-                numeroImei: null,
-            };
+    this.arrayDetalle.push(nuevoDetalle);
 
-            this.arrayProductos.push(nuevoProducto);
+    const nuevoProducto = {
+        actividadEconomica: 461021,
+        codigoProductoSin: this.arraySeleccionado.codigoProductoSin,
+        codigoProducto: this.arraySeleccionado.codigo,
+        descripcion: this.arraySeleccionado.nombre,
+        cantidad: cantidad,
+        unidadMedida: this.arraySeleccionado.codigoClasificador,
+        precioUnitario: precioUnitario.toFixed(2),
+        montoDescuento: descuento,
+        subTotal: total,
+        numeroSerie: null,
+        numeroImei: null,
+    };
 
-            this.precioBloqueado = true;
-            this.arraySeleccionado = [];
-            this.cantidad = 1;
-            this.unidadPaquete = 1;
-            this.codigo = "";
-            this.descuentoProducto = 0;
+    this.arrayProductos.push(nuevoProducto);
 
-            this.calcularTotal();
-        },
+    this.precioBloqueado = true;
+    this.arraySeleccionado = [];
+    this.cantidad = 1;
+    this.unidadPaquete = 1;
+    this.codigo = "";
+    this.descuentoProducto = 0;
+    this.precioSeleccionado = null;  // Reseteamos el precio seleccionado
 
-        agregarDetalleModal(data) {
-            //this.scrollToSection();
-            this.codigo = data.codigo;
-            console.log("SLECCIONE ESTO:", data);
+    this.calcularTotal();
+},
 
-            this.buscarPromocion(data.id);
-            this.precioseleccionado = data.precio_uno;
+agregarDetalleModal(data) {
+    this.codigo = data.codigo;
+    console.log("SELECCIONE ESTO:", data);
 
-            this.cerrarModal();
-        },
+    this.buscarPromocion(data.id);
+    this.precioSeleccionado = data.precio_uno;  // Cambiamos precioseleccionado a precioSeleccionado
+
+    this.cerrarModal();
+},
         eliminarSeleccionado() {
             this.codigo = "";
             this.arraySeleccionado = [];
         },
-        listarArticulo(buscar, criterio) {
-            let me = this;
-            var url =
-                "/articulo/listarArticuloVenta?buscar=" +
-                buscar +
-                "&criterio=" +
-                criterio +
-                "&idAlmacen=" +
-                this.idAlmacen;
-            axios
-                .get(url)
-                .then(function (response) {
-                    var respuesta = response.data;
-                    me.arrayArticulo = respuesta.articulos;
-                    console.log("listar articulo", respuesta);
+        listarArticulo() {
+            let url = "/articulo/listarArticuloVenta?buscar=" + this.buscarA + "&idAlmacen=" + this.idAlmacen;
+
+            axios.get(url)
+                .then(response => {
+                    this.arrayArticulo = response.data.articulos;
+                    console.log("listar articulo", response.data);
                 })
-                .catch(function (error) {
-                    console.log(error);
+                .catch(error => {
+                    console.error("Error en la búsqueda:", error);
                 });
         },
-
         datosConfiguracion() {
             let me = this;
             var url = "/configuracion";
@@ -2558,18 +2603,19 @@ export default {
                 });
         },
         cerrarModal() {
-            this.modal = false;
-            this.tituloModal = "";
-        },
-        abrirModal() {
-            this.scrollToTop();
-            this.listarArticulo("", "nombre");
-            this.selectAlmacen();
-            this.arrayArticulo = [];
-            this.modal = true;
-            this.tituloModal = "Seleccione los articulos que desee";
-            console.log("entro siii");
-        },
+      this.modal = false;
+      console.log("Modal cerrado");
+    },
+    abrirModal() {
+      this.scrollToTop();
+      this.listarArticulo("", "nombre");
+      this.selectAlmacen();
+      this.arrayArticulo = [];
+      this.modal = true;
+      this.tituloModal = "Seleccione los articulos que desee";
+      console.log("Modal abierto");
+    },
+
         advertenciaFechaVencimiento() {
             swal({
                 title: "No Disponible",
@@ -2865,5 +2911,10 @@ export default {
 
 .pi {
     margin-right: 0.5rem;
+}
+@media screen and (max-width: 960px) {
+  .hidden {
+    display: none;
+  }
 }
 </style>
