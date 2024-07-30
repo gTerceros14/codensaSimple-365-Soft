@@ -195,8 +195,7 @@
                         </div>
 
                         <!-- Product Details Section -->
-                        <div v-if="
-                            arraySeleccionado && Object.keys(arraySeleccionado).length > 0
+                        <div v-if=" arraySeleccionado && Object.keys(arraySeleccionado).length > 0
                         " class="p-mt-4">
                             <template>
                                 <Card class="product-card">
@@ -233,29 +232,31 @@
                                                         disponibles</strong>
                                                 </div>
                                                 <div class="product-price-section">
-    <h4 class="price-title">PRECIOS:</h4>
-    <div class="product-price p-mb-4">
-        <div v-for="(precio, key) in [
-            {nombre: 'Precio Uno', valor: arraySeleccionado.precio_uno},
-            {nombre: 'Precio Dos', valor: arraySeleccionado.precio_dos},
-            {nombre: 'Precio Tres', valor: arraySeleccionado.precio_tres},
-            {nombre: 'Precio Cuatro', valor: arraySeleccionado.precio_cuatro},
-            {nombre: 'Precio Venta', valor: arraySeleccionado.precio_venta}
-        ]" :key="key" class="precio-opcion" v-if="precio.valor !== '0.0000'">
-            <input type="radio" :id="key" :value="precio.valor" v-model="precioSeleccionado" @change="seleccionarPrecio(precio.valor)">
-            <label :for="key">
-                {{ precio.nombre }}: {{ formatearPrecio(precio.valor) }}
-            </label>
-        </div>
-    </div>
-    <h4>Precio:</h4>
-    <h2 class="selected-price" v-if="precioSeleccionado">
-        {{ formatearPrecio(precioSeleccionado) }}
-    </h2>
-    <h2 class="selected-price" v-else>
-        Ningún precio seleccionado
-    </h2>
-</div>
+                                                    <h4 class="price-title">PRECIOS:</h4>
+                                                    <div class="product-price p-mb-4">
+                                                        <div v-for="(precio, key) in [
+                                                            { nombre: 'Precio Uno', valor: arraySeleccionado.precio_uno },
+                                                            { nombre: 'Precio Dos', valor: arraySeleccionado.precio_dos },
+                                                            { nombre: 'Precio Tres', valor: arraySeleccionado.precio_tres },
+                                                            { nombre: 'Precio Cuatro', valor: arraySeleccionado.precio_cuatro },
+                                                            { nombre: 'Precio Venta', valor: arraySeleccionado.precio_venta }
+                                                        ]" :key="key" class="precio-opcion" v-if="precio.valor !== '0.0000'">
+                                                            <input type="radio" :id="key" :value="precio.valor"
+                                                                v-model="precioSeleccionado"
+                                                                @change="seleccionarPrecio(precio.valor)">
+                                                            <label :for="key">
+                                                                {{ precio.nombre }}: {{ formatearPrecio(precio.valor) }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <h4>Precio:</h4>
+                                                    <h2 class="selected-price" v-if="precioSeleccionado">
+                                                        {{ formatearPrecio(precioSeleccionado) }}
+                                                    </h2>
+                                                    <h2 class="selected-price" v-else>
+                                                        Ningún precio seleccionado
+                                                    </h2>
+                                                </div>
                                                 <div class="purchase-options">
                                                     <div class="p-grid p-fluid">
                                                         <div class="p-col-6">
@@ -420,7 +421,7 @@
                                                             <div class="p-inputgroup">
                                                                 <span class="p-inputgroup-addon">{{
                                                                     monedaVenta[1]
-                                                                    }}</span>
+                                                                }}</span>
                                                                 <InputNumber id="montoEfectivo" v-model="recibido"
                                                                     placeholder="Ingrese el monto recibido" />
                                                             </div>
@@ -482,7 +483,7 @@
                                                     <label for="montoEfectivo">Monto:</label>
                                                     <span class="font-weight-bold">{{
                                                         (montoEfectivo = calcularTotal.toFixed(2))
-                                                        }}</span>
+                                                    }}</span>
                                                 </div>
                                                 <button class="btn btn-primary mb-2" @click="generarQr">
                                                     Generar QR
@@ -499,7 +500,7 @@
                                                     <div>
                                                         <span :class="'badge badge-' + badgeSeverity">{{
                                                             estadoTransaccion.objeto.estadoActual
-                                                            }}</span>
+                                                        }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -635,87 +636,60 @@
                     </div>
 
                     <template>
-  <footer class="footer d-flex justify-content-center gap-2">
-    <Button 
-      @click="prevStep" 
-      :disabled="step === 1"
-      class="p-button-primary"
-      icon="pi pi-chevron-left"
-      iconPos="left"
-      label="Anterior"
-      :style="{ width: '150px' }" 
-    />
-    <Button 
-      @click="validarYAvanzar" 
-      :disabled="step === 3"
-      class="p-button-primary"
-      icon="pi pi-chevron-right"
-      iconPos="right"
-      label="Siguiente"
-      :style="{ width: '150px' }" 
-    />
-  </footer>
-</template>
+                        <footer class="footer d-flex justify-content-center gap-2">
+                            <Button @click="prevStep" :disabled="step === 1" class="p-button-primary"
+                                icon="pi pi-chevron-left" iconPos="left" label="Anterior" :style="{ width: '150px' }" />
+                            <Button @click="validarYAvanzar" :disabled="step === 3" class="p-button-primary"
+                                icon="pi pi-chevron-right" iconPos="right" label="Siguiente"
+                                :style="{ width: '150px' }" />
+                        </footer>
+                    </template>
 
                 </div>
             </Dialog>
         </template>
 
         <template>
-  <Dialog :visible.sync="modal" :containerStyle="{ width: '800px', paddingTop: '35px' }" modal closable>
-    <template #header>
-      <h3>{{ tituloModal }}</h3>
-    </template>
-    
-    <TabView>
-      <TabPanel header="Articulos">
-        <div class="grid">
-          <div class="col-12 md:col-6 lg:col-6">
-            <span class="p-input-icon-left w-full">
-              <i class="pi pi-search" />
-              <InputText
-                v-model="buscarA"
-                placeholder="Buscar por código o nombre"
-                @input="listarArticulo"
-                class="w-full"
-              />
-            </span>
-          </div>
-        </div>
-        <DataTable 
-          :value="arrayArticulo" 
-          :paginator="true" 
-          :rows="10"
-          class="p-datatable-sm moto-table"
-          @row-select="onRowSelect" 
-          selectionMode="single" 
-          :selection="selectedArticulo"
-    
-          breakpoint="960px"
-        >
-          <Column field="codigo" header="Código" :class="'sm:table-cell'" />
-          <Column field="nombre" header="Nombre" :class="'sm:table-cell'" />
-          <Column field="nombre_categoria" header="Categoría" :class="'hidden sm:table-cell'" />
-          <Column header="Precio Venta" :class="'hidden sm:table-cell'">
-            <template #body="slotProps">
-              {{ (slotProps.data.precio_venta * parseFloat(monedaVenta[0])).toFixed(2) }}
-              {{ monedaVenta[1] }}
-            </template>
-          </Column>
-          <Column field="saldo_stock" header="Stock" :class="'sm:table-cell'" />
-          <Column header="Estado" :class="'hidden sm:table-cell'">
-            <template #body="slotProps">
-              <Tag 
-                :severity="slotProps.data.condicion ? 'success' : 'danger'"
-                :value="slotProps.data.condicion ? 'Activo' : 'Desactivado'" 
-              />
-            </template>
-          </Column>
-        </DataTable>
-      </TabPanel>
-    </TabView>
-  </Dialog>
-</template>
+            <Dialog :visible.sync="modal" :containerStyle="{ width: '800px', paddingTop: '35px' }" modal closable>
+                <template #header>
+                    <h3>{{ tituloModal }}</h3>
+                </template>
+
+                <TabView>
+                    <TabPanel header="Articulos">
+                        <div class="grid">
+                            <div class="col-12 md:col-6 lg:col-6">
+                                <span class="p-input-icon-left w-full">
+                                    <i class="pi pi-search" />
+                                    <InputText v-model="buscarA" placeholder="Buscar por código o nombre"
+                                        @input="listarArticulo" class="w-full" />
+                                </span>
+                            </div>
+                        </div>
+                        <DataTable :value="arrayArticulo" :paginator="true" :rows="10" class="p-datatable-sm moto-table"
+                            @row-select="onRowSelect" selectionMode="single" :selection="selectedArticulo"
+                            breakpoint="960px">
+                            <Column field="codigo" header="Código" :class="'sm:table-cell'" />
+                            <Column field="nombre" header="Nombre" :class="'sm:table-cell'" />
+                            <Column field="nombre_categoria" header="Categoría" :class="'hidden sm:table-cell'" />
+                            <Column header="Precio Venta" :class="'hidden sm:table-cell'">
+                                <template #body="slotProps">
+                                    {{ (slotProps.data.precio_venta * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                    {{ monedaVenta[1] }}
+                                </template>
+                            </Column>
+                            <Column field="saldo_stock" header="Stock" :class="'sm:table-cell'" />
+                            <Column header="Estado" :class="'hidden sm:table-cell'">
+                                <template #body="slotProps">
+                                    <Tag :severity="slotProps.data.condicion ? 'success' : 'danger'"
+                                        :value="slotProps.data.condicion ? 'Activo' : 'Desactivado'" />
+                                </template>
+                            </Column>
+                        </DataTable>
+                    </TabPanel>
+                </TabView>
+            </Dialog>
+        </template>
 
     </main>
 </template>
@@ -1042,15 +1016,15 @@ export default {
 
     methods: {
         seleccionarPrecio(precio) {
-        this.precioSeleccionado = precio;
-    },
-    formatearPrecio(precio) {
-        // Asegúrate de que esta función esté definida y funcione correctamente
-        return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(precio);
-    },
+            this.precioSeleccionado = precio;
+        },
+        formatearPrecio(precio) {
+            // Asegúrate de que esta función esté definida y funcione correctamente
+            return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(precio);
+        },
         onRowSelect(event) {
-      this.agregarDetalleModal(event.data);
-    },
+            this.agregarDetalleModal(event.data);
+        },
         debouncedSearch() {
             clearTimeout(this.debounceTimeout);
             this.debounceTimeout = setTimeout(() => {
@@ -1233,20 +1207,25 @@ export default {
         },
 
         validarYAvanzar() {
-            const errores = [];
+    const errores = [];
 
-            if (this.step === 2) {
-                if (!this.idAlmacen) errores.push("Seleccione un almacén");
-            }
+    if (this.step === 2) {
+        if (!this.selectedAlmacen) {
+            errores.push("Seleccione un almacén");
+        }
 
-            if (errores.length > 0) {
-                const mensaje = errores.join("\n");
-                swal("Campos incompletos", mensaje, "warning");
-            } else {
-                this.nextStep();
-            }
-        },
+        if (this.arrayDetalle.length === 0) {
+            errores.push("Añada al menos un artículo a la tabla");
+        }
+    }
 
+    if (errores.length > 0) {
+        const mensaje = errores.join("\n");
+        swal("Campos incompletos", mensaje, "warning");
+    } else {
+        this.nextStep();
+    }
+},
         cerrarModal2() {
             this.modal2 = false;
         },
@@ -1934,99 +1913,99 @@ export default {
         },
 
         agregarDetalle() {
-    if (this.encuentra(this.arraySeleccionado.id)) {
-        swal({
-            type: "error",
-            title: "Error...",
-            text: "Este Artículo ya se encuentra agregado!",
-        });
-        return;
-    }
+            if (this.encuentra(this.arraySeleccionado.id)) {
+                swal({
+                    type: "error",
+                    title: "Error...",
+                    text: "Este Artículo ya se encuentra agregado!",
+                });
+                return;
+            }
 
-    if (
-        this.saldosNegativos === 0 &&
-        this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete
-    ) {
-        swal({
-            type: "error",
-            title: "Error...",
-            text: "No hay stock disponible!",
-        });
-        return;
-    }
+            if (
+                this.saldosNegativos === 0 &&
+                this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete
+            ) {
+                swal({
+                    type: "error",
+                    title: "Error...",
+                    text: "No hay stock disponible!",
+                });
+                return;
+            }
 
-    if (!this.precioSeleccionado) {
-        swal({
-            type: "error",
-            title: "Error...",
-            text: "Por favor, seleccione un precio antes de agregar",
-        });
-        return;
-    }
+            if (!this.precioSeleccionado) {
+                swal({
+                    type: "error",
+                    title: "Error...",
+                    text: "Por favor, seleccione un precio antes de agregar",
+                });
+                return;
+            }
 
-    const precioUnitario = parseFloat(this.precioSeleccionado);
-    const cantidad = this.cantidad * this.unidadPaquete;
-    const descuento = (
-        precioUnitario *
-        cantidad *
-        (this.descuentoProducto / 100)
-    ).toFixed(2);
-    const total = (precioUnitario * cantidad - descuento).toFixed(2);
+            const precioUnitario = parseFloat(this.precioSeleccionado);
+            const cantidad = this.cantidad * this.unidadPaquete;
+            const descuento = (
+                precioUnitario *
+                cantidad *
+                (this.descuentoProducto / 100)
+            ).toFixed(2);
+            const total = (precioUnitario * cantidad - descuento).toFixed(2);
 
-    const nuevoDetalle = {
-        id: Date.now(),
-        idkit: -1,
-        idarticulo: this.arraySeleccionado.id,
-        articulo: this.arraySeleccionado.nombre,
-        medida: this.arraySeleccionado.medida,
-        unidad_envase: this.arraySeleccionado.unidad_envase,
-        cantidad: cantidad,
-        cantidad_paquetes: this.arraySeleccionado.unidad_envase,
-        precio: precioUnitario,
-        descuento: this.descuentoProducto,
-        stock: this.arraySeleccionado.saldo_stock,
-        precioseleccionado: precioUnitario,
-        total: total,
-    };
+            const nuevoDetalle = {
+                id: Date.now(),
+                idkit: -1,
+                idarticulo: this.arraySeleccionado.id,
+                articulo: this.arraySeleccionado.nombre,
+                medida: this.arraySeleccionado.medida,
+                unidad_envase: this.arraySeleccionado.unidad_envase,
+                cantidad: cantidad,
+                cantidad_paquetes: this.arraySeleccionado.unidad_envase,
+                precio: precioUnitario,
+                descuento: this.descuentoProducto,
+                stock: this.arraySeleccionado.saldo_stock,
+                precioseleccionado: precioUnitario,
+                total: total,
+            };
 
-    this.arrayDetalle.push(nuevoDetalle);
+            this.arrayDetalle.push(nuevoDetalle);
 
-    const nuevoProducto = {
-        actividadEconomica: 461021,
-        codigoProductoSin: this.arraySeleccionado.codigoProductoSin,
-        codigoProducto: this.arraySeleccionado.codigo,
-        descripcion: this.arraySeleccionado.nombre,
-        cantidad: cantidad,
-        unidadMedida: this.arraySeleccionado.codigoClasificador,
-        precioUnitario: precioUnitario.toFixed(2),
-        montoDescuento: descuento,
-        subTotal: total,
-        numeroSerie: null,
-        numeroImei: null,
-    };
+            const nuevoProducto = {
+                actividadEconomica: 461021,
+                codigoProductoSin: this.arraySeleccionado.codigoProductoSin,
+                codigoProducto: this.arraySeleccionado.codigo,
+                descripcion: this.arraySeleccionado.nombre,
+                cantidad: cantidad,
+                unidadMedida: this.arraySeleccionado.codigoClasificador,
+                precioUnitario: precioUnitario.toFixed(2),
+                montoDescuento: descuento,
+                subTotal: total,
+                numeroSerie: null,
+                numeroImei: null,
+            };
 
-    this.arrayProductos.push(nuevoProducto);
+            this.arrayProductos.push(nuevoProducto);
 
-    this.precioBloqueado = true;
-    this.arraySeleccionado = [];
-    this.cantidad = 1;
-    this.unidadPaquete = 1;
-    this.codigo = "";
-    this.descuentoProducto = 0;
-    this.precioSeleccionado = null;  // Reseteamos el precio seleccionado
+            this.precioBloqueado = true;
+            this.arraySeleccionado = [];
+            this.cantidad = 1;
+            this.unidadPaquete = 1;
+            this.codigo = "";
+            this.descuentoProducto = 0;
+            this.precioSeleccionado = null;  // Reseteamos el precio seleccionado
 
-    this.calcularTotal();
-},
+            this.calcularTotal();
+        },
 
-agregarDetalleModal(data) {
-    this.codigo = data.codigo;
-    console.log("SELECCIONE ESTO:", data);
+        agregarDetalleModal(data) {
+            this.codigo = data.codigo;
+            console.log("SELECCIONE ESTO:", data);
 
-    this.buscarPromocion(data.id);
-    this.precioSeleccionado = data.precio_uno;  // Cambiamos precioseleccionado a precioSeleccionado
+            this.buscarPromocion(data.id);
+            this.precioSeleccionado = data.precio_uno;  // Cambiamos precioseleccionado a precioSeleccionado
 
-    this.cerrarModal();
-},
+            this.cerrarModal();
+        },
         eliminarSeleccionado() {
             this.codigo = "";
             this.arraySeleccionado = [];
@@ -2603,18 +2582,18 @@ agregarDetalleModal(data) {
                 });
         },
         cerrarModal() {
-      this.modal = false;
-      console.log("Modal cerrado");
-    },
-    abrirModal() {
-      this.scrollToTop();
-      this.listarArticulo("", "nombre");
-      this.selectAlmacen();
-      this.arrayArticulo = [];
-      this.modal = true;
-      this.tituloModal = "Seleccione los articulos que desee";
-      console.log("Modal abierto");
-    },
+            this.modal = false;
+            console.log("Modal cerrado");
+        },
+        abrirModal() {
+            this.scrollToTop();
+            this.listarArticulo("", "nombre");
+            this.selectAlmacen();
+            this.arrayArticulo = [];
+            this.modal = true;
+            this.tituloModal = "Seleccione los articulos que desee";
+            console.log("Modal abierto");
+        },
 
         advertenciaFechaVencimiento() {
             swal({
@@ -2912,9 +2891,10 @@ agregarDetalleModal(data) {
 .pi {
     margin-right: 0.5rem;
 }
+
 @media screen and (max-width: 960px) {
-  .hidden {
-    display: none;
-  }
+    .hidden {
+        display: none;
+    }
 }
 </style>
