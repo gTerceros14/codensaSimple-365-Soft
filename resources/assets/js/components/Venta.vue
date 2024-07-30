@@ -93,7 +93,7 @@
                                 </div>
                             </div>
                         </div>
-                        <DataTable :value="arrayDetalle" class="mb-3">
+                        <DataTable :value="arrayDetalle" class="mb-3" responsiveLayout="scroll">
                             <Column field="articulo" header="Artículo"></Column>
                             <Column header="Precio">
                                 <template #body="slotProps">
@@ -133,7 +133,7 @@
         </Panel>
         <!-- HASTA AQUI DEVOLUCIONES -->
         <template>
-            <Dialog :visible.sync="modal2" :containerStyle="{ width: '800px' }" :modal="true" :closable="true"
+            <Dialog :visible.sync="modal2" :containerStyle="{width: '100%', maxWidth: '800px'}" :modal="true" :closable="true"
                 :closeOnEscape="false">
                 <template #header>
                     <h5 class="modal-title">DETALLE VENTAS</h5>
@@ -320,8 +320,8 @@
                                 <Column field="unidades" header="Unidades" style="width: 10%">
                                     <template #body="slotProps">
                                         <InputNumber v-model="slotProps.data.cantidad" :min="1" showButtons
-                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger"
-                                            incrementButtonClass="p-button-success" incrementButtonIcon="pi pi-plus"
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm" incrementButtonIcon="pi pi-plus"
                                             decrementButtonIcon="pi pi-minus"
                                             @input="actualizarDetalle(slotProps.data.id)" />
                                     </template>
@@ -639,7 +639,7 @@
         </template>
 
         <template>
-            <Dialog :visible.sync="modal" :containerStyle="{ width: '800px', paddingTop: '35px' }" modal closable>
+            <Dialog :visible.sync="modal" :containerStyle="{width: '100%', maxWidth: '800px', paddingTop: '35px' }" modal closable>
                 <template #header>
                     <h3>{{ tituloModal }}</h3>
                 </template>
@@ -656,7 +656,7 @@
                             </div>
                         </div>
                         <DataTable :value="arrayArticulo" :paginator="true" :rows="10" class="p-datatable-sm moto-table"
-                            @row-select="onRowSelect" selectionMode="single" :selection="selectedArticulo"
+                            @row-select="onRowSelect" selectionMode="single"  responsiveLayout="scroll" :selection="selectedArticulo"
                             breakpoint="960px">
                             <Column field="codigo" header="Código" :class="'sm:table-cell'" />
                             <Column field="nombre" header="Nombre" :class="'sm:table-cell'" />
