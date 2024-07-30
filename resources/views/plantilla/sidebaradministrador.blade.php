@@ -109,9 +109,7 @@
                     <li @click="menu=2" class="nav-item">
                         <a class="nav-link" href="#"><i class="fa fa-product-hunt" style="font-size: 19px;"></i> PRODUCTOS</a>
                     </li>
-                    <li @click="menu=71" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-list" style="font-size: 11px;"></i> PRODUCTOS NUEVO</a>
-                    </li>
+
                     <li @click="menu=18" class="nav-item">
                         <a class="nav-link" href="#"><i class="fa fa-trademark" style="font-size: 19px;"></i> MARCA</a>
                     </li>
