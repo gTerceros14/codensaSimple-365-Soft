@@ -195,7 +195,7 @@
                         </div>
 
                         <!-- Product Details Section -->
-                        <div v-if=" arraySeleccionado && Object.keys(arraySeleccionado).length > 0
+                        <div v-if="arraySeleccionado && Object.keys(arraySeleccionado).length > 0
                         " class="p-mt-4">
                             <template>
                                 <Card class="product-card">
@@ -214,22 +214,14 @@
                                             </div>
                                             <div class="p-col-12 p-md-6 p-lg-6">
                                                 <div class="stock-info p-mb-3">
-                                                    <i :class="calcularStockDisponible > 0
-                                                        ? 'pi pi-check-circle'
-                                                        : 'pi pi-exclamation-triangle'
-                                                        " :style="{
-                                                            color:
-                                                                calcularStockDisponible > 0
-                                                                    ? 'var(--green-500)'
-                                                                    : 'var(--yellow-500)',
-                                                        }"></i>
-                                                    <span>{{
-                                                        calcularStockDisponible > 0
-                                                            ? "En stock"
-                                                            : "Bajo stock"
-                                                    }}</span>
-                                                    <strong>{{ calcularStockDisponible }} Unidades
-                                                        disponibles</strong>
+                                                    <i :class="stockMostrado > 0 ? 'pi pi-check-circle' : 'pi pi-exclamation-triangle'"
+                                                        :style="{ color: stockMostrado > 0 ? 'var(--green-500)' : 'var(--yellow-500)' }"></i>
+                                                    <span>{{ stockMostrado > 0 ? "En stock" : "Bajo stock" }}</span>
+                                                    <strong>
+                                                        {{ stockMostrado }}
+                                                        {{ unidadPaquete === 'paquete' ? 'Paquetes' : 'Unidades' }}
+                                                        disponibles
+                                                    </strong>
                                                 </div>
                                                 <div class="product-price-section">
                                                     <h4 class="price-title">PRECIOS:</h4>
@@ -240,7 +232,8 @@
                                                             { nombre: 'Precio Tres', valor: arraySeleccionado.precio_tres },
                                                             { nombre: 'Precio Cuatro', valor: arraySeleccionado.precio_cuatro },
                                                             { nombre: 'Precio Venta', valor: arraySeleccionado.precio_venta }
-                                                        ]" :key="key" class="precio-opcion" v-if="precio.valor !== '0.0000'">
+                                                        ]" :key="key" class="precio-opcion"
+                                                            v-if="precio.valor !== '0.0000'">
                                                             <input type="radio" :id="key" :value="precio.valor"
                                                                 v-model="precioSeleccionado"
                                                                 @change="seleccionarPrecio(precio.valor)">
@@ -262,14 +255,10 @@
                                                         <div class="p-col-6">
                                                             <div class="p-field">
                                                                 <label>Tipo de venta</label>
-                                                                <Dropdown v-model="unidadPaquete" :options="[
-                                                                    {
-                                                                        label: 'Por paquete',
-                                                                        value: arraySeleccionado.unidad_envase,
-                                                                    },
-                                                                    { label: 'Por unidad', value: '1' },
-                                                                ]" optionLabel="label" optionValue="value"
-                                                                    class="w-full" />
+                                                                <Dropdown v-model="unidadPaquete"
+                                                                    :options="tipoVentaOptions" optionLabel="label"
+                                                                    optionValue="value" class="w-full"
+                                                                    @change="actualizarVistaStock" />
                                                             </div>
                                                         </div>
                                                         <div class="p-col-6">
@@ -421,7 +410,7 @@
                                                             <div class="p-inputgroup">
                                                                 <span class="p-inputgroup-addon">{{
                                                                     monedaVenta[1]
-                                                                }}</span>
+                                                                    }}</span>
                                                                 <InputNumber id="montoEfectivo" v-model="recibido"
                                                                     placeholder="Ingrese el monto recibido" />
                                                             </div>
@@ -483,7 +472,7 @@
                                                     <label for="montoEfectivo">Monto:</label>
                                                     <span class="font-weight-bold">{{
                                                         (montoEfectivo = calcularTotal.toFixed(2))
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                                 <button class="btn btn-primary mb-2" @click="generarQr">
                                                     Generar QR
@@ -500,7 +489,7 @@
                                                     <div>
                                                         <span :class="'badge badge-' + badgeSeverity">{{
                                                             estadoTransaccion.objeto.estadoActual
-                                                        }}</span>
+                                                            }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -798,10 +787,10 @@ export default {
             arrayArticulosPE: [],
 
             arrayPromocion: [],
-            unidadPaquete: 1,
+            unidadPaquete: '1',  // Por defecto, establecido a '1' para venta por unidad
             tipoVentaOptions: [
-                { label: "Por paquete", value: 1 },
-                { label: "Por unidad", value: 0 },
+                { label: "Por unidad", value: '1' },
+                { label: "Por paquete", value: 'paquete' }
             ],
 
             monedaVenta: [],
@@ -941,12 +930,25 @@ export default {
     },
     computed: {
         calcularStockDisponible() {
-            return this.unidadPaquete == 1
-                ? this.arraySeleccionado.saldo_stock - this.cantidad
-                : this.arraySeleccionado.saldo_stock /
-                this.arraySeleccionado.unidad_envase -
-                this.cantidad;
+            if (!this.arraySeleccionado) return 0;
+
+            const stockTotal = parseInt(this.arraySeleccionado.saldo_stock);
+            const unidadEnvase = parseInt(this.arraySeleccionado.unidad_envase);
+
+            if (this.unidadPaquete === 'paquete') {
+                return Math.floor(stockTotal / unidadEnvase);
+            } else {
+                return stockTotal;
+            }
         },
+        stockMostrado() {
+            const stockDisponible = this.calcularStockDisponible;
+            const cantidadSolicitada = this.unidadPaquete === 'paquete'
+                ? this.cantidad
+                : this.cantidad / this.arraySeleccionado.unidad_envase;
+            return Math.floor(Math.max(0, stockDisponible - cantidadSolicitada));
+        },
+
 
         resultadoMultiplicacion() {
             if (this.arraySeleccionado) {
@@ -1015,6 +1017,13 @@ export default {
     },
 
     methods: {
+        actualizarVistaStock() {
+            // Forzar la actualización de la vista
+            this.$forceUpdate();
+        },
+        encuentra(id) {
+            return this.arrayDetalle.some(item => item.idarticulo === id);
+        },
         seleccionarPrecio(precio) {
             this.precioSeleccionado = precio;
         },
@@ -1207,25 +1216,25 @@ export default {
         },
 
         validarYAvanzar() {
-    const errores = [];
+            const errores = [];
 
-    if (this.step === 2) {
-        if (!this.selectedAlmacen) {
-            errores.push("Seleccione un almacén");
-        }
+            if (this.step === 2) {
+                if (!this.selectedAlmacen) {
+                    errores.push("Seleccione un almacén");
+                }
 
-        if (this.arrayDetalle.length === 0) {
-            errores.push("Añada al menos un artículo a la tabla");
-        }
-    }
+                if (this.arrayDetalle.length === 0) {
+                    errores.push("Añada al menos un artículo a la tabla");
+                }
+            }
 
-    if (errores.length > 0) {
-        const mensaje = errores.join("\n");
-        swal("Campos incompletos", mensaje, "warning");
-    } else {
-        this.nextStep();
-    }
-},
+            if (errores.length > 0) {
+                const mensaje = errores.join("\n");
+                swal("Campos incompletos", mensaje, "warning");
+            } else {
+                this.nextStep();
+            }
+        },
         cerrarModal2() {
             this.modal2 = false;
         },
@@ -1922,10 +1931,10 @@ export default {
                 return;
             }
 
-            if (
-                this.saldosNegativos === 0 &&
-                this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete
-            ) {
+            const stockDisponible = this.calcularStockDisponible;
+            const cantidadSolicitada = this.unidadPaquete === 'paquete' ? this.cantidad : this.cantidad / this.arraySeleccionado.unidad_envase;
+
+            if (this.saldosNegativos === 0 && stockDisponible < cantidadSolicitada) {
                 swal({
                     type: "error",
                     title: "Error...",
@@ -1944,13 +1953,15 @@ export default {
             }
 
             const precioUnitario = parseFloat(this.precioSeleccionado);
-            const cantidad = this.cantidad * this.unidadPaquete;
+            const cantidadTotal = this.unidadPaquete === 'paquete'
+                ? this.cantidad * this.arraySeleccionado.unidad_envase
+                : this.cantidad;
             const descuento = (
                 precioUnitario *
-                cantidad *
+                cantidadTotal *
                 (this.descuentoProducto / 100)
             ).toFixed(2);
-            const total = (precioUnitario * cantidad - descuento).toFixed(2);
+            const total = (precioUnitario * cantidadTotal - descuento).toFixed(2);
 
             const nuevoDetalle = {
                 id: Date.now(),
@@ -1959,8 +1970,8 @@ export default {
                 articulo: this.arraySeleccionado.nombre,
                 medida: this.arraySeleccionado.medida,
                 unidad_envase: this.arraySeleccionado.unidad_envase,
-                cantidad: cantidad,
-                cantidad_paquetes: this.arraySeleccionado.unidad_envase,
+                cantidad: cantidadTotal,
+                cantidad_paquetes: this.unidadPaquete === 'paquete' ? this.cantidad : cantidadTotal / this.arraySeleccionado.unidad_envase,
                 precio: precioUnitario,
                 descuento: this.descuentoProducto,
                 stock: this.arraySeleccionado.saldo_stock,
@@ -1975,7 +1986,7 @@ export default {
                 codigoProductoSin: this.arraySeleccionado.codigoProductoSin,
                 codigoProducto: this.arraySeleccionado.codigo,
                 descripcion: this.arraySeleccionado.nombre,
-                cantidad: cantidad,
+                cantidad: cantidadTotal,
                 unidadMedida: this.arraySeleccionado.codigoClasificador,
                 precioUnitario: precioUnitario.toFixed(2),
                 montoDescuento: descuento,
@@ -1989,12 +2000,13 @@ export default {
             this.precioBloqueado = true;
             this.arraySeleccionado = [];
             this.cantidad = 1;
-            this.unidadPaquete = 1;
+            this.unidadPaquete = '1';  // Reseteamos a 'Por unidad'
             this.codigo = "";
             this.descuentoProducto = 0;
             this.precioSeleccionado = null;  // Reseteamos el precio seleccionado
 
             this.calcularTotal();
+            this.actualizarVistaStock();
         },
 
         agregarDetalleModal(data) {
@@ -2003,7 +2015,7 @@ export default {
 
             this.buscarPromocion(data.id);
             this.precioSeleccionado = data.precio_uno;  // Cambiamos precioseleccionado a precioSeleccionado
-
+            this.unidadPaquete = '1';
             this.cerrarModal();
         },
         eliminarSeleccionado() {
