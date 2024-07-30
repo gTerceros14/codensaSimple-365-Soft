@@ -1,21 +1,26 @@
 <template>
     <main class="main">   
-        <Card class="p-shadow-4-sm" style="width: 80vw">
-            <template #title>
-                <div class="p-d-flex p-ai-center p-jc-between">
-                    <h2 class="p-m-0"><i class="pi pi-building p-mr-2"></i>Información de la Empresa</h2>
-                    <Button v-if="estadoInputs" icon="pi pi-pencil" label="Editar" @click="estadoCampos()" class="p-button p-button-info p-button-sm" />
-                </div>
-            </template>
-            <template #content>
+        <Panel>
+            <Toast :breakpoints="{ '920px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
+                </Toast>
+                <template #header>
+                    <div class="panel-header">
+                        
+                        <h4 class="panel-icon">Empresa</h4>
+                    </div>
+                    
+                </template>
+            <template >
                 <div class="p-fluid p-formgrid p-grid">
+                    
                     <div class="p-field p-col-12 p-md-4">
                        
                             <img :src="logoUrl" width="150" height="150" alt="Logo empresa" class="p-mb-3 p-shadow-2" style="object-fit: contain;" />
                             <FileUpload v-if="!estadoInputs" mode="basic" accept="image/*" :auto="true" @select="onLogoChange" chooseLabel="Cambiar Logo" class="p-button-rounded p-button-info p-button-sm" />
-                        
+                            <Button v-if="estadoInputs" icon="pi pi-pencil" label="Editar datos de  la empresa" @click="estadoCampos()" class="p-button p-button-info p-button-sm" />
+
                     </div>
-                    <div class="p-col-12 p-md-8">
+                                        <div class="p-col-12 p-md-8">
                         <div class="p-grid">
                             <div class="p-field p-col-12 p-md-6">
                                 <label class="p-font-bold">Nombre:</label>
@@ -50,7 +55,7 @@
                     <Button label="Guardar" icon="pi pi-check" @click="actualizarEmpresa()" class="p-button p-button-success p-button-sm" />
                 </div>
             </template>
-        </Card>
+        </Panel>
     </main>
 </template>
 
@@ -61,7 +66,7 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import FileUpload from 'primevue/fileupload';
-
+import Toast from 'primevue/toast';
 export default {
     components: {
         Card,
@@ -69,7 +74,8 @@ export default {
         Button,
         InputText,
         InputNumber,
-        FileUpload
+        FileUpload,
+        Toast,
     },
     data() {
         return {
@@ -166,21 +172,22 @@ export default {
 </script>
 
 <style scoped>
-.main {
-    padding: 2rem;
-    background-color: #f8f9fa;
+>>> .p-panel-header {
+    padding: 0.75rem;
 }
-.p-card {
-    background-color: white;
-    border-radius: 10px;
+.panel-header {
+    display: flex;
+    align-items: center;
 }
-.p-panel {
-    background-color: #f1f3f5;
+
+.panel-icon {
+    font-size: 2rem;
+    padding-left: 10px;
 }
-.p-inputtext-lg {
-    font-size: 1.1rem;
+
+.panel-icon {
+    font-size: 1.5rem;
+    margin: 0;
 }
-.p-text-bold {
-    font-weight: 700;
-}
+
 </style>

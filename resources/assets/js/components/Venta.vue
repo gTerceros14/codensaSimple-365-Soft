@@ -1,16 +1,15 @@
 <template>
     <main class="main">
         <!-- Breadcrumb -->
-        <Panel header="Venta">
-            <template #header>
-                <div class="moto-header p-d-flex p-flex-column p-flex-md-row p-jc-between p-ai-center">
-                    <h2 class="p-m-0 p-mt-3 p-mt-md-0">
-                        <i class="pi pi-motorcycle p-mr-2"></i>
-                        Ventas
-                    </h2>
-                </div>
-            </template>
-
+        <Panel>
+            <Toast :breakpoints="{ '920px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
+                </Toast>
+                <template #header>
+                    <div class="panel-header">
+                        
+                        <h4 class="panel-icon">Ventas</h4>
+                    </div>
+                </template>
             <!-- Buscador -->
             <div class="p-d-flex p-flex-column p-flex-md-row p-ai-start p-ai-md-center p-mb-4">
                 <Button @click="abrirTipoVenta" label="Nueva Venta" icon="pi pi-plus"
@@ -702,6 +701,7 @@ import Tag from "primevue/tag";
 import Swal from "sweetalert2";
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
+import Toast from 'primevue/toast';
 export default {
 
 
@@ -724,6 +724,7 @@ export default {
         Checkbox,
         TabView,
         TabPanel,
+        Toast,
     },
     data() {
         return {
@@ -2904,9 +2905,22 @@ export default {
     margin-right: 0.5rem;
 }
 
-@media screen and (max-width: 960px) {
-    .hidden {
-        display: none;
-    }
+>>> .p-panel-header {
+    padding: 0.75rem;
 }
+.panel-header {
+    display: flex;
+    align-items: center;
+}
+
+.panel-icon {
+    font-size: 2rem;
+    padding-left: 10px;
+}
+
+.panel-icon {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
 </style>

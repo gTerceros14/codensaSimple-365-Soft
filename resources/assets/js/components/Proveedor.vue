@@ -1,16 +1,14 @@
 <template>
   <div class="main">
-      <Card>
-          <template #header>
-              <div class="flex justify-content-between align-items-center">
-                  <h5>Proveedores</h5>
-                  <div>
-                      <Button icon="pi pi-plus" label="Nuevo" class="p-button-secondary mr-2" @click="abrirModal('persona', 'registrar')" />
-                      <Button icon="pi pi-upload" label="Importar" class="p-button-success" @click="abrirModalImportar()" />
-                  </div>
-              </div>
-          </template>
-          <template #content>
+      <Panel>
+        <Toast :breakpoints="{ '900px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
+                </Toast>
+                <template #header>
+                    <div class="panel-header">
+                        <h4 class="panel-icon">Provedores</h4>
+                    </div>
+                </template>
+          <template>
               <div class="p-fluid p-formgrid p-grid">
                   <div class="p-field p-col-8 p-md-3">
                       <span class="p-input-icon-left">
@@ -41,7 +39,7 @@
                   <Column field="contacto" header="Contacto"></Column>
               </DataTable>
           </template>
-      </Card>
+      </Panel>
 
       <Dialog :visible.sync="modal" :containerStyle="{width: '700px'}" modal :closable="false">
           <template #header>
@@ -125,6 +123,8 @@ import Dropdown from 'primevue/dropdown';
 import InputNumber from 'primevue/inputnumber';
 import InputText from 'primevue/inputtext';
 import Swal from 'sweetalert2';
+import Panel from 'primevue/panel';
+import Toast from 'primevue/toast';
 export default {
 components: {
   Card,
@@ -134,7 +134,9 @@ components: {
   Column,
   Dialog,
   Dropdown,
-  InputNumber
+  InputNumber,
+  Panel,
+  Toast,
 },
 data() {
   return {
@@ -353,5 +355,25 @@ mounted() {
 }
 }
 </script>
+<style scoped>
+>>> .p-panel-header {
+    padding: 0.75rem;
+}
+.panel-header {
+    display: flex;
+    align-items: center;
+}
+
+.panel-icon {
+    font-size: 2rem;
+    padding-left: 10px;
+}
+
+.panel-icon {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+</style>
 
 

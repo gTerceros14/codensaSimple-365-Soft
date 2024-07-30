@@ -1,20 +1,15 @@
 <template>
     <main class="main">
-        <!-- Tabla de Clientes -->
-        <h5>Clientes</h5>
-        <Card>
-            <template #title>
-                <div class="p-d-flex p-jc-between p-ai-center">
-
-                    <div>
-                        <Button icon="pi pi-plus" label="Nuevo" class="p-button-secondary p-mr-2"
-                            @click="abrirModal('persona', 'registrar')" />
-                        <Button icon="pi pi-file" label="Reporte" class="p-button-info p-mr-2"
-                            @click="cargarReporteExcel()" />
+        <Panel>
+            <Toast :breakpoints="{ '920px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
+                </Toast>
+                <template #header>
+                    <div class="panel-header">
+                        
+                        <h4 class="panel-icon">Clientes</h4>
                     </div>
-                </div>
-            </template>
-            <template #content>
+                </template>
+            <template>
                 <div class="p-grid p-mb-3">
                     <div class="p-col-12 p-md-6">
                         <div class="p-inputgroup">
@@ -52,7 +47,7 @@
                     <Column field="num_documento" header="Número de documento"></Column>
                 </DataTable>
             </template>
-        </Card>
+        </Panel>
 
         <!-- Modal para agregar/actualizar -->
         <Dialog :visible.sync="modal" :containerStyle="{ width: '800px' }" :modal="true">
@@ -138,7 +133,8 @@ import Message from 'primevue/message';
 import Paginator from 'primevue/paginator';
 import Swal from 'sweetalert2';
 import { esquemaCliente } from '../constants/validations';
-
+import Panel from 'primevue/panel';
+import Toast from 'primevue/toast';
 export default {
     components: {
         Card,
@@ -150,7 +146,9 @@ export default {
         AutoComplete,
         Dialog,
         Paginator,
-        Message
+        Message,
+        Panel,
+        Toast,
     },
     data() {
         return {
@@ -477,3 +475,23 @@ eliminarCliente(cliente) {
     },
 }
 </script>
+<style scoped>
+>>> .p-panel-header {
+    padding: 0.75rem;
+}
+.panel-header {
+    display: flex;
+    align-items: center;
+}
+
+.panel-icon {
+    font-size: 2rem;
+    padding-left: 10px;
+}
+
+.panel-icon {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+</style>

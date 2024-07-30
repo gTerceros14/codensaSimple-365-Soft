@@ -1,52 +1,87 @@
 <template>
     <div class="main">
-        <div class="p-col-12">
-            <Card>
+            <Panel>
+                <Toast :breakpoints="{ '920px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
+                </Toast>
                 <template #header>
-                    <div class="p-d-flex p-jc-between p-ai-center">
-                        <h5 class="p-m-0">Inventario</h5>
-                        <Button label="Importar" icon="pi pi-plus" @click="abrirModalImportar" class="p-button-success" />
+                    <div class="panel-header">
+                        
+                        <h4 class="panel-icon">Inventarios</h4>
                     </div>
                 </template>
-                <template #content>
-                    <div class="p-grid p-mb-3">
-                        <div class="p-col-4">
-                            <label>ALMACEN DE TRABAJO</label>
-                            <Dropdown v-model="AlmacenSeleccionado" :options="arrayAlmacenes" optionLabel="nombre_almacen" 
-                                      optionValue="id" placeholder="Seleccione" @change="getDatosAlmacen" class="p-mb-2" />
-                        </div>
-                        <div class="p-col-4">
-                            <label class="p-mb-2">MODO VISTA</label>
-                            <div class="p-d-flex p-flex-column">
-                                <RadioButton v-model="tipoSeleccionado" inputId="item" name="tipo" value="item" @change="cambiarTipo" />
-                                <label for="item" class="p-ml-2">Por Item</label>
-                                <RadioButton v-model="tipoSeleccionado" inputId="lote" name="tipo" value="lote" @change="cambiarTipo" />
-                                <label for="lote" class="p-ml-2">Por Lote</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="p-grid p-mb-3">
-                        <div class="p-col-6">
-                            <span class="p-input-icon-left p-input-icon-right">
-                                <i class="pi pi-search" />
-                                <InputText v-model="buscar" placeholder="Buscar por nombre de producto" 
-                                           @input="listarInventario(1, buscar, criterio)" />
-                                <Button icon="pi pi-search" @click="listarInventario" />
-                            </span>
-                        </div>
-                    </div>
+                <template>
+                
+                
+  <div>
+    <div class="p-grid p-ai-center p-mb-1">
+    <div class="p-col-12 p-md-3 p-lg-2 p-mb-1 p-mb-md-0">
+        <Button label="Importar" icon="pi pi-plus" @click="abrirModalImportar" class="p-button-success w-full" />
+    </div>
+    <div class="p-col-12 p-md-4 p-lg-3 p-mb-1 p-mb-md-0">
+        <label class="p-text-bold p-mr-2">ALMACEN</label>
+        <Dropdown 
+            v-model="AlmacenSeleccionado" 
+            :options="arrayAlmacenes"
+            optionLabel="nombre_almacen" 
+            optionValue="id" 
+            placeholder="Seleccione"
+            @change="getDatosAlmacen" 
+            class="w-full" 
+        />
+    </div>
+    <div class="p-col-12 p-md-5 p-lg-3 p-mb-1 p-mb-md-0">
+        <label class="p-text-bold p-mr-2">MODO VISTA</label>
+        <div class="p-d-flex p-ai-center">
+            <div class="p-field-radiobutton p-mr-2">
+                <RadioButton 
+                    v-model="tipoSeleccionado" 
+                    inputId="item" 
+                    name="tipo" 
+                    value="item"
+                    @change="cambiarTipo" 
+                />
+                <label for="item" class="p-ml-1">Por Item</label>
+            </div>
+            <div class="p-field-radiobutton">
+                <RadioButton 
+                    v-model="tipoSeleccionado" 
+                    inputId="lote" 
+                    name="tipo" 
+                    value="lote"
+                    @change="cambiarTipo" 
+                />
+                <label for="lote" class="p-ml-1">Por Lote</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="p-grid p-mt-1">
+    <div class="p-col-12 p-md-6 p-lg-4">
+        <span class="p-input-icon-left p-input-icon-right w-full">
+            <i class="pi pi-search" />
+            <InputText 
+                v-model="buscar" 
+                placeholder="Buscar por nombre de producto"
+                @input="listarInventario(1, buscar, criterio)" 
+                class="w-full"
+            />
+        </span>
+    </div>
+</div>
+</div>
 
-                    <DataTable :value="arrayInventario"  :rows="10" 
-                               :rowsPerPageOptions="[5,10,20]" responsiveLayout="scroll">
-                        <Column v-for="col in columnas" :key="col.field" :field="col.field" :header="col.header"></Column>
+
+                    <DataTable :value="arrayInventario" :rows="10" :rowsPerPageOptions="[5, 10, 20]"
+                        responsiveLayout="scroll">
+                        <Column v-for="col in columnas" :key="col.field" :field="col.field" :header="col.header">
+                        </Column>
                     </DataTable>
 
-                    <Paginator :rows="10" :totalRecords="pagination.total" 
-                               @page="onPageChange($event)" :rowsPerPageOptions="[5,10,20]" />
+                    <Paginator :rows="10" :totalRecords="pagination.total" @page="onPageChange($event)"
+                        :rowsPerPageOptions="[5, 10, 20]" />
                 </template>
-            </Card>
-        </div>
+            </Panel>
+        
 
         <div v-if="modalImportar">
             <ImportarExcelInventario @cerrar="cerrarModalImportar" />
@@ -64,7 +99,8 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Paginator from 'primevue/paginator';
 import Dialog from 'primevue/dialog';
-
+import Panel from 'primevue/panel';
+import Toast from 'primevue/toast';
 export default {
     components: {
         Card,
@@ -75,7 +111,9 @@ export default {
         DataTable,
         Column,
         Paginator,
-        Dialog
+        Dialog,
+        Panel,
+        Toast,
     },
     data() {
         return {
@@ -119,9 +157,9 @@ export default {
                 me.arrayInventario = respuesta.inventarios.data;
                 me.pagination = respuesta.pagination;
             })
-            .catch(function (error) {
-                console.log(error);
-            });
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
         selectAlmacen() {
             let me = this;
@@ -130,9 +168,9 @@ export default {
                 var respuesta = response.data;
                 me.arrayAlmacenes = respuesta.almacenes;
             })
-            .catch(function (error) {
-                console.log(error);
-            });
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
         getDatosAlmacen() {
             if (this.AlmacenSeleccionado !== '') {
@@ -151,22 +189,22 @@ export default {
         setColumnas() {
             if (this.tipoSeleccionado === 'item') {
                 this.columnas = [
-                    {field: 'nombre_producto', header: 'Producto'},
-                    {field: 'unidad_envase', header: 'Unidad X Paq.'},
-                    {field: 'saldo_stock_total', header: 'Saldo Stock Total'},
-                    {field: 'cantidad', header: 'Cantidad'},
-                    {field: 'nombre_almacen', header: 'Almacén'}
+                    { field: 'nombre_producto', header: 'Producto' },
+                    { field: 'unidad_envase', header: 'Unidad X Paq.' },
+                    { field: 'saldo_stock_total', header: 'Saldo Stock Total' },
+                    { field: 'cantidad', header: 'Cantidad' },
+                    { field: 'nombre_almacen', header: 'Almacén' }
                 ];
             } else {
                 this.columnas = [
-                    {field: 'nombre_producto', header: 'Producto'},
-                    {field: 'unidad_envase', header: 'Unid.X.Paq'},
-                    {field: 'precio_costo_unid', header: 'Costo Unidad'},
-                    {field: 'saldo_stock', header: 'Saldo Stock'},
-                    {field: 'cantidad', header: 'Cantidad'},
-                    {field: 'fecha_ingreso', header: 'Fecha Ingreso'},
-                    {field: 'fecha_vencimiento', header: 'Fecha Vencimiento'},
-                    {field: 'nombre_almacen', header: 'Almacén'}
+                    { field: 'nombre_producto', header: 'Producto' },
+                    { field: 'unidad_envase', header: 'Unid.X.Paq' },
+                    { field: 'precio_costo_unid', header: 'Costo Unidad' },
+                    { field: 'saldo_stock', header: 'Saldo Stock' },
+                    { field: 'cantidad', header: 'Cantidad' },
+                    { field: 'fecha_ingreso', header: 'Fecha Ingreso' },
+                    { field: 'fecha_vencimiento', header: 'Fecha Vencimiento' },
+                    { field: 'nombre_almacen', header: 'Almacén' }
                 ];
             }
         }
@@ -179,3 +217,24 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+>>> .p-panel-header {
+    padding: 0.75rem;
+}
+.panel-header {
+    display: flex;
+    align-items: center;
+}
+
+.panel-icon {
+    font-size: 2rem;
+    padding-left: 10px;
+}
+
+.panel-icon {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+</style>
