@@ -11,19 +11,18 @@
                 </div>
             </template>
             <!-- Buscador -->
-            <div class="p-d-flex p-flex-column p-flex-md-row p-ai-start p-ai-md-center p-mb-4">
-                <Button @click="abrirTipoVenta" label="Nueva Venta" icon="pi pi-plus"
-                    class="p-button-success p-mb-3 p-mb-md-0 p-mr-md-3 p-button-lg p-w-100 p-w-md-auto" />
-                <span class="p-input-icon-left p-input-icon-right p-w-100">
-                    <i class="pi pi-search" />
-                    <InputText v-model="buscar" @input="buscarVenta" placeholder="Buscar venta..."
-                        class="p-inputtext-lg moto-search p-w-100" />
-                    <i class="pi pi-times" v-if="buscar" @click="
-                        buscar = '';
-                    buscarVenta();
-                    " style="cursor: pointer" />
-                </span>
-            </div>
+          <div class="p-d-flex p-ai-center p-mb-4">
+  <Button @click="abrirTipoVenta" label="Nueva" icon="pi pi-plus" class="p-button-success-sm p-mr-2"/>
+  <span class="p-input-icon-left p-input-icon-right p-w-100">
+    <i class="pi pi-search" />
+    <InputText v-model="buscar" @input="buscarVenta" placeholder="Buscar venta..." 
+               class="p-inputtext-lg-sm moto-search p-w-100" />
+    <i class="pi pi-times" v-if="buscar" @click="
+      buscar = '';
+      buscarVenta();
+    " style="cursor: pointer" />
+  </span>
+</div>
 
             <!-- Listado de Ventas -->
             <template v-if="listado == 1">
@@ -133,7 +132,7 @@
         <!-- HASTA AQUI DEVOLUCIONES -->
         <template>
             <Dialog :visible.sync="modal2" :containerStyle="{ width: '100%', maxWidth: '850px' }" :modal="true"
-                :closable="true" :closeOnEscape="false">
+                :closable="true" :closeOnEscape="false" @hide="cerrarModal2">
                 <template #header>
                     <h5 class="modal-title">DETALLE VENTAS</h5>
                 </template>
@@ -1321,8 +1320,6 @@ export default {
             }
         },
         abrirTipoVenta() {
-            console.log("abriendo ventas ");
-            console.log(this.arraySeleccionado);
             if (this.idtipo_venta == 1) {
                 this.modal2 = true;
                 this.cliente = this.nombreCliente;
@@ -2461,6 +2458,8 @@ export default {
                 tiempo_diaz: 0,
                 primera_cuota: false,
                 cuotas: [],
+                selectedArticulo: null,  // Restablecer el artículo seleccionado
+                arraySeleccionado: [],
             });
         },
         validarVenta() {
@@ -2674,11 +2673,13 @@ export default {
         },
 
         cerrarModal2() {
-            this.modal2 = false;
-            this.tituloModal2 = "";
-            this.idtipo_pago = "";
-            this.tipoPago = "";
-        },
+    this.modal2 = false;
+    this.reiniciarFormulario();
+    // Restablecer campos específicos del modal
+    this.tituloModal2 = "";
+    this.idtipo_pago = "";
+    this.tipoPago = "";
+},
         cerrarModal3() {
             this.modal3 = false;
             this.tituloModal3 = "";
