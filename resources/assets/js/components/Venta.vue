@@ -3,13 +3,13 @@
         <!-- Breadcrumb -->
         <Panel>
             <Toast :breakpoints="{ '920px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
-                </Toast>
-                <template #header>
-                    <div class="panel-header">
-                        
-                        <h4 class="panel-icon">Ventas</h4>
-                    </div>
-                </template>
+            </Toast>
+            <template #header>
+                <div class="panel-header">
+
+                    <h4 class="panel-icon">Ventas</h4>
+                </div>
+            </template>
             <!-- Buscador -->
             <div class="p-d-flex p-flex-column p-flex-md-row p-ai-start p-ai-md-center p-mb-4">
                 <Button @click="abrirTipoVenta" label="Nueva Venta" icon="pi pi-plus"
@@ -132,8 +132,8 @@
         </Panel>
         <!-- HASTA AQUI DEVOLUCIONES -->
         <template>
-            <Dialog :visible.sync="modal2" :containerStyle="{width: '100%', maxWidth: '800px'}" :modal="true" :closable="true"
-                :closeOnEscape="false">
+            <Dialog :visible.sync="modal2" :containerStyle="{ width: '100%', maxWidth: '850px' }" :modal="true"
+                :closable="true" :closeOnEscape="false">
                 <template #header>
                     <h5 class="modal-title">DETALLE VENTAS</h5>
                 </template>
@@ -146,24 +146,47 @@
                         </div>
                     </div>
                     <div v-if="step === 1" class="step-content p-fluid">
-                        <div class="p-grid p-formgrid p-mb-3">
-                            <div class="p-col-12 p-md-4">
-                                <InputText id="documento" v-model="documento" @input="checkDocumento" maxlength="7" />
-                                <label for="documento">DOCUMENTO <span class="p-error">*</span></label>
-                            </div>
-                            <div class="p-col-12 p-md-4">
-                                <InputText id="nombreCliente" v-model="nombreCliente"
-                                    :disabled="!nombreClienteEditable" />
-                                <label for="nombreCliente">CLIENTE <span class="p-error">*</span></label>
-                            </div>
+                        <template>
+                            <div class="form-container">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <div class="p-inputgroup">
+                                            <span class="p-inputgroup-addon">
+                                                <i class="pi pi-id-card"></i>
+                                            </span>
+                                            <span class="p-float-label">
+                                                <InputText id="documento" v-model="documento" @input="checkDocumento"
+                                                    maxlength="7" class="w-full" />
+                                                <label for="documento">Numero de Documento</label>
+                                            </span>
+                                        </div>
+                                    </div>
 
-                            <div class="p-col-12 p-md-4">
-                                <Dropdown id="tipoComprobante" v-model="tipo_comprobante"
-                                    :options="tipoComprobanteOptions" optionLabel="name" optionValue="code" />
-                                <label for="tipoComprobante">COMPROBANTE <span class="p-error">*</span></label>
-                            </div>
-                        </div>
+                                    <div class="form-group">
+                                        <div class="p-inputgroup">
+                                            <span class="p-inputgroup-addon">
+                                                <i class="pi pi-user"></i>
+                                            </span>
+                                            <span class="p-float-label">
+                                                <InputText id="nombreCliente" v-model="nombreCliente"
+                                                    :disabled="!nombreClienteEditable" class="w-full" />
+                                                <label for="nombreCliente">Nombre del cliente</label>
+                                            </span>
+                                        </div>
+                                    </div>
 
+                                    <div class="form-group">
+                                        <span class="p-float-label">
+                                            <Dropdown id="tipoComprobante" v-model="tipo_comprobante"
+                                                :options="tipoComprobanteOptions" optionLabel="name" optionValue="code"
+                                                class="w-full" />
+                                            <label for="tipoComprobante">Comprobante <span
+                                                    class="p-error">*</span></label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
                         <InputText v-model="idcliente" type="hidden" />
                         <InputText v-model="tipo_documento" type="hidden" />
                         <InputText v-model="complemento_id" type="hidden" />
@@ -320,8 +343,8 @@
                                     <template #body="slotProps">
                                         <InputNumber v-model="slotProps.data.cantidad" :min="1" showButtons
                                             buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
-                                            incrementButtonClass="p-button-success p-button-sm" incrementButtonIcon="pi pi-plus"
-                                            decrementButtonIcon="pi pi-minus"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
                                             @input="actualizarDetalle(slotProps.data.id)" />
                                     </template>
                                 </Column>
@@ -354,151 +377,113 @@
                     </div>
 
                     <div v-show="step === 3" class="step-content">
-                        <div class="d-flex justify-content-center mb-3">
-                            <div class="form-group">
-                                <div class="d-flex">
-                                    <button class="btn btn-lg me-3" :class="{
-                                        'btn-primary': tipoVenta === 'contado',
-                                        'btn-outline-primary': tipoVenta !== 'contado',
-                                    }" @click="seleccionarTipoVenta('contado')">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <i class="fa fa-money fa-2x mb-2"></i>
-                                            <span>Contado</span>
-                                        </div>
-                                    </button>
-                                    <button class="btn btn-lg" :class="{
-                                        'btn-primary': tipoVenta === 'credito',
-                                        'btn-outline-primary': tipoVenta !== 'credito',
-                                    }" @click="seleccionarTipoVenta('credito')">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <i class="fa fa-credit-card fa-2x mb-2"></i>
-                                            <span>Crédito</span>
-                                        </div>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-if="tipoVenta === 'contado'">
-                            <!-- ... (existing cash and QR payment code) ... -->
-                            <div>
-                                <div class="p-d-flex p-jc-center p-mb-3">
-                                    <div class="p-d-flex p-jc-center">
-                                        <Button :class="{ 'p-button-primary': opcionPago === 'efectivo' }"
-                                            @click="opcionPago = 'efectivo'">
-                                            <i class="pi pi-money-bill p-mr-2" />
-                                            Efectivo
-                                        </Button>
-                                        <Button :class="{ 'p-button-primary': opcionPago === 'qr' }"
-                                            @click="opcionPago = 'qr'">
-                                            <i class="pi pi-qrcode p-mr-2" />
-                                            QR
-                                        </Button>
-                                    </div>
-                                </div>
-
-                                <div v-if="opcionPago === 'efectivo'">
-                                    <div class="p-grid">
-                                        <div class="p-col-7">
-                                            <Card>
-                                                <template #content>
-                                                    <div class="p-fluid">
-                                                        <div class="p-field">
-                                                            <label for="montoEfectivo"><i
-                                                                    class="pi pi-money-bill p-mr-2" /> Monto
-                                                                Recibido:</label>
-                                                            <div class="p-inputgroup">
-                                                                <span class="p-inputgroup-addon">{{
-                                                                    monedaVenta[1]
-                                                                    }}</span>
-                                                                <InputNumber id="montoEfectivo" v-model="recibido"
-                                                                    placeholder="Ingrese el monto recibido" />
-                                                            </div>
-                                                        </div>
-                                                        <div class="p-field">
-                                                            <label for="cambioRecibir"><i class="pi pi-sync p-mr-2" />
-                                                                Cambio a
-                                                                Entregar:</label>
-                                                            <InputText id="cambioRecibir" :value="(
-                                                                recibido -
-                                                                calcularTotal * parseFloat(monedaVenta[0])
-                                                            ).toFixed(2)
-                                                                " readonly />
-                                                        </div>
-                                                    </div>
-                                                </template>
-                                            </Card>
-                                        </div>
-                                        <div class="p-col-5">
-                                            <Card>
-                                                <template #content>
-                                                    <h5>Detalle de Venta</h5>
-                                                    <div class="p-d-flex p-jc-between p-mb-2">
-                                                        <span><i class="pi pi-dollar p-mr-2" /> Monto
-                                                            Total:</span>
-                                                        <span class="p-text-bold">{{
-                                                            (
-                                                                calcularTotal * parseFloat(monedaVenta[0])
-                                                            ).toFixed(2)
-                                                        }}
-                                                            {{ monedaVenta[1] }}</span>
-                                                    </div>
-                                                    <div class="p-d-flex p-jc-between">
-                                                        <span><i class="pi pi-money-bill p-mr-2" /> Total a
-                                                            Pagar:</span>
-                                                        <span class="p-text-bold p-text-xl">{{
-                                                            (
-                                                                calcularTotal * parseFloat(monedaVenta[0])
-                                                            ).toFixed(2)
-                                                        }}
-                                                            {{ monedaVenta[1] }}</span>
-                                                    </div>
-                                                </template>
-                                            </Card>
-                                            <Button label="Registrar Pago" icon="pi pi-check"
-                                                class="p-button-success p-mt-2" @click="aplicarDescuento" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div v-else-if="opcionPago === 'qr'">
-                                    <div class="container">
-                                        <div class="row justify-content-center">
-                                            <div class="col-md-8">
-                                                <div class="form-group">
-                                                    <input v-model="alias" readonly style="display: none" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="montoEfectivo">Monto:</label>
-                                                    <span class="font-weight-bold">{{
-                                                        (montoEfectivo = calcularTotal.toFixed(2))
-                                                        }}</span>
-                                                </div>
-                                                <button class="btn btn-primary mb-2" @click="generarQr">
-                                                    Generar QR
-                                                </button>
-                                                <div v-if="qrImage" class="mb-2 text-center">
-                                                    <img :src="qrImage" alt="Código QR" class="img-fluid" />
-                                                </div>
-                                                <button class="btn btn-secondary mb-2" @click="verificarEstado"
-                                                    v-if="qrImage">
-                                                    Verificar Estado de Pago
-                                                </button>
-                                                <div v-if="estadoTransaccion" class="card p-2">
-                                                    <div class="font-weight-bold">Estado Actual:</div>
-                                                    <div>
-                                                        <span :class="'badge badge-' + badgeSeverity">{{
-                                                            estadoTransaccion.objeto.estadoActual
-                                                            }}</span>
-                                                    </div>
-                                                </div>
+                        <template>
+                            <div class="p-d-flex p-jc-center p-mb-3">
+                                <div v-if="!tipoVentaSeleccionado" class="p-d-flex">
+                                    <Button class="p-button-lg p-mr-3"
+                                        :class="{ 'p-button-primary': tipoVenta === 'contado', 'p-button-outlined': tipoVenta !== 'contado' }"
+                                        @click="seleccionarTipoVenta('contado')">
+                                        <template #default>
+                                            <div class="p-d-flex p-flex-column p-ai-center">
+                                                <i class="pi pi-money-bill p-mr-2" style="font-size: 2rem;"></i>
                                             </div>
-                                            <Button @click="registrarVenta(7)" label="Registrar Pago" icon="pi pi-check"
-                                                class="p-button-success" />
-                                        </div>
-                                    </div>
+                                            <span>Contado</span>
+                                        </template>
+                                    </Button>
+                                    <Button class="p-button-lg"
+                                        :class="{ 'p-button-primary': tipoVenta === 'credito', 'p-button-outlined': tipoVenta !== 'credito' }"
+                                        @click="seleccionarTipoVenta('credito')">
+                                        <template #default>
+                                            <div class="p-d-flex p-flex-column p-ai-center">
+                                                <i class="pi pi-credit-card p-mb-2" style="font-size: 2rem;"></i>
+                                            </div>
+                                            <span>Crédito</span>
+                                        </template>
+                                    </Button>
+                                </div>
+                                <div v-else class="p-d-flex p-ai-center">
+                                    <i :class="tipoVenta === 'contado' ? 'pi pi-money-bill' : 'pi pi-credit-card'"
+                                        class="p-mr-2" style="font-size: 2rem;"></i>
+                                    <span class="p-text-bold">{{ tipoVenta === 'contado' ? 'Contado' : 'Crédito'
+                                        }}</span>
                                 </div>
                             </div>
-                        </div>
+                        </template>
+                        <template>
+  <div v-if="tipoVenta === 'contado'" class="payment-options">
+    <TabView class="custom-tabview">
+      <TabPanel header="Efectivo">
+        <div class="p-grid p-fluid">
+          <div class="p-col-12 p-md-7">
+            <Card>
+              <template #content>
+                <div class="p-fluid">
+                  <div class="p-field">
+                    <label for="montoEfectivo"><i class="pi pi-money-bill p-mr-2" /> Monto Recibido:</label>
+                    <div class="p-inputgroup">
+                      <span class="p-inputgroup-addon">{{ monedaVenta[1] }}</span>
+                      <InputNumber id="montoEfectivo" v-model="recibido" placeholder="Ingrese el monto recibido" />
+                    </div>
+                  </div>
+                  <div class="p-field">
+                    <label for="cambioRecibir"><i class="pi pi-sync p-mr-2" /> Cambio a Entregar:</label>
+                    <InputText id="cambioRecibir" :value="(recibido - calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)" readonly />
+                  </div>
+                </div>
+              </template>
+            </Card>
+          </div>
+          <div class="p-col-12 p-md-5">
+            <Card>
+              <template #content>
+                <h5>Detalle de Venta</h5>
+                <div class="p-d-flex p-jc-between p-mb-2">
+                  <span><i class="pi pi-dollar p-mr-2" /> Monto Total:</span>
+                  <span class="p-text-bold">{{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}</span>
+                </div>
+                <div class="p-d-flex p-jc-between">
+                  <span><i class="pi pi-money-bill p-mr-2" /> Total a Pagar:</span>
+                  <span class="p-text-bold p-text-xl">{{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}</span>
+                </div>
+              </template>
+            </Card>
+            <Button label="Registrar Pago" icon="pi pi-check" class="p-button-success p-mt-2 p-button-lg p-button-raised" @click="aplicarDescuento" />
+          </div>
+        </div>
+      </TabPanel>
+      
+      <TabPanel header="QR">
+        <div class="p-grid p-fluid">
+          <div class="p-col-12 p-md-8 p-lg-6 p-mx-auto">
+            <Card>
+              <template #content>
+                <div class="form-group">
+                  <input v-model="alias" readonly style="display: none" />
+                </div>
+                <div class="form-group">
+                  <label for="montoEfectivo">Monto:</label>
+                  <span class="font-weight-bold">{{ (montoEfectivo = calcularTotal.toFixed(2)) }}</span>
+                </div>
+                <Button label="Generar QR" icon="pi pi-qrcode" class="p-button-primary p-mb-2" @click="generarQr" />
+                <div v-if="qrImage" class="p-mb-2 p-text-center">
+                  <img :src="qrImage" alt="Código QR" class="p-mx-auto" style="max-width: 100%; height: auto;" />
+                </div>
+                <Button label="Verificar Estado de Pago" icon="pi pi-check-circle" class="p-button-secondary p-mb-2" @click="verificarEstado" v-if="qrImage" />
+                <div v-if="estadoTransaccion" class="p-card p-2">
+                  <div class="font-weight-bold">Estado Actual:</div>
+                  <div>
+                    <span :class="'p-tag p-tag-' + badgeSeverity">{{ estadoTransaccion.objeto.estadoActual }}</span>
+                  </div>
+                </div>
+              </template>
+            </Card>
+            <Button @click="registrarVenta(7)" label="Registrar Pago" icon="pi pi-check" class="p-button-success p-mt-2 p-button-lg p-button-raised" />
+          </div>
+        </div>
+      </TabPanel>
+    </TabView>
+  </div>
+</template>
 
                         <div v-if="tipoVenta === 'credito'">
                             <div class="p-grid">
@@ -638,7 +623,8 @@
         </template>
 
         <template>
-            <Dialog :visible.sync="modal" :containerStyle="{width: '100%', maxWidth: '800px', paddingTop: '35px' }" modal closable>
+            <Dialog :visible.sync="modal" :containerStyle="{ width: '100%', maxWidth: '800px', paddingTop: '35px' }"
+                modal closable>
                 <template #header>
                     <h3>{{ tituloModal }}</h3>
                 </template>
@@ -655,8 +641,8 @@
                             </div>
                         </div>
                         <DataTable :value="arrayArticulo" :paginator="true" :rows="10" class="p-datatable-sm moto-table"
-                            @row-select="onRowSelect" selectionMode="single"  responsiveLayout="scroll" :selection="selectedArticulo"
-                            breakpoint="960px">
+                            @row-select="onRowSelect" selectionMode="single" responsiveLayout="scroll"
+                            :selection="selectedArticulo" breakpoint="960px">
                             <Column field="codigo" header="Código" :class="'sm:table-cell'" />
                             <Column field="nombre" header="Nombre" :class="'sm:table-cell'" />
                             <Column field="nombre_categoria" header="Categoría" :class="'hidden sm:table-cell'" />
@@ -702,6 +688,7 @@ import Swal from "sweetalert2";
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import Toast from 'primevue/toast';
+
 export default {
 
 
@@ -728,6 +715,7 @@ export default {
     },
     data() {
         return {
+            tipoVentaSeleccionado: false,
             precioSeleccionado: null,
             searchTerm: '',
             selectedArticulo: null,
@@ -1018,6 +1006,10 @@ export default {
     },
 
     methods: {
+        seleccionarTipoVenta(tipo) {
+            this.tipoVenta = tipo;
+            this.tipoVentaSeleccionado = true;
+        },
         actualizarVistaStock() {
             // Forzar la actualización de la vista
             this.$forceUpdate();
@@ -2905,9 +2897,10 @@ export default {
     margin-right: 0.5rem;
 }
 
->>> .p-panel-header {
+>>>.p-panel-header {
     padding: 0.75rem;
 }
+
 .panel-header {
     display: flex;
     align-items: center;
@@ -2923,4 +2916,88 @@ export default {
     margin: 0;
 }
 
+.form-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.form-group {
+    flex: 1 1 100%;
+    min-width: 250px;
+}
+
+@media (min-width: 768px) {
+    .form-row {
+        flex-wrap: nowrap;
+    }
+
+    .form-group {
+        flex: 1;
+    }
+}
+
+.p-inputgroup {
+    width: 100%;
+}
+
+.p-float-label {
+    width: 100%;
+}
+
+.p-inputtext,
+.p-dropdown {
+    width: 100%;
+}
+.payment-options {
+  .custom-tabview {
+    .p-tabview-nav {
+      li {
+        .p-tabview-nav-link {
+          background-color: #f8f9fa;
+          color: #495057;
+          border: 1px solid #dee2e6;
+          border-bottom: none;
+          margin-right: 2px;
+          border-top-left-radius: 4px;
+          border-top-right-radius: 4px;
+          transition: background-color 0.2s, color 0.2s;
+
+          &:not(.p-disabled):focus {
+            box-shadow: inset 0 0 0 0.2rem rgba(0,123,255,0.25);
+          }
+        }
+
+        &.p-highlight .p-tabview-nav-link {
+          background-color: #ffffff;
+          color: #007bff;
+          border-bottom: 2px solid #007bff;
+        }
+      }
+    }
+
+    .p-tabview-panels {
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      border-top: none;
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+      padding: 1.5rem;
+    }
+  }
+
+  .p-card {
+    margin-bottom: 1rem;
+  }
+
+  .p-button-lg {
+    width: 100%;
+  }
+}
 </style>
