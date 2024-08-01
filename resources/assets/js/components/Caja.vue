@@ -169,47 +169,71 @@
                 </Dialog>
             </template>
 
-
             <template>
                 <Dialog :visible.sync="modal5" :modal="true" :header="tituloModal5" @hide="cerrarModal5"
-                    containerStyle="width: 700px">
+                    containerStyle="width: 800px">
                     <form @submit.prevent="registrarArqueo" enctype="multipart/form-data" class="p-fluid">
                         <div class="p-grid">
                             <div class="p-col-12 p-md-6">
                                 <h4>Billetes</h4>
                                 <div class="p-field p-grid">
-                                    <label for="billete200" class="p-col-12 p-md-4">Bs. 200:</label>
-                                    <div class="p-col-12 p-md-8">
-                                        <InputText id="billete200" type="number" v-model="billete200" placeholder="0" />
+                                    <label for="billete200" class="p-col-12">
+                                        <img src="img/caja/200.jpg" alt="Bs. 200" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5 ">
+                                        <InputNumber id="billete200" v-model="billete200" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
                                     </div>
                                 </div>
                                 <div class="p-field p-grid">
-                                    <label for="billete100" class="p-col-12 p-md-4">Bs. 100:</label>
-                                    <div class="p-col-12 p-md-8">
-                                        <InputText id="billete100" type="number" v-model="billete100" placeholder="0" />
+                                    <label for="billete100" class="p-col-12">
+                                        <img src="img/caja/100.jpg" alt="Bs. 100" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="billete100" v-model="billete100" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
                                     </div>
                                 </div>
                                 <div class="p-field p-grid">
-                                    <label for="billete50" class="p-col-12 p-md-4">Bs. 50:</label>
-                                    <div class="p-col-12 p-md-8">
-                                        <InputText id="billete50" type="number" v-model="billete50" placeholder="0" />
+                                    <label for="billete50" class="p-col-12">
+                                        <img src="img/caja/50.jpg" alt="Bs. 50" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="billete50" v-model="billete50" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
                                     </div>
                                 </div>
                                 <div class="p-field p-grid">
-                                    <label for="billete20" class="p-col-12 p-md-4">Bs. 20:</label>
-                                    <div class="p-col-12 p-md-8">
-                                        <InputText id="billete20" type="number" v-model="billete20" placeholder="0" />
+                                    <label for="billete20" class="p-col-12">
+                                        <img src="img/caja/20.jpg" alt="Bs. 20" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="billete20" v-model="billete20" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
                                     </div>
                                 </div>
                                 <div class="p-field p-grid">
-                                    <label for="billete10" class="p-col-12 p-md-4">Bs. 10:</label>
-                                    <div class="p-col-12 p-md-8">
-                                        <InputText id="billete10" type="number" v-model="billete10" placeholder="0" />
+                                    <label for="billete10" class="p-col-12">
+                                        <img src="img/caja/10.jpg" alt="Bs. 10" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="billete10" v-model="billete10" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
                                     </div>
                                 </div>
                                 <div class="p-field p-grid">
                                     <label class="p-col-12 p-md-4">Total Billetes Bs.</label>
-                                    <div class="p-col-12 p-md-8">
+                                    <div class="p-col-12 p-md-6">
                                         <span v-text="totalBilletes" class="font-weight-bold"></span>
                                     </div>
                                 </div>
@@ -217,39 +241,69 @@
                             <div class="p-col-12 p-md-6">
                                 <h4>Monedas</h4>
                                 <div class="p-field p-grid">
-                                    <label for="moneda5" class="p-col-12 p-md-4">Bs. 5:</label>
-                                    <div class="p-col-12 p-md-8">
-                                        <InputText id="moneda5" type="number" v-model="moneda5" placeholder="0" />
+                                    <label for="moneda5" class="p-col-12">
+                                        <img src="img/caja/5.jpg" alt="Bs. 5" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="moneda5" v-model="moneda5" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
                                     </div>
                                 </div>
                                 <div class="p-field p-grid">
-                                    <label for="moneda2" class="p-col-12 p-md-4">Bs. 2:</label>
-                                    <div class="p-col-12 p-md-8">
-                                        <InputText id="moneda2" type="number" v-model="moneda2" placeholder="0" />
+                                    <label for="moneda2" class="p-col-12">
+                                        <img src="img/caja/2.jpg" alt="Bs. 2" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="moneda2" v-model="moneda2" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
                                     </div>
                                 </div>
                                 <div class="p-field p-grid">
-                                    <label for="moneda1" class="p-col-12 p-md-4">Bs. 1:</label>
-                                    <div class="p-col-12 p-md-8">
-                                        <InputText id="moneda1" type="number" v-model="moneda1" placeholder="0" />
+                                    <label for="moneda1" class="p-col-12">
+                                        <img src="img/caja/1.jpg" alt="Bs. 1" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="moneda1" v-model="moneda1" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
                                     </div>
                                 </div>
                                 <div class="p-field p-grid">
-                                    <label for="moneda050" class="p-col-12 p-md-4">Bs. 0.50:</label>
-                                    <div class="p-col-12 p-md-8">
-                                        <InputText id="moneda050" type="number" v-model="moneda050" placeholder="0" />
+                                    <label for="moneda050" class="p-col-12">
+                                        <img src="img/caja/c50.jpg" alt="Bs. 0.50" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="moneda050" v-model="moneda050" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
                                     </div>
                                 </div>
                                 <div class="p-field p-grid">
-                                    <label for="moneda020" class="p-col-12 p-md-4">Bs. 0.20:</label>
-                                    <div class="p-col-12 p-md-8">
-                                        <InputText id="moneda020" type="number" v-model="moneda020" placeholder="0" />
+                                    <label for="moneda020" class="p-col-12">
+                                        <img src="img/caja/20M.jpg" alt="Bs. 0.20" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="moneda020" v-model="moneda020" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
                                     </div>
                                 </div>
                                 <div class="p-field p-grid">
-                                    <label for="moneda010" class="p-col-12 p-md-4">Bs. 0.10:</label>
-                                    <div class="p-col-12 p-md-8">
-                                        <InputText id="moneda010" type="number" v-model="moneda010" placeholder="0" />
+                                    <label for="moneda010" class="p-col-12">
+                                        <img src="img/caja/c10.jpg" alt="Bs. 0.10" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="moneda010" v-model="moneda010" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
                                     </div>
                                 </div>
                                 <div class="p-field p-grid">
@@ -272,11 +326,10 @@
                     <template #footer>
                         <Button label="Cancelar" icon="pi pi-times" class="p-button-danger" @click="cerrarModal5" />
                         <Button v-if="tipoAccion == 5" label="Guardar" icon="pi pi-check" class="p-button-success"
-                        @click.prevent="registrarArqueo" />
+                            @click.prevent="registrarArqueo" />
                     </template>
                 </Dialog>
             </template>
-
         </Panel>
     </main>
 </template>
@@ -392,27 +445,27 @@ export default {
     },
     computed: {
         totalEfectivo() {
-        return parseFloat((this.totalBilletes + this.totalMonedas).toFixed(2));
-    },
-    totalBilletes() {
-        return parseFloat((
-            (Number(this.billete200) || 0) * 200 +
-            (Number(this.billete100) || 0) * 100 +
-            (Number(this.billete50) || 0) * 50 +
-            (Number(this.billete20) || 0) * 20 +
-            (Number(this.billete10) || 0) * 10
-        ).toFixed(2));
-    },
-    totalMonedas() {
-        return parseFloat((
-            (Number(this.moneda5) || 0) * 5 +
-            (Number(this.moneda2) || 0) * 2 +
-            (Number(this.moneda1) || 0) * 1 +
-            (Number(this.moneda050) || 0) * 0.5 +
-            (Number(this.moneda020) || 0) * 0.2 +
-            (Number(this.moneda010) || 0) * 0.1
-        ).toFixed(2));
-    },
+            return parseFloat((this.totalBilletes + this.totalMonedas).toFixed(2));
+        },
+        totalBilletes() {
+            return parseFloat((
+                (Number(this.billete200) || 0) * 200 +
+                (Number(this.billete100) || 0) * 100 +
+                (Number(this.billete50) || 0) * 50 +
+                (Number(this.billete20) || 0) * 20 +
+                (Number(this.billete10) || 0) * 10
+            ).toFixed(2));
+        },
+        totalMonedas() {
+            return parseFloat((
+                (Number(this.moneda5) || 0) * 5 +
+                (Number(this.moneda2) || 0) * 2 +
+                (Number(this.moneda1) || 0) * 1 +
+                (Number(this.moneda050) || 0) * 0.5 +
+                (Number(this.moneda020) || 0) * 0.2 +
+                (Number(this.moneda010) || 0) * 0.1
+            ).toFixed(2));
+        },
         isActived: function () {
             return this.pagination.current_page;
         },
@@ -508,63 +561,63 @@ export default {
         },
 
         async registrarArqueo() {
-    let me = this;
-    
-    // Calcular el total del arqueo
-    const totalArqueo = parseFloat(this.totalEfectivo.toFixed(2));
-    
-    try {
-        // Obtener el saldo actual de la caja
-        const saldoCaja = parseFloat((await this.obtenerSaldoCaja()).toFixed(2));
-        
-        // Validar que se hayan ingresado datos
-        if (totalArqueo === 0) {
-            this.$toast.add({severity:'error', summary: 'Error', detail: 'Debe ingresar al menos un valor para el arqueo', life: 3000});
-            return;
-        }
-        
-        // Validar que el total del arqueo coincida con el saldo de caja
-        const diferencia = Math.abs(totalArqueo - saldoCaja);
-        if (diferencia > 0.01) { // Permitimos una diferencia de hasta 1 centavo
-            this.$toast.add({severity:'error', summary: 'Error', detail: `El total del arqueo (${totalArqueo.toFixed(2)}) no coincide con el saldo de caja (${saldoCaja.toFixed(2)})`, life: 3000});
-            return;
-        }
+            let me = this;
 
-        // Si pasa las validaciones, proceder con el registro del arqueo
-        const response = await axios.post('/caja/arqueoCaja', {
-            'idcaja': this.id,
-            'billete200': this.billete200,
-            'billete100': this.billete100,
-            'billete50': this.billete50,
-            'billete20': this.billete20,
-            'billete10': this.billete10,
-            'moneda5': this.moneda5,
-            'moneda2': this.moneda2,
-            'moneda1': this.moneda1,
-            'moneda050': this.moneda050,
-            'moneda020': this.moneda020,
-            'moneda010': this.moneda010,
-            'totalArqueo': totalArqueo
-        });
+            // Calcular el total del arqueo
+            const totalArqueo = parseFloat(this.totalEfectivo.toFixed(2));
 
-        me.cerrarModal5();
-        me.arqueoRealizado = true;
-        me.$toast.add({severity:'success', summary: 'Éxito', detail: 'Arqueo de caja registrado correctamente', life: 3000});
-    } catch (error) {
-        console.error('Error al registrar el arqueo:', error);
-        me.$toast.add({severity:'error', summary: 'Error', detail: 'No se pudo registrar el arqueo de caja', life: 3000});
-    }
-},
-obtenerSaldoCaja() {
-    return new Promise((resolve, reject) => {
-        axios.get(`/caja/saldo/${this.id}`)
-            .then(response => resolve(parseFloat(response.data.saldo)))
-            .catch(error => {
-                console.error('Error al obtener el saldo de caja:', error);
-                reject(error);
+            try {
+                // Obtener el saldo actual de la caja
+                const saldoCaja = parseFloat((await this.obtenerSaldoCaja()).toFixed(2));
+
+                // Validar que se hayan ingresado datos
+                if (totalArqueo === 0) {
+                    this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Debe ingresar al menos un valor para el arqueo', life: 3000 });
+                    return;
+                }
+
+                // Validar que el total del arqueo coincida con el saldo de caja
+                const diferencia = Math.abs(totalArqueo - saldoCaja);
+                if (diferencia > 0.01) { // Permitimos una diferencia de hasta 1 centavo
+                    this.$toast.add({ severity: 'error', summary: 'Error', detail: `El total del arqueo (${totalArqueo.toFixed(2)}) no coincide con el saldo de caja (${saldoCaja.toFixed(2)})`, life: 3000 });
+                    return;
+                }
+
+                // Si pasa las validaciones, proceder con el registro del arqueo
+                const response = await axios.post('/caja/arqueoCaja', {
+                    'idcaja': this.id,
+                    'billete200': this.billete200,
+                    'billete100': this.billete100,
+                    'billete50': this.billete50,
+                    'billete20': this.billete20,
+                    'billete10': this.billete10,
+                    'moneda5': this.moneda5,
+                    'moneda2': this.moneda2,
+                    'moneda1': this.moneda1,
+                    'moneda050': this.moneda050,
+                    'moneda020': this.moneda020,
+                    'moneda010': this.moneda010,
+                    'totalArqueo': totalArqueo
+                });
+
+                me.cerrarModal5();
+                me.arqueoRealizado = true;
+                me.$toast.add({ severity: 'success', summary: 'Éxito', detail: 'Arqueo de caja registrado correctamente', life: 3000 });
+            } catch (error) {
+                console.error('Error al registrar el arqueo:', error);
+                me.$toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo registrar el arqueo de caja', life: 3000 });
+            }
+        },
+        obtenerSaldoCaja() {
+            return new Promise((resolve, reject) => {
+                axios.get(`/caja/saldo/${this.id}`)
+                    .then(response => resolve(parseFloat(response.data.saldo)))
+                    .catch(error => {
+                        console.error('Error al obtener el saldo de caja:', error);
+                        reject(error);
+                    });
             });
-    });
-},
+        },
 
         depositar() {
             let me = this;
@@ -882,5 +935,19 @@ obtenerSaldoCaja() {
 .panel-icon {
     font-size: 1.5rem;
     margin: 0;
+}
+
+.billete-img {
+    max-width: 230px;
+    /* Ajusta el tamaño máximo según tus necesidades */
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    /* Centra la imagen en su contenedor */
+}
+
+.p-field p-grid {
+    margin-bottom: 1rem;
+    /* Añade un margen inferior entre los campos */
 }
 </style>
