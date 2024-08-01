@@ -950,7 +950,8 @@ export default {
     margin-bottom: 1rem;
     /* Añade un margen inferior entre los campos */
 }
-.p-col-5{
+
+.p-col-5 {
     margin-left: 115px;
 }
 </style>

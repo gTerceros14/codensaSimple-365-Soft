@@ -7,7 +7,13 @@
                     <div class="panel-header">
                         <h4 class="panel-icon">Provedores</h4>
                     </div>
-                </template>
+                </template> 
+                  <div>
+                      <Button icon="pi pi-plus" label="Nuevo" class="p-button-secondary mr-2" @click="abrirModal('persona', 'registrar')" />
+                      <Button icon="pi pi-upload" label="Importar" class="p-button-success" @click="abrirModalImportar()" />
+                  </div>
+
+
           <template>
               <div class="p-fluid p-formgrid p-grid">
                   <div class="p-field p-col-8 p-md-3">
