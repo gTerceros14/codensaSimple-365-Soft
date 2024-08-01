@@ -138,5 +138,12 @@ class CajaController extends Controller
         $caja->saldoFaltante = ($request->saldoFaltante)-($caja->saldoCaja);
         $caja->save();
     }
+    public function obtenerSaldoCaja($id)
+    {
+        if (!request()->ajax()) return redirect('/');
+    
+        $caja = Caja::findOrFail($id);
+        return response()->json(['saldo' => floatval($caja->saldoCaja)]);
+    }
 
 }

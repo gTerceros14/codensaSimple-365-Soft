@@ -1043,7 +1043,7 @@ export default {
             axios.get(url)
                 .then(response => {
                     this.arrayArticulo = response.data.articulos;
-                    console.log("listar articulo", response.data);
+            
                 })
                 .catch(error => {
                     console.error("Error en la búsqueda:", error);
@@ -1324,7 +1324,7 @@ export default {
                 this.modal2 = true;
                 this.cliente = this.nombreCliente;
                 this.tipoAccion2 = 1;
-                this.scrollToTop();
+              
             }
         },
 
@@ -1333,344 +1333,6 @@ export default {
             this.tipoPago = tipo;
             this.tituloModal2 = `TIPO DE PAGO : ${tipo}`;
             this.idtipo_pago = this.tiposPago[tipo];
-        },
-
-        agregarKit(kit) {
-            if (new Date(kit.fecha_final) < new Date()) {
-                swal({
-                    type: "error",
-                    title: "Error...",
-                    text: "Este kit ha expirado!",
-                });
-                return;
-            }
-            //   this.GetValidateKit(kit['id'])
-            this.GetValidateKit(kit["id"])
-                .then(() => {
-                    if (this.mensajesKit.length == 0) {
-                        const totalKit = this.arrayArticulosKit.reduce(
-                            (total, producto) => {
-                                return total + producto.cantidad * producto.precio_costo_unid;
-                            },
-                            0
-                        );
-                        this.arrayArticulosKit.forEach((producto) => {
-                            producto.porcentaje =
-                                ((producto.cantidad * producto.precio_costo_unid) / totalKit) *
-                                100;
-                        });
-
-                        this.arrayArticulosKit.forEach((producto) => {
-                            producto.nuevo_precio = (kit.precio * producto.porcentaje) / 100;
-                        });
-                        console.log("Estos son los articulos: ", this.arrayArticulosKit);
-                        this.arrayArticulosKit.forEach((articulo) => {
-                            this.arrayDetalle.push({
-                                idkit: kit["id"],
-                                idarticulo: articulo.id,
-                                articulo: articulo.nombre,
-                                medida: "KIT",
-                                unidad_envase: articulo.unidad_envase,
-                                cantidad: articulo.cantidad,
-                                cantidad_paquetes: articulo.unidad_envase * articulo.cantidad,
-                                precio: articulo.nuevo_precio,
-                                descuento: 0,
-                                stock: articulo.stock,
-                                precioseleccionado: articulo.precio_costo_unid,
-                            });
-                            let actividadEconomica = 461021;
-
-                            this.arrayProductos.push({
-                                actividadEconomica: actividadEconomica,
-                                codigoProductoSin: articulo.id,
-                                codigoProducto: articulo.codigo,
-                                descripcion: articulo.nombre,
-                                cantidad: articulo.cantidad,
-                                unidadMedida: 25,
-                                precioUnitario: parseFloat(
-                                    articulo.precio_costo_unid * this.monedaVenta[0]
-                                ).toFixed(2),
-                                montoDescuento: (
-                                    articulo.precio_costo_unid *
-                                    articulo.cantidad *
-                                    this.monedaVenta[0] -
-                                    articulo.nuevo_precio * this.monedaVenta[0]
-                                ).toFixed(2),
-                                subTotal: parseFloat(
-                                    articulo.nuevo_precio * this.monedaVenta[0]
-                                ).toFixed(2),
-                                numeroSerie: null,
-                                numeroImei: null,
-                            });
-                            this.cerrarModal();
-                        });
-                    } else {
-                        swal({
-                            type: "error",
-                            title: "Stock insuficiente",
-                            text: this.mensajesKit.join("\n\n"),
-                        });
-                    }
-                })
-                .catch((error) => {
-                    // Maneja el error aquí
-                    console.error(error);
-                });
-        },
-
-        agregarPE(kit) {
-            console.log("esto:", kit);
-            kit["articulos"] = this.arrayArticulosKit;
-            kit["precio"] = kit["precio"] / parseFloat(this.monedaVenta[0]);
-            axios.put("/ofertasespeciales/actualizar", kit);
-
-            this.modalDetalle = 0;
-            if (new Date(kit.fecha_final) < new Date()) {
-                swal({
-                    type: "error",
-                    title: "Error...",
-                    text: "Este kit ha expirado!",
-                });
-                return;
-            }
-            console.log("datos formulario agregar PE", kit);
-            //   this.GetValidateKit(kit['id'])
-            this.GetValidateKit(kit["id"])
-                .then(() => {
-                    if (this.mensajesKit.length == 0) {
-                        const totalKit = this.arrayArticulosKit.reduce(
-                            (total, producto) => {
-                                return total + producto.cantidad * producto.precio_costo_unid;
-                            },
-                            0
-                        );
-                        this.arrayArticulosKit.forEach((producto) => {
-                            producto.porcentaje =
-                                ((producto.cantidad * producto.precio_costo_unid) / totalKit) *
-                                100;
-                        });
-                        console.log("precio especial ", this.arrayArticulosKit);
-                        this.arrayArticulosKit.forEach((producto) => {
-                            producto.nuevo_precio =
-                                (this.calcularPrecioUnitario(kit) * producto.porcentaje) / 100;
-                        });
-                        console.log("Estos son los articulos: ", this.arrayArticulosKit);
-                        this.arrayArticulosKit.forEach((articulo) => {
-                            this.arrayDetalle.push({
-                                idkit: kit["id"],
-                                idarticulo: articulo.id,
-                                articulo: articulo.nombre,
-                                medida: "KIT",
-                                unidad_envase: articulo.unidad_envase,
-                                cantidad: articulo.cantidad,
-                                cantidad_paquetes: articulo.unidad_envase * articulo.cantidad,
-                                precio: articulo.nuevo_precio,
-                                descuento: 0,
-                                stock: articulo.stock,
-                                precioseleccionado: this.calcularPrecioUnitario(articulo),
-                            });
-                            let actividadEconomica = 461021;
-
-                            this.arrayProductos.push({
-                                actividadEconomica: actividadEconomica,
-                                codigoProductoSin: articulo.id,
-                                codigoProducto: articulo.codigo,
-                                descripcion: articulo.nombre,
-                                cantidad: articulo.cantidad,
-                                unidadMedida: 25,
-                                precioUnitario: parseFloat(
-                                    this.calcularPrecioUnitario(articulo) * this.monedaVenta[0]
-                                ).toFixed(2),
-                                montoDescuento: (
-                                    articulo.precio_costo_unid *
-                                    articulo.cantidad *
-                                    this.monedaVenta[0] -
-                                    articulo.nuevo_precio * this.monedaVenta[0]
-                                ).toFixed(2),
-                                subTotal: parseFloat(
-                                    articulo.nuevo_precio * this.monedaVenta[0]
-                                ).toFixed(2),
-                                numeroSerie: null,
-                                numeroImei: null,
-                            });
-                            this.cerrarModal();
-                        });
-                    } else {
-                        swal({
-                            type: "error",
-                            title: "Stock insuficiente",
-                            text: this.mensajesKit.join("\n\n"),
-                        });
-                    }
-                })
-                .catch((error) => {
-                    // Maneja el error aquí
-                    console.error(error);
-                });
-        },
-
-        abrirModalDetallesKit(data) {
-            this.arrayArticulosSeleccionados = [];
-
-            this.modalDetalleKit = 1;
-            this.datosFormularioKit = {
-                id: data["id"],
-                nombre: data["nombre"],
-                porcentaje: data["porcentaje"],
-                codigo: data["codigo"],
-
-                fecha_final: new Date(data["fecha_final"]).toISOString().split("T")[0],
-                tipo_promocion: data["tipo_promocion"],
-                estado: data["estado"],
-                precio: data["precio"],
-            };
-            this.obtenerDatosKit(data["id"]);
-        },
-
-        abrirModalDetalles(data) {
-            this.arrayArticulosSeleccionados = [];
-
-            this.modalDetalle = 1;
-            this.datosFormularioPE = {
-                id: data["id"],
-                nombre: data["nombre"],
-                precio_r1: data["precio_r1"],
-                rango_inicio_r1: data["rango_inicio_r1"],
-                rango_final_r1: data["rango_final_r1"],
-                precio_r2: data["precio_r2"],
-                rango_inicio_r2: data["rango_inicio_r2"],
-                rango_final_r2: data["rango_final_r2"],
-                precio_r3: data["precio_r3"],
-                rango_inicio_r3: data["rango_inicio_r3"],
-                rango_final_r3: data["rango_final_r3"],
-
-                fecha_final: new Date(data["fecha_final"]).toISOString().split("T")[0],
-                tipo_promocion: data["tipo_promocion"],
-                estado: data["estado"],
-            };
-            this.obtenerDatosKit(data["id"]), console.log(this.datosFormularioPE);
-        },
-
-        obtenerDatosKit(idPromocion) {
-            return axios
-                .get("/ofertas/id", {
-                    params: {
-                        idPromocion: idPromocion,
-                    },
-                })
-                .then((response) => {
-                    const datos = response.data.articulosPorPromocion;
-                    this.arrayArticulosKit = datos.map((item) => ({
-                        ...item.articulo,
-                        cantidad: item.cantidad,
-                    }));
-                })
-                .catch((error) => {
-                    console.error(error);
-                    throw error; // Re-lanza el error para que pueda ser manejado en agregarKit
-                });
-        },
-
-        getColorForEstado(estado, fecha_final) {
-            const fechaFinal = new Date(fecha_final) < new Date();
-
-            if (fechaFinal) {
-                return "#ff0000";
-            }
-            switch (estado) {
-                case "Activo":
-                    return "#5ebf5f";
-                case "Inactivo":
-                    return "#d76868";
-                case "Agotado":
-                    return "#ce4444";
-                default:
-                    return "#f9dda6";
-            }
-        },
-
-        listarOfertaEspecial(page, buscar, criterio) {
-            let me = this;
-            let url = "/ofertasespeciales";
-
-            axios
-                .get(url, {
-                    params: {
-                        page: page,
-                        buscar: buscar,
-                        criterio: criterio,
-                    },
-                })
-                .then(function (response) {
-                    let respuesta = response.data;
-                    me.arrayPreciosEspeciales = response.data.ofertas.data;
-                    me.pagination = respuesta.pagination;
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        },
-
-        scrollToSection() {
-            $("html, body").animate(
-                {
-                    scrollTop: $("#seccionObjetivo").offset().top,
-                },
-                50
-            );
-        },
-        scrollToTop() {
-            $("html, body").animate(
-                {
-                    scrollTop: 0,
-                },
-                50
-            );
-        },
-        calcularPrecioConDescuento(precioOriginal, porcentajeDescuento) {
-            const descuento =
-                this.precioseleccionado * (this.descuentoProducto / 100);
-            const precioConDescuento = this.precioseleccionado - descuento;
-            const precioFinal =
-                precioConDescuento * this.unidadPaquete * this.cantidad;
-            return precioFinal;
-        },
-        calcularDiasRestantes(fechaFinal) {
-            const fechaActual = new Date();
-            const fechaObjetivo = new Date(fechaFinal);
-            const diferenciaEnMilisegundos = fechaObjetivo - fechaActual;
-            const diasRestantes = Math.ceil(
-                diferenciaEnMilisegundos / (1000 * 60 * 60 * 24)
-            );
-            return diasRestantes;
-        },
-        actualizarDetalle(index) {
-            if (
-                this.arrayDetalle[index] &&
-                typeof this.arrayDetalle[index].precioseleccionado !== "undefined" &&
-                typeof this.arrayDetalle[index].cantidad !== "undefined"
-            ) {
-                this.arrayDetalle[index].total = (
-                    this.arrayDetalle[index].precioseleccionado *
-                    this.arrayDetalle[index].cantidad
-                ).toFixed(2);
-                this.calcularTotal(); // Asegúrate de recalcular el total después de actualizar
-            } else {
-                console.error(
-                    "Datos inválidos en actualizarDetalle para el índice:",
-                    index
-                );
-            }
-        },
-
-        actualizarDetalleDescuento(index) {
-            this.calcularTotal(index);
-        },
-        validarDescuentoAdicional() {
-            if (this.descuentoAdicional >= this.totalParcial) {
-                this.descuentoAdicional = 0;
-                alert("El descuento adicional no puede ser mayor o igual al total.");
-            }
         },
 
         habilitarNombreCliente() {
@@ -1685,25 +1347,6 @@ export default {
                 this.idcliente = "";
                 this.tipo_documento = "";
             }
-        },
-        validarDescuentoGiftCard() {
-            if (this.descuentoGiftCard >= this.calcularTotal) {
-                this.descuentoGiftCard = 0;
-                alert("El descuento Gift Card no puede ser mayor o igual al total.");
-            }
-        },
-        buscarPromocion(idArticulo) {
-            // Supongamos que el ID del artículo es 1, ajusta según tus necesidades
-
-            axios
-                .get(`/promocion/id?idArticulo=${idArticulo}`)
-                .then((response) => {
-                    this.arrayPromocion = response.data.promocion;
-                })
-                .catch((error) => {
-                    // Maneja los errores aquí
-                    console.error("Error:", error);
-                });
         },
 
         async obtenerDatosUsuario() {
@@ -1759,7 +1402,7 @@ export default {
                 .get(url)
                 .then(function (response) {
                     var respuesta = response.data;
-                    console.log(respuesta);
+                   
                     me.arrayVenta = respuesta.ventas.data;
                     me.pagination = respuesta.pagination;
                 })
@@ -1777,7 +1420,7 @@ export default {
                     let respuesta = response.data;
                     q: numero;
                     me.arrayCliente = respuesta.clientes;
-                    console.log(me.arrayCliente);
+             
                     me.cantidadClientes = me.arrayCliente.length;
                 })
                 .catch(function (error) {
@@ -1794,7 +1437,7 @@ export default {
                     let respuesta = response.data;
                     q: nombre;
                     me.arrayCliente = respuesta.clientes;
-                    console.log(me.arrayCliente);
+           
                     me.cantidadClientes = me.arrayCliente.length;
                 })
                 .catch(function (error) {
@@ -1861,7 +1504,7 @@ export default {
                     .then(function (response) {
                         let respuesta = response.data;
                         me.arraySeleccionado = respuesta.articulos[0];
-                        console.log(me.arraySeleccionado);
+                
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -2001,9 +1644,6 @@ export default {
 
         agregarDetalleModal(data) {
             this.codigo = data.codigo;
-            console.log("SELECCIONE ESTO:", data);
-
-            this.buscarPromocion(data.id);
             this.precioSeleccionado = data.precio_uno;  // Cambiamos precioseleccionado a precioSeleccionado
             this.unidadPaquete = '1';
             this.cerrarModal();
@@ -2018,7 +1658,7 @@ export default {
             axios.get(url)
                 .then(response => {
                     this.arrayArticulo = response.data.articulos;
-                    console.log("listar articulo", response.data);
+                
                 })
                 .catch(error => {
                     console.error("Error en la búsqueda:", error);
@@ -2100,12 +1740,7 @@ export default {
             this.registrarVenta(idtipo_pago);
         },
 
-        aplicarCombinacion() {
-            const descuentoGiftCard = this.descuentoGiftCard;
-            const idtipo_pago = descuentoGiftCard ? 40 : 2;
-
-            this.registrarVenta(idtipo_pago);
-        },
+     
 
         otroMetodo(metodoPago) {
             const idtipo_pago = metodoPago;
@@ -2475,18 +2110,7 @@ export default {
                 }
             });
 
-            // Verificar si se seleccionó el tipo de comprobante
-            if (me.tipo_comprobante == 0)
-                me.errorMostrarMsjVenta.push("Seleccione el Comprobante");
-
-            // Verificar si se ingresó el impuesto
-            if (!me.impuesto)
-                me.errorMostrarMsjVenta.push("Ingrese el impuesto de compra");
-
-            // Verificar si hay detalles en la venta
-            if (me.arrayDetalle.length <= 0)
-                me.errorMostrarMsjVenta.push("Ingrese detalles");
-
+           
             // Verificar si hay errores
             if (me.errorMostrarMsjVenta.length) {
                 me.errorVenta = 1;
@@ -2502,48 +2126,6 @@ export default {
             return true;
         },
 
-        eliminarVenta(idVenta) {
-            axios
-                .delete("/venta/eliminarVenta/" + idVenta)
-                .then(function (response) {
-                    console.log("Venta eliminada correctamente:", response);
-                })
-                .catch(function (error) {
-                    console.error("Error al eliminar la venta:", error);
-                });
-        },
-
-        mostrarDetalle() {
-            let me = this;
-            me.selectAlmacen();
-            me.listado = 0;
-
-            me.idproveedor = 0;
-            me.tipo_comprobante = "RESIVO";
-            me.serie_comprobante = "";
-            me.impuesto = 0.18;
-            me.total = 0.0;
-            me.idarticulo = 0;
-            me.articulo = "";
-            me.cantidad = 1;
-            me.precio = 0;
-            me.arrayDetalle = [];
-            me.arraySeleccionado = [];
-        },
-        ocultarDetalle() {
-            this.listado = 1;
-            this.codigo = null;
-            this.arrayArticulo.length = 0;
-            this.precioseleccionado = null;
-            this.medida = null;
-            this.nombreCliente = null;
-            this.documento = null;
-            this.email = null;
-            this.idAlmacen = null;
-            this.arrayProductos = [];
-            this.arrayDetalle = [];
-            this.precioBloqueado = false;
-        },
         verVenta(id) {
             let me = this;
             me.listado = 2;
@@ -2576,7 +2158,6 @@ export default {
             axios
                 .get(url)
                 .then(function (response) {
-                    //console.log(response);
                     var respuesta = response.data;
                     me.arrayDetalle = respuesta.detalles;
                     console.log(array);
@@ -2587,16 +2168,15 @@ export default {
         },
         cerrarModal() {
             this.modal = false;
-            console.log("Modal cerrado");
+      
         },
         abrirModal() {
-            this.scrollToTop();
             this.listarArticulo("", "nombre");
             this.selectAlmacen();
             this.arrayArticulo = [];
             this.modal = true;
             this.tituloModal = "Seleccione los articulos que desee";
-            console.log("Modal abierto");
+           
         },
 
         advertenciaFechaVencimiento() {
@@ -2661,17 +2241,14 @@ export default {
                 .then(function (response) {
                     var respuesta = response.data;
                     me.arrayPrecios = respuesta.precio.data;
-                    console.log("PRECIOS", me.arrayPrecios);
+                   
                     //me.precioCount = me.arrayBuscador.length;
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
         },
-        mostrarSeleccion() {
-            console.log("Precio seleccionado:", this.precioseleccionado);
-        },
-
+    
         cerrarModal2() {
     this.modal2 = false;
     this.reiniciarFormulario();
@@ -2695,7 +2272,7 @@ export default {
             );
             if (recibidoNumero === 0) {
                 this.efectivo = recibidoNumero;
-                console.log("EFECTIVO", this.efectivo);
+            
                 this.cambio = 0;
                 this.faltante = 0;
             } else if (recibidoNumero < this.calcularTotal) {

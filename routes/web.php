@@ -911,6 +911,7 @@ Route::group(["middleware" => ["auth"]], function () {
         );
         Route::delete('/proveedor/eliminar/{id}', 'ProveedorController@eliminarProveedor');
         Route::delete('/cliente/eliminar/{id}', 'ClienteController@eliminarCliente');
+        Route::get('/caja/saldo/{id}', 'CajaController@obtenerSaldoCaja');
     });
 
     //RUTA PARA RECUPERAR LA SESSION CON EL ID DE LA PERSONA LOGUEADA
