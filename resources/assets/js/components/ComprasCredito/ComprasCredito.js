@@ -125,6 +125,8 @@ export default {
             enumeracion: index + 1,
             fecha_cancelado: cuota.fecha_cancelado? cuota.fecha_cancelado.split(" ")[0]: null,
           }));
+
+          this.displayListaCuotas = true;
         }
       } catch (error) {
         console.error(error);
@@ -135,14 +137,9 @@ export default {
       return cadena.substring(0, 9);
     },
 
-    openModalListaCuotas(ingresoId) {
-      this.displayListaCuotas = true;
-      this.listarCuotasPorIngreso(ingresoId);
-    },
-
     closeModalListaCuotas() {
-      this.displayListaCuotas = false;
       this.array_cuotas = [];
+      this.displayListaCuotas = false;
     },
 
     openModalPagoCuota(data) {
@@ -277,16 +274,13 @@ export default {
     },
 
     getDialogPosition() {
-      console.log('direccion',window.innerWidth <= 768 ? 'right' : 'center')
-      return window.innerWidth <= 768 ? 'right' : 'center';
+      return window.innerWidth <= 850 ? 'right' : 'center';
     },
 
     getDialogStyle(desktopWidth = '55vw') {
       if (window.innerWidth <= 768) {
-          console.log('style',window.innerWidth <= 768)
           return { width: '100vw', height: '100vh' };
       } else if (window.innerWidth <= 1366) {
-          console.log('style',window.innerWidth <= 1366)
           return { width: '80vw' };
       } else {
           console.log('style',desktopWidth)

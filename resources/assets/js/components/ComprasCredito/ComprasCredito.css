@@ -45,7 +45,7 @@
 }
 
 >>> .div-pagar-cuota .p-dialog-footer {
-    padding: 0 1rem 1rem 1.5rem;
+    padding: 0 1.5rem 1rem 1.5rem;
 }
 
 >>> .p-md-4 {
@@ -61,8 +61,8 @@
 
 >>> .div-detalles .p-dialog-content {
     padding: 1rem 1rem 0 1rem;
-    /*border-bottom-right-radius: 6px;
-    border-bottom-left-radius: 6px;*/
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
 }
 
 >>> .div-detalles .p-dialog-footer {
@@ -99,4 +99,43 @@
 .product-image {
     border-radius: 10px;
     width: 100px;
+}
+
+/* Tabla */
+>>> .dt-lista-compras .p-datatable tbody{
+    height: 75vh;
+}
+
+/*>>> .b-table-sticky-header, .table-responsive, [class*=table-responsive-] {
+    margin-bottom: 0;
+}*/
+
+/* Responsive dialog */
+@media (min-width: 1024px) {
+
+    >>>.div-pagar-cuota .p-dialog {
+        max-width: 45%;
+        max-height: 50%;
+    }
+
+    
+}
+
+@media (min-width: 1024px) {
+    >>> .div-detalles .p-dialog {
+        max-width: 70%;
+        max-height: 75%;
+    }
+}
+
+@media (max-width: 850px) {
+    >>> .p-dialog-right .p-dialog {
+        padding-top: 30px;
+    }
+}
+
+@media (min-width: 768px) {
+    >>> .div-pagar-cuota .p-dialog {
+        padding-top: 0px;
+    }
 }

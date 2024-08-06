@@ -9,6 +9,7 @@
                 </div>
             </template>
 
+            <div class="dt-lista-compras">
             <DataTable
                 :value="array_ingresos"
                 :paginator="true"
@@ -17,10 +18,6 @@
                 dataKey="id"
                 :rowHover="true"
                 responsiveLayout="scroll"
-                showGridlines
-                :scrollable="true"
-                scrollHeight="77vh"
-                tableStyle="height:77vh"
             >
                 <!--<template #header>
                     <div class="flex justify-content-between align-items-center">
@@ -32,7 +29,7 @@
                     </div>
                 </template>-->
 
-                <Column header="Acciones" :styles="{'max-width':'7%'}">
+                <Column header="Acciones" >
                     <template #body="slotProps">
                         <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
                             <Button
@@ -45,16 +42,16 @@
                                 type="button"
                                 class="p-button-warning p-button-sm"
                                 icon="pi pi-eject"
-                                @click="openModalListaCuotas(slotProps.data.id)"
+                                @click="listarCuotasPorIngreso(slotProps.data.id)"
                             ></Button>
                         </div>
                     </template>
                 </Column>
-                <Column field="proveedor" header="Proveedor" :styles="{'max-width':'10%'}"></Column>
-                <Column field="usuario" header="Comprador" :styles="{'max-width':'10%'}"></Column>
-                <Column field="fecha_hora" header="Fecha" :styles="{'max-width':'8%'}"></Column>
-                <Column field="nombre_almacen" header="Almacen" :styles="{'max-width':'10%'}"></Column>
-                <Column :styles="{'max-width':'10%'}">
+                <Column field="proveedor" header="Proveedor" ></Column>
+                <Column field="usuario" header="Comprador" ></Column>
+                <Column field="fecha_hora" header="Fecha" ></Column>
+                <Column field="nombre_almacen" header="Almacen" ></Column>
+                <Column >
                     <template #header>
                         Comprobante
                     </template>
@@ -64,7 +61,7 @@
                         </div>
                     </template>
                 </Column>
-                <Column :styles="{'max-width':'10%'}">
+                <Column >
                     <template #header>
                         Compra Total
                     </template>
@@ -74,7 +71,7 @@
                         </div>
                     </template>
                 </Column>
-                <Column :styles="{'max-width':'9%'}">
+                <Column >
                     <template #header>
                         Cuota Inicial
                     </template>
@@ -84,7 +81,7 @@
                         </div>
                     </template>
                 </Column>
-                <Column :styles="{'max-width':'9%'}">
+                <Column >
                     <template #header>
                         Deuda Restante
                     </template>
@@ -94,7 +91,7 @@
                         </div>
                     </template>
                 </Column>
-                <Column :styles="{'max-width':'9%'}">
+                <Column >
                     <template #header>
                         Num. Cuotas
                     </template>
@@ -104,7 +101,7 @@
                         </div>
                     </template>
                 </Column>
-                <Column header="Estado" :bodyStyle="{'text-align': 'center'}" :styles="{'max-width':'8%'}">
+                <Column header="Estado" :bodyStyle="{'text-align': 'center'}" >
                     <template #body="slotProps">
                         <div style="text-align: center; width: 100%;">
                             <Tag
@@ -130,6 +127,7 @@
                     </div>
                 </template>
             </DataTable>
+            </div>
         </Panel>
 
         <div class="div-lista-cuota">
@@ -147,7 +145,6 @@
                     class="p-datatable-sm"
                     dataKey="id"
                     :rowHover="true"
-                    responsiveLayout="scroll"
                     showGridlines
                 >
                     <Column
@@ -166,14 +163,29 @@
                         field="saldo_restante"
                         header="Saldo Restante"
                     ></Column>
-                    <Column
-                        field="fecha_cancelado"
-                        header="Fecha Cancelado"
-                    ></Column>
-                    <Column field="tipo_pago_cuota" header="Tipo Pago" ></Column>
+                    <Column field="fecha_cancelado" header="Fecha Cancelado" >
+                        <template #body="slotProps">
+                            <p v-if="slotProps.data.fecha_cancelado != null">
+                                <strong>{{ slotProps.data.fecha_cancelado }}</strong>
+                            </p>
+                            <p v-else>
+                                <strong style="color: red;">Sin fecha</strong>
+                            </p>
+                        </template>
+                    </Column>
+                    <Column header="Tipo Pago" >
+                        <template #body="slotProps">
+                            <p v-if="slotProps.data.tipo_pago_cuota != null">
+                                <strong>{{ slotProps.data.tipo_pago_cuota }}</strong>
+                            </p>
+                            <p v-else>
+                                <strong style="color: red;">Ninguna</strong>
+                            </p>
+                        </template>
+                    </Column>
                     <Column header="Estado" >
                         <template #body="slotProps">
-                            <div style="text-align: center; width: 100%;">
+                            <div style="text-align: right; width: 100%;">
                                 <Tag
                                     v-if="slotProps.data.estado == 'Pagado'"
                                     class="mr-2"
@@ -191,7 +203,7 @@
                     </Column>
                     <Column >
                         <template #body="slotProps">
-                            <div style="text-align: center; width: 100%;">
+                            <div style="text-align: right; width: 100%;">
                                 <Button
                                     v-if="slotProps.data.estado == 'Pagado'"
                                     disabled
@@ -220,9 +232,7 @@
                 header="Pagar Cuota"
                 :visible.sync="displayPagarCuota"
                 :modal="true"
-                position="center"
-                :contentStyle="{ overflow: 'visible' }"
-                :containerStyle="{ width: '35vw' }"
+                :position="getDialogPosition()"
                 @hide="cancelarPagoCuota"
             >
                 <div class="p-fluid p-formgrid p-grid">
@@ -320,53 +330,52 @@
                 header="Detalles de la Compra"
                 :visible.sync="displayMostrarDetalles"
                 :modal="true"
-                position="center"
-                :containerStyle="{ width: '45vw' }"
+                :position="getDialogPosition()"
             >
 
                 <div class="card">
                     <div class="p-fluid p-formgrid p-grid">
-                        <div class="p-col p-md-6">
+                        <div class="p-col-6 p-md-6">
                             <label for="nombreProveedor"><strong>Proveedor</strong></label>
                             <p>{{ cabecera.nombre_proveedor }}</p>
                         </div>
-                        <div class="p-col p-md-6">
+                        <div class="p-col-6 p-md-6">
                             <label for="nombreAlmacen"><strong>Almacen</strong></label>
                             <p>{{ cabecera.nombre_almacen }}</p>
                         </div>
 
-                        <div class="p-col p-md-6">
+                        <div class="p-col-6 p-md-6">
                             <label for="nombreProveedor"><strong>Serie Comprobante</strong></label>
                             <p>{{ cabecera.serie_comprobante }}</p>
                         </div>
-                        <div class="p-col p-md-6">
+                        <div class="p-col-6 p-md-6">
                             <label for="nombreAlmacen"><strong>Numero Comprobante</strong></label>
                             <p>{{ cabecera.num_comprobante }}</p>
                         </div>
 
-                        <div class="p-col p-md-6">
+                        <div class="p-col-6 p-md-6">
                             <label for="nombreProveedor"><strong>Comprobante</strong></label>
                             <p>{{ cabecera.tipo_comprobante }}</p>
                         </div>
-                        <div class="p-col p-md-6">
+                        <div class="p-col-6 p-md-6">
                             <label for="nombreAlmacen"><strong>Fecha / Hora</strong></label>
                             <p>{{ cabecera.fecha_hora }}</p>
                         </div>
 
-                        <div class="p-col p-md-6">
+                        <div class="p-col-6 p-md-6">
                             <label for="nombreProveedor"><strong>Total</strong></label>
                             <p style="color: red;"><strong>Bs. {{ cabecera.total }}</strong></p>
                         </div>
-                        <div class="p-col p-md-6">
-                            <label for="nombreAlmacen"><strong>Descuento Global</strong></label>
+                        <div class="p-col-6 p-md-6">
+                            <label for="nombreAlmacen"><strong>Descuento</strong></label>
                             <p>{{ cabecera.descuento_global }} %</p>
                         </div>
 
-                        <div class="p-col p-md-6">
+                        <div class="p-col-6 p-md-6">
                             <label for="nombreProveedor"><strong>Cuota Inicial</strong></label>
                             <p>Bs. {{ cabecera.cuota_inicial }}</p>
                         </div>
-                        <div class="p-col p-md-6">
+                        <div class="p-col-6 p-md-6">
                             <label for="nombreAlmacen"><strong>Tipo Pago</strong></label>
                             <p>{{ cabecera.tipo_pago_inicial }}</p>
                         </div>
@@ -375,49 +384,58 @@
 
                 <DataTable
                     :value="array_detalles_ingreso"
-                    :paginator="false"
+                    :paginator="true"
                     class="p-datatable-sm"
                     dataKey="id"
                     :rowHover="true"
-                    responsiveLayout="scroll"
+                    :rows="5"
                     showGridlines
-                    :scrollable="true"
-                    scrollHeight="25vh"
-                    tableStyle="height:25vh"
                 >
-                    <Column :styles="{'max-width':'55%'}"
-                        field="nombre"
-                        header="Nombre"
-                    />
-                    <Column :styles="{'max-width':'15%'}"
-                        field="cantidad"
-                        header="Cantidad"
-                    />
-                    <Column :styles="{'max-width':'15%'}"
+                    <Column header="Nombre">
+                        <template #body="slotProps">
+                            <div style="text-align: right; width: 100%;">
+                                {{ slotProps.data.nombre }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column header="Cantidad">
+                        <template #body="slotProps">
+                            <div style="text-align: right; width: 100%;">
+                                {{ slotProps.data.cantidad }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column
                         field="precio"
                         header="Precio"
                     />
-                    <Column :styles="{'max-width':'15%'}">
-                        <template #header>
-                            Descuento
-                        </template>
+                    <Column header="Descuento">
                         <template #body="slotProps">
-                            <div style="text-align: center; width: 100%;">
+                            <div style="text-align: right; width: 100%;">
                                 {{ slotProps.data.descuento }} %
                             </div>
                         </template>
                     </Column>
 
+                    <template #paginatorend>
+                        <Button
+                            label="Cancelar"
+                            icon="pi pi-times"
+                            class="p-button-sm p-button-danger"
+                            @click="closeModalMostrarDetalle"
+                            autofocus
+                        />
+                    </template>
                 </DataTable>
 
                 <template #footer>
-                    <Button
+                    <!--<Button
                         label="Cancelar"
                         icon="pi pi-times"
                         class="p-button-sm p-button-danger"
                         @click="closeModalMostrarDetalle"
                         autofocus
-                    />
+                    />-->
                 </template>
             </Dialog>
         </div>
