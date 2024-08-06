@@ -169,4 +169,23 @@ class AlmacenController extends Controller
             ->select('id', 'nombre_almacen')->orderBy('nombre_almacen', 'asc')->get();
         return ['almacenes' => $almacenes];
     }
+    public function destroy($id)
+{
+    if (!request()->ajax()) return redirect('/');
+    
+    try {
+        $almacen = Almacen::findOrFail($id);
+        $almacen->delete();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Almacén eliminado correctamente'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'No se pudo eliminar el almacén'
+        ], 500);
+    }
+}
 }

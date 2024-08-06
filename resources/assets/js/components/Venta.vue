@@ -1,59 +1,73 @@
 <template>
     <main class="main">
         <!-- Breadcrumb -->
-        <Panel header=" Ventas">
-            <template>
-                <div class="p-d-flex p-jc-between p-ai-center">
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-search" />
-                        <InputText v-model="buscar" @input="buscarVenta" placeholder="Texto a buscar" />
-                    </span>
-                    <Button @click="abrirTipoVenta" label="Nuevo" icon="pi pi-plus" class="p-button-primary" />
+        <Panel>
+            <Toast :breakpoints="{ '920px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
+            </Toast>
+            <template #header>
+                <div class="panel-header">
+
+                    <h4 class="panel-icon">Ventas</h4>
                 </div>
             </template>
-            <!-- Listado-->
+            <!-- Buscador -->
+          <div class="p-d-flex p-ai-center p-mb-4">
+  <Button @click="abrirTipoVenta" label="Nueva" icon="pi pi-plus" class="p-button-success-sm p-mr-2"/>
+  <span class="p-input-icon-left p-input-icon-right p-w-100">
+    <i class="pi pi-search" />
+    <InputText v-model="buscar" @input="buscarVenta" placeholder="Buscar venta..." 
+               class="p-inputtext-lg-sm moto-search p-w-100" />
+    <i class="pi pi-times" v-if="buscar" @click="
+      buscar = '';
+      buscarVenta();
+    " style="cursor: pointer" />
+  </span>
+</div>
+
+            <!-- Listado de Ventas -->
             <template v-if="listado == 1">
-                <div>
-                    <DataTable responsiveLayout="scroll" class="p-datatable-gridlines p-datatable-sm"
-                        :value="arrayVenta" :rows="10">
-                        <Column header="Opciones">
-                            <template #body="slotProps">
-                                <Button icon="pi pi-eye" @click="verVenta(slotProps.data.id)" class="p-button-sm p-mr-1"
-                                    style="background-color: green; border-color: green; color: white;" />
-                                <template v-if="slotProps.data.estado === 'Registrado' && idrol !== 2">
-                                    <Button icon="pi pi-trash" @click="desactivarVenta(slotProps.data.id)"
-                                        class="p-button-sm p-button-danger p-mr-1" />
-                                </template>
-                                <Button icon="pi pi-print"
-                                    @click="imprimirResivo(slotProps.data.id, slotProps.data.correo)"
-                                    class="p-button-sm p-button-primary p-mr-1" />
+                <DataTable :value="arrayVenta" :rows="10" responsiveLayout="scroll"
+                    class="p-datatable-gridlines p-datatable-sm moto-table" :rowHover="true" dataKey="id">
+                    <Column header="Opciones">
+                        <template #body="slotProps">
+                            <Button icon="pi pi-eye" @click="verVenta(slotProps.data.id)" class="p-button-sm p-mr-1"
+                                style="
+                  background-color: green;
+                  border-color: green;
+                  color: white;
+                " />
+                            <template v-if="slotProps.data.estado === 'Registrado' && idrol !== 2">
+                                <Button icon="pi pi-trash" @click="desactivarVenta(slotProps.data.id)"
+                                    class="p-button-sm p-button-danger p-mr-1" />
                             </template>
-                        </Column>
-                        <Column field="usuario" header="Vendedor"></Column>
-                        <Column field="razonSocial" header="Cliente"></Column>
-                        <Column field="documentoid" header="Documento" class="d-none d-md-table-cell"></Column>
-                        <Column field="num_comprobante" header="N° de Comprobante" class="d-none d-md-table-cell">
-                        </Column>
-                        <Column field="fecha_hora" header="Fecha y Hora" class="d-none d-md-table-cell"></Column>
-                        <Column header="Total">
-                            <template #body="slotProps">
-                                {{ (slotProps.data.total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
+                            <Button icon="pi pi-print" @click="
+                                imprimirResivo(slotProps.data.id, slotProps.data.correo)
+                                " class="p-button-sm p-button-primary p-mr-1" />
+                        </template>
+                    </Column>
+                    <Column field="usuario" header="Vendedor"></Column>
+                    <Column field="razonSocial" header="Cliente"></Column>
+                    <Column field="documentoid" header="Documento" class="d-none d-md-table-cell"></Column>
+                    <Column field="num_comprobante" header="N° de Comprobante" class="d-none d-md-table-cell"></Column>
+                    <Column field="fecha_hora" header="Fecha y Hora" class="d-none d-md-table-cell"></Column>
+                    <Column header="Total">
+                        <template #body="slotProps">
+                            <span class="moto-price">
+                                {{
+                                    (slotProps.data.total * parseFloat(monedaVenta[0])).toFixed(2)
                                 }}
-                            </template>
-                        </Column>
-                        <Column field="estado" header="Estado" class="d-none d-md-table-cell"></Column>
-                    </DataTable>
+                                {{ monedaVenta[1] }}
+                            </span>
+                        </template>
+                    </Column>
+                    <Column field="estado" header="Estado" class="d-none d-md-table-cell"></Column>
+                </DataTable>
 
-                    <Paginator :rows="10" :totalRecords="pagination.total" :first="(pagination.current_page - 1) * 10"
-                        @page="onPageChange" />
-                </div>
+                <Paginator :rows="10" :totalRecords="pagination.total" :first="(pagination.current_page - 1) * 10"
+                    @page="onPageChange" />
             </template>
 
-
-
-            <!--Fin Listado-->
-
-            <!--Ver ingreso-->
+            <!-- Ver Detalle de Venta -->
             <template v-else-if="listado == 2">
                 <Card class="shadow">
                     <template #content>
@@ -77,82 +91,101 @@
                                 </div>
                             </div>
                         </div>
-
-                        <DataTable :value="arrayDetalle" class="mb-3">
+                        <DataTable :value="arrayDetalle" class="mb-3" responsiveLayout="scroll">
                             <Column field="articulo" header="Artículo"></Column>
                             <Column header="Precio">
                                 <template #body="slotProps">
-                                    {{ (slotProps.data.precio * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                        monedaVenta[1] }}
+                                    {{
+                                        (
+                                            slotProps.data.precio * parseFloat(monedaVenta[0])
+                                        ).toFixed(2)
+                                    }}
+                                    {{ monedaVenta[1] }}
                                 </template>
                             </Column>
                             <Column field="cantidad" header="Cantidad"></Column>
                             <Column header="Subtotal">
                                 <template #body="slotProps">
-                                    {{ ((slotProps.data.precio * slotProps.data.cantidad) *
-                                        parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
+                                    {{
+                                        (
+                                            slotProps.data.precio *
+                                            slotProps.data.cantidad *
+                                            parseFloat(monedaVenta[0])
+                                        ).toFixed(2)
+                                    }}
+                                    {{ monedaVenta[1] }}
                                 </template>
                             </Column>
                         </DataTable>
-
                         <div class="p-text-right p-mb-3">
-                            <strong>Total Neto: {{ (total * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
-                                }}</strong>
+                            <strong>Total Neto:
+                                {{ (total * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                {{ monedaVenta[1] }}</strong>
                         </div>
-
                         <div class="p-text-right">
                             <Button label="Cerrar" @click="ocultarDetalle()" class="p-button-secondary" />
                         </div>
                     </template>
                 </Card>
             </template>
-
-        </panel>
+        </Panel>
         <!-- HASTA AQUI DEVOLUCIONES -->
         <template>
-            <Dialog :visible.sync="modal2" :containerStyle="{ width: '60vw' }" :modal="true" :closable="false"
-                :closeOnEscape="false">
+            <Dialog :visible.sync="modal2" :containerStyle="{ width: '100%', maxWidth: '850px' }" :modal="true"
+                :closable="true" :closeOnEscape="false" @hide="cerrarModal2">
                 <template #header>
-                    <h5 class="modal-title">Detalle Ventas</h5>
+                    <h5 class="modal-title">DETALLE VENTAS</h5>
                 </template>
-
                 <div class="p-fluid">
                     <div class="p-field">
                         <div class="step-indicators">
-                            <span :class="['step', { 'active': step === 1, 'completed': step > 1 }]">1</span>
-                            <span :class="['step', { 'active': step === 2, 'completed': step > 2 }]">2</span>
-                            <span :class="['step', { 'active': step === 3 }]">3</span>
+                            <span :class="['step', { active: step === 1, completed: step > 1 }]">1</span>
+                            <span :class="['step', { active: step === 2, completed: step > 2 }]">2</span>
+                            <span :class="['step', { active: step === 3 }]">3</span>
                         </div>
                     </div>
-
                     <div v-if="step === 1" class="step-content p-fluid">
-                        <div class="p-grid p-formgrid p-mb-3">
-                            <div class="p-col-12 p-md-4">
-                                <span class="p-float-label">
-                                    <InputText id="documento" v-model="documento"
-                                        @keyup.enter="buscarClientePorDocumento" />
-                                    <label for="documento">Documento <span class="p-error">*</span></label>
-                                </span>
-                            </div>
+                        <template>
+                            <div class="form-container">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <div class="p-inputgroup">
+                                            <span class="p-inputgroup-addon">
+                                                <i class="pi pi-id-card"></i>
+                                            </span>
+                                            <span class="p-float-label">
+                                                <InputText id="documento" v-model="documento" @input="checkDocumento"
+                                                    maxlength="7" class="w-full" />
+                                                <label for="documento">Numero de Documento</label>
+                                            </span>
+                                        </div>
+                                    </div>
 
-                            <div class="p-col-12 p-md-4">
-                                <span class="p-float-label">
-                                    <InputText id="nombreCliente" v-model="nombreCliente"
-                                        :disabled="!nombreClienteEditable" />
-                                    <label for="nombreCliente">Cliente <span class="p-error">*</span></label>
-                                </span>
-                            </div>
+                                    <div class="form-group">
+                                        <div class="p-inputgroup">
+                                            <span class="p-inputgroup-addon">
+                                                <i class="pi pi-user"></i>
+                                            </span>
+                                            <span class="p-float-label">
+                                                <InputText id="nombreCliente" v-model="nombreCliente"
+                                                    :disabled="!nombreClienteEditable" class="w-full" />
+                                                <label for="nombreCliente">Nombre del cliente</label>
+                                            </span>
+                                        </div>
+                                    </div>
 
-                            <div class="p-col-12 p-md-4">
-                                <span class="p-float-label">
-                                    <Dropdown id="tipoComprobante" v-model="tipo_comprobante"
-                                        :options="tipoComprobanteOptions" optionLabel="name" optionValue="code" />
-                                    <label for="tipoComprobante">Tipo de comprobante <span
-                                            class="p-error">*</span></label>
-                                </span>
+                                    <div class="form-group">
+                                        <span class="p-float-label">
+                                            <Dropdown id="tipoComprobante" v-model="tipo_comprobante"
+                                                :options="tipoComprobanteOptions" optionLabel="name" optionValue="code"
+                                                class="w-full" />
+                                            <label for="tipoComprobante">Comprobante <span
+                                                    class="p-error">*</span></label>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-
+                        </template>
                         <InputText v-model="idcliente" type="hidden" />
                         <InputText v-model="tipo_documento" type="hidden" />
                         <InputText v-model="complemento_id" type="hidden" />
@@ -163,6 +196,7 @@
                     </div>
 
                     <div v-if="step === 2" class="step-content">
+                        <!-- Header Section -->
                         <div class="p-fluid p-grid">
                             <div class="p-col-12 p-md-6">
                                 <label class="p-d-block">Almacen <span class="p-error">*</span></label>
@@ -181,423 +215,444 @@
                             </div>
                         </div>
 
-                        <div v-if="arraySeleccionado && arraySeleccionado.id" class="p-grid">
-                            <div class="p-col-12">
-                                <Card>
+                        <!-- Product Details Section -->
+                        <div v-if="arraySeleccionado && Object.keys(arraySeleccionado).length > 0
+                        " class="p-mt-4">
+                            <template>
+                                <Card class="product-card">
                                     <template #content>
                                         <div class="p-grid">
-                                            <div class="p-col-12 p-md-4">
-                                                <h3>{{ arraySeleccionado.nombre }}</h3>
-                                                <Tag :value="'Medida: ' + arraySeleccionado.medida" class="p-mr-2" />
-                                                <Tag :value="'Línea: ' + arraySeleccionado.nombre_categoria" />
-                                                <img v-if="arraySeleccionado.fotografia"
-                                                    :src="'img/articulo/' + arraySeleccionado.fotografia + '?t=' + new Date().getTime()"
-                                                    width="150" height="150" class="p-mt-3" />
-                                                <img v-else src="img/productoSinImagen.png" alt="Imagen del Card"
-                                                    width="150" height="150" class="p-mt-3" />
-                                                <Message :severity="calcularStockDisponible > 0 ? 'success' : 'warn'"
-                                                    class="p-mt-3">
-                                                    <p>Stock disponible</p>
-                                                    <b>{{ calcularStockDisponible }} Unidades</b>
-                                                </Message>
+                                            <h2 class="product-title p-col-12 p-mb-3">
+                                                {{ arraySeleccionado.nombre }}
+                                            </h2>
+                                            <div class="p-col-12 p-md-6 p-lg-6">
+                                                <div class="product-image-container">
+                                                    <img :src="arraySeleccionado.fotografia
+                                                        ? `img/articulo/${arraySeleccionado.fotografia}?t=${new Date().getTime()}`
+                                                        : 'img/productoSinImagen.png'
+                                                        " :alt="arraySeleccionado.nombre" class="product-image" />
+                                                </div>
                                             </div>
-                                            <div class="p-col-12 p-md-8">
-                                                <div class="p-field">
-                                                    <label>Tipo de venta <span class="p-error">*</span></label>
-                                                    <Dropdown v-model="unidadPaquete" :options="[
-                                                        { label: 'Por paquete', value: arraySeleccionado.unidad_envase },
-                                                        { label: 'Por unidad', value: '1' }
-                                                    ]" optionLabel="label" optionValue="value" />
+                                            <div class="p-col-12 p-md-6 p-lg-6">
+                                                <div class="stock-info p-mb-3">
+                                                    <i :class="stockMostrado > 0 ? 'pi pi-check-circle' : 'pi pi-exclamation-triangle'"
+                                                        :style="{ color: stockMostrado > 0 ? 'var(--green-500)' : 'var(--yellow-500)' }"></i>
+                                                    <span>{{ stockMostrado > 0 ? "En stock" : "Bajo stock" }}</span>
+                                                    <strong>
+                                                        {{ stockMostrado }}
+                                                        {{ unidadPaquete === 'paquete' ? 'Paquetes' : 'Unidades' }}
+                                                        disponibles
+                                                    </strong>
                                                 </div>
-                                                <div class="p-field">
-                                                    <label>Cantidad <span class="p-error">*</span></label>
-                                                    <div class="p-inputgroup">
-                                                        <Button icon="pi pi-minus"
-                                                            @click="cantidad = Math.max(1, cantidad - 1)" />
-                                                        <InputNumber v-model="cantidad" :min="1" />
-                                                        <Button icon="pi pi-plus" @click="cantidad++" />
+                                                <div class="product-price-section">
+                                                    <h4 class="price-title">PRECIOS:</h4>
+                                                    <div class="product-price p-mb-4">
+                                                        <div v-for="(precio, key) in [
+                                                            { nombre: 'Precio Uno', valor: arraySeleccionado.precio_uno },
+                                                            { nombre: 'Precio Dos', valor: arraySeleccionado.precio_dos },
+                                                            { nombre: 'Precio Tres', valor: arraySeleccionado.precio_tres },
+                                                            { nombre: 'Precio Cuatro', valor: arraySeleccionado.precio_cuatro },
+                                                            { nombre: 'Precio Venta', valor: arraySeleccionado.precio_venta }
+                                                        ]" :key="key" class="precio-opcion"
+                                                            v-if="precio.valor !== '0.0000'">
+                                                            <input type="radio" :id="key" :value="precio.valor"
+                                                                v-model="precioSeleccionado"
+                                                                @change="seleccionarPrecio(precio.valor)">
+                                                            <label :for="key">
+                                                                {{ precio.nombre }}: {{ formatearPrecio(precio.valor) }}
+                                                            </label>
+                                                        </div>
                                                     </div>
+                                                    <h4>Precio:</h4>
+                                                    <h2 class="selected-price" v-if="precioSeleccionado">
+                                                        {{ formatearPrecio(precioSeleccionado) }}
+                                                    </h2>
+                                                    <h2 class="selected-price" v-else>
+                                                        Ningún precio seleccionado
+                                                    </h2>
                                                 </div>
-                                                <div class="p-field">
-                                                    <h3 v-if="arrayPromocion && arrayPromocion.id">
-                                                        <span v-if="arrayPromocion.porcentaje == 100">GRATIS</span>
-                                                        <span v-else>
-                                                            {{ (calcularPrecioConDescuento(resultadoMultiplicacion,
-                                                                arrayPromocion.porcentaje) *
-                                                                parseFloat(monedaVenta[0])).toFixed(2) }}
-                                                            {{ monedaVenta[1] }}
-                                                        </span>
-                                                        <small class="p-ml-2">
-                                                            <s>{{ calcularPrecioConDescuento(resultadoMultiplicacion *
-                                                                parseFloat(monedaVenta[0])).toFixed(2) }}
-                                                                {{ monedaVenta[1] }}
-                                                            </s>
-                                                        </small>
-                                                    </h3>
-                                                    <h3 v-else>
-                                                        {{ calcularPrecioConDescuento(resultadoMultiplicacion *
-                                                            parseFloat(monedaVenta[0])).toFixed(2) }}
-                                                        {{ monedaVenta[1] }}
-                                                    </h3>
-                                                </div>
-                                                <div class="p-field">
-                                                    <Button label="Agregar" icon="pi pi-plus" @click="agregarDetalle"
-                                                        class="p-mr-2" />
-                                                    <Button label="Eliminar" icon="pi pi-trash"
-                                                        @click="eliminarSeleccionado" class="p-button-danger" />
+                                                <div class="purchase-options">
+                                                    <div class="p-grid p-fluid">
+                                                        <div class="p-col-6">
+                                                            <div class="p-field">
+                                                                <label>Tipo de venta</label>
+                                                                <Dropdown v-model="unidadPaquete"
+                                                                    :options="tipoVentaOptions" optionLabel="label"
+                                                                    optionValue="value" class="w-full"
+                                                                    @change="actualizarVistaStock" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <div class="p-field">
+                                                                <label>Cantidad</label>
+                                                                <div class="p-inputgroup">
+                                                                    <InputNumber v-model="cantidad" :min="1" showButtons
+                                                                        buttonLayout="horizontal"
+                                                                        decrementButtonClass="p-button-danger"
+                                                                        incrementButtonClass="p-button-success"
+                                                                        incrementButtonIcon="pi pi-plus"
+                                                                        decrementButtonIcon="pi pi-minus" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="p-col-12">
+                                                            <div class="p-d-flex p-jc-center p-mt-3">
+                                                                <Button label="Agregar" icon="pi pi-shopping-cart"
+                                                                    @click="agregarDetalle"
+                                                                    class="p-button-success p-mr-2" />
+                                                                <Button label="Eliminar" icon="pi pi-trash"
+                                                                    @click="eliminarSeleccionado"
+                                                                    class="p-button-danger" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </template>
                                 </Card>
-                            </div>
+                            </template>
                         </div>
 
-                        <DataTable :value="arrayDetalle" class="p-mt-3">
-                            <Column header="Opciones" style="width: 10%">
-                                <template #body="slotProps">
-                                    <Button icon="pi pi-trash" class="p-button-danger p-button-sm"
-                                        @click="slotProps.data.medida != 'KIT' ? eliminarDetalle(slotProps.data.id) : eliminarKit(slotProps.data.idkit)" />
-                                </template>
-                            </Column>
-                            <Column field="articulo" header="Artículo" style="width: 30%" />
-                            <Column field="precioUnidad" header="Precio Unidad" style="width: 15%">
-                                <template #body="slotProps">
-                                    {{ (slotProps.data.precioseleccionado * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                        monedaVenta[1] }}
-                                </template>
-                            </Column>
-                            <Column field="unidades" header="Unidades" style="width: 15%">
-                                <template #body="slotProps">
-                                    <InputNumber v-model="slotProps.data.cantidad" :min="1"
-                                        @input="actualizarDetalle(slotProps.data.id)" />
-                                </template>
-                            </Column>
-                            <Column field="total" header="Total" style="width: 20%">
-                                <template #body="slotProps">
-                                    {{ (slotProps.data.precioseleccionado * slotProps.data.cantidad *
-                                        parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}
-                                </template>
-                            </Column>
-                        </DataTable>
+                        <!-- Cart Table -->
+                        <div class="p-mt-4">
+                            <DataTable :value="arrayDetalle" class="p-mt-3">
+                                <Column header="Opciones" style="width: 10%">
+                                    <template #body="slotProps">
+                                        <Button icon="pi pi-trash" class="p-button-danger p-button-sm" @click="
+                                            slotProps.data.medida != 'KIT'
+                                                ? eliminarDetalle(slotProps.data.id)
+                                                : eliminarKit(slotProps.data.idkit)
+                                            " />
+                                    </template>
+                                </Column>
+                                <Column field="articulo" header="Artículo" style="width: 30%" />
+                                <Column field="precioUnidad" header="Precio Unidad" style="width: 15%">
+                                    <template #body="slotProps">
+                                        {{
+                                            (
+                                                slotProps.data.precioseleccionado *
+                                                parseFloat(monedaVenta[0])
+                                            ).toFixed(2)
+                                        }}
+                                        {{ monedaVenta[1] }}
+                                    </template>
+                                </Column>
+                                <Column field="unidades" header="Unidades" style="width: 10%">
+                                    <template #body="slotProps">
+                                        <InputNumber v-model="slotProps.data.cantidad" :min="1" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                                            @input="actualizarDetalle(slotProps.data.id)" />
+                                    </template>
+                                </Column>
+                                <Column field="total" header="Total" style="width: 20%">
+                                    <template #body="slotProps">
+                                        {{
+                                            (
+                                                slotProps.data.precioseleccionado *
+                                                slotProps.data.cantidad *
+                                                parseFloat(monedaVenta[0])
+                                            ).toFixed(2)
+                                        }}
+                                        {{ monedaVenta[1] }}
+                                    </template>
+                                </Column>
+                            </DataTable>
+                        </div>
 
+                        <!-- Total Section -->
                         <div class="p-grid p-mt-3">
                             <div class="p-col-12 p-md-8"></div>
-                            <div class="p-col-12 p-md-4" style="text-align: right;">
-                                <h3>Total Neto: {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                    monedaVenta[1] }}</h3>
+                            <div class="p-col-12 p-md-4 p-text-right">
+                                <h3>
+                                    Total Neto:
+                                    {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                    {{ monedaVenta[1] }}
+                                </h3>
                             </div>
                         </div>
                     </div>
 
                     <div v-show="step === 3" class="step-content">
-                                <div class="d-flex justify-content-center mb-3">
-                                    <div class="form-group">
-                                        <div class="d-flex">
-                                            <button class="btn btn-lg me-3"
-                                                :class="{ 'btn-primary': tipoVenta === 'contado', 'btn-outline-primary': tipoVenta !== 'contado' }"
-                                                @click="seleccionarTipoVenta('contado')">
-                                                <div class="d-flex flex-column align-items-center">
-                                                    <i class="fa fa-money fa-2x mb-2"></i>
-                                                    <span>Contado</span>
-                                                </div>
-                                            </button>
-                                            <button class="btn btn-lg"
-                                                :class="{ 'btn-primary': tipoVenta === 'credito', 'btn-outline-primary': tipoVenta !== 'credito' }"
-                                                @click="seleccionarTipoVenta('credito')">
-                                                <div class="d-flex flex-column align-items-center">
-                                                    <i class="fa fa-credit-card fa-2x mb-2"></i>
-                                                    <span>Crédito</span>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    </div>
+                        <template>
+                            <div class="p-d-flex p-jc-center p-mb-3">
+                                <div v-if="!tipoVentaSeleccionado" class="p-d-flex">
+                                    <Button class="p-button-lg p-mr-3"
+                                        :class="{ 'p-button-primary': tipoVenta === 'contado', 'p-button-outlined': tipoVenta !== 'contado' }"
+                                        @click="seleccionarTipoVenta('contado')">
+                                        <template #default>
+                                            <div class="p-d-flex p-flex-column p-ai-center">
+                                                <i class="pi pi-money-bill p-mr-2" style="font-size: 2rem;"></i>
+                                            </div>
+                                            <span>Contado</span>
+                                        </template>
+                                    </Button>
+                                    <Button class="p-button-lg"
+                                        :class="{ 'p-button-primary': tipoVenta === 'credito', 'p-button-outlined': tipoVenta !== 'credito' }"
+                                        @click="seleccionarTipoVenta('credito')">
+                                        <template #default>
+                                            <div class="p-d-flex p-flex-column p-ai-center">
+                                                <i class="pi pi-credit-card p-mb-2" style="font-size: 2rem;"></i>
+                                            </div>
+                                            <span>Crédito</span>
+                                        </template>
+                                    </Button>
                                 </div>
-                                <div v-if="tipoVenta === 'contado'">
-                                    <!-- ... (existing cash and QR payment code) ... -->
-                                    <div class="d-flex justify-content-center mb-3">
-                                        <div class="form-group">
-                                            <div class="btn-group">
-                                                <button class="btn btn-primary" @click="opcionPago = 'efectivo'">
-                                                    <i class="fa fa-money mr-2" aria-hidden="true"></i>
-                                                    Efectivo
-                                                </button>
-                                                <button class="btn btn-primary" @click="opcionPago = 'qr'">
-                                                    <i class="fa fa-qrcode mr-2" aria-hidden="true"></i>
-                                                    QR
-                                                </button>
-                                            </div>
-                                        </div><br>
-                                        <div v-if="opcionPago === 'efectivo'">
-                                            <div class="row">
-                                                <div class="col-md-7">
-                                                    <div class="card">
-                                                        <div class="card-body">
-                                                            <form>
-                                                                <div class="form-group">
-                                                                    <label for="montoEfectivo"><i
-                                                                            class="fa fa-money mr-2"></i>
-                                                                        Monto
-                                                                        Recibido:</label>
-                                                                    <div class="input-group mb-3">
-                                                                        <div class="input-group-prepend">
-                                                                            <span class="input-group-text">{{
-                                                                                monedaVenta[1]
-                                                                            }}</span>
-                                                                        </div>
-                                                                        <input type="number" class="form-control"
-                                                                            id="montoEfectivo" v-model="recibido"
-                                                                            placeholder="Ingrese el monto recibido" />
-                                                                    </div>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="cambioRecibir"><i
-                                                                            class="fa fa-exchange mr-2"></i>
-                                                                        Cambio a
-                                                                        Entregar:</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="cambioRecibir"
-                                                                        placeholder="Se calculará automáticamente"
-                                                                        :value="recibido - calcularTotal * parseFloat(monedaVenta[0])"
-                                                                        readonly />
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <div class="card">
-                                                        <div class="card-body">
-                                                            <div class="mb-3">
-                                                                <h5 class="mb-0">Detalle de Venta</h5>
-                                                            </div>
-                                                            <div class="d-flex justify-content-between mb-2">
-                                                                <span><i class="fa fa-dollar mr-2"></i> Monto
-                                                                    Total:</span>
-                                                                <span class="font-weight-bold">{{ (calcularTotal *
-                                                                    parseFloat(monedaVenta[0])).toFixed(2)
-                                                                    }}
-                                                                    {{
-                                                                        monedaVenta[1] }}</span>
-                                                            </div>
-                                                            <div class="d-flex justify-content-between">
-                                                                <span><i class="fa fa-money mr-2"></i> Total a
-                                                                    Pagar:</span>
-                                                                <span class="font-weight-bold h5">{{ (calcularTotal *
-                                                                    parseFloat(monedaVenta[0])).toFixed(2)
-                                                                    }} {{
-                                                                        monedaVenta[1] }}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" @click="aplicarDescuento"
-                                                        class="btn btn-success btn-block">
-                                                        <i class="fa fa-check mr-2"></i> Registrar Pago
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div v-else-if="opcionPago === 'qr'">
-                                            <div class="container">
-                                                <div class="row justify-content-center">
-                                                    <div class="col-md-8">
-                                                        <div class="form-group">
-                                                            <input v-model="alias" readonly style="display: none;" />
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="montoEfectivo">Monto:</label>
-                                                            <span class="font-weight-bold">{{ montoEfectivo =
-                                                            (calcularTotal).toFixed(2) }}</span>
-                                                        </div>
-                                                        <button class="btn btn-primary mb-2" @click="generarQr">Generar
-                                                            QR</button>
-                                                        <div v-if="qrImage" class="mb-2 text-center">
-                                                            <img :src="qrImage" alt="Código QR" class="img-fluid" />
-                                                        </div>
-                                                        <button class="btn btn-secondary mb-2" @click="verificarEstado"
-                                                            v-if="qrImage">Verificar
-                                                            Estado
-                                                            de
-                                                            Pago</button>
-                                                        <div v-if="estadoTransaccion" class="card p-2">
-                                                            <div class="font-weight-bold">Estado Actual:</div>
-                                                            <div>
-                                                                <span :class="'badge badge-' + badgeSeverity">{{
-                                                                    estadoTransaccion.objeto.estadoActual
-                                                                }}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" @click="registrarVenta(7)"
-                                                        class="btn btn-success btn-block">
-                                                        <i class="fa fa-check mr-2"></i> Registrar Pago
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div v-else class="p-d-flex p-ai-center">
+                                    <i :class="tipoVenta === 'contado' ? 'pi pi-money-bill' : 'pi pi-credit-card'"
+                                        class="p-mr-2" style="font-size: 2rem;"></i>
+                                    <span class="p-text-bold">{{ tipoVenta === 'contado' ? 'Contado' : 'Crédito'
+                                        }}</span>
+                                </div>
+                            </div>
+                        </template>
+                        <template>
+  <div v-if="tipoVenta === 'contado'" class="payment-options">
+    <TabView class="custom-tabview">
+      <TabPanel header="Efectivo">
+        <div class="p-grid p-fluid">
+          <div class="p-col-12 p-md-7">
+            <Card>
+              <template #content>
+                <div class="p-fluid">
+                  <div class="p-field">
+                    <label for="montoEfectivo"><i class="pi pi-money-bill p-mr-2" /> Monto Recibido:</label>
+                    <div class="p-inputgroup">
+                      <span class="p-inputgroup-addon">{{ monedaVenta[1] }}</span>
+                      <InputNumber id="montoEfectivo" v-model="recibido" placeholder="Ingrese el monto recibido" />
+                    </div>
+                  </div>
+                  <div class="p-field">
+                    <label for="cambioRecibir"><i class="pi pi-sync p-mr-2" /> Cambio a Entregar:</label>
+                    <InputText id="cambioRecibir" :value="(recibido - calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)" readonly />
+                  </div>
+                </div>
+              </template>
+            </Card>
+          </div>
+          <div class="p-col-12 p-md-5">
+            <Card>
+              <template #content>
+                <h5>Detalle de Venta</h5>
+                <div class="p-d-flex p-jc-between p-mb-2">
+                  <span><i class="pi pi-dollar p-mr-2" /> Monto Total:</span>
+                  <span class="p-text-bold">{{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}</span>
+                </div>
+                <div class="p-d-flex p-jc-between">
+                  <span><i class="pi pi-money-bill p-mr-2" /> Total a Pagar:</span>
+                  <span class="p-text-bold p-text-xl">{{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1] }}</span>
+                </div>
+              </template>
+            </Card>
+            <Button label="Registrar Pago" icon="pi pi-check" class="p-button-success p-mt-2 p-button-lg p-button-raised" @click="aplicarDescuento" />
+          </div>
+        </div>
+      </TabPanel>
+      
+      <TabPanel header="QR">
+        <div class="p-grid p-fluid">
+          <div class="p-col-12 p-md-8 p-lg-6 p-mx-auto">
+            <Card>
+              <template #content>
+                <div class="form-group">
+                  <input v-model="alias" readonly style="display: none" />
+                </div>
+                <div class="form-group">
+                  <label for="montoEfectivo">Monto:</label>
+                  <span class="font-weight-bold">{{ (montoEfectivo = calcularTotal.toFixed(2)) }}</span>
+                </div>
+                <Button label="Generar QR" icon="pi pi-qrcode" class="p-button-primary p-mb-2" @click="generarQr" />
+                <div v-if="qrImage" class="p-mb-2 p-text-center">
+                  <img :src="qrImage" alt="Código QR" class="p-mx-auto" style="max-width: 100%; height: auto;" />
+                </div>
+                <Button label="Verificar Estado de Pago" icon="pi pi-check-circle" class="p-button-secondary p-mb-2" @click="verificarEstado" v-if="qrImage" />
+                <div v-if="estadoTransaccion" class="p-card p-2">
+                  <div class="font-weight-bold">Estado Actual:</div>
+                  <div>
+                    <span :class="'p-tag p-tag-' + badgeSeverity">{{ estadoTransaccion.objeto.estadoActual }}</span>
+                  </div>
+                </div>
+              </template>
+            </Card>
+            <Button @click="registrarVenta(7)" label="Registrar Pago" icon="pi pi-check" class="p-button-success p-mt-2 p-button-lg p-button-raised" />
+          </div>
+        </div>
+      </TabPanel>
+    </TabView>
+  </div>
+</template>
+
+                        <div v-if="tipoVenta === 'credito'">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <label for="numeroCuotas" class="font-weight-bold">Cantidad de cuotas <span
+                                            class="p-error">*</span></label>
+                                    <InputNumber id="numeroCuotas" v-model="numero_cuotas" :useGrouping="false" />
+                                </div>
+
+                                <div class="p-col-4">
+                                    <label for="tiempoDias" class="font-weight-bold">Frecuencia de Pagos <span
+                                            class="p-error">*</span></label>
+                                    <div class="p-inputgroup">
+                                        <InputNumber id="tiempoDias" v-model="tiempo_diaz" :useGrouping="false" />
+                                        <span class="p-inputgroup-addon">Dias</span>
                                     </div>
                                 </div>
 
-                                <div v-else-if="tipoVenta === 'credito'">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label for="" class="font-weight-bold">Cantidad de cuotas
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <input type="number" id="numeroCuotas" class="form-control"
-                                                v-model="numero_cuotas">
+                                <div class="p-col-4">
+                                    <div class="p-field">
+                                        <label class="font-weight-bold">Total</label>
+                                        <div>
+                                            {{
+                                                (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)
+                                            }}
+                                            {{ monedaVenta[1] }}
                                         </div>
-
-                                        <div class="col-md-4">
-                                            <label for="" class="font-weight-bold">Frecuencia de Pagos
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <div class="input-group mb-3">
-                                                <input type="number" class="form-control" v-model="tiempo_diaz">
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text">Dias</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label class="font-weight-bold">Total</label>
-                                                <label>
-                                                    {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                                        monedaVenta[1] }}
-                                                </label>
-                                                <button @click="generarCuotas" type="button"
-                                                    class="btn btn-success">GENERAR CUOTAS</button>
-                                            </div>
-                                        </div>
+                                        <Button label="GENERAR CUOTAS" @click="generarCuotas"
+                                            class="p-button-success" />
                                     </div>
-
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" v-model="primera_cuota">
-                                        <label class="form-check-label" for="defaultCheck1">
-                                            Primera cuota pagada
-                                        </label>
-                                    </div>
-
-                                    <div class="row" v-if="primera_cuota">
-                                        <div class="col-md-5 form-group">
-                                            <label class="font-weight-bold">Monto a pagar</label>
-                                            <input type="number" class="form-control" v-model="primer_precio_cuota">
-                                        </div>
-                                        <div class="col-md-5 form-group">
-                                            <label class="font-weight-bold" for="select-input">Tipo de Pago</label>
-                                            <select class="form-control" id="select-input" v-model="tipo_pago"
-                                                @change="seleccionarTipoPago(tipo_pago)">
-                                                <option v-for="(value, key) in tiposPago" :value="value">{{ key }}
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <!-- Cuotas table -->
-                                    <div class="form-group row border">
-                                        <div class="table-responsive col-md-12">
-                                            <table class="table table-bordered table-striped table-sm">
-                                                <thead>
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>Fecha Pago</th>
-                                                        <th>Precio Cuota</th>
-                                                        <th>Total Cancelado</th>
-                                                        <th>Saldo</th>
-                                                        <th>Fecha Cancelado</th>
-                                                        <th>Estado</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="(cuota, index) in cuotas" :key="index">
-                                                        <td>{{ index + 1 }}</td>
-                                                        <td>{{ new Date(cuota.fecha_pago).toLocaleDateString('es-ES') }}
-                                                        </td>
-                                                        <td>{{ (cuota.precio_cuota *
-                                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
-                                                            }}</td>
-                                                        <td>{{ (cuota.totalCancelado *
-                                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
-                                                            }}</td>
-                                                        <td>{{ (cuota.saldo_restante *
-                                                            parseFloat(monedaVenta[0])).toFixed(2) }} {{ monedaVenta[1]
-                                                            }}</td>
-                                                        <td>{{ cuota.fecha_cancelado ? new
-                                                            Date(cuota.fecha_cancelado).toLocaleDateString('es-ES') :
-                                                            "Sin fecha" }}</td>
-                                                        <td>{{ cuota.estado }}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        @click="cerrarModal3()">Volver</button>
-                                    <button type="button" class="btn btn-primary"
-                                        @click="registrarVenta()">Registrar</button>
                                 </div>
-
-                                </div>
-                             
-
                             </div>
 
-                            <div class="buttons d-flex justify-content-center">
-                                <button class="btn btn-primary mr-2" @click="prevStep"
-                                    :disabled="step === 1">Anterior</button>
-                                <button class="btn btn-primary" @click="validarYAvanzar"
-                                    :disabled="step === 3">Siguiente</button>
+                            <div class="p-field-checkbox">
+                                <Checkbox v-model="primera_cuota" :binary="true" id="primera_cuota" />
+                                <label for="primera_cuota">Primera cuota pagada</label>
+                            </div>
+
+                            <div v-if="primera_cuota" class="p-grid">
+                                <div class="p-col-6">
+                                    <label class="font-weight-bold">Monto a pagar</label>
+                                    <InputNumber v-model="primer_precio_cuota" :useGrouping="false" />
+                                </div>
+                                <div class="p-col-6">
+                                    <label class="font-weight-bold" for="tipo_pago">Tipo de Pago</label>
+                                    <Dropdown id="tipo_pago" v-model="tipo_pago" :options="tiposPagoOptions"
+                                        optionLabel="label" optionValue="value"
+                                        @change="seleccionarTipoPago($event.value)" />
+                                </div>
+                            </div>
+
+                            <DataTable :value="cuotas" class="p-mt-4" :paginator="true" :rows="10"
+                                responsiveLayout="scroll">
+                                <Column field="index" header="#">
+                                    <template #body="slotProps">
+                                        {{ slotProps.index + 1 }}
+                                    </template>
+                                </Column>
+                                <Column field="fecha_pago" header="Fecha Pago">
+                                    <template #body="slotProps">
+                                        {{
+                                            new Date(slotProps.data.fecha_pago).toLocaleDateString(
+                                                "es-ES"
+                                            )
+                                        }}
+                                    </template>
+                                </Column>
+                                <Column field="precio_cuota" header="Precio Cuota">
+                                    <template #body="slotProps">
+                                        {{
+                                            (
+                                                slotProps.data.precio_cuota * parseFloat(monedaVenta[0])
+                                            ).toFixed(2)
+                                        }}
+                                        {{ monedaVenta[1] }}
+                                    </template>
+                                </Column>
+                                <Column field="totalCancelado" header="Total Cancelado">
+                                    <template #body="slotProps">
+                                        {{
+                                            (
+                                                slotProps.data.totalCancelado *
+                                                parseFloat(monedaVenta[0])
+                                            ).toFixed(2)
+                                        }}
+                                        {{ monedaVenta[1] }}
+                                    </template>
+                                </Column>
+                                <Column field="saldo_restante" header="Saldo">
+                                    <template #body="slotProps">
+                                        {{
+                                            (
+                                                slotProps.data.saldo_restante *
+                                                parseFloat(monedaVenta[0])
+                                            ).toFixed(2)
+                                        }}
+                                        {{ monedaVenta[1] }}
+                                    </template>
+                                </Column>
+                                <Column field="fecha_cancelado" header="Fecha Cancelado">
+                                    <template #body="slotProps">
+                                        {{
+                                            slotProps.data.fecha_cancelado
+                                                ? new Date(
+                                                    slotProps.data.fecha_cancelado
+                                                ).toLocaleDateString("es-ES")
+                                                : "Sin fecha"
+                                        }}
+                                    </template>
+                                </Column>
+                                <Column field="estado" header="Estado" />
+                            </DataTable>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" @click="cerrarModal3()">
+                                    Volver
+                                </button>
+                                <button type="button" class="btn btn-primary" @click="registrarVenta()">
+                                    Registrar
+                                </button>
                             </div>
                         </div>
-                    
-               
-              
-        
-             </Dialog>
-            
+                    </div>
+
+                    <template>
+                        <footer class="footer d-flex justify-content-center gap-2">
+                            <Button @click="prevStep" :disabled="step === 1" class="p-button-primary"
+                                icon="pi pi-chevron-left" iconPos="left" label="Anterior" :style="{ width: '150px' }" />
+                            <Button @click="validarYAvanzar" :disabled="step === 3" class="p-button-primary"
+                                icon="pi pi-chevron-right" iconPos="right" label="Siguiente"
+                                :style="{ width: '150px' }" />
+                        </footer>
+                    </template>
+
+                </div>
+            </Dialog>
         </template>
-        
+
         <template>
-            <Dialog :visible="modal" :containerStyle="{ width: '800px' }" style="padding-top: 35px;" :modal="true"
-                :closable="false">
+            <Dialog :visible.sync="modal" :containerStyle="{ width: '100%', maxWidth: '800px', paddingTop: '35px' }"
+                modal closable>
                 <template #header>
                     <h3>{{ tituloModal }}</h3>
                 </template>
 
                 <TabView>
                     <TabPanel header="Articulos">
-                        <div class="p-grid">
-                            <div class="p-col-6">
-                                <div class="p-inputgroup">
-                                    <Dropdown v-model="criterioA" :options="criterioOptions" optionLabel="label"
-                                        optionValue="value" class="p-col-4" />
-                                    <InputText v-model="buscarA" placeholder="Texto a buscar"
-                                        @input="listarArticulo(buscarA, criterioA)" class="p-col-8" />
-                                </div>
+                        <div class="grid">
+                            <div class="col-12 md:col-6 lg:col-6">
+                                <span class="p-input-icon-left w-full">
+                                    <i class="pi pi-search" />
+                                    <InputText v-model="buscarA" placeholder="Buscar por código o nombre"
+                                        @input="listarArticulo" class="w-full" />
+                                </span>
                             </div>
                         </div>
-
-                        <DataTable :value="arrayArticulo" :paginator="true" :rows="10" class="p-mt-2">
-                            <Column header="Opciones">
+                        <DataTable :value="arrayArticulo" :paginator="true" :rows="10" class="p-datatable-sm moto-table"
+                            @row-select="onRowSelect" selectionMode="single" responsiveLayout="scroll"
+                            :selection="selectedArticulo" breakpoint="960px">
+                            <Column field="codigo" header="Código" :class="'sm:table-cell'" />
+                            <Column field="nombre" header="Nombre" :class="'sm:table-cell'" />
+                            <Column field="nombre_categoria" header="Categoría" :class="'hidden sm:table-cell'" />
+                            <Column header="Precio Venta" :class="'hidden sm:table-cell'">
                                 <template #body="slotProps">
-                                    <Button icon="pi pi-check" class="p-button-success p-button-sm"
-                                        @click="agregarDetalleModal(slotProps.data)" />
+                                    {{ (slotProps.data.precio_venta * parseFloat(monedaVenta[0])).toFixed(2) }}
+                                    {{ monedaVenta[1] }}
                                 </template>
                             </Column>
-                            <Column field="codigo" header="Código" />
-                            <Column field="nombre" header="Nombre" />
-                            <Column field="nombre_categoria" header="Categoría" />
-                            <Column header="Precio Venta">
-                                <template #body="slotProps">
-                                    {{ (slotProps.data.precio_venta * parseFloat(monedaVenta[0])).toFixed(2) }} {{
-                                        monedaVenta[1] }}
-                                </template>
-                            </Column>
-                            <Column field="saldo_stock" header="Stock" />
-                            <Column header="Estado">
+                            <Column field="saldo_stock" header="Stock" :class="'sm:table-cell'" />
+                            <Column header="Estado" :class="'hidden sm:table-cell'">
                                 <template #body="slotProps">
                                     <Tag :severity="slotProps.data.condicion ? 'success' : 'danger'"
                                         :value="slotProps.data.condicion ? 'Activo' : 'Desactivado'" />
@@ -606,34 +661,36 @@
                         </DataTable>
                     </TabPanel>
                 </TabView>
-
-                <template #footer>
-                    <Button label="Cerrar" icon="pi pi-times" @click="cerrarModal" class="p-button-secondary" />
-                    <Button v-if="tipoAccion === 1" label="Guardar" icon="pi pi-check" @click="registrarPersona" />
-                    <Button v-if="tipoAccion === 2" label="Actualizar" icon="pi pi-check" @click="actualizarPersona" />
-                </template>
             </Dialog>
         </template>
+
     </main>
 </template>
 
 <script>
-import Dropdown from 'primevue/dropdown';
-import Swal from 'sweetalert2';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Paginator from 'primevue/paginator';
-import Card from 'primevue/card';
-import InputText from 'primevue/inputtext';
-import Button from 'primevue/button';
-import Panel from 'primevue/panel';
-import Steps from 'primevue/steps';
-import Dialog from 'primevue/dialog';
-import Message from 'primevue/message';
-import Tag from 'primevue/tag';
-import SelectButton from 'primevue/selectbutton';
+import Button from "primevue/button";
+import Card from "primevue/card";
+import Checkbox from "primevue/checkbox";
+import Column from "primevue/column";
+import DataTable from "primevue/datatable";
+import Dialog from "primevue/dialog";
+import Dropdown from "primevue/dropdown";
+import InputNumber from "primevue/inputnumber";
+import InputText from "primevue/inputtext";
+import Message from "primevue/message";
+import Paginator from "primevue/paginator";
+import Panel from "primevue/panel";
+import SelectButton from "primevue/selectbutton";
+import Steps from "primevue/steps";
+import Tag from "primevue/tag";
+import Swal from "sweetalert2";
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+import Toast from 'primevue/toast';
 
 export default {
+
+
     components: {
         Dropdown,
         DataTable,
@@ -649,42 +706,56 @@ export default {
         Dialog,
         Tag,
         SelectButton,
+        InputNumber,
+        Checkbox,
+        TabView,
+        TabPanel,
+        Toast,
     },
     data() {
         return {
+            tipoVentaSeleccionado: false,
+            precioSeleccionado: null,
+            searchTerm: '',
+            selectedArticulo: null,
+            debounceTimeout: null,
+            tiposPagoOptions: [
+                { label: "Efectivo", value: "efectivo" },
+                { label: "Tarjeta", value: "tarjeta" },
+                { label: "Transferencia", value: "transferencia" },
+            ],
+            detalles: [],
             opcionesPago: [
-        { label: 'Efectivo', value: 'efectivo' },
-        { label: 'QR', value: 'qr' }
-      ],
-      criterioOptions: [
-        { label: 'Nombre', value: 'nombre' },
-        { label: 'Descripción', value: 'descripcion' },
-        { label: 'Código', value: 'codigo' }
-      ],
-      isDialogVisible: false,
-      tipoComprobanteOptions: [
-        { name: 'RECIBO', code: 'RESIVO' }
-      ],
-      opcionPago: '',
-      tipoVenta: '',
-      mostrarSpinner: false,
-      selectedAlmacen: null,
-      idrol: null,
-      step: 1,
-      modal2: false,
-      modal: false,
-      zIndexBase: 1050,
+                { label: "Efectivo", value: "efectivo" },
+                { label: "QR", value: "qr" },
+            ],
+            criterioOptions: [
+                { label: "Nombre", value: "nombre" },
+                { label: "Descripción", value: "descripcion" },
+                { label: "Código", value: "codigo" },
+            ],
+            isDialogVisible: false,
+            tipoComprobanteOptions: [{ name: "RECIBO", code: "RESIVO" }],
+            opcionPago: "",
+            tipoVenta: "",
+            mostrarSpinner: false,
+            selectedAlmacen: null,
+            idrol: null,
+            step: 1,
+            modal2: false,
+            modal: false,
+            zIndexBase: 1050,
             //qr
-            alias: '',
+            alias: "",
             montoQR: 0,
-            qrImage: '',
-            aliasverificacion: '',
+            qrImage: "",
+            aliasverificacion: "",
             estadoTransaccion: null,
-            currency: 'BOB', // Define tu moneda
+            currency: "BOB", // Define tu moneda
             resivo: "",
             clienteDeudas: 0,
             arrayCuotas: [],
-            arraySeleccionado: [],
+            arraySeleccionado: null,
             cuotaSeleccionada: null,
             modalCuotas: 0,
 
@@ -704,10 +775,10 @@ export default {
             arrayArticulosPE: [],
 
             arrayPromocion: [],
-            unidadPaquete: 1,
+            unidadPaquete: '1',  // Por defecto, establecido a '1' para venta por unidad
             tipoVentaOptions: [
-                { label: 'Por paquete', value: 1 },
-                { label: 'Por unidad', value: 0 }
+                { label: "Por unidad", value: '1' },
+                { label: "Por paquete", value: 'paquete' }
             ],
 
             monedaVenta: [],
@@ -755,7 +826,6 @@ export default {
             criterioA: "",
             buscarA: "",
             arrayArticulo: [],
-            arraySeleccionado: [],
 
             idarticulo: 0,
             codigo: "",
@@ -839,13 +909,34 @@ export default {
             this.mostrarCampoCorreo =
                 newDocumento === "99002" || newDocumento === "99003";
         },
+        arraySeleccionado: {
+            handler() {
+                this.fetchDetalles();
+            },
+            deep: true,
+        },
     },
     computed: {
         calcularStockDisponible() {
-            return this.unidadPaquete == 1
-                ? this.arraySeleccionado.saldo_stock - this.cantidad
-                : this.arraySeleccionado.saldo_stock / this.arraySeleccionado.unidad_envase - this.cantidad;
+            if (!this.arraySeleccionado) return 0;
+
+            const stockTotal = parseInt(this.arraySeleccionado.saldo_stock);
+            const unidadEnvase = parseInt(this.arraySeleccionado.unidad_envase);
+
+            if (this.unidadPaquete === 'paquete') {
+                return Math.floor(stockTotal / unidadEnvase);
+            } else {
+                return stockTotal;
+            }
         },
+        stockMostrado() {
+            const stockDisponible = this.calcularStockDisponible;
+            const cantidadSolicitada = this.unidadPaquete === 'paquete'
+                ? this.cantidad
+                : this.cantidad / this.arraySeleccionado.unidad_envase;
+            return Math.floor(Math.max(0, stockDisponible - cantidadSolicitada));
+        },
+
 
         resultadoMultiplicacion() {
             if (this.arraySeleccionado) {
@@ -896,26 +987,119 @@ export default {
             return resultado;
         },
 
-
         badgeSeverity() {
-            if (this.estadoTransaccion && this.estadoTransaccion.objeto.estadoActual === 'PENDIENTE') {
-                return 'danger'; // Rojo para estado PENDIENTE
-            } else if (this.estadoTransaccion && this.estadoTransaccion.objeto.estadoActual === 'PAGADO') {
-                return 'success'; // Verde para estado PAGADO
+            if (
+                this.estadoTransaccion &&
+                this.estadoTransaccion.objeto.estadoActual === "PENDIENTE"
+            ) {
+                return "danger"; // Rojo para estado PENDIENTE
+            } else if (
+                this.estadoTransaccion &&
+                this.estadoTransaccion.objeto.estadoActual === "PAGADO"
+            ) {
+                return "success"; // Verde para estado PAGADO
             } else {
-                return 'info'; // Otros estados
+                return "info"; // Otros estados
             }
-        }
+        },
     },
 
     methods: {
+        seleccionarTipoVenta(tipo) {
+            this.tipoVenta = tipo;
+            this.tipoVentaSeleccionado = true;
+        },
+        actualizarVistaStock() {
+            // Forzar la actualización de la vista
+            this.$forceUpdate();
+        },
+        encuentra(id) {
+            return this.arrayDetalle.some(item => item.idarticulo === id);
+        },
+        seleccionarPrecio(precio) {
+            this.precioSeleccionado = precio;
+        },
+        formatearPrecio(precio) {
+            // Asegúrate de que esta función esté definida y funcione correctamente
+            return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(precio);
+        },
+        onRowSelect(event) {
+            this.agregarDetalleModal(event.data);
+        },
+        debouncedSearch() {
+            clearTimeout(this.debounceTimeout);
+            this.debounceTimeout = setTimeout(() => {
+                this.performSearch();
+            }, 300); // Espera 300ms después de que el usuario deje de escribir
+        },
+        performSearch() {
+            if (this.searchTerm.length < 2) {
+                this.arrayArticulo = [];
+                return;
+            }
 
+            const url = `/articulo/listarArticuloVenta?buscar=${this.searchTerm}&idAlmacen=${this.idAlmacen}`;
+
+            axios.get(url)
+                .then(response => {
+                    this.arrayArticulo = response.data.articulos;
+            
+                })
+                .catch(error => {
+                    console.error("Error en la búsqueda:", error);
+                    this.arrayArticulo = [];
+                });
+        },
+
+        decrementarCantidad() {
+            this.cantidad = Math.max(1, this.cantidad - 1);
+        },
+        incrementarCantidad() {
+            this.cantidad++;
+        },
+        formatearPrecio(precio) {
+            // Verificar si precio es null o undefined
+            if (precio == null) {
+                return "N/A";
+            }
+
+            // Convertir precio a número si es una cadena
+            let precioNumerico =
+                typeof precio === "string" ? parseFloat(precio) : precio;
+
+            // Verificar si es un número válido
+            if (isNaN(precioNumerico)) {
+                return "N/A";
+            }
+
+            // Formatear el precio
+            return `${precioNumerico.toFixed(2)} ${this.monedaVenta[1]}`;
+        },
+        fetchDetalles() {
+            if (this.arraySeleccionado && this.arraySeleccionado.id) {
+                axios
+                    .get("/venta/obtenerDetalles", {
+                        params: {
+                            id: this.arraySeleccionado.id,
+                        },
+                    })
+                    .then((response) => {
+                        this.detalles = response.data.detalles;
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching details:", error);
+                    });
+            }
+        },
         generarCuotas() {
             this.cuotas = [];
             const fechaHoy = new Date();
 
             const montoEntero = Math.floor(this.calcularTotal / this.numero_cuotas);
-            const montoDecimal = (this.calcularTotal - montoEntero * (this.numero_cuotas - 1)).toFixed(2);
+            const montoDecimal = (
+                this.calcularTotal -
+                montoEntero * (this.numero_cuotas - 1)
+            ).toFixed(2);
 
             let fechaInicioPago;
             let saldoRestante;
@@ -925,7 +1109,7 @@ export default {
                 const primerPago = Number(this.primer_precio_cuota) || 0;
                 fechaInicioPago = fechaHoy;
                 saldoRestante = (this.calcularTotal - primerPago).toFixed(2);
-                estadoCuota = 'Pagado';
+                estadoCuota = "Pagado";
 
                 const primeraCuota = {
                     fecha_pago: `${fechaHoy.getFullYear()}-${fechaHoy.getMonth() + 1}-${fechaHoy.getDate()} ${fechaHoy.toLocaleTimeString()}`,
@@ -933,32 +1117,45 @@ export default {
                     totalCancelado: primerPago.toFixed(2),
                     saldo_restante: saldoRestante,
                     fecha_cancelado: `${fechaHoy.getFullYear()}-${fechaHoy.getMonth() + 1}-${fechaHoy.getDate()} ${fechaHoy.toLocaleTimeString()}`,
-                    estado: 'Pagado',
+                    estado: "Pagado",
                 };
 
                 this.cuotas.push(primeraCuota);
 
                 const montoRestante = this.calcularTotal - primerPago;
-                const montoEnteroRestante = Math.floor(montoRestante / (this.numero_cuotas - 1));
-                const montoDecimalRestante = (montoRestante - montoEnteroRestante * (this.numero_cuotas - 2)).toFixed(2);
+                const montoEnteroRestante = Math.floor(
+                    montoRestante / (this.numero_cuotas - 1)
+                );
+                const montoDecimalRestante = (
+                    montoRestante -
+                    montoEnteroRestante * (this.numero_cuotas - 2)
+                ).toFixed(2);
 
                 saldoRestante = montoRestante;
-                fechaInicioPago = new Date(fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000);
-                estadoCuota = 'Pendiente';
+                fechaInicioPago = new Date(
+                    fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000
+                );
+                estadoCuota = "Pendiente";
 
                 for (let i = 1; i < this.numero_cuotas; i++) {
-                    const fechaPago = new Date(fechaInicioPago.getTime() + (i - 1) * this.tiempo_diaz * 24 * 60 * 60 * 1000);
+                    const fechaPago = new Date(
+                        fechaInicioPago.getTime() +
+                        (i - 1) * this.tiempo_diaz * 24 * 60 * 60 * 1000
+                    );
                     const dia = fechaPago.getDate();
                     const mes = fechaPago.getMonth() + 1;
                     const año = fechaPago.getFullYear();
 
                     const cuota = {
                         fecha_pago: `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}`,
-                        precio_cuota: i === this.numero_cuotas - 1 ? parseFloat(montoDecimalRestante).toFixed(2) : montoEnteroRestante,
+                        precio_cuota:
+                            i === this.numero_cuotas - 1
+                                ? parseFloat(montoDecimalRestante).toFixed(2)
+                                : montoEnteroRestante,
                         totalCancelado: 0,
                         saldo_restante: saldoRestante,
                         fecha_cancelado: null,
-                        estado: 'Pendiente',
+                        estado: "Pendiente",
                     };
 
                     saldoRestante -= cuota.precio_cuota;
@@ -967,23 +1164,31 @@ export default {
                     this.cuotas.push(cuota);
                 }
             } else {
-                fechaInicioPago = new Date(fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000);
+                fechaInicioPago = new Date(
+                    fechaHoy.getTime() + this.tiempo_diaz * 24 * 60 * 60 * 1000
+                );
                 saldoRestante = this.calcularTotal;
-                estadoCuota = 'Pendiente';
+                estadoCuota = "Pendiente";
 
                 for (let i = 0; i < this.numero_cuotas; i++) {
-                    const fechaPago = new Date(fechaInicioPago.getTime() + i * this.tiempo_diaz * 24 * 60 * 60 * 1000);
+                    const fechaPago = new Date(
+                        fechaInicioPago.getTime() +
+                        i * this.tiempo_diaz * 24 * 60 * 60 * 1000
+                    );
                     const dia = fechaPago.getDate();
                     const mes = fechaPago.getMonth() + 1;
                     const año = fechaPago.getFullYear();
 
                     const cuota = {
                         fecha_pago: `${año}-${mes}-${dia} ${fechaPago.toLocaleTimeString()}`,
-                        precio_cuota: i === this.numero_cuotas - 1 ? parseFloat(montoDecimal).toFixed(2) : montoEntero,
+                        precio_cuota:
+                            i === this.numero_cuotas - 1
+                                ? parseFloat(montoDecimal).toFixed(2)
+                                : montoEntero,
                         totalCancelado: 0,
                         saldo_restante: saldoRestante,
                         fecha_cancelado: null,
-                        estado: 'Pendiente',
+                        estado: "Pendiente",
                     };
 
                     saldoRestante -= cuota.precio_cuota;
@@ -995,8 +1200,8 @@ export default {
         },
         seleccionarTipoVenta(tipo) {
             this.tipoVenta = tipo;
-            this.idtipo_venta = tipo === 'contado' ? 1 : 2;
-            this.opcionPago = ''; // Reinicia la opción de pago al cambiar el tipo de venta
+            this.idtipo_venta = tipo === "contado" ? 1 : 2;
+            this.opcionPago = ""; // Reinicia la opción de pago al cambiar el tipo de venta
         },
         buscarVenta() {
             this.listarVenta(1, this.buscar);
@@ -1006,17 +1211,22 @@ export default {
             const errores = [];
 
             if (this.step === 2) {
-                if (!this.idAlmacen) errores.push('Seleccione un almacén');
+                if (!this.selectedAlmacen) {
+                    errores.push("Seleccione un almacén");
+                }
+
+                if (this.arrayDetalle.length === 0) {
+                    errores.push("Añada al menos un artículo a la tabla");
+                }
             }
 
             if (errores.length > 0) {
-                const mensaje = errores.join('\n');
-                swal('Campos incompletos', mensaje, 'warning');
+                const mensaje = errores.join("\n");
+                swal("Campos incompletos", mensaje, "warning");
             } else {
                 this.nextStep();
             }
         },
-
         cerrarModal2() {
             this.modal2 = false;
         },
@@ -1036,35 +1246,36 @@ export default {
             this.alias = now.toLocaleString();
         },
         verificarEstado() {
-            axios.post('/qr/verificarestado', {
-                alias: this.aliasverificacion,
-            })
-                .then(response => {
+            axios
+                .post("/qr/verificarestado", {
+                    alias: this.aliasverificacion,
+                })
+                .then((response) => {
                     this.estadoTransaccion = response.data;
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error(error);
                 });
         },
 
         generarQr() {
             this.aliasverificacion = this.alias;
-            axios.post('/qr/generarqr', {
-                alias: this.alias,
-                monto: this.calcularTotal
-            })
-                .then(response => {
+            axios
+                .post("/qr/generarqr", {
+                    alias: this.alias,
+                    monto: this.calcularTotal,
+                })
+                .then((response) => {
                     const imagenBase64 = response.data.objeto.imagenQr;
                     this.qrImage = `data:image/png;base64,${imagenBase64}`;
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error(error);
                 });
 
-            this.alias = '';
+            this.alias = "";
             this.montoQR = 0;
         },
-
 
         calcularPrecioUnitario(articulo) {
             // Lógica para calcular el precio unitario según el rango total de cantidades
@@ -1113,342 +1324,15 @@ export default {
                 this.modal2 = true;
                 this.cliente = this.nombreCliente;
                 this.tipoAccion2 = 1;
-                this.scrollToTop();
+              
             }
         },
 
         seleccionarTipoPago(tipo) {
-            console.log("TIPO PAGO ", tipo)
+            console.log("TIPO PAGO ", tipo);
             this.tipoPago = tipo;
             this.tituloModal2 = `TIPO DE PAGO : ${tipo}`;
             this.idtipo_pago = this.tiposPago[tipo];
-        },
-
-        agregarKit(kit) {
-            if (new Date(kit.fecha_final) < new Date()) {
-                swal({
-                    type: "error",
-                    title: "Error...",
-                    text: "Este kit ha expirado!",
-                });
-                return;
-            }
-            //   this.GetValidateKit(kit['id'])
-            this.GetValidateKit(kit["id"])
-                .then(() => {
-                    if (this.mensajesKit.length == 0) {
-                        const totalKit = this.arrayArticulosKit.reduce(
-                            (total, producto) => {
-                                return total + producto.cantidad * producto.precio_costo_unid;
-                            },
-                            0
-                        );
-                        this.arrayArticulosKit.forEach((producto) => {
-                            producto.porcentaje =
-                                ((producto.cantidad * producto.precio_costo_unid) / totalKit) *
-                                100;
-                        });
-
-                        this.arrayArticulosKit.forEach((producto) => {
-                            producto.nuevo_precio = (kit.precio * producto.porcentaje) / 100;
-                        });
-                        console.log("Estos son los articulos: ", this.arrayArticulosKit);
-                        this.arrayArticulosKit.forEach((articulo) => {
-                            this.arrayDetalle.push({
-                                idkit: kit["id"],
-                                idarticulo: articulo.id,
-                                articulo: articulo.nombre,
-                                medida: "KIT",
-                                unidad_envase: articulo.unidad_envase,
-                                cantidad: articulo.cantidad,
-                                cantidad_paquetes: articulo.unidad_envase * articulo.cantidad,
-                                precio: articulo.nuevo_precio,
-                                descuento: 0,
-                                stock: articulo.stock,
-                                precioseleccionado: articulo.precio_costo_unid,
-                            });
-                            let actividadEconomica = 461021;
-
-                            this.arrayProductos.push({
-                                actividadEconomica: actividadEconomica,
-                                codigoProductoSin: articulo.id,
-                                codigoProducto: articulo.codigo,
-                                descripcion: articulo.nombre,
-                                cantidad: articulo.cantidad,
-                                unidadMedida: 25,
-                                precioUnitario: parseFloat(
-                                    articulo.precio_costo_unid * this.monedaVenta[0]
-                                ).toFixed(2),
-                                montoDescuento: (
-                                    articulo.precio_costo_unid *
-                                    articulo.cantidad *
-                                    this.monedaVenta[0] -
-                                    articulo.nuevo_precio * this.monedaVenta[0]
-                                ).toFixed(2),
-                                subTotal: parseFloat(
-                                    articulo.nuevo_precio * this.monedaVenta[0]
-                                ).toFixed(2),
-                                numeroSerie: null,
-                                numeroImei: null,
-                            });
-                            this.cerrarModal();
-                        });
-
-                    } else {
-                        swal({
-                            type: "error",
-                            title: "Stock insuficiente",
-                            text: this.mensajesKit.join("\n\n"),
-                        });
-                    }
-                })
-                .catch((error) => {
-                    // Maneja el error aquí
-                    console.error(error);
-                });
-        },
-
-        agregarPE(kit) {
-            console.log("esto:", kit);
-            kit["articulos"] = this.arrayArticulosKit;
-            kit["precio"] = kit["precio"] / parseFloat(this.monedaVenta[0]);
-            axios.put("/ofertasespeciales/actualizar", kit);
-
-            this.modalDetalle = 0;
-            if (new Date(kit.fecha_final) < new Date()) {
-                swal({
-                    type: "error",
-                    title: "Error...",
-                    text: "Este kit ha expirado!",
-                });
-                return;
-            }
-            console.log("datos formulario agregar PE", kit);
-            //   this.GetValidateKit(kit['id'])
-            this.GetValidateKit(kit["id"])
-                .then(() => {
-                    if (this.mensajesKit.length == 0) {
-                        const totalKit = this.arrayArticulosKit.reduce(
-                            (total, producto) => {
-                                return total + producto.cantidad * producto.precio_costo_unid;
-                            },
-                            0
-                        );
-                        this.arrayArticulosKit.forEach((producto) => {
-                            producto.porcentaje =
-                                ((producto.cantidad * producto.precio_costo_unid) / totalKit) *
-                                100;
-                        });
-                        console.log("precio especial ", this.arrayArticulosKit);
-                        this.arrayArticulosKit.forEach((producto) => {
-                            producto.nuevo_precio =
-                                (this.calcularPrecioUnitario(kit) * producto.porcentaje) / 100;
-                        });
-                        console.log("Estos son los articulos: ", this.arrayArticulosKit);
-                        this.arrayArticulosKit.forEach((articulo) => {
-                            this.arrayDetalle.push({
-                                idkit: kit["id"],
-                                idarticulo: articulo.id,
-                                articulo: articulo.nombre,
-                                medida: "KIT",
-                                unidad_envase: articulo.unidad_envase,
-                                cantidad: articulo.cantidad,
-                                cantidad_paquetes: articulo.unidad_envase * articulo.cantidad,
-                                precio: articulo.nuevo_precio,
-                                descuento: 0,
-                                stock: articulo.stock,
-                                precioseleccionado: this.calcularPrecioUnitario(articulo),
-                            });
-                            let actividadEconomica = 461021;
-
-                            this.arrayProductos.push({
-                                actividadEconomica: actividadEconomica,
-                                codigoProductoSin: articulo.id,
-                                codigoProducto: articulo.codigo,
-                                descripcion: articulo.nombre,
-                                cantidad: articulo.cantidad,
-                                unidadMedida: 25,
-                                precioUnitario: parseFloat(
-                                    this.calcularPrecioUnitario(articulo) * this.monedaVenta[0]
-                                ).toFixed(2),
-                                montoDescuento: (
-                                    articulo.precio_costo_unid *
-                                    articulo.cantidad *
-                                    this.monedaVenta[0] -
-                                    articulo.nuevo_precio * this.monedaVenta[0]
-                                ).toFixed(2),
-                                subTotal: parseFloat(
-                                    articulo.nuevo_precio * this.monedaVenta[0]
-                                ).toFixed(2),
-                                numeroSerie: null,
-                                numeroImei: null,
-                            });
-                            this.cerrarModal();
-                        });
-                    } else {
-                        swal({
-                            type: "error",
-                            title: "Stock insuficiente",
-                            text: this.mensajesKit.join("\n\n"),
-                        });
-                    }
-                })
-                .catch((error) => {
-                    // Maneja el error aquí
-                    console.error(error);
-                });
-        },
-
-        abrirModalDetallesKit(data) {
-            this.arrayArticulosSeleccionados = [];
-
-            this.modalDetalleKit = 1;
-            this.datosFormularioKit = {
-                id: data["id"],
-                nombre: data["nombre"],
-                porcentaje: data["porcentaje"],
-                codigo: data["codigo"],
-
-                fecha_final: new Date(data["fecha_final"]).toISOString().split("T")[0],
-                tipo_promocion: data["tipo_promocion"],
-                estado: data["estado"],
-                precio: data["precio"],
-            };
-            this.obtenerDatosKit(data["id"]);
-        },
-
-        abrirModalDetalles(data) {
-            this.arrayArticulosSeleccionados = [];
-
-            this.modalDetalle = 1;
-            this.datosFormularioPE = {
-                id: data["id"],
-                nombre: data["nombre"],
-                precio_r1: data["precio_r1"],
-                rango_inicio_r1: data["rango_inicio_r1"],
-                rango_final_r1: data["rango_final_r1"],
-                precio_r2: data["precio_r2"],
-                rango_inicio_r2: data["rango_inicio_r2"],
-                rango_final_r2: data["rango_final_r2"],
-                precio_r3: data["precio_r3"],
-                rango_inicio_r3: data["rango_inicio_r3"],
-                rango_final_r3: data["rango_final_r3"],
-
-                fecha_final: new Date(data["fecha_final"]).toISOString().split("T")[0],
-                tipo_promocion: data["tipo_promocion"],
-                estado: data["estado"],
-            };
-            this.obtenerDatosKit(data["id"]), console.log(this.datosFormularioPE);
-        },
-
-        obtenerDatosKit(idPromocion) {
-            return axios
-                .get("/ofertas/id", {
-                    params: {
-                        idPromocion: idPromocion,
-                    },
-                })
-                .then((response) => {
-                    const datos = response.data.articulosPorPromocion;
-                    this.arrayArticulosKit = datos.map((item) => ({
-                        ...item.articulo,
-                        cantidad: item.cantidad,
-                    }));
-                })
-                .catch((error) => {
-                    console.error(error);
-                    throw error; // Re-lanza el error para que pueda ser manejado en agregarKit
-                });
-        },
-
-        getColorForEstado(estado, fecha_final) {
-            const fechaFinal = new Date(fecha_final) < new Date();
-
-            if (fechaFinal) {
-                return "#ff0000";
-            }
-            switch (estado) {
-                case "Activo":
-                    return "#5ebf5f";
-                case "Inactivo":
-                    return "#d76868";
-                case "Agotado":
-                    return "#ce4444";
-                default:
-                    return "#f9dda6";
-            }
-        },
-
-
-
-        listarOfertaEspecial(page, buscar, criterio) {
-            let me = this;
-            let url = "/ofertasespeciales";
-
-            axios
-                .get(url, {
-                    params: {
-                        page: page,
-                        buscar: buscar,
-                        criterio: criterio,
-                    },
-                })
-                .then(function (response) {
-                    let respuesta = response.data;
-                    me.arrayPreciosEspeciales = response.data.ofertas.data;
-                    me.pagination = respuesta.pagination;
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        },
-
-        scrollToSection() {
-            $("html, body").animate(
-                {
-                    scrollTop: $("#seccionObjetivo").offset().top,
-                },
-                50
-            );
-        },
-        scrollToTop() {
-            $("html, body").animate(
-                {
-                    scrollTop: 0,
-                },
-                50
-            );
-        },
-        calcularPrecioConDescuento(precioOriginal, porcentajeDescuento) {
-            const descuento = this.precioseleccionado * (this.descuentoProducto / 100);
-            const precioConDescuento = this.precioseleccionado - descuento;
-            const precioFinal = precioConDescuento * this.unidadPaquete * this.cantidad;
-            return precioFinal;
-        },
-        calcularDiasRestantes(fechaFinal) {
-            const fechaActual = new Date();
-            const fechaObjetivo = new Date(fechaFinal);
-            const diferenciaEnMilisegundos = fechaObjetivo - fechaActual;
-            const diasRestantes = Math.ceil(diferenciaEnMilisegundos / (1000 * 60 * 60 * 24));
-            return diasRestantes;
-        },
-        actualizarDetalle(index) {
-            if (this.arrayDetalle[index] && typeof this.arrayDetalle[index].precioseleccionado !== 'undefined' && typeof this.arrayDetalle[index].cantidad !== 'undefined') {
-                this.arrayDetalle[index].total = (this.arrayDetalle[index].precioseleccionado * this.arrayDetalle[index].cantidad).toFixed(2);
-                this.calcularTotal(); // Asegúrate de recalcular el total después de actualizar
-            } else {
-                console.error('Datos inválidos en actualizarDetalle para el índice:', index);
-            }
-        },
-
-        actualizarDetalleDescuento(index) {
-            this.calcularTotal(index);
-        },
-        validarDescuentoAdicional() {
-            if (this.descuentoAdicional >= this.totalParcial) {
-                this.descuentoAdicional = 0;
-                alert("El descuento adicional no puede ser mayor o igual al total.");
-            }
         },
 
         habilitarNombreCliente() {
@@ -1464,29 +1348,10 @@ export default {
                 this.tipo_documento = "";
             }
         },
-        validarDescuentoGiftCard() {
-            if (this.descuentoGiftCard >= this.calcularTotal) {
-                this.descuentoGiftCard = 0;
-                alert("El descuento Gift Card no puede ser mayor o igual al total.");
-            }
-        },
-        buscarPromocion(idArticulo) {
-            // Supongamos que el ID del artículo es 1, ajusta según tus necesidades
-
-            axios
-                .get(`/promocion/id?idArticulo=${idArticulo}`)
-                .then((response) => {
-                    this.arrayPromocion = response.data.promocion;
-                })
-                .catch((error) => {
-                    // Maneja los errores aquí
-                    console.error("Error:", error);
-                });
-        },
 
         async obtenerDatosUsuario() {
             try {
-                const response = await axios.get('/venta');
+                const response = await axios.get("/venta");
                 this.usuarioAutenticado = response.data.usuario.usuario;
                 this.usuario_autenticado = this.usuarioAutenticado;
                 this.idrol = response.data.usuario.idrol;
@@ -1502,17 +1367,17 @@ export default {
             try {
                 const idsucursal = this.idsucursalAutenticado;
                 console.log("El idsucursal es: " + idsucursal);
-                const response = await axios.get('/obtener-ultimo-comprobante', {
+                const response = await axios.get("/obtener-ultimo-comprobante", {
                     params: {
-                        idsucursal: idsucursal
-                    }
+                        idsucursal: idsucursal,
+                    },
                 });
                 const lastComprobante = response.data.last_comprobante;
                 this.last_comprobante = lastComprobante;
                 console.log("El ultimo comprobante es: " + this.last_comprobante);
                 this.nextNumber(lastComprobante);
             } catch (error) {
-                console.error('Error al obtener el último comprobante:', error);
+                console.error("Error al obtener el último comprobante:", error);
             }
         },
 
@@ -1537,7 +1402,7 @@ export default {
                 .get(url)
                 .then(function (response) {
                     var respuesta = response.data;
-                    console.log(respuesta);
+                   
                     me.arrayVenta = respuesta.ventas.data;
                     me.pagination = respuesta.pagination;
                 })
@@ -1555,7 +1420,7 @@ export default {
                     let respuesta = response.data;
                     q: numero;
                     me.arrayCliente = respuesta.clientes;
-                    console.log(me.arrayCliente);
+             
                     me.cantidadClientes = me.arrayCliente.length;
                 })
                 .catch(function (error) {
@@ -1563,7 +1428,7 @@ export default {
                 });
         },
         selectClienteNombre(nombre) {
-            console.log("nombre ", nombre)
+            console.log("nombre ", nombre);
             let me = this;
             var url = "/cliente/selectCliente?filtro=" + nombre;
             axios
@@ -1572,7 +1437,7 @@ export default {
                     let respuesta = response.data;
                     q: nombre;
                     me.arrayCliente = respuesta.clientes;
-                    console.log(me.arrayCliente);
+           
                     me.cantidadClientes = me.arrayCliente.length;
                 })
                 .catch(function (error) {
@@ -1592,15 +1457,14 @@ export default {
                 this.tipo_documento = val1.tipo_documento;
                 this.complemento_id = val1.complemento_id;
                 this.clienteDeudas = val1.cantidad_creditos;
-            }
-            else {
+            } else {
                 //console.log(val1);
-                this.email = '';
-                this.nombreCliente = '';
-                this.documento = '';
-                this.tipo_documento = '';
-                this.complemento_id = '';
-                this.clienteDeudas = '';
+                this.email = "";
+                this.nombreCliente = "";
+                this.documento = "";
+                this.tipo_documento = "";
+                this.complemento_id = "";
+                this.clienteDeudas = "";
             }
         },
         getDatosCliente2(val1) {
@@ -1616,28 +1480,31 @@ export default {
                 this.tipo_documento = val1.tipo_documento;
                 this.complemento_id = val1.complemento_id;
                 this.clienteDeudas = val1.cantidad_creditos;
-            }
-            else {
+            } else {
                 //console.log(val1);
-                this.email = '';
-                this.nombreCliente = '';
-                this.documento = '';
-                this.tipo_documento = '';
-                this.complemento_id = '';
-                this.clienteDeudas = '';
+                this.email = "";
+                this.nombreCliente = "";
+                this.documento = "";
+                this.tipo_documento = "";
+                this.complemento_id = "";
+                this.clienteDeudas = "";
             }
         },
         buscarArticulo() {
             clearTimeout(this.timer);
             this.timer = setTimeout(() => {
                 let me = this;
-                var url = "/articulo/buscarArticuloVenta?filtro=" + me.codigo + "&idalmacen=" + me.selectedAlmacen;
+                var url =
+                    "/articulo/buscarArticuloVenta?filtro=" +
+                    me.codigo +
+                    "&idalmacen=" +
+                    me.selectedAlmacen;
                 axios
                     .get(url)
                     .then(function (response) {
                         let respuesta = response.data;
                         me.arraySeleccionado = respuesta.articulos[0];
-                        console.log(me.arraySeleccionado);
+                
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -1665,7 +1532,7 @@ export default {
             return sw;
         },
         eliminarDetalle(id) {
-            const index = this.arrayDetalle.findIndex(item => item.id === id);
+            const index = this.arrayDetalle.findIndex((item) => item.id === id);
             if (index !== -1) {
                 this.arrayDetalle.splice(index, 1);
                 this.arrayProductos.splice(index, 1);
@@ -1697,7 +1564,10 @@ export default {
                 return;
             }
 
-            if (this.saldosNegativos === 0 && this.arraySeleccionado.saldo_stock < this.cantidad * this.unidadPaquete) {
+            const stockDisponible = this.calcularStockDisponible;
+            const cantidadSolicitada = this.unidadPaquete === 'paquete' ? this.cantidad : this.cantidad / this.arraySeleccionado.unidad_envase;
+
+            if (this.saldosNegativos === 0 && stockDisponible < cantidadSolicitada) {
                 swal({
                     type: "error",
                     title: "Error...",
@@ -1706,10 +1576,25 @@ export default {
                 return;
             }
 
-            const precioUnitario = parseFloat(this.precioseleccionado);
-            const cantidad = this.cantidad * this.unidadPaquete;
-            const descuento = (precioUnitario * cantidad * (this.descuentoProducto / 100)).toFixed(2);
-            const total = (precioUnitario * cantidad - descuento).toFixed(2);
+            if (!this.precioSeleccionado) {
+                swal({
+                    type: "error",
+                    title: "Error...",
+                    text: "Por favor, seleccione un precio antes de agregar",
+                });
+                return;
+            }
+
+            const precioUnitario = parseFloat(this.precioSeleccionado);
+            const cantidadTotal = this.unidadPaquete === 'paquete'
+                ? this.cantidad * this.arraySeleccionado.unidad_envase
+                : this.cantidad;
+            const descuento = (
+                precioUnitario *
+                cantidadTotal *
+                (this.descuentoProducto / 100)
+            ).toFixed(2);
+            const total = (precioUnitario * cantidadTotal - descuento).toFixed(2);
 
             const nuevoDetalle = {
                 id: Date.now(),
@@ -1718,13 +1603,13 @@ export default {
                 articulo: this.arraySeleccionado.nombre,
                 medida: this.arraySeleccionado.medida,
                 unidad_envase: this.arraySeleccionado.unidad_envase,
-                cantidad: cantidad,
-                cantidad_paquetes: this.arraySeleccionado.unidad_envase,
+                cantidad: cantidadTotal,
+                cantidad_paquetes: this.unidadPaquete === 'paquete' ? this.cantidad : cantidadTotal / this.arraySeleccionado.unidad_envase,
                 precio: precioUnitario,
                 descuento: this.descuentoProducto,
                 stock: this.arraySeleccionado.saldo_stock,
                 precioseleccionado: precioUnitario,
-                total: total
+                total: total,
             };
 
             this.arrayDetalle.push(nuevoDetalle);
@@ -1734,7 +1619,7 @@ export default {
                 codigoProductoSin: this.arraySeleccionado.codigoProductoSin,
                 codigoProducto: this.arraySeleccionado.codigo,
                 descripcion: this.arraySeleccionado.nombre,
-                cantidad: cantidad,
+                cantidad: cantidadTotal,
                 unidadMedida: this.arraySeleccionado.codigoClasificador,
                 precioUnitario: precioUnitario.toFixed(2),
                 montoDescuento: descuento,
@@ -1748,48 +1633,37 @@ export default {
             this.precioBloqueado = true;
             this.arraySeleccionado = [];
             this.cantidad = 1;
-            this.unidadPaquete = 1;
+            this.unidadPaquete = '1';  // Reseteamos a 'Por unidad'
             this.codigo = "";
             this.descuentoProducto = 0;
+            this.precioSeleccionado = null;  // Reseteamos el precio seleccionado
 
             this.calcularTotal();
+            this.actualizarVistaStock();
         },
 
         agregarDetalleModal(data) {
-            //this.scrollToSection();
             this.codigo = data.codigo;
-            console.log("SLECCIONE ESTO:", data);
-
-            this.buscarPromocion(data.id);
-            this.precioseleccionado = data.precio_uno;
-
+            this.precioSeleccionado = data.precio_uno;  // Cambiamos precioseleccionado a precioSeleccionado
+            this.unidadPaquete = '1';
             this.cerrarModal();
         },
         eliminarSeleccionado() {
             this.codigo = "";
             this.arraySeleccionado = [];
         },
-        listarArticulo(buscar, criterio) {
-            let me = this;
-            var url =
-                "/articulo/listarArticuloVenta?buscar=" +
-                buscar +
-                "&criterio=" +
-                criterio +
-                "&idAlmacen=" +
-                this.idAlmacen;
-            axios
-                .get(url)
-                .then(function (response) {
-                    var respuesta = response.data;
-                    me.arrayArticulo = respuesta.articulos;
-                    console.log("listar articulo", respuesta);
+        listarArticulo() {
+            let url = "/articulo/listarArticuloVenta?buscar=" + this.buscarA + "&idAlmacen=" + this.idAlmacen;
+
+            axios.get(url)
+                .then(response => {
+                    this.arrayArticulo = response.data.articulos;
+                
                 })
-                .catch(function (error) {
-                    console.log(error);
+                .catch(error => {
+                    console.error("Error en la búsqueda:", error);
                 });
         },
-
         datosConfiguracion() {
             let me = this;
             var url = "/configuracion";
@@ -1830,60 +1704,26 @@ export default {
 
         async obtenerAlmacenPredeterminado() {
             try {
-                const response = await axios.get('/api/configuracion/almacen-predeterminado');
+                const response = await axios.get(
+                    "/api/configuracion/almacen-predeterminado"
+                );
                 this.almacenPredeterminadoId = response.data.almacen_predeterminado_id;
-                console.log("El almacen predeterminado es : " + this.almacenPredeterminadoId);
+                console.log(
+                    "El almacen predeterminado es : " + this.almacenPredeterminadoId
+                );
 
                 this.almacenSeleccionado = this.arrayAlmacenes.find(
-                    almacen => almacen.id === this.almacenPredeterminadoId
+                    (almacen) => almacen.id === this.almacenPredeterminadoId
                 );
             } catch (error) {
-                console.error('Error al obtener el almacén predeterminado:', error);
+                console.error("Error al obtener el almacén predeterminado:", error);
             }
         },
 
         getAlmacenProductos(event) {
             this.idAlmacen = event.value;
         },
-        validarVenta() {
-            let me = this;
-            me.errorVenta = 0;
-            me.errorMostrarMsjVenta = [];
 
-            // Verificar stock de cada artículo
-            me.arrayDetalle.forEach(function (x) {
-                if (x.cantidad > x.stock) {
-                    let art = `${x.articulo}: Stock insuficiente`;
-                    me.errorMostrarMsjVenta.push(art);
-                }
-            });
-
-            // Verificar si se seleccionó el tipo de comprobante
-            if (me.tipo_comprobante == 0)
-                me.errorMostrarMsjVenta.push("Seleccione el Comprobante");
-
-            // Verificar si se ingresó el impuesto
-            if (!me.impuesto)
-                me.errorMostrarMsjVenta.push("Ingrese el impuesto de compra");
-
-            // Verificar si hay detalles en la venta
-            if (me.arrayDetalle.length <= 0)
-                me.errorMostrarMsjVenta.push("Ingrese detalles");
-
-            // Verificar si hay errores
-            if (me.errorMostrarMsjVenta.length) {
-                me.errorVenta = 1;
-
-                // Mostrar todos los errores en un solo mensaje de SweetAlert
-                swal({
-                    type: "error",
-                    title: "Error en la venta",
-                    text: me.errorMostrarMsjVenta.join("\n"),
-                });
-            }
-
-           return true;
-        },
         aplicarDescuento() {
             const descuentoGiftCard = this.descuentoGiftCard;
             const numeroTarjeta = this.numeroTarjeta;
@@ -1900,12 +1740,7 @@ export default {
             this.registrarVenta(idtipo_pago);
         },
 
-        aplicarCombinacion() {
-            const descuentoGiftCard = this.descuentoGiftCard;
-            const idtipo_pago = descuentoGiftCard ? 40 : 2;
-
-            this.registrarVenta(idtipo_pago);
-        },
+     
 
         otroMetodo(metodoPago) {
             const idtipo_pago = metodoPago;
@@ -1932,8 +1767,8 @@ export default {
             let nombreRazonSocial = document.getElementById("nombreCliente").value;
             let numeroDocumento = document.getElementById("documento").value;
             let complemento = document.getElementById("complemento_id").value;
-            let tipoDocumentoIdentidad = document.getElementById("tipo_documento")
-                .value;
+            let tipoDocumentoIdentidad =
+                document.getElementById("tipo_documento").value;
             let montoTotal = (
                 this.calcularTotal * parseFloat(this.monedaVenta[0])
             ).toFixed(2);
@@ -2074,7 +1909,9 @@ export default {
         async buscarOCrearCliente() {
             try {
                 // Primero, intenta buscar el cliente
-                const response = await axios.get(`/api/clientes/existe?documento=${this.documento}`);
+                const response = await axios.get(
+                    `/api/clientes/existe?documento=${this.documento}`
+                );
 
                 if (response.data.existe) {
                     // Si el cliente existe, usa ese ID y actualiza los datos del cliente
@@ -2084,10 +1921,10 @@ export default {
                     this.complemento_id = response.data.cliente.complemento_id;
                 } else {
                     // Si el cliente no existe, intenta crearlo
-                    const nuevoClienteResponse = await axios.post('/cliente/registrar', {
-                        'nombre': this.nombreCliente,
-                        'num_documento': this.documento,
-                        'tipo_documento': '5'
+                    const nuevoClienteResponse = await axios.post("/cliente/registrar", {
+                        nombre: this.nombreCliente,
+                        num_documento: this.documento,
+                        tipo_documento: "5",
                     });
                     this.idcliente = nuevoClienteResponse.data.id;
                 }
@@ -2098,32 +1935,29 @@ export default {
         },
 
         async registrarVenta(idtipo_pago) {
-      if (this.validarVenta()) {
-        this.prepararDatosCliente();
-        await this.buscarOCrearCliente();
+            if (this.validarVenta()) {
+                this.prepararDatosCliente();
+                await this.buscarOCrearCliente();
 
-        const ventaData = this.prepararDatosVenta(idtipo_pago);
+                const ventaData = this.prepararDatosVenta(idtipo_pago);
 
-        try {
-          this.mostrarSpinner = true;
-          const response = await axios.post("/venta/registrar", ventaData);
+                try {
+                    this.mostrarSpinner = true;
+                    const response = await axios.post("/venta/registrar", ventaData);
 
-          if (response.data.id > 0) {
-            this.manejarVentaExitosa(response.data.id);
-          } else {
-            this.manejarErrorVenta(response.data);
-          }
-        } catch (error) {
-          console.error("Error al registrar venta:", error);
-          this.ejecutarFlujoCompleto();
-        } finally {
-          this.mostrarSpinner = false;
-        }
-      }
-    },
-
-
-
+                    if (response.data.id > 0) {
+                        this.manejarVentaExitosa(response.data.id);
+                    } else {
+                        this.manejarErrorVenta(response.data);
+                    }
+                } catch (error) {
+                    console.error("Error al registrar venta:", error);
+                    this.ejecutarFlujoCompleto();
+                } finally {
+                    this.mostrarSpinner = false;
+                }
+            }
+        },
 
         cambiarProducto(index, nuevoProducto) {
             if (index >= 0 && index < this.arrayDetalle.length) {
@@ -2133,13 +1967,11 @@ export default {
                     cantidad: 1,
                     precio: nuevoProducto.precio,
                     stock: nuevoProducto.stock,
-                    subtotal: nuevoProducto.precio
+                    subtotal: nuevoProducto.precio,
                 };
                 this.calcularTotal();
             }
         },
-
-
 
         prepararDatosCliente() {
             if (!this.nombreCliente.trim()) {
@@ -2162,7 +1994,7 @@ export default {
                 data: this.arrayDetalle,
             };
 
-            if (this.tipoVenta === 'credito') {
+            if (this.tipoVenta === "credito") {
                 const totalCredito = this.primera_cuota
                     ? this.calcularTotal - this.primer_precio_cuota
                     : this.calcularTotal;
@@ -2172,7 +2004,7 @@ export default {
                     cuotasActualizadas[0] = {
                         ...cuotasActualizadas[0],
                         totalCancelado: this.primer_precio_cuota,
-                        estado: 'Pagado'
+                        estado: "Pagado",
                     };
                 }
                 return {
@@ -2180,11 +2012,13 @@ export default {
                     idpersona: this.idcliente,
                     numero_cuotasCredito: this.numero_cuotas,
                     tiempo_dias_cuotaCredito: this.tiempo_diaz,
-                    totalCredito: this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal,
+                    totalCredito: this.primera_cuota
+                        ? this.calcularTotal - this.cuotas[0].totalCancelado
+                        : this.calcularTotal,
                     estadoCredito: "Pendiente",
                     cuotaspago: cuotasActualizadas,
                     primer_precio_cuota: this.primer_precio_cuota,
-                    primera_cuota_pagada: this.primera_cuota
+                    primera_cuota_pagada: this.primera_cuota,
                 };
             } else if (this.tipo_comprobante === "RESIVO") {
                 return { ...datosComunes, resivo: this.resivo };
@@ -2200,7 +2034,13 @@ export default {
             this.cerrarModal2();
             this.cerrarModal3();
 
-            if (this.tipo_comprobante === "RESIVO") {
+            if (this.tipoVenta === "credito") {
+                swal(
+                    "Venta Exitosa",
+                    "La venta a crédito se ha registrado correctamente.",
+                    "success"
+                );
+            } else {
                 this.imprimirResivo(idVenta);
             }
 
@@ -2209,7 +2049,11 @@ export default {
 
         manejarErrorVenta(data) {
             if (data.valorMaximo) {
-                swal("Aviso", `El valor de descuento no puede exceder el ${data.valorMaximo}`, "warning");
+                swal(
+                    "Aviso",
+                    `El valor de descuento no puede exceder el ${data.valorMaximo}`,
+                    "warning"
+                );
             } else if (data.caja_validado) {
                 swal("Aviso", data.caja_validado, "warning");
             } else {
@@ -2221,7 +2065,7 @@ export default {
             // Restablecer todos los valores del formulario
             Object.assign(this, {
                 idproveedor: 0,
-                tipo_comprobante: this.tipo_comprobante === "RESIVO" ? "FACTURA" : "RESIVO",
+                tipo_comprobante: "RESIVO",
                 nombreCliente: "",
                 idcliente: 0,
                 tipo_documento: 0,
@@ -2234,7 +2078,7 @@ export default {
                 total: 0.0,
                 idarticulo: 0,
                 articulo: "",
-                cantidad: 0,
+                cantidad: 1,
                 precio: 0,
                 stock: 0,
                 codigo: "",
@@ -2242,69 +2086,46 @@ export default {
                 arrayDetalle: [],
                 primer_precio_cuota: 0,
                 step: 1,
-                recibido: 0
+                recibido: 0,
+                tipoVenta: "",
+                tipoPago: "",
+                numero_cuotas: 0,
+                tiempo_diaz: 0,
+                primera_cuota: false,
+                cuotas: [],
+                selectedArticulo: null,  // Restablecer el artículo seleccionado
+                arraySeleccionado: [],
             });
         },
-
-        eliminarVenta(idVenta) {
-            axios.delete('/venta/eliminarVenta/' + idVenta)
-                .then(function (response) {
-                    console.log('Venta eliminada correctamente:', response);
-                })
-                .catch(function (error) {
-                    console.error('Error al eliminar la venta:', error);
-                });
-        },
-
-        mostrarDetalle() {
-            /*const idsucursal = this.idsucursalAutenticado;
-            console.log("El idsucursal es: " + idsucursal);
-            axios.get('/obtener-ultimo-comprobante', {
-                params: {
-                    idsucursal: idsucursal
-                }
-            })
-            .then(response => {
-                const lastComprobante = response.data.last_comprobante;
-                this.last_comprobante = lastComprobante;
-                this.nextNumber(lastComprobante);
-            })
-            .catch(error => {
-                console.error('Error al obtener el último comprobante:', error);
-            });*/
+        validarVenta() {
             let me = this;
-            me.selectAlmacen();
-            me.listado = 0;
+            me.errorVenta = 0;
+            me.errorMostrarMsjVenta = [];
 
-            me.idproveedor = 0;
-            me.tipo_comprobante = 'RESIVO';
-            me.serie_comprobante = '';
-            //me.nextNumber();
-            //me.num_comprobante = '';
-            me.impuesto = 0.18;
-            me.total = 0.0;
-            me.idarticulo = 0;
-            me.articulo = '';
-            me.cantidad = 1;
-            me.precio = 0;
-            me.arrayDetalle = [];
-            me.arraySeleccionado = [];
-        },
-        ocultarDetalle() {
-            this.listado = 1;
-            this.codigo = null;
-            this.arrayArticulo.length = 0;
-            this.precioseleccionado = null;
-            this.medida = null;
-            this.nombreCliente = null;
-            this.documento = null;
-            this.email = null;
-            this.idAlmacen = null;
-            this.arrayProductos = [];
-            this.arrayDetalle = [];
-            this.precioBloqueado = false;
+            // Verificar stock de cada artículo
+            me.arrayDetalle.forEach(function (x) {
+                if (x.cantidad > x.stock) {
+                    let art = `${x.articulo}: Stock insuficiente`;
+                    me.errorMostrarMsjVenta.push(art);
+                }
+            });
 
+           
+            // Verificar si hay errores
+            if (me.errorMostrarMsjVenta.length) {
+                me.errorVenta = 1;
+
+                // Mostrar todos los errores en un solo mensaje de SweetAlert
+                swal({
+                    type: "error",
+                    title: "Error en la venta",
+                    text: me.errorMostrarMsjVenta.join("\n"),
+                });
+            }
+
+            return true;
         },
+
         verVenta(id) {
             let me = this;
             me.listado = 2;
@@ -2337,7 +2158,6 @@ export default {
             axios
                 .get(url)
                 .then(function (response) {
-                    //console.log(response);
                     var respuesta = response.data;
                     me.arrayDetalle = respuesta.detalles;
                     console.log(array);
@@ -2347,19 +2167,18 @@ export default {
                 });
         },
         cerrarModal() {
-            this.modal = 0;
-            this.tituloModal = "";
+            this.modal = false;
+      
         },
         abrirModal() {
-
-            this.scrollToTop();
             this.listarArticulo("", "nombre");
             this.selectAlmacen();
             this.arrayArticulo = [];
             this.modal = true;
             this.tituloModal = "Seleccione los articulos que desee";
-            console.log("entro siii");
+           
         },
+
         advertenciaFechaVencimiento() {
             swal({
                 title: "No Disponible",
@@ -2422,26 +2241,24 @@ export default {
                 .then(function (response) {
                     var respuesta = response.data;
                     me.arrayPrecios = respuesta.precio.data;
-                    console.log("PRECIOS", me.arrayPrecios);
+                   
                     //me.precioCount = me.arrayBuscador.length;
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
         },
-        mostrarSeleccion() {
-            console.log("Precio seleccionado:", this.precioseleccionado);
-        },
-
-
+    
         cerrarModal2() {
-            this.modal2 = false;
-            this.tituloModal2 = "";
-            this.idtipo_pago = "";
-            this.tipoPago = "";
-        },
+    this.modal2 = false;
+    this.reiniciarFormulario();
+    // Restablecer campos específicos del modal
+    this.tituloModal2 = "";
+    this.idtipo_pago = "";
+    this.tipoPago = "";
+},
         cerrarModal3() {
-            this.modal3 = 0;
+            this.modal3 = false;
             this.tituloModal3 = "";
             this.numero_cuotas = "";
             this.tiempo_diaz = "";
@@ -2450,13 +2267,12 @@ export default {
         },
 
         calcularCambio() {
-
             const recibidoNumero = parseFloat(
                 this.recibido / parseFloat(this.monedaVenta[0])
             );
             if (recibidoNumero === 0) {
                 this.efectivo = recibidoNumero;
-                console.log("EFECTIVO", this.efectivo);
+            
                 this.cambio = 0;
                 this.faltante = 0;
             } else if (recibidoNumero < this.calcularTotal) {
@@ -2473,33 +2289,44 @@ export default {
             }
         },
 
+        checkDocumento() {
+            if (this.documento.length === 7 && /^\d+$/.test(this.documento)) {
+                this.buscarClientePorDocumento();
+            } else {
+                this.resetearCampos();
+            }
+        },
+        resetearCampos() {
+            this.nombreCliente = "";
+            this.nombreClienteEditable = false;
+        },
         buscarClientePorDocumento() {
-            axios.get(`/api/clientes?documento=${this.documento}`)
-                .then(response => {
+            axios
+                .get(`/api/clientes?documento=${this.documento}`)
+                .then((response) => {
                     const cliente = response.data;
                     console.log(cliente);
                     this.nombreCliente = cliente.nombre;
-                    this.nombreClienteEditable = false; // Deshabilita el input si se encuentra el cliente
+                    this.nombreClienteEditable = false;
                 })
-                .catch(error => {
+                .catch((error) => {
                     if (error.response && error.response.status === 404) {
-                        this.nombreCliente = '';
-                        this.nombreClienteEditable = true; // Habilita el input si no se encuentra el cliente
+                        this.nombreCliente = "";
+                        this.nombreClienteEditable = true;
                         Swal.fire({
-                            title: 'Cliente no encontrado',
-                            text: 'No se encontró ningún cliente con el documento proporcionado.',
-                            icon: 'warning',
-                            confirmButtonText: 'Ok'
+                            title: "Cliente no encontrado",
+                            text: "No se encontró ningún cliente con el documento proporcionado.",
+                            icon: "warning",
+                            confirmButtonText: "Ok",
                         });
                     } else {
-                        console.error('Error al buscar el cliente:', error);
-                        this.nombreCliente = '';
-                        this.nombreClienteEditable = false; // Asegura que el input esté deshabilitado en caso de error
+                        console.error("Error al buscar el cliente:", error);
+                        this.resetearCampos();
                         Swal.fire({
-                            title: 'Error',
-                            text: 'Hubo un problema al buscar el cliente. Por favor, inténtelo de nuevo más tarde.',
-                            icon: 'error',
-                            confirmButtonText: 'Ok'
+                            title: "Error",
+                            text: "Hubo un problema al buscar el cliente. Por favor, inténtelo de nuevo más tarde.",
+                            icon: "error",
+                            confirmButtonText: "Ok",
                         });
                     }
                 });
@@ -2509,18 +2336,25 @@ export default {
         this.listarPrecio();
     },
     mounted() {
+        axios
+            .get("/tu-endpoint-api")
+            .then((response) => {
+                this.arraySeleccionado = response.data;
+            })
+            .catch((error) => {
+                console.error("Error al cargar los datos:", error);
+            });
         this.datosConfiguracion();
         this.selectAlmacen();
         this.listarVenta(1, this.buscar, this.criterio);
         //this.obtenerDatosUsuario();
         this.actualizarFechaHora();
         this.ejecutarFlujoCompleto();
-        document.addEventListener('keypress', this.handleKeyPress);
-
+        document.addEventListener("keypress", this.handleKeyPress);
     },
     beforeDestroy() {
-        document.removeEventListener('keypress', this.handleKeyPress);
-    }
+        document.removeEventListener("keypress", this.handleKeyPress);
+    },
 };
 </script>
 <style scoped>
@@ -2549,5 +2383,199 @@ export default {
 .step.completed {
     background-color: #28a745;
     color: white;
+}
+
+.product-detail {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.product-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.product-image {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+}
+
+.product-meta {
+    margin-bottom: 1rem;
+}
+
+.stock-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.stock-info i {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+}
+
+.product-price {
+    margin-bottom: 1rem;
+}
+
+.promo-price {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.original-price {
+    color: var(--text-color-secondary);
+    margin-left: 0.5rem;
+}
+
+.regular-price {
+    color: var(--text-color);
+    font-size: 1.5rem;
+}
+
+.purchase-options {
+    margin-bottom: 1rem;
+}
+
+.action-buttons {
+    margin-top: 1rem;
+}
+
+.product-details-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.product-details-list li {
+    margin-bottom: 0.5rem;
+}
+
+.footer {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+}
+
+.pi {
+    margin-right: 0.5rem;
+}
+
+>>>.p-panel-header {
+    padding: 0.75rem;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+}
+
+.panel-icon {
+    font-size: 2rem;
+    padding-left: 10px;
+}
+
+.panel-icon {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.form-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.form-group {
+    flex: 1 1 100%;
+    min-width: 250px;
+}
+
+@media (min-width: 768px) {
+    .form-row {
+        flex-wrap: nowrap;
+    }
+
+    .form-group {
+        flex: 1;
+    }
+}
+
+.p-inputgroup {
+    width: 100%;
+}
+
+.p-float-label {
+    width: 100%;
+}
+
+.p-inputtext,
+.p-dropdown {
+    width: 100%;
+}
+.payment-options {
+  .custom-tabview {
+    .p-tabview-nav {
+      li {
+        .p-tabview-nav-link {
+          background-color: #f8f9fa;
+          color: #495057;
+          border: 1px solid #dee2e6;
+          border-bottom: none;
+          margin-right: 2px;
+          border-top-left-radius: 4px;
+          border-top-right-radius: 4px;
+          transition: background-color 0.2s, color 0.2s;
+
+          &:not(.p-disabled):focus {
+            box-shadow: inset 0 0 0 0.2rem rgba(0,123,255,0.25);
+          }
+        }
+
+        &.p-highlight .p-tabview-nav-link {
+          background-color: #ffffff;
+          color: #007bff;
+          border-bottom: 2px solid #007bff;
+        }
+      }
+    }
+
+    .p-tabview-panels {
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      border-top: none;
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+      padding: 1.5rem;
+    }
+  }
+
+  .p-card {
+    margin-bottom: 1rem;
+  }
+
+  .p-button-lg {
+    width: 100%;
+  }
 }
 </style>

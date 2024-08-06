@@ -909,6 +909,10 @@ Route::group(["middleware" => ["auth"]], function () {
             "/credito/recibo-general/{id}",
             "CreditoVentaController@generarReciboGeneral"
         );
+        Route::delete('/proveedor/eliminar/{id}', 'ProveedorController@eliminarProveedor');
+        Route::delete('/cliente/eliminar/{id}', 'ClienteController@eliminarCliente');
+        Route::get('/caja/saldo/{id}', 'CajaController@obtenerSaldoCaja');
+        route::delete('/almacen/eliminar/{id}', 'AlmacenController@destroy');
     });
 
     //RUTA PARA RECUPERAR LA SESSION CON EL ID DE LA PERSONA LOGUEADA
@@ -918,5 +922,3 @@ Route::group(["middleware" => ["auth"]], function () {
         ]);
     });
 });
-
-//Route::get('/home', 'HomeController@index')->name('home');

@@ -21,43 +21,45 @@
                 </div>
             </div>
             <DataTable :value="arrayArticulo" class="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll">
-                <Column header="Acciones">
-                    <template #body="slotProps">
-                        <Button
-                            icon="pi pi-pencil"
-                            class="p-button-warning p-button-sm"
-                            @click="abrirModal('articulo', 'actualizar',slotProps.data)"
-                        />
-                        <Button v-if="slotProps.data.condicion" icon="pi pi-ban" class="p-button-sm p-button-danger custom-icon-size" @click="desactivarArticulo(slotProps.data.id)"  />
-                        <Button v-else icon="pi pi-check-circle" class="p-button-sm p-button-success custom-icon-size" @click="activarArticulo(slotProps.data.id)" />                    
-                    </template>
-                </Column>
-                <Column field="codigo" header="CODIGO" />
-                <Column field="nombre" header="NOMBRE COMERCIAL" />
-                <Column field="nombre_generico" header="NOMBRE GENERICO" />
-                <Column field="unidad_envase" header="UNIDADES POR PAQUETE" />
-                <Column field="precio_costo_unid" header="COSTO UNITARIO" />
-                <Column field="precio_costo_paq" header="COSTO PAQUETE" />
-                <Column field="precio_uno" header="PRECIO ESTUDIANTE" />
-                <Column field="precio_dos" header="PRECIO PUBLICO" />
-                <Column field="precio_tres" header="PRECIO FACTURA" />
-                <Column field="nombre_categoria" header="LINEA" />
-                <Column field="nombre_industria" header="INDUSTRIA" />
-                <Column field="nombre_marca" header="MARCA" />
-                <Column field="stock" header="STOCK MINIMO" />
-                <Column field="nombre_proveedor" header="PROVEEDOR" />
-                <Column field="descripcion" header="DESCRIPCION" />
-                <Column field="condicion" header="CONTROLADO" />
-                <Column field="nombre_grupo" header="GRUPO/FAMILIA" />
-                <Column  header="Estado">
-                    <template #body="slotProps">
-                        <img :src="'img/articulo/' + slotProps.data.fotografia + '?t=' + new Date().getTime()"
-                                            width="50" height="50" v-if="slotProps.data.fotografia" ref="imagen">
-                                        <img :src="'img/articulo/' + 'defecto.jpg'" width="50" height="50" v-else
-                                            ref="imagen">
-                    </template>
-                </Column>
-            </DataTable>
+        <Column v-for="(column, index) in computedColumns" :key="index" :field="column.field" :header="column.header">
+            <template #body="slotProps">
+                <span v-if="column.type === 'button'">
+                    <Button
+                        v-if="column.field === 'acciones'"
+                        icon="pi pi-pencil"
+                        class="p-button-warning p-button-sm"
+                        @click="abrirModal('articulo', 'actualizar', slotProps.data)"
+                    />
+                    <Button
+                        v-if="column.field === 'acciones' && slotProps.data.condicion"
+                        icon="pi pi-ban"
+                        class="p-button-sm p-button-danger custom-icon-size"
+                        @click="desactivarArticulo(slotProps.data.id)"
+                    />
+                    <Button
+                        v-if="column.field === 'acciones' && !slotProps.data.condicion"
+                        icon="pi pi-check-circle"
+                        class="p-button-sm p-button-success custom-icon-size"
+                        @click="activarArticulo(slotProps.data.id)"
+                    />
+                </span>
+                <span v-else-if="column.type === 'dynamicPrice'">
+                    {{ (slotProps.data[column.field] * parseFloat(monedaPrincipal[0])).toFixed(2) }} {{ monedaPrincipal[1] }}
+                </span>
+                <span v-else-if="column.type === 'image'">
+                    <img :src="'img/articulo/' + slotProps.data.fotografia + '?t=' + new Date().getTime()" width="50" height="50" v-if="slotProps.data.fotografia" ref="imagen">
+                    <img :src="'img/articulo/' + 'defecto.jpg'" width="50" height="50" v-else ref="imagen">
+                </span>
+                <span v-else-if="column.type === 'badge'" style="text-align: center;">
+                    <span v-if="slotProps.data.condicion" class="badge badge-success" style="center">Si</span>
+                    <span v-else class="badge badge-danger" style="center">No</span>
+                </span>
+                <span v-else>
+                    {{ slotProps.data[column.field] }}
+                </span>
+            </template>
+        </Column>
+    </DataTable>
             <Paginator :rows="pagination.per_page" 
                    :totalRecords="pagination.total" 
                    :first="(pagination.current_page - 1) * pagination.per_page" 
@@ -229,7 +231,7 @@
                     <div class="col-md-6">
                         <label class="font-weight-bold" for="preciounitario">Precio Unitario <span class="text-danger">*</span></label>
                         <div class="p-inputgroup">
-                            <InputNumber id="preciounitario"  v-model="datosFormulario.precio_costo_unid" placeholder="Sin decimales" class=" p-inputtext-sm bold-input" 
+                            <InputNumber id="preciounitario"  v-model="datosFormulario.precio_costo_unid" placeholder="Sin decimales" class=" p-inputtext-sm bold-input"  mode="decimal" :minFractionDigits="2" 
                                         :class="{'p-invalid' : errores.precio_costo_unid}" @input="validarCampo('precio_costo_unid')" />
                             <Button label="Calcular" class="p-button-primary p-button-sm" @click="calcularPrecioCostoUnid" />
                         </div>
@@ -239,7 +241,7 @@
                     <div class="col-md-6">
                         <label class="font-weight-bold"  for="preciopaquete">Precio Paquete <span class="text-danger">*</span></label>
                         <div class="p-inputgroup">
-                            <InputNumber id="preciopaquete"  v-model="datosFormulario.precio_costo_paq" placeholder="Sin decimales" class=" p-inputtext-sm bold-input" 
+                            <InputNumber id="preciopaquete"  v-model="datosFormulario.precio_costo_paq" placeholder="Sin decimales" class=" p-inputtext-sm bold-input"  mode="decimal" :minFractionDigits="2" 
                                             :class="{'p-invalid' : errores.precio_costo_paq}" @input="validarCampo('precio_costo_paq')"/>
                             <Button label="Calcular" class="p-button-primary p-button-sm" @click="calcularPrecioCostoPaq" />
                         </div>
@@ -251,7 +253,7 @@
                     <div class="col-md-6">
                         <label class="font-weight-bold" for="costocompra">Costo compra <span class="text-danger">*</span></label>
                         <div class="p-inputgroup">
-                            <InputNumber id="costocompra"  v-model="datosFormulario.costo_compra" placeholder="Sin decimales" class=" p-inputtext-sm bold-input" 
+                            <InputNumber id="costocompra"  v-model="datosFormulario.costo_compra" placeholder="Sin decimales" class=" p-inputtext-sm bold-input"  mode="decimal" :minFractionDigits="2" 
                                     :class="{'p-invalid' : errores.costo_compra}" @input="validarCampo('costo_compra')"/>                            
                         </div>
                         <small class="p-error" v-if="errores.costo_compra"><strong>{{ errores.costo_compra }}</strong></small>
@@ -260,8 +262,8 @@
                     <div class="col-md-6">
                         <label class="font-weight-bold"  for="precioventa">Precio Venta <span class="text-danger">*</span></label>
                         <div class="p-inputgroup">
-                            <InputNumber id="precioventa"  v-model="datosFormulario.precio_venta" placeholder="Sin decimales" class=" p-inputtext-sm bold-input" 
-                                        :class="{'p-invalid' : errores.precio_venta}" @input="validarCampo('precio_venta')" />                        
+                            <InputNumber id="precioventa"  v-model="datosFormulario.precio_venta" placeholder="Sin decimales" class=" p-inputtext-sm bold-input"  mode="decimal" :minFractionDigits="2" 
+                                        :class="{'p-invalid' : errores.precio_venta}" @input="validarCampo('precio_venta')" :maxFracionDigits="2"  />                        
                         </div>
                         <small class="p-error" v-if="errores.precio_venta"><strong>{{ errores.precio_venta }}</strong></small>   
 
@@ -282,7 +284,7 @@
                     <div class="col-md-4">
                         <label class="font-weight-bold" for="cantidadStock">Cantidad Stock <span class="text-danger">*</span></label>
                         <div class="p-inputgroup">
-                            <InputNumber id="cantidadStock" v-model="unidadStock" placeholder="Ej: 10" class="p-inputtext-sm"
+                            <InputNumber id="cantidadStock" v-model="unidadStock" placeholder="Ej: 10" class="p-inputtext-sm"  mode="decimal"
                                         :class="{'p-invalid' : erroresinventario.unidadStock}" @input="validarCampoInventario('unidadStock')"/>
                         </div>
                         <small class="p-error" v-if="erroresinventario.unidadStock"><strong>{{ erroresinventario.unidadStock }}</strong></small>   
@@ -308,28 +310,34 @@
 
                     </div>
                 </div>
-                <div v-for="(precio, index) in precios" :key="precio.id" class="p-grid p-ai-center p-mb-2">
-                    <!-- Primera columna -->
-                    <div class="p-col-6 custom-precios">
-                        <label class="p-mr-2 p-text-bold" style="width: 100px;">{{ precio.nombre_precio }}:</label>
-                        <div class="p-inputgroup p-mr-2" style="width: 150px;">
-                            <InputNumber v-if="index === 0" placeholder="Precio" v-model="precio_uno" mode="decimal" class="p-inputtext-sm" />
-                            <InputNumber v-if="index === 1" placeholder="Precio" v-model="precio_dos" mode="decimal" class="p-inputtext-sm" />
-                            <InputNumber v-if="index === 2" placeholder="Precio" v-model="precio_tres" mode="decimal"  class="p-inputtext-sm" />
-                            <InputNumber v-if="index === 3" placeholder="Precio" v-model="precio_cuatro" mode="decimal"  class="p-inputtext-sm" />
-                            <span class="p-inputgroup-addon">{{ monedaPrincipal[1] }}</span>
-                        </div>
-                    </div>
+                <div v-for="(precio, index) in precios" :key="precio.id" class="p-grid p-ai-center p-mb-2 mobile-responsive">
+        <!-- Primera columna -->
+        <div class="p-col-12 custom-precios">
+            <label class="p-mr-2 p-text-bold" style="width: 100%;">{{ precio.nombre_precio }}:</label>
+        </div>
 
-                    <!-- Segunda columna -->
-                    <div class="p-col-6 custom-precios">
-                        <div class="p-inputgroup p-mr-2" style="width: 150px;">
-                            <InputNumber placeholder="Porcentaje" v-model="precio.porcentage" mode="decimal" :minFractionDigits=2 class="p-inputtext-sm" />
-                            <span class="p-inputgroup-addon">%</span>
-                        </div>
-                        <Button label="Calcular" class="p-button-primary p-button-sm" @click="calcularPrecio(precio, index)" />
-                    </div>
-                </div>
+        <!-- Segunda fila para inputs en vista móvil -->
+        <div class="p-col-12 p-md-6 custom-precios">
+            <div class="p-inputgroup p-mr-2" style="width: 100%;">
+                <InputNumber v-if="index === 0" placeholder="Precio" v-model="precio_uno" mode="decimal" :minFractionDigits="2" :maxFractionDigits="2" class="p-inputtext-sm" />
+                <InputNumber v-if="index === 1" placeholder="Precio" v-model="precio_dos" mode="decimal" :minFractionDigits="2" :maxFractionDigits="2" class="p-inputtext-sm" />
+                <InputNumber v-if="index === 2" placeholder="Precio" v-model="precio_tres" mode="decimal" :minFractionDigits="2" :maxFractionDigits="2" class="p-inputtext-sm" />
+                <InputNumber v-if="index === 3" placeholder="Precio" v-model="precio_cuatro" mode="decimal" :minFractionDigits="2" :maxFractionDigits="2" class="p-inputtext-sm" />
+                <span class="p-inputgroup-addon">{{ monedaPrincipal[1] }}</span>
+            </div>
+        </div>
+
+        <!-- Tercera fila para porcentaje y botón en vista móvil -->
+        <div class="p-col-12 p-md-6 custom-precios">
+            <div class="p-inputgroup p-mr-2" style="width: 100%;">
+                <InputNumber placeholder="Porcentaje" v-model="precio.porcentage" mode="decimal" :minFractionDigits="2" class="p-inputtext-sm" />
+                <span class="p-inputgroup-addon">%</span>
+            </div>
+            <div >
+                <Button label="Calcular" class="p-button-primary p-button-sm"@click="calcularPrecio(precio, index)" />
+            </div>
+        </div>
+    </div>
             </form>
             <template #footer>
                 <Button label="Cerrar" icon="pi pi-times" class="p-button-danger p-button-sm" @click="cerrarModal" />
@@ -525,6 +533,25 @@ export default {
                 'to': 0,
             },
             offset: 3,
+            headers: [
+                { field: 'acciones', header: 'Acciones', type: 'button' },
+                { field: 'codigo', header: 'CODIGO' },
+                { field: 'nombre', header: 'NOMBRE COMERCIAL' },
+                { field: 'nombre_generico', header: 'NOMBRE GENERICO' },
+                { field: 'unidad_envase', header: 'UNIDADES POR PAQUETE' },
+                { field: 'precio_costo_unid', header: 'COSTO UNITARIO' },
+                { field: 'precio_costo_paq', header: 'COSTO PAQUETE' },
+                // Las columnas dinámicas se insertarán aquí
+                { field: 'nombre_categoria', header: 'LINEA' },
+                { field: 'nombre_industria', header: 'INDUSTRIA' },
+                { field: 'nombre_marca', header: 'MARCA' },
+                { field: 'stock', header: 'STOCK MINIMO' },
+                { field: 'nombre_proveedor', header: 'PROVEEDOR' },
+                { field: 'descripcion', header: 'DESCRIPCION' },
+                { field: 'condicion', header: 'CONTROLADO', type: 'badge' },
+                { field: 'nombre_grupo', header: 'GRUPO/FAMILIA' },
+                { field: 'fotografia', header: 'FOTOGRAFIA', type: 'image' }
+            ]
         };
     },
     computed:{
@@ -568,6 +595,21 @@ export default {
                 this.fechaVencimientoAlmacen = this.formatDateToYMD(defaultDate); // Formato YYYY-MM-DD
             }
             return defaultDate;
+        },
+        computedColumns() {
+            const dynamicColumns = this.precios.map((precio, index) => ({
+                field: `precio_${['uno', 'dos', 'tres', 'cuatro'][index]}`,
+                header: `PRECIO ${precio.nombre_precio}`,
+                type: 'dynamicPrice'
+            }));
+            const index = this.headers.findIndex(header => header.field === 'precio_costo_paq') + 1;
+            const result = [
+                ...this.headers.slice(0, index),
+                ...dynamicColumns,
+                ...this.headers.slice(index)
+            ];
+            console.log("RESULTS COMPUTED ",index)
+            return result;
         }
     },
     methods: {
@@ -746,6 +788,15 @@ export default {
             this.datosFormulario.idindustria = this.industriaSeleccionado.id
             this.datosFormulario.idmedida = this.medidaSeleccionado.id
             this.datosFormulario.idgrupo = this.grupoSeleccionado.id
+            
+            if(this.fechaVencimientoSeleccion == false){
+                this.datosFormulario.fechaVencimientoSeleccion = '0'
+            }
+            else{
+                this.datosFormulario.fechaVencimientoSeleccion = '1'
+            }
+        },
+        asignarCamposPrecios(){
             this.datosFormulario.precio_costo_unid = this.convertDolar(this.datosFormulario.precio_costo_unid);
             this.datosFormulario.precio_costo_paq = this.convertDolar(this.datosFormulario.precio_costo_paq);
             this.datosFormulario.precio_venta = this.convertDolar(this.datosFormulario.precio_venta);
@@ -755,12 +806,6 @@ export default {
             this.datosFormulario.precio_tres = this.convertDolar(this.precio_tres);
             this.datosFormulario.precio_cuatro = this.convertDolar(this.precio_cuatro);
             this.datosFormulario.costo_compra = this.convertDolar(this.datosFormulario.costo_compra);
-            if(this.fechaVencimientoSeleccion == false){
-                this.datosFormulario.fechaVencimientoSeleccion = '0'
-            }
-            else{
-                this.datosFormulario.fechaVencimientoSeleccion = '1'
-            }
         },
         asignarCamposInventario(){
             this.datosFormularioInventario.AlmacenSeleccionado = this.almacenSeleccionado.id
@@ -790,7 +835,7 @@ export default {
         },
         async enviarFormulario() {
             this.asignarCampos();
-
+            this.asignarCamposPrecios();
             console.log("UNIDAD STOCK ", this.unidadStock);
             console.log("ALMACEN ", this.AlmacenSeleccionado);
             console.log("agregar ", this.agregarStock);
@@ -839,6 +884,10 @@ export default {
                 // Actualización del artículo
                 try {
                     this.datosFormulario.fotografia = this.fotografia;
+                    if (this.tipo_stock == "paquetes") {
+                        this.datosFormulario.stock = this.datosFormulario.unidad_envase * this.datosFormulario.stock;
+                        console.log("paquetes ",this.datosFormulario.stock)
+                    }
                     await this.actualizarArticulo(this.datosFormulario);
                     console.log("Actualización de artículo exitosa");
                 } catch (error) {
@@ -846,6 +895,7 @@ export default {
                 }
             } else if (validacionExitosa || validacionInventarioExitosa) {
                 // Registro del artículo
+                console.log("TIPO STOCK ",this.tipo_stock)
                 this.datosFormulario.fotografia = this.fotografia;
                 if (this.tipo_stock == "paquetes") {
                     this.datosFormulario.stock = this.datosFormulario.unidad_envase * this.datosFormulario.stock;
@@ -962,7 +1012,7 @@ export default {
             me.listarArticulo(page, buscar, criterio);
         },
         calcularPrecioValorMoneda(precio) {
-            return ((precio * parseFloat(this.monedaPrincipal)).toFixed(2))
+            return Number((precio * parseFloat(this.monedaPrincipal)).toFixed(2));
         },
         registrarArticulo(data) {
             let me = this;
@@ -1151,10 +1201,7 @@ export default {
             this.proveedorSeleccionado=[];
             this.grupoSeleccionado=[];
             this.medidaSeleccionado=[];
-            this.almacenSeleccionado=[];
-            this.unidadStock='',
             this.fechaVencimientoSeleccion = false;
-            this.fechaVencimientoAlmacen = '',
             this.errorArticulo = 0;
             this.idmedida = 0;
             this.costo_compra = '';
@@ -1284,15 +1331,15 @@ export default {
             }
             const margen_ganancia = parseFloat(this.datosFormulario.precio_costo_unid) * (parseFloat(precio.porcentage) / 100);
             const precio_publico = parseFloat(this.datosFormulario.precio_costo_unid) + margen_ganancia;
-
+            console.log("precio publico",typeof precio_publico);
             if (index === 0) {
-                this.precio_uno = precio_publico.toFixed(2);
+                this.precio_uno = Number(parseFloat(precio_publico).toFixed(2));
             } else if (index === 1) {
-                this.precio_dos = precio_publico.toFixed(2);
+                this.precio_dos = Number(parseFloat(precio_publico).toFixed(2));
             } else if (index === 2) {
-                this.precio_tres = precio_publico.toFixed(2);
+                this.precio_tres = Number(parseFloat(precio_publico).toFixed(2));
             } else if (index === 3) {
-                this.precio_cuatro = precio_publico.toFixed(2);
+                this.precio_cuatro = Number(parseFloat(precio_publico).toFixed(2));
             }
         },
         recuperarIdRol() {
@@ -1317,6 +1364,9 @@ export default {
 </script>
 
 <style scoped>
+>>>.p-datatable.p-datatable-gridlines .p-datatable-tbody > tr > td {
+    text-align: center;
+}
 .bold-input {
     font-weight: bold;
 }

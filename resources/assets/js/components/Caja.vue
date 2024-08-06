@@ -1,1028 +1,957 @@
 <template>
     <main class="main">
-    <!-- Breadcrumb -->
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Escritorio</a></li>
-    </ol>
-    <div class="container-fluid">
-        <!-- Ejemplo de tabla Listado -->
-        <div class="card">
-            <div class="card-header">
-                <i class="fa fa-align-justify"></i> Apertura/Cierre de Caja
-                <button type="button" @click="abrirModal('caja','registrar')" class="btn btn-secondary">
-                    <i class="icon-plus"></i>&nbsp;Abrir Caja
-                </button>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
+        <Panel>
+            <Toast :breakpoints="{ '920px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
+            </Toast>
+            <template #header>
+                <div class="panel-header">
 
-                <table class="table table-bordered table-striped table-sm">
-                    <thead>
-                        <tr>
-                            <th>N°</th>
-                            <th>Fecha Apertura</th>
-                            <th>Fecha Cierre</th>
-                            <th>Saldo Inicial</th>
-                            <th>Ventas Totales</th>
-                            <th>Ventas al Contado</th>
-                            <th>Ventas a Credito </th>
-                            <th>Pagos en Efectivo Ventas</th>
-                            <th>Pagos de Cuotas</th>
-                            <th>Pagos de Cuotas Efectivo</th>
-                            <th>Saldo de faltante </th>
-                            <th>Depósitos Extras</th>
-                            <th>Salidas Extras</th>
-                            <th>Saldo Caja</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
+                    <h4 class="panel-icon">Apertura/Cierre de Caja
+                    </h4>
+                </div>
+            </template>
+            <template>
+                <div class="card-header">
+                    <Button @click="abrirModal('caja', 'registrar')" icon="pi pi-plus" label="Abrir Caja"
+                        class="p-button-secondary" />
+                </div>
+            </template>
 
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(caja, index) in arrayCaja" :key="caja.id">
-                            <td v-text="index + 1"></td>
-                            <td v-text="caja.fechaApertura" width="90"></td>
-                            <td v-text="caja.fechaCierre"></td>
-                            <td v-text="caja.saldoInicial"></td>
-                          
-                            <td v-text="caja.ventas"></td>
-                            <td v-text="caja.ventasContado"></td>
-                            <td v-text="caja.ventasCredito"></td>
-                            <td v-text="caja.pagosEfectivoVentas"></td>
-                            <td v-text="caja.cuotasventasCredito"></td>
-                            <td v-text="caja.PagoCuotaEfectivo"></td>
-                            <td v-text="caja.saldoFaltante"></td>
-                           
-                            <td v-text="caja.depositos"></td>
-                            <td v-text="caja.salidas"></td>
-                            <td v-text="caja.saldoCaja"></td>
-                            <td>
-                                <div v-if="caja.estado">
-                                    <span class="badge badge-success">ABIERTO</span>
-                                </div>
-                                <div v-else>
-                                    <span class="badge badge-danger">CERRADO</span>
-                                </div>        
-                            </td>
-                            <td>
-                                <template v-if = caja.estado>
-                                        <template v-if="!mostrarBotonesSecundarios">
-                                        <button type="button" @click="abrirModal2('cajaDepositar', 'depositar', caja)" class="btn btn-primary btn-sm">
-                                            <i class="icon-plus"></i>
-                                        </button> &nbsp;
+            <DataTable :value="arrayCaja" :paginator="true" :rows="10" :totalRecords="pagination.total" :lazy="true"
+                @page="onPage($event)" :first="pagination.from - 1" responsiveLayout="scroll"
+                class="p-datatable-gridlines p-datatable-sm moto-table" :responsive="true">
+                <Column field="id" header="N°"></Column>
+                <Column field="fechaApertura" header="Fecha Apertura"></Column>
+                <Column field="fechaCierre" header="Fecha Cierre"></Column>
+                <Column field="saldoInicial" header="Saldo Inicial"></Column>
+                <Column field="ventas" header="Ventas Totales"></Column>
+                <Column field="ventasContado" header="Ventas al Contado"></Column>
+                <Column field="ventasCredito" header="Ventas a Crédito"></Column>
+                <Column field="pagosEfectivoVentas" header="Pagos en Efectivo Ventas"></Column>
+                <Column field="cuotasventasCredito" header="Pagos de Cuotas"></Column>
+                <Column field="PagoCuotaEfectivo" header="Pagos de Cuotas Efectivo"></Column>
+                <Column field="saldoFaltante" header="Saldo de faltante"></Column>
+                <Column field="depositos" header="Depósitos Extras"></Column>
+                <Column field="salidas" header="Salidas Extras"></Column>
+                <Column field="saldoCaja" header="Saldo Caja"></Column>
+                <Column field="estado" header="Estado">
+                    <template #body="slotProps">
+                        <Tag :severity="slotProps.data.estado ? 'success' : 'danger'">
+                            {{ slotProps.data.estado ? 'ABIERTO' : 'CERRADO' }}
+                        </Tag>
+                    </template>
+                </Column>
+                <Column header="Acciones">
+                    <template #body="slotProps">
+                        <Button icon="pi pi-plus" class="p-button-primary p-button-sm"
+                            @click="abrirModal2('cajaDepositar', 'depositar', slotProps.data)"
+                            v-if="slotProps.data.estado"></Button>
+                        <Button icon="pi pi-minus" class="p-button-danger p-button-sm"
+                            @click="abrirModal3('cajaRetirar', 'retirar', slotProps.data)"
+                            v-if="slotProps.data.estado"></Button>
+                        <Button icon="pi pi-eye" class="p-button-warning p-button-sm"
+                            @click="abrirModal4('cajaVer', 'ver', slotProps.data.id)"></Button>
+                        <Button icon="pi pi-calculator" class="p-button-success p-button-sm"
+                            @click="abrirModal5('arqueoCaja', 'contar', slotProps.data.id)"
+                            v-if="slotProps.data.estado"></Button>
+                        <Button icon="pi pi-lock" class="p-button-danger p-button-sm"
+                            @click="cerrarCaja(slotProps.data.id)"
+                            v-if="slotProps.data.estado && arqueoRealizado"></Button>
+                    </template>
+                </Column>
+            </DataTable>
 
-                                        <button type="button" @click="abrirModal3('cajaRetirar', 'retirar', caja)" class="btn btn-danger btn-sm">
-                                            <i class="icon-minus"></i>
-                                        </button> &nbsp;
-
-                                        <button type="button" @click="abrirModal4('cajaVer', 'ver', caja.id)" class="btn btn-warning btn-sm">
-                                            <i class="icon-eye"></i>
-                                        </button> &nbsp;
-
-                                        <button type="button" @click="abrirModal5('arqueoCaja', 'contar', caja.id)" class="btn btn-success btn-sm">
-                                            <i class="icon-calculator"></i>
-                                        </button> &nbsp;
-                                        
-                                        </template>
-
-                                        <template v-else>
-                                        <button type="button" @click="abrirModal4('cajaVer', 'ver', caja.id)" class="btn btn-warning btn-sm">
-                                            <i class="icon-eye"></i>
-                                        </button> &nbsp;
-
-                                        <button type="button" class="btn btn-danger btn-sm" @click="cerrarCaja(caja.id)">
-                                            <i class="icon-lock"></i>
-                                        </button>
-                                        </template>
-                                </template>
-
-                                <template v-else>
-                                    <button type="button" @click="" class="btn btn-success btn-sm">
-                                        <i class="icon-printer"></i>
-                                    </button>
-
-                                    <button type="button" @click="" class="btn btn-danger btn-sm">
-                                        <i class="icon-printer"></i>
-                                    </button>
-                                </template>
-
-                            </td>
-                        </tr>                                
-                    </tbody>
-                </table>
-            </div>
-
-                <nav>
-                    <ul class="pagination">
-                        <li class="page-item" v-if="pagination.current_page > 1">
-                            <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Ant</a>
-                        </li>
-                        <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
-                            <a class="page-link" href="#" @click.prevent="cambiarPagina(page,buscar,criterio)" v-text="page"></a>
-                        </li>
-                        <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                            <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Sig</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-        <!-- Fin ejemplo de tabla Listado -->
-    </div>
-    <!--Inicio del modal aperturar caja-->
-    <div class="modal " tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
-                <div class="modal-dialog modal-primary modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" v-text="tituloModal"></h4>
-                            <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <form @submit.prevent="registrarCaja">    
-                            <div class="modal-body">
-                                    <div class="form-group row">
-                                        <label class="col-md-3 form-control-label" for="text-input">Saldo Inicial</label>
-                                        <div class="col-md-9">
-                                            <input type="text" v-model="saldoInicial" class="form-control" placeholder="0.00">   
-                                        </div>
-                                    </div>
-                                    <div v-show="errorCaja" class="form-group row div-error">
-                                        <div class="text-center text-error">
-                                            <div v-for="error in errorMostrarMsjCaja" :key="error" v-text="error">
-
-                                            </div>
-                                        </div>
-                                    </div>
+            <template>
+                <Dialog :visible.sync="modal" :modal="true" :header="tituloModal" @hide="cerrarModal"
+                    containerStyle="width: 500px;">
+                    <form @submit.prevent="registrarCaja" class="p-fluid">
+                        <div class="p-field p-grid">
+                            <label for="saldoInicial" class="p-col-12 p-md-3">Saldo Inicial</label>
+                            <div class="p-col-12 p-md-9">
+                                <InputText id="saldoInicial" v-model="saldoInicial" placeholder="0.00"
+                                    @keyup.enter="registrarCaja" />
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                                <button type="submit" v-if="tipoAccion==1" class="btn btn-primary">Guardar</button>
+                        </div>
+                        <div v-if="errorCaja" class="p-field p-grid div-error">
+                            <div class="p-col text-center text-error">
+                                <div v-for="error in errorMostrarMsjCaja" :key="error" v-text="error"></div>
                             </div>
-                        </form>
-                    </div>
-                    <!-- /.modal-content -->
-                </div>
-                <!-- /.modal-dialog -->
-            </div>
-    <!--Fin del modal-->
-    <!--Inicio del modal Depósitos-->
-    <div class="modal " tabindex="-1" :class="{'mostrar' : modal2}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
-                <div class="modal-dialog modal-primary modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" v-text="tituloModal2"></h4>
-                            <button type="button" class="close" @click="cerrarModal2()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
-                            </button>
                         </div>
-                        <div class="modal-body">
-                            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Importe</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="depositos" class="form-control" placeholder="0.00">   
-                                    </div>
-                                
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Descripcion de Importe</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="Desdepositos" class="form-control" placeholder="Descripcion">   
-                                    </div>
-                                
-                                </div>
-                                <div v-show="errorCaja" class="form-group row div-error">
-                                    <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjCaja" :key="error" v-text="error">
+                    </form>
+                    <template #footer>
+                        <Button label="Cerrar" icon="pi pi-times" class="p-button-danger" @click="cerrarModal" />
+                        <Button v-if="tipoAccion == 1" label="Guardar" icon="pi pi-check" class="p-button-success"
+                            @click="registrarCaja" />
+                    </template>
+                </Dialog>
+            </template>
 
-                                        </div>
-                                    </div>
-                                </div>
 
-                            </form>
+            <template>
+                <Dialog :visible.sync="modal2" :modal="true" :header="tituloModal2" @hide="cerrarModal2"
+                    containerStyle="width: 500px">
+                    <form @submit.prevent="depositar" enctype="multipart/form-data" class="p-fluid">
+                        <div class="p-field p-grid">
+                            <label for="depositos" class="p-col-12 p-md-3">Importe</label>
+                            <div class="p-col-12 p-md-9">
+                                <InputText id="depositos" v-model="depositos" placeholder="0.00" />
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal2()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="depositar()">Depositar <i class="icon-arrow-right"></i></button>
+                        <div class="p-field p-grid">
+                            <label for="Desdepositos" class="p-col-12 p-md-3">Descripcion de Importe</label>
+                            <div class="p-col-12 p-md-9">
+                                <InputText id="Desdepositos" v-model="Desdepositos" placeholder="Descripcion" />
+                            </div>
                         </div>
-                    </div>
-                    <!-- /.modal-content -->
-                </div>
-                <!-- /.modal-dialog -->
-            </div>
-            <!--Fin del modal-->
-
-            <!--Inicio del modal Salidas-->
-    <div class="modal " tabindex="-1" :class="{'mostrar' : modal3}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
-                <div class="modal-dialog modal-primary modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" v-text="tituloModal3"></h4>
-                            <button type="button" class="close" @click="cerrarModal3()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
-                            </button>
+                        <div v-if="errorCaja" class="p-field p-grid div-error">
+                            <div class="p-col text-center text-error">
+                                <div v-for="error in errorMostrarMsjCaja" :key="error" v-text="error"></div>
+                            </div>
                         </div>
-                        <div class="modal-body">
-                            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Importe</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="salidas" class="form-control" placeholder="0.00">   
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Descripcion de Importe</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="Dessalidas" class="form-control" placeholder="Descripcion">   
-                                    </div>
-                                </div>
-                                <div v-show="errorCaja" class="form-group row div-error">
-                                    <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjCaja" :key="error" v-text="error">
+                    </form>
+                    <template #footer>
+                        <Button label="Cerrar" icon="pi pi-times" class="p-button-danger" @click="cerrarModal2" />
+                        <Button v-if="tipoAccion == 2" label="Depositar" icon="pi pi-arrow-right"
+                            class="p-button-success" @click="depositar" />
+                    </template>
+                </Dialog>
+            </template>
 
-                                        </div>
-                                    </div>
-                                </div>
 
-                            </form>
+            <template>
+                <Dialog :visible.sync="modal3" :modal="true" :header="tituloModal3" @hide="cerrarModal3"
+                    containerStyle="width: 500px">
+                    <form @submit.prevent="retirar" enctype="multipart/form-data" class="p-fluid">
+                        <div class="p-field p-grid">
+                            <label for="salidas" class="p-col-12 p-md-3">Importe</label>
+                            <div class="p-col-12 p-md-9">
+                                <InputText id="salidas" v-model="salidas" placeholder="0.00" />
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal3()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==3" class="btn btn-primary" @click="retirar()">Retirar <i class="icon-arrow-right"></i></button>
+                        <div class="p-field p-grid">
+                            <label for="Dessalidas" class="p-col-12 p-md-3">Descripcion de Importe</label>
+                            <div class="p-col-12 p-md-9">
+                                <InputText id="Dessalidas" v-model="Dessalidas" placeholder="Descripcion" />
+                            </div>
                         </div>
-                    </div>
-                    <!-- /.modal-content -->
-                </div>
-                <!-- /.modal-dialog -->
-            </div>
-            <!--Fin del modal-->
-
-            <!--Inicio del modal Ver Transacciones-->
-            <div class="modal " tabindex="-1" :class="{ 'mostrar': modal4 }" role="dialog" aria-labelledby="myModalLabel"
-            style="display: none; overflow-y: auto" aria-hidden="true">
-            <div class="modal-dialog modal-primary modal-lg" role="document">
-                <div class="modal-content m-2">
-                    <div class="modal-header">
-                        <h4 class="modal-title" v-text="tituloModal4"></h4>
-                        <button type="button" class="close" @click="cerrarModal4()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div>
-                            <b-tabs content-class="mt-3">
-                                <b-tab title="Compras Realizadas (egresos)" active>
-
-                                    <TransaccionErgeso v-if="egreso" :data="egreso" />
-                                    <!-- <div class="table-responsive">
-                                        <table class="table table-bordered table-striped table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>N°</th>
-                                                    <th>Fecha</th>
-                                                    <th>Proveedor</th>
-                                                    <th>Tipo Comprobante</th>
-                                                    <th>Número Comprobante</th>
-                                                    <th>importe</th>
-                                                    <th>Usuario</th>
-
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-if="ArrayEgresos.length <= 0">
-                                                    <td colspan="100">
-                                                        Parece que aún no has realizado ningún egreso.
-                                                    </td>
-                                                </tr>
-                                                <tr v-for="(ingreso, index) in ArrayEgresos" :key="ingreso.id">
-                                                    <td v-text="index + 1"></td>
-                                                    <td v-text="ingreso.fecha_hora"></td>
-                                                    <td v-text="ingreso.nombre"></td>
-                                                    <td v-text="ingreso.tipo_comprobante"></td>
-                                                    <td v-text="ingreso.num_comprobante"></td>
-                                                    <td v-text="ingreso.total"></td>
-                                                    <td v-text="ingreso.usuario"></td>
-
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div> -->
-                                </b-tab>
-                                <b-tab title="Ventas Realizadas (ingresos)">
-                                    <div class="table-responsive">
-                                        <TransaccionIngreso v-if="ingreso" :data="ingreso" />
-
-                                        <!-- <table class="table table-bordered table-striped table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>N°</th>
-                                                    <th>Fecha</th>
-                                                    <th>Cliente</th>
-                                                    <th>Tipo Comprobante</th>
-                                                    <th>Número Comprobante</th>
-                                                    <th>importe</th>
-                                                    <th>Usuario</th>
-
-
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-if="ArrayIngresos.length <= 0">
-                                                    <td colspan="100">
-                                                        Parece que aún no has realizado ningún ingreso.
-                                                    </td>
-                                                </tr>
-                                                <tr v-for="(venta, index) in ArrayIngresos" :key="venta.id">
-                                                    <td v-text="index + 1"></td>
-                                                    <td v-text="venta.fecha_hora"></td>
-                                                    <td v-text="venta.nombre"></td>
-                                                    <td v-text="venta.tipo_comprobante"></td>
-                                                    <td v-text="venta.num_comprobante"></td>
-                                                    <td v-text="venta.total"></td>
-                                                    <td v-text="venta.usuario"></td>
-                                                </tr>
-                                            </tbody>
-                                        </table> -->
-                                    </div>
-                                </b-tab>
-                                <b-tab title="Transacciones Extras">
-                                    <TransaccionExtra v-if="extra" :data="extra" />
-                                    <!-- <div class="table-responsive">
-                                        <table class="table table-bordered table-striped table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>N°</th>
-                                                    <th>Fecha</th>
-                                                    <th>Transacción</th>
-                                                    <th>Importe</th>
-                                                    <th>Usuario</th>
-
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-if="arrayTransacciones.length <= 0">
-                                                    <td colspan="100">
-                                                        Parece que aún no has realizado ninguna transacción.
-                                                    </td>
-                                                </tr>
-                                                <tr v-for="(transacciones, index) in arrayTransacciones"
-                                                    :key="transacciones.id">
-                                                    <td v-text="index + 1"></td>
-                                                    <td v-text="transacciones.fecha" width="90"></td>
-                                                    <td v-text="transacciones.transaccion"></td>
-                                                    <td v-text="transacciones.importe"></td>
-                                                    <td v-text="transacciones.usuario"></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div> -->
-                                </b-tab>
-                            </b-tabs>
+                        <div v-if="errorCaja" class="p-field p-grid div-error">
+                            <div class="p-col text-center text-error">
+                                <div v-for="error in errorMostrarMsjCaja" :key="error" v-text="error"></div>
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal4()">Cerrar</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- /.modal-content -->
-            </div>
-            <!-- /.modal-dialog -->
-        </div>
-            <!--Fin del modal-->
+                    </form>
+                    <template #footer>
+                        <Button label="Cerrar" icon="pi pi-times" class="p-button-danger" @click="cerrarModal3" />
+                        <Button v-if="tipoAccion == 3" label="Retirar" icon="pi pi-arrow-right" class="p-button-success"
+                            @click="retirar" />
+                    </template>
+                </Dialog>
+            </template>
 
-            <!--Inicio del modal Arqueo de Caja-->
-    <div class="modal " tabindex="-1" :class="{'mostrar' : modal5}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
-                <div class="modal-dialog modal-primary modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" v-text="tituloModal5"></h4>
-                            <button type="button" class="close" @click="cerrarModal5()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h4>Billetes</h4>
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Bs. 200:</label>
-                                            <div class="col-sm-8">
-                                                <input type="number" v-model="billete200" class="form-control form-control-sm" placeholder="0">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Bs. 100:</label>
-                                            <div class="col-sm-8">
-                                                <input type="number" v-model="billete100" class="form-control form-control-sm" placeholder="0">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Bs. 50:</label>
-                                            <div class="col-sm-8">
-                                                <input type="number" v-model="billete50" class="form-control form-control-sm" placeholder="0">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Bs. 20:</label>
-                                            <div class="col-sm-8">
-                                                <input type="number" v-model="billete20" class="form-control form-control-sm" placeholder="0">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Bs. 10:</label>
-                                            <div class="col-sm-8">
-                                                <input type="number" v-model="billete10" class="form-control form-control-sm" placeholder="0">
-                                            </div>
-                                        </div>
 
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Total Billetes Bs.</label>
-                                            <div class="col-sm-8">
-                                                <span v-text="totalBilletes" class="font-weight-bold"></span>
-                                            </div>
-                                        </div>
+            <template>
+                <Dialog :visible.sync="modal4" :modal="true" :header="tituloModal4" @hide="cerrarModal4"
+                    containerStyle="width: 800px; overflow-y: auto;">
+                    <b-tabs content-class="mt-3">
+                        <b-tab title="Compras Realizadas (egresos)" active>
+                            <TransaccionErgeso v-if="egreso" :data="egreso" />
+                        </b-tab>
+                        <b-tab title="Ventas Realizadas (ingresos)">
+                            <TransaccionIngreso v-if="ingreso" :data="ingreso" />
+                        </b-tab>
+                        <b-tab title="Transacciones Extras">
+                            <TransaccionExtra v-if="extra" :data="extra" />
+                        </b-tab>
+                    </b-tabs>
+                    <template #footer>
+                        <Button label="Cerrar" icon="pi pi-times" class="p-button-danger" @click="cerrarModal4" />
+                    </template>
+                </Dialog>
+            </template>
 
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h4>Monedas</h4>
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Bs. 5:</label>
-                                            <div class="col-sm-8">
-                                                <input type="number" v-model="moneda5" class="form-control form-control-sm" id="" name="" placeholder="0">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Bs. 2:</label>
-                                            <div class="col-sm-8">
-                                                <input type="number" v-model="moneda2" class="form-control form-control-sm" id="" name="" placeholder="0">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Bs. 1:</label>
-                                            <div class="col-sm-8">
-                                                <input type="number" v-model="moneda1" class="form-control form-control-sm" id="" name="" placeholder="0">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Bs. 0.50:</label>
-                                            <div class="col-sm-8">
-                                                <input type="number" v-model="moneda050" class="form-control form-control-sm" id="" name="" placeholder="0">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Bs. 0.20:</label>
-                                            <div class="col-sm-8">
-                                                <input type="number" v-model="moneda020" class="form-control form-control-sm" id="" name="" placeholder="0">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Bs. 0.10:</label>
-                                            <div class="col-sm-8">
-                                                <input type="number" v-model="moneda010" class="form-control form-control-sm" id="" name="" placeholder="0">
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group row">
-                                        <label class="col-sm-4 col-form-label">Total Monedas Bs.</label>
-                                        <div class="col-sm-8">
-                                            <span v-text="totalMonedas" class="font-weight-bold"></span>
-                                        </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group row">
-                                        <label class="col-sm-4 col-form-label">Total Efectivo Bs.</label>
-                                        <div class="col-sm-8">
-                                            <strong>{{ totalEfectivo }}</strong>
-                                        </div>
-                                    </div>
+            <template>
+                <Dialog :visible.sync="modal5" :modal="true" :header="tituloModal5" @hide="cerrarModal5"
+                    containerStyle="width: 800px">
+                    <form @submit.prevent="registrarArqueo" enctype="multipart/form-data" class="p-fluid">
+                        <div class="p-grid">
+                            <div class="p-col-12 p-md-6">
+                                <h4>Billetes</h4>
+                                <div class="p-field p-grid">
+                                    <label for="billete200" class="p-col-12">
+                                        <img src="img/caja/200.jpg" alt="Bs. 200" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5 ">
+                                        <InputNumber id="billete200" v-model="billete200" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
                                     </div>
                                 </div>
-                            </form>
+                                <div class="p-field p-grid">
+                                    <label for="billete100" class="p-col-12">
+                                        <img src="img/caja/100.jpg" alt="Bs. 100" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="billete100" v-model="billete100" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <label for="billete50" class="p-col-12">
+                                        <img src="img/caja/50.jpg" alt="Bs. 50" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="billete50" v-model="billete50" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <label for="billete20" class="p-col-12">
+                                        <img src="img/caja/20.jpg" alt="Bs. 20" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="billete20" v-model="billete20" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <label for="billete10" class="p-col-12">
+                                        <img src="img/caja/10.jpg" alt="Bs. 10" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="billete10" v-model="billete10" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <label class="p-col-12 p-md-4">Total Billetes Bs.</label>
+                                    <div class="p-col-12 p-md-6">
+                                        <span v-text="totalBilletes" class="font-weight-bold"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-col-12 p-md-6">
+                                <h4>Monedas</h4>
+                                <div class="p-field p-grid">
+                                    <label for="moneda5" class="p-col-12">
+                                        <img src="img/caja/5.jpg" alt="Bs. 5" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="moneda5" v-model="moneda5" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <label for="moneda2" class="p-col-12">
+                                        <img src="img/caja/2.jpg" alt="Bs. 2" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="moneda2" v-model="moneda2" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <label for="moneda1" class="p-col-12">
+                                        <img src="img/caja/1.jpg" alt="Bs. 1" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="moneda1" v-model="moneda1" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <label for="moneda050" class="p-col-12">
+                                        <img src="img/caja/c50.jpg" alt="Bs. 0.50" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="moneda050" v-model="moneda050" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <label for="moneda020" class="p-col-12">
+                                        <img src="img/caja/20M.jpg" alt="Bs. 0.20" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="moneda020" v-model="moneda020" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <label for="moneda010" class="p-col-12">
+                                        <img src="img/caja/c10.jpg" alt="Bs. 0.10" class="billete-img">
+                                    </label>
+                                    <div class="p-col-5">
+                                        <InputNumber id="moneda010" v-model="moneda010" :min="0" showButtons
+                                            buttonLayout="horizontal" decrementButtonClass="p-button-danger p-button-sm"
+                                            incrementButtonClass="p-button-success p-button-sm"
+                                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <label class="p-col-12 p-md-4">Total Monedas Bs.</label>
+                                    <div class="p-col-12 p-md-8">
+                                        <span v-text="totalMonedas" class="font-weight-bold"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-col-12">
+                                <div class="p-field p-grid">
+                                    <label class="p-col-12 p-md-4">Total Efectivo Bs.</label>
+                                    <div class="p-col-12 p-md-8">
+                                        <strong>{{ totalEfectivo }}</strong>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" @click="cerrarModal5()">Cancelar</button>
-                            <button type="button" v-if="tipoAccion==5" class="btn btn-primary" @click="registrarArqueo()">Guardar</button>
-                        </div>
-                    </div>
-                    <!-- /.modal-content -->
-                </div>
-                <!-- /.modal-dialog -->
-            </div>
-    <!--Fin del modal-->
-
-
-</main>
+                    </form>
+                    <template #footer>
+                        <Button label="Cancelar" icon="pi pi-times" class="p-button-danger" @click="cerrarModal5" />
+                        <Button v-if="tipoAccion == 5" label="Guardar" icon="pi pi-check" class="p-button-success"
+                            @click.prevent="registrarArqueo" />
+                    </template>
+                </Dialog>
+            </template>
+        </Panel>
+    </main>
 </template>
 
 <script>
-import TransaccionErgeso from "./Tables/TransaccionEgreso.vue";
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import InputText from 'primevue/inputtext';
+import Dropdown from 'primevue/dropdown';
+import Tag from 'primevue/tag';
+import InputNumber from 'primevue/inputnumber';
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+import Card from 'primevue/card';
+import Toast from 'primevue/toast';
+import TransaccionEgreso from "./Tables/TransaccionEgreso.vue";
 import TransaccionIngreso from "./Tables/TransaccionIngreso.vue";
 import TransaccionExtra from "./Tables/TransaccionExtra.vue";
-
+import Panel from 'primevue/panel';
+import Swal from "sweetalert2";
 export default {
-data (){
-    return {
-        id: 0,
-        idsucursal : 0,
-        nombre_sucursal:'',
-        idusuario : 0,
-        usuario : '',
-        fechaApertura : '',
-        fechaCierre : '',
-        saldoInicial : '',
-        depositos : '',
-        Desdepositos:'',
-        salidas : '',
-        Dessalidas : '',
-        ventasContado : '',
-        ventasCredito : '',
-        comprasContado : '',
-        comprasCredito : '',
-        saldoFaltante : '',
-        PagoCuotaEfectivo : '',
-        saldoCaja : '',
-        arqueo_id: 0,
-        billete200 : 0,
-        billete100 : 0,
-        billete50 : 0,
-        billete20 : 0,
-        billete10 : 0,
-        totalBilletes: 0,
-        moneda5 : 0,
-        moneda2 : 0,
-        moneda1 : 0,
-        moneda050 : 0,
-        moneda020 : 0,
-        moneda010 : 0,
-        totalMonedas : 0,
-        arrayCaja : [],
-        arrayTransacciones: [],
-        ArrayIngresos:[],
-        ArrayEgresos:[],
-        egreso: null,
-        ingreso: null,
-        extra: null,
-        modal : 0,
-        modal2 : 0,
-        modal3 : 0,
-        modal4 : 0,
-        modal5 : 0,
-        tituloModal : '',
-        tituloModal2: '',
-        tituloModal3: '',
-        tituloModal4: '',
-        tituloModal5: '',
-        tipoAccion : 0,
-        arqueoRealizado : false,
-        errorCaja : 0,
-        errorMostrarMsjCaja : [],
-        pagination : {
-            'total' : 0,
-            'current_page' : 0,
-            'per_page' : 0,
-            'last_page' : 0,
-            'from' : 0,
-            'to' : 0,
+    components: {
+        DataTable,
+        Column,
+        Button,
+        Dialog,
+        InputText,
+        Dropdown,
+        Tag,
+        InputNumber,
+        TabView,
+        TabPanel,
+        Card,
+        Toast,
+        Panel,
+        TransaccionEgreso,
+        TransaccionIngreso,
+        TransaccionExtra
+    },
+    data() {
+        return {
+            id: 0,
+            idsucursal: 0,
+            nombre_sucursal: '',
+            idusuario: 0,
+            usuario: '',
+            fechaApertura: '',
+            fechaCierre: '',
+            saldoInicial: '',
+            depositos: '',
+            Desdepositos: '',
+            salidas: '',
+            Dessalidas: '',
+            ventasContado: '',
+            ventasCredito: '',
+            comprasContado: '',
+            comprasCredito: '',
+            saldoFaltante: '',
+            PagoCuotaEfectivo: '',
+            saldoCaja: '',
+            arqueo_id: 0,
+            billete200: 0,
+            billete100: 0,
+            billete50: 0,
+            billete20: 0,
+            billete10: 0,
+            totalBilletes: 0,
+            moneda5: 0,
+            moneda2: 0,
+            moneda1: 0,
+            moneda050: 0,
+            moneda020: 0,
+            moneda010: 0,
+            totalMonedas: 0,
+            arrayCaja: [],
+            arrayTransacciones: [],
+            ArrayIngresos: [],
+            ArrayEgresos: [],
+            egreso: null,
+            ingreso: null,
+            extra: null,
+            modal: false,
+            modal2: false,
+            modal3: false,
+            modal4: false,
+            modal5: false,
+            tituloModal: '',
+            tituloModal2: '',
+            tituloModal3: '',
+            tituloModal4: '',
+            tituloModal5: '',
+            tipoAccion: 0,
+            arqueoRealizado: false,
+            errorCaja: 0,
+            errorMostrarMsjCaja: [],
+            pagination: {
+                'total': 0,
+                'current_page': 0,
+                'per_page': 0,
+                'last_page': 0,
+                'from': 0,
+                'to': 0,
+            },
+            offset: 3,
+            arraySucursal: [],
+            arrayUser: [],
+            buscar: '',
+            criterio: '',
+            mostrarBotonesSecundarios: false
+        }
+    },
+    computed: {
+        totalEfectivo() {
+            return parseFloat((this.totalBilletes + this.totalMonedas).toFixed(2));
         },
-        offset : 3,
-        arraySucursal :[],
-        arrayUser :[],
-        buscar : '',
-        criterio : '',
-        mostrarBotonesSecundarios: false
-    }
-},
-computed:{
-    isActived: function(){
-        return this.pagination.current_page;
-    },
-    //Calcula los elementos de la paginación
-    pagesNumber: function() {
-        if(!this.pagination.to) {
-            return [];
+        totalBilletes() {
+            return parseFloat((
+                (Number(this.billete200) || 0) * 200 +
+                (Number(this.billete100) || 0) * 100 +
+                (Number(this.billete50) || 0) * 50 +
+                (Number(this.billete20) || 0) * 20 +
+                (Number(this.billete10) || 0) * 10
+            ).toFixed(2));
+        },
+        totalMonedas() {
+            return parseFloat((
+                (Number(this.moneda5) || 0) * 5 +
+                (Number(this.moneda2) || 0) * 2 +
+                (Number(this.moneda1) || 0) * 1 +
+                (Number(this.moneda050) || 0) * 0.5 +
+                (Number(this.moneda020) || 0) * 0.2 +
+                (Number(this.moneda010) || 0) * 0.1
+            ).toFixed(2));
+        },
+        isActived: function () {
+            return this.pagination.current_page;
+        },
+        //Calcula los elementos de la paginación
+        pagesNumber: function () {
+            if (!this.pagination.to) {
+                return [];
+            }
+
+            var from = this.pagination.current_page - this.offset;
+            if (from < 1) {
+                from = 1;
+            }
+
+            var to = from + (this.offset * 2);
+            if (to >= this.pagination.last_page) {
+                to = this.pagination.last_page;
+            }
+
+            var pagesArray = [];
+            while (from <= to) {
+                pagesArray.push(from);
+                from++;
+            }
+            return pagesArray;
+
+        },
+
+        totalEfectivo() {
+            return this.totalBilletes + this.totalMonedas;
         }
-        
-        var from = this.pagination.current_page - this.offset; 
-        if(from < 1) {
-            from = 1;
-        }
-
-        var to = from + (this.offset * 2); 
-        if(to >= this.pagination.last_page){
-            to = this.pagination.last_page;
-        }  
-
-        var pagesArray = [];
-        while(from <= to) {
-            pagesArray.push(from);
-            from++;
-        }
-        return pagesArray;             
-
-    }, 
-
-    totalEfectivo() {
-    return this.totalBilletes + this.totalMonedas;
-  }
-},
-methods : {
-    listarCaja (page,buscar,criterio){
-        let me=this;
-        var url= '/caja?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
-        axios.get(url).then(function (response) {
-            var respuesta= response.data;
-            console.log(respuesta);
-            me.arrayCaja = respuesta.cajas.data;
-            me.pagination= respuesta.pagination;
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
     },
-
-    cambiarPagina(page,buscar,criterio){
-        let me = this;
-        //Actualiza la página actual
-        me.pagination.current_page = page;
-        //Envia la petición para visualizar la data de esa página
-        me.listarCaja(page,buscar,criterio);
-    },
-            registrarCaja(){
-                if (this.validarCaja()){
-                    return;
-                }
-                
-                let me = this;
-                let formData = new FormData();
-
-                //formData.append('idempresa', 1);
-                formData.append('saldoInicial', this.saldoInicial);
-
-                axios.post('/caja/registrar', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-
-                }).then(function (response) {
-                    me.cerrarModal();
-                    me.listarCaja(1,'','id');
-                    swal(
-                            'Aperturada!',
-                            'Caja aperturada de forma satisfactoria!',
-                            'success'
-                        )
-                }).catch(function (error) {
+    methods: {
+        onPage(event) {
+            this.listarCaja(event.page + 1, this.buscar, this.criterio);
+        },
+        mostrarError(mensaje) {
+            this.$toast.add({ severity: 'error', summary: 'Error', detail: mensaje, life: 3000 });
+        },
+        listarCaja(page, buscar, criterio) {
+            let me = this;
+            var url = '/caja?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.arrayCaja = respuesta.cajas.data;
+                me.pagination = {
+                    total: respuesta.cajas.total,
+                    current_page: respuesta.cajas.current_page,
+                    per_page: respuesta.cajas.per_page,
+                    last_page: respuesta.cajas.last_page,
+                    from: respuesta.cajas.from,
+                    to: respuesta.cajas.to
+                };
+            })
+                .catch(function (error) {
                     console.log(error);
                 });
-                
-            },
-    
-        registrarArqueo(){
-        let me = this;
-        this.mostrarBotonesSecundarios = true;
+        },
 
-        axios.post('/caja/arqueoCaja', {
-            'idcaja':this.id,
-            'billete200': this.billete200,
-            'billete100': this.billete100,
-            'billete50': this.billete50,
-            'billete20': this.billete20,
-            'billete10': this.billete10,
-            'moneda5': this.moneda5,
-            'moneda2': this.moneda2,
-            'moneda1': this.moneda1,
-            'moneda050': this.moneda050,
-            'moneda020': this.moneda020,
-            'moneda010': this.moneda010
+        cambiarPagina(page, buscar, criterio) {
+            let me = this;
+            //Actualiza la página actual
+            me.pagination.current_page = page;
+            //Envia la petición para visualizar la data de esa página
+            me.listarCaja(page, buscar, criterio);
+        },
+        registrarCaja() {
+            if (this.validarCaja()) {
+                return;
+            }
 
+            let me = this;
+            let formData = new FormData();
+
+            formData.append('saldoInicial', this.saldoInicial);
+
+            axios.post('/caja/registrar', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             }).then(function (response) {
-                console.log(response);
-                me.cerrarModal5();
-                    swal(
-                        'Información!',
-                        'Conteo de dinero registrado satisfactoriamente!',
-                        'success'
-                    );
+                me.cerrarModal();
+                me.arqueoRealizado = false; // Reiniciamos arqueoRealizado
+                me.listarCaja(1, '', 'id');
+                swal(
+                    'Aperturada!',
+                    'Caja aperturada de forma satisfactoria!',
+                    'success'
+                )
             }).catch(function (error) {
                 console.log(error);
             });
-    },
-    
-    depositar(){
-        let me = this;
+        },
 
-        axios.put('/caja/depositar',{
-            'depositos':this.depositos,
-            'id':this.id,
-            'transaccion':this.Desdepositos+'  (movimiento de ingreso )',
-
-        }).then(function (response) {
-            me.cerrarModal2();
-            me.listarCaja(1,'','id');
-            swal(
-                'Información!',
-                'Transacción de caja registrada satisfactoriamente!',
-                'success'
-                )
-        }).catch(function (error) {
-            console.log(error);
-        }); 
-    },
-
-    retirar(){
-        let me = this;
-
-        axios.put('/caja/retirar',{
-            'salidas':this.salidas,
-            'transaccion':this.Dessalidas+' (movimiento de egreso  )',
-            'id':this.id
-        }).then(function (response) {
-            me.cerrarModal3();
-            me.listarCaja(1,'','id');
-            swal(
-                'Información!',
-                'Transacción de caja registrada satisfactoriamente!',
-                'success'
-                )
-        }).catch(function (error) {
-            console.log(error);
-        }); 
-    },
-    calcularTotalBilletes(){
-        const billete200 = parseFloat(this.billete200) || 0;
-        const billete100 = parseFloat(this.billete100) || 0;
-        const billete50 = parseFloat(this.billete50) || 0;
-        const billete20 = parseFloat(this.billete20) || 0;
-        const billete10 = parseFloat(this.billete10) || 0;
-
-        this.totalBilletes = billete200*200 + billete100*100 + billete50*50 + billete20*20 + billete10*10;
-    },
-
-    calcularTotalMonedas(){
-        const moneda5 = parseFloat(this.moneda5) || 0;
-        const moneda2 = parseFloat(this.moneda2) || 0;
-        const moneda1 = parseFloat(this.moneda1) || 0;
-        const moneda050 = parseFloat(this.moneda050) || 0;
-        const moneda020 = parseFloat(this.moneda020) || 0;
-        const moneda010 = parseFloat(this.moneda010) || 0;
-
-        this.totalMonedas = moneda5*5 + moneda2*2 + moneda1*1 + moneda050*0.50 + moneda020*0.20 + moneda010*0.10;
-    },
-    cerrarCaja(id){
-        const total = this.totalEfectivo;
-       swal({
-        title: 'Esta seguro de cerrar la caja?',
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Aceptar!',
-        cancelButtonText: 'Cancelar',
-        confirmButtonClass: 'btn btn-success',
-        cancelButtonClass: 'btn btn-danger',
-        buttonsStyling: false,
-        reverseButtons: true
-        }).then((result) => {
-        if (result.value) {
+        async registrarArqueo() {
             let me = this;
 
-            axios.put('/caja/cerrar',{
-                'id': id,
-                'saldoFaltante':total
+            // Calcular el total del arqueo
+            const totalArqueo = parseFloat(this.totalEfectivo.toFixed(2));
+
+            try {
+                // Obtener el saldo actual de la caja
+                const saldoCaja = parseFloat((await this.obtenerSaldoCaja()).toFixed(2));
+
+                // Validar que se hayan ingresado datos
+                if (totalArqueo === 0) {
+                    this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Debe ingresar al menos un valor para el arqueo', life: 3000 });
+                    return;
+                }
+
+                // Validar que el total del arqueo coincida con el saldo de caja
+                const diferencia = Math.abs(totalArqueo - saldoCaja);
+                if (diferencia > 0.01) { // Permitimos una diferencia de hasta 1 centavo
+                    this.$toast.add({ severity: 'error', summary: 'Error', detail: `El total del arqueo (${totalArqueo.toFixed(2)}) no coincide con el saldo de caja (${saldoCaja.toFixed(2)})`, life: 3000 });
+                    return;
+                }
+
+                // Si pasa las validaciones, proceder con el registro del arqueo
+                const response = await axios.post('/caja/arqueoCaja', {
+                    'idcaja': this.id,
+                    'billete200': this.billete200,
+                    'billete100': this.billete100,
+                    'billete50': this.billete50,
+                    'billete20': this.billete20,
+                    'billete10': this.billete10,
+                    'moneda5': this.moneda5,
+                    'moneda2': this.moneda2,
+                    'moneda1': this.moneda1,
+                    'moneda050': this.moneda050,
+                    'moneda020': this.moneda020,
+                    'moneda010': this.moneda010,
+                    'totalArqueo': totalArqueo
+                });
+
+                me.cerrarModal5();
+                me.arqueoRealizado = true;
+                me.$toast.add({ severity: 'success', summary: 'Éxito', detail: 'Arqueo de caja registrado correctamente', life: 3000 });
+            } catch (error) {
+                console.error('Error al registrar el arqueo:', error);
+                me.$toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo registrar el arqueo de caja', life: 3000 });
+            }
+        },
+        obtenerSaldoCaja() {
+            return new Promise((resolve, reject) => {
+                axios.get(`/caja/saldo/${this.id}`)
+                    .then(response => resolve(parseFloat(response.data.saldo)))
+                    .catch(error => {
+                        console.error('Error al obtener el saldo de caja:', error);
+                        reject(error);
+                    });
+            });
+        },
+
+        depositar() {
+            let me = this;
+
+            axios.put('/caja/depositar', {
+                'depositos': this.depositos,
+                'id': this.id,
+                'transaccion': this.Desdepositos + '  (movimiento de ingreso )',
+
             }).then(function (response) {
-                me.listarCaja(1,'','id');
+                me.cerrarModal2();
+                me.listarCaja(1, '', 'id');
                 swal(
-                'Cerrada!',
-                'La caja fue cerrada con éxito.',
-                'success'
+                    'Información!',
+                    'Transacción de caja registrada satisfactoriamente!',
+                    'success'
                 )
             }).catch(function (error) {
                 console.log(error);
             });
-            
-            
-        } else if (
-            // Read more about handling dismissals
-            result.dismiss === swal.DismissReason.cancel
-        ) {
-            
-        }
-        }) 
-    },
+        },
 
-    cajaAbierta(){
-        for (let i = 0; i < this.arrayCaja.length; i++){
-            if(this.arrayCaja[i].estado){
-                return true;
+        retirar() {
+            let me = this;
+
+            axios.put('/caja/retirar', {
+                'salidas': this.salidas,
+                'transaccion': this.Dessalidas + ' (movimiento de egreso  )',
+                'id': this.id
+            }).then(function (response) {
+                me.cerrarModal3();
+                me.listarCaja(1, '', 'id');
+                swal(
+                    'Información!',
+                    'Transacción de caja registrada satisfactoriamente!',
+                    'success'
+                )
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        calcularTotalBilletes() {
+            const billete200 = parseFloat(this.billete200) || 0;
+            const billete100 = parseFloat(this.billete100) || 0;
+            const billete50 = parseFloat(this.billete50) || 0;
+            const billete20 = parseFloat(this.billete20) || 0;
+            const billete10 = parseFloat(this.billete10) || 0;
+
+            this.totalBilletes = billete200 * 200 + billete100 * 100 + billete50 * 50 + billete20 * 20 + billete10 * 10;
+        },
+
+        calcularTotalMonedas() {
+            const moneda5 = parseFloat(this.moneda5) || 0;
+            const moneda2 = parseFloat(this.moneda2) || 0;
+            const moneda1 = parseFloat(this.moneda1) || 0;
+            const moneda050 = parseFloat(this.moneda050) || 0;
+            const moneda020 = parseFloat(this.moneda020) || 0;
+            const moneda010 = parseFloat(this.moneda010) || 0;
+
+            this.totalMonedas = moneda5 * 5 + moneda2 * 2 + moneda1 * 1 + moneda050 * 0.50 + moneda020 * 0.20 + moneda010 * 0.10;
+        },
+        cerrarCaja(id) {
+            const total = this.totalEfectivo;
+            Swal.fire({
+                title: '¿Está seguro de cerrar la caja?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'btn btn-success',
+                    cancelButton: 'btn btn-danger'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let me = this;
+
+                    axios.put('/caja/cerrar', {
+                        'id': id,
+                        'saldoFaltante': total
+                    }).then(function (response) {
+                        me.listarCaja(1, '', 'id');
+                        me.arqueoRealizado = false; // Reiniciamos arqueoRealizado
+                        Swal.fire(
+                            '¡Cerrada!',
+                            'La caja fue cerrada con éxito.',
+                            'success'
+                        );
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+
+
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+
+                }
+            })
+        },
+
+        cajaAbierta() {
+            for (let i = 0; i < this.arrayCaja.length; i++) {
+                if (this.arrayCaja[i].estado) {
+                    return true;
+                }
             }
-        }
-        return false;
-    },
-    
-    validarCaja(){
-        this.errorCaja=0;
-        this.errorMostrarMsjCaja =[];
+            return false;
+        },
 
-        if (!this.saldoInicial) this.errorMostrarMsjCaja.push("El saldo inicial no puede estar vacío.");
+        validarCaja() {
+            this.errorCaja = 0;
+            this.errorMostrarMsjCaja = [];
 
-        if (this.errorMostrarMsjCaja.length) this.errorCaja = 1;
+            if (!this.saldoInicial) this.errorMostrarMsjCaja.push("El saldo inicial no puede estar vacío.");
 
-        return this.errorCaja;
-    },
-    cerrarModal(){
-        this.modal=0;
-        this.tituloModal='';
-        this.idsucursal= 0;
-        this.sucursal='';
-        this.saldoInicial='';
-    },
-    
-    cerrarModal2(){
-        this.modal2=0;
-        this.depositos='';
-        this.Desdepositos='';
-    },
+            if (this.errorMostrarMsjCaja.length) this.errorCaja = 1;
 
-    cerrarModal3(){
-        this.modal3=0;
-        this.salidas='';
-        this.Dessalidas='';
-    },
+            return this.errorCaja;
+        },
+        cerrarModal() {
+            this.modal = false;
+            this.tituloModal = '';
+            this.idsucursal = 0;
+            this.sucursal = '';
+            this.saldoInicial = '';
+        },
 
-    cerrarModal4(){
-        this.modal4=0;
-    },
+        cerrarModal2() {
+            this.modal2 = false;
+            this.depositos = '';
+            this.Desdepositos = '';
+        },
 
-    cerrarModal5(){
-        this.modal5=0;
-    },
+        cerrarModal3() {
+            this.modal3 = false;
+            this.salidas = '';
+            this.Dessalidas = '';
+        },
 
-    abrirModal(modelo, accion, data = []){
-        switch(modelo){
-            case "caja":
-            {
-                switch(accion){
-                    case 'registrar':
+        cerrarModal4() {
+            this.modal4 = false;
+        },
+
+        cerrarModal5() {
+            this.modal5 = false;
+        },
+
+        abrirModal(modelo, accion, data = []) {
+            switch (modelo) {
+                case "caja":
                     {
-                        if(this.cajaAbierta()){
-                            swal(
-                            'Ya existe una caja abierta!',
-                            'Por favor realice el cierre de la caja e intente de nuevo.',
-                            'error'
-                            )
-                            return;
+                        switch (accion) {
+                            case 'registrar':
+                                {
+                                    if (this.cajaAbierta()) {
+                                        swal(
+                                            'Ya existe una caja abierta!',
+                                            'Por favor realice el cierre de la caja e intente de nuevo.',
+                                            'error'
+                                        )
+                                        return;
+                                    }
+
+                                    this.modal = true;
+                                    this.tituloModal = 'Apertura de Caja Sucursal: ';
+                                    this.saldoInicial = '';
+
+                                    this.tipoAccion = 1;
+                                    break;
+                                }
                         }
-
-                        this.modal = 1;
-                        this.tituloModal = 'Apertura de Caja Sucursal: ';
-                        this.saldoInicial= '';
-
-                        this.tipoAccion = 1;
-                        break;
                     }
-                }
+            }
+        },
+
+        abrirModal2(modelo, accion, data = []) {
+            switch (modelo) {
+                case "cajaDepositar":
+                    {
+                        switch (accion) {
+                            case 'depositar':
+                                {
+                                    this.modal2 = true;
+                                    this.tituloModal2 = 'Depositar Dinero';
+                                    this.id = data['id'];
+
+                                    this.tipoAccion = 2;
+
+                                    break;
+                                }
+                        }
+                    }
+            }
+        },
+
+        abrirModal3(modelo, accion, data = []) {
+            switch (modelo) {
+                case "cajaRetirar":
+                    {
+                        switch (accion) {
+                            case 'retirar':
+                                {
+                                    this.modal3 = true;
+                                    this.tituloModal3 = 'Retirar Dinero';
+                                    this.id = data['id'];
+
+                                    this.tipoAccion = 3;
+
+                                    break;
+                                }
+                        }
+                    }
+            }
+        },
+
+        abrirModal4(modelo, accion, id) {
+            switch (modelo) {
+                case "cajaVer":
+                    {
+                        switch (accion) {
+                            case 'ver':
+                                {
+                                    this.modal4 = true;
+                                    this.tituloModal4 = 'Transacciones Caja';
+
+                                    let me = this;
+                                    var url = '/transacciones/' + id;
+                                    axios.get(url).then(function (response) {
+                                        var respuesta = response.data;
+
+                                        console.log(respuesta);
+                                        me.arrayTransacciones = respuesta.transacciones.data;
+                                        // me.pagination= respuesta.pagination;
+                                        me.ArrayEgresos = respuesta.ingresos;
+                                        me.ArrayIngresos = respuesta.ventas.data;
+
+                                        me.egreso = respuesta.ingresos;
+                                        me.ingreso = respuesta.ventas;
+                                        me.extra = respuesta.transacciones;
+                                    })
+                                        .catch(function (error) {
+                                            console.log(error);
+                                        });
+
+                                    break;
+                                }
+                        }
+                    }
+            }
+        },
+
+        abrirModal5(modelo, accion, id) {
+            switch (modelo) {
+                case "arqueoCaja":
+                    {
+                        switch (accion) {
+                            case 'contar':
+                                {
+                                    this.modal5 = true;
+                                    this.tituloModal5 = 'Arqueo de Caja';
+                                    this.id = id;
+                                    this.tipoAccion = 5;
+                                    break;
+                                }
+                        }
+                    }
             }
         }
     },
-    
-    abrirModal2(modelo, accion, data = []){
-        switch(modelo){
-            case "cajaDepositar":
-            {
-                switch(accion){
-                    case 'depositar':
-                    {
-                        this.modal2 = 1;
-                        this.tituloModal2='Depositar Dinero';
-                        this.id=data['id'];
 
-                        this.tipoAccion=2;
-
-                        break;
-                    }
-                }
-            }
-        }
+    watch: {
+        'billete200': 'calcularTotalBilletes',
+        'billete100': 'calcularTotalBilletes',
+        'billete50': 'calcularTotalBilletes',
+        'billete20': 'calcularTotalBilletes',
+        'billete10': 'calcularTotalBilletes',
+        'moneda5': 'calcularTotalMonedas',
+        'moneda2': 'calcularTotalMonedas',
+        'moneda1': 'calcularTotalMonedas',
+        'moneda050': 'calcularTotalMonedas',
+        'moneda020': 'calcularTotalMonedas',
+        'moneda010': 'calcularTotalMonedas'
     },
 
-    abrirModal3(modelo, accion, data = []){
-        switch(modelo){
-            case "cajaRetirar":
-            {
-                switch(accion){
-                    case 'retirar':
-                    {
-                        this.modal3 = 1;
-                        this.tituloModal3='Retirar Dinero';
-                        this.id=data['id'];
+    mounted() {
+        this.listarCaja(1, this.buscar, this.criterio);
 
-                        this.tipoAccion=3;
 
-                        break;
-                    }
-                }
-            }
-        }
-    },
-
-    abrirModal4(modelo, accion, id){
-        switch(modelo){
-            case "cajaVer":
-            {
-                switch(accion){
-                    case 'ver':
-                    {
-                        this.modal4 = 1;
-                        this.tituloModal4 = 'Transacciones Caja';
-
-                        let me=this;
-                        var url= '/transacciones/' + id;
-                        axios.get(url).then(function (response) {
-                            var respuesta= response.data;
-                            
-                            console.log(respuesta);
-                            me.arrayTransacciones = respuesta.transacciones.data;
-                            // me.pagination= respuesta.pagination;
-                            me.ArrayEgresos=respuesta.ingresos;
-                            me.ArrayIngresos=respuesta.ventas.data;
-
-                            me.egreso = respuesta.ingresos;
-                            me.ingreso = respuesta.ventas;
-                            me.extra = respuesta.transacciones;
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                        
-                        break;
-                    }
-                }
-            }
-        }
-    },
-
-    abrirModal5(modelo, accion, id){
-        switch(modelo){
-            case "arqueoCaja":
-            {
-                switch(accion){
-                    case 'contar':
-                    {
-                        this.modal5 = 1;
-                        this.tituloModal5 = 'Arqueo de Caja';
-                        this.id=id;
-                        this.tipoAccion = 5;
-                        break;
-                    }
-                }
-            }
-        }
     }
-}, 
-
-watch: {
-    'billete200': 'calcularTotalBilletes',
-    'billete100': 'calcularTotalBilletes',
-    'billete50': 'calcularTotalBilletes',
-    'billete20': 'calcularTotalBilletes',
-    'billete10': 'calcularTotalBilletes',
-    'moneda5': 'calcularTotalMonedas',
-    'moneda2': 'calcularTotalMonedas',
-    'moneda1': 'calcularTotalMonedas',
-    'moneda050': 'calcularTotalMonedas',
-    'moneda020': 'calcularTotalMonedas',
-    'moneda010': 'calcularTotalMonedas'
-},
-
-mounted() {
-    this.listarCaja(1,this.buscar,this.criterio);
-    
-}
 }
 </script>
-<style>    
-.modal-content{
-width: 100% !important;
-position: absolute !important;
+<style scoped>
+>>>.p-panel-header {
+    padding: 0.75rem;
 }
-.mostrar{
-    
-display: list-item !important;
-opacity: 1 !important;
-position: absolute !important;
-background-color: #3c29297a !important;
+
+.panel-header {
+    display: flex;
+    align-items: center;
 }
-.div-error{
-display: flex;
-justify-content: center;
+
+.panel-icon {
+    font-size: 2rem;
+    padding-left: 10px;
 }
-.text-error{
-color: red !important;
-font-weight: bold;
+
+.panel-icon {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.billete-img {
+    max-width: 230px;
+    /* Ajusta el tamaño máximo según tus necesidades */
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    /* Centra la imagen en su contenedor */
+}
+
+.p-field p-grid {
+    margin-bottom: 1rem;
+    /* Añade un margen inferior entre los campos */
+}
+
+.p-col-5 {
+    margin-left: 115px;
 }
 </style>

@@ -1,25 +1,46 @@
 <template>
    <main class="main">
-  <div class="p-grid">
-    <div class="p-col-12">
-      <Breadcrumb :home="{ icon: 'pi pi-home', to: '/' }" :model="breadcrumbItems" />
-    </div>
-    <div class="p-col-12">
-      <Card>
-        <template #title>
-          <i class="pi pi-align-justify"></i> Sucursales
-          <Button icon="pi pi-plus" class="p-button-secondary p-button-sm" @click="abrirModal('sucursal', 'registrar')" label="Nuevo" />
-        </template>
-        <template #content>
+      <panel>
+        <Toast :breakpoints="{ '920px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
+                </Toast>
+                <template #header>
+                    <div class="panel-header">
+                        
+                        <h4 class="panel-icon">Sucursales</h4>
+                    </div>
+                </template>
+        <template >
           <div class="p-grid">
-            <div class="p-col-12 p-md-6">
-              <div class="p-inputgroup-sm">
-                <Dropdown v-model="criterio" :options="criterioOptions" optionLabel="label" optionValue="value" placeholder="Seleccione criterio"  />
-                <InputText  v-model="buscar" placeholder="Texto a buscar" @keyup.enter="listarSucursal(1, buscar, criterio)" />
-                <Button     icon="pi pi-search" @click="listarSucursal(1, buscar, criterio)" />
-              </div>
-            </div>
-          </div>
+    <div class="p-col-12 p-md-6">
+      <div class="p-inputgroup p-inputgroup-sm align-items-center">
+        <Button 
+          icon="pi pi-plus" 
+          class="p-button-secondary p-button-sm" 
+          @click="abrirModal('sucursal', 'registrar')" 
+          label="Nuevo" 
+        />
+        <Dropdown 
+          v-model="criterio" 
+          :options="criterioOptions" 
+          optionLabel="label" 
+          optionValue="value" 
+          placeholder="Seleccione criterio" 
+          class="p-ml-2"
+        />
+        <InputText  
+          v-model="buscar" 
+          placeholder="Texto a buscar" 
+          @keyup.enter="listarSucursal(1, buscar, criterio)" 
+          class="p-ml-2"
+        />
+        <Button 
+          icon="pi pi-search" 
+          @click="listarSucursal(1, buscar, criterio)" 
+          class="p-ml-2"
+        />
+      </div>
+    </div>
+  </div>
           <DataTable :value="arraySucursal" responsiveLayout="scroll" class="p-datatable-gridlines p-datatable-sm" :rows="10" :responsive="true">
             <Column header="Acciones">
               <template #body="slotProps">
@@ -42,8 +63,8 @@
           </DataTable>
           <Paginator :rows="10" :totalRecords="pagination.total" @page="onPageChange($event)" :rowsPerPageOptions="[10,20,30]"></Paginator>
         </template>
-      </Card>
-    </div>
+      </panel>
+    
 
     <Dialog :visible.sync="modal" :containerStyle="{width: '600px'}" :modal="true">
       <template #header>
@@ -90,7 +111,7 @@
         <Button v-if="tipoAccion === 2" label="Actualizar" icon="pi pi-check" @click="enviarFormulario" autofocus />
       </template>
     </Dialog>
-  </div>
+  
   </main>
 </template>
   
@@ -107,6 +128,8 @@ import Dialog from 'primevue/dialog';
 import Paginator from 'primevue/paginator';
 import Tag from 'primevue/tag';
 import InputNumber from 'primevue/inputnumber';
+import Panel from 'primevue/panel';
+import Toast from 'primevue/toast';
 export default {
   components: {
     Breadcrumb,
@@ -119,7 +142,9 @@ export default {
     Dialog,
     Paginator,
     Tag,
-    InputNumber
+    InputNumber,
+    Panel,
+    Toast,
   },
   data() {
     return {
@@ -419,4 +444,23 @@ export default {
   }
 }
 </script>
+<style scoped>
+>>> .p-panel-header {
+    padding: 0.75rem;
+}
+.panel-header {
+    display: flex;
+    align-items: center;
+}
 
+.panel-icon {
+    font-size: 2rem;
+    padding-left: 10px;
+}
+
+.panel-icon {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+</style>

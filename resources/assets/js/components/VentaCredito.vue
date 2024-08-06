@@ -1,15 +1,15 @@
 <template>
     <div class="main">
-        <div class="container-fluid">
-            <Card style="padding-top:15px">
-
+        <Panel>
+            <Toast :breakpoints="{ '920px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
+                </Toast>
                 <template #header>
-                <div class="panel-header">
-                    <i class="pi pi-shopping-cart panel-icon"></i>
-                    <h4 class="panel-icon">Ventas  Credito</h4>
-                </div>
-            </template>
-                <template #content>
+                    <div class="panel-header">
+                        
+                        <h4 class="panel-icon">Ventas A Credito</h4>
+                    </div>
+                </template>
+                <template >
                     <div class="p-grid">
                         <div class="p-col-6">
                             <div class="p-inputgroup">
@@ -63,13 +63,13 @@
 
                     <Paginator :rows="pagination.per_page" :totalRecords="pagination.total" :first="pagination.current_page - 1" @page="onPageChange($event)" />
                 </template>
-            </Card>
-        </div>
+            </Panel>
+
 
         <Dialog 
     :visible.sync="modalDetalle" 
     :modal="true" 
-    :containerStyle="{width: '70vw'}"
+    :containerStyle="{width: '800px'}"
     :closable="true" 
     :dismissableMask="true"
     :closeOnEscape="true"
@@ -138,16 +138,16 @@
 
 <script>
 
-import Toast from 'primevue/toast';
-import Card from 'primevue/card';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
 import Button from 'primevue/button';
+import Card from 'primevue/card';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
-import Dialog from 'primevue/dialog';
 import Paginator from 'primevue/paginator';
 import Panel from 'primevue/panel';
+import Toast from 'primevue/toast';
 export default {
     components: {
     Panel,
@@ -158,7 +158,8 @@ export default {
     Dropdown,
     InputText,
     Dialog,
-    Paginator
+    Paginator,
+    Toast,
   }, 
     data() {
         return {

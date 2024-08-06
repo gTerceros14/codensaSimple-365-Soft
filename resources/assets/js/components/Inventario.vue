@@ -1,175 +1,128 @@
 <template>
-
-
-
-    <main class="main">
-
-        <!-- Ejemplo de tabla Listado -->
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <i class="fa fa-align-justify"></i> Inventario
-                    <button type="button" @click="abrirModalImportar()" class="btn btn-success">
-                        <i class="icon-plus"></i>&nbsp;Importar
-                    </button>
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label> ALMACEN DE TRABAJO </label>
-                            <select class="form-control" v-model="AlmacenSeleccionado" @change="getDatosAlmacen">
-                                <option value="0" disabled>Seleccione</option>
-                                <option v-for="opcion in arrayAlmacenes" :key="opcion.id" :value="opcion.id">{{
-                        opcion.nombre_almacen }}</option>
-                            </select>
-                        </div>
+    <div class="main">
+            <Panel>
+                <Toast :breakpoints="{ '920px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
+                </Toast>
+                <template #header>
+                    <div class="panel-header">
+                        
+                        <h4 class="panel-icon">Inventarios</h4>
                     </div>
-                    <div class="col-md-3">
-                        <div class="d-flex flex-column">
-                            <label class="mb-1"> MODO VISTA </label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" v-model="tipoSeleccionado" value="item"
-                                    @change="cambiarTipo">
-                                <label class="form-check-label ms-2">Por Item</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" v-model="tipoSeleccionado" value="lote"
-                                    @change="cambiarTipo">
-                                <label class="form-check-label ms-2">Por Lote</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </template>
+                <template>
+                
+                
+  <div>
+    <div class="p-grid p-ai-center p-mb-1">
+    <div class="p-col-12 p-md-3 p-lg-2 p-mb-1 p-mb-md-0">
+        <Button label="Importar" icon="pi pi-plus" @click="abrirModalImportar" class="p-button-success w-full" />
+    </div>
+    <div class="p-col-12 p-md-4 p-lg-3 p-mb-1 p-mb-md-0">
+        <label class="p-text-bold p-mr-2">ALMACEN</label>
+        <Dropdown 
+            v-model="AlmacenSeleccionado" 
+            :options="arrayAlmacenes"
+            optionLabel="nombre_almacen" 
+            optionValue="id" 
+            placeholder="Seleccione"
+            @change="getDatosAlmacen" 
+            class="w-full" 
+        />
+    </div>
+    <div class="p-col-12 p-md-5 p-lg-3 p-mb-1 p-mb-md-0">
+        <label class="p-text-bold p-mr-2">MODO VISTA</label>
+        <div class="p-d-flex p-ai-center">
+            <div class="p-field-radiobutton p-mr-2">
+                <RadioButton 
+                    v-model="tipoSeleccionado" 
+                    inputId="item" 
+                    name="tipo" 
+                    value="item"
+                    @change="cambiarTipo" 
+                />
+                <label for="item" class="p-ml-1">Por Item</label>
             </div>
-            <div class="card-body">
-                <div class="form-group row">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <select class="form-control col-md-3" v-model="criterio">
-                                <option value="nombre">Nombre Producto</option>
-                                <!-- <option value="descripcion">Descripción</option> -->
-                            </select>
-                            <input type="text" v-model="buscar" @keyup="listarInventario(1, buscar, criterio)"
-                                class="form-control" placeholder="Texto a buscar">
-                            <button type="button" @click="listarInventario" class="btn btn-primary"><i
-                                    class="fa fa-search"></i> Buscar</button>
-                        </div>
-                    </div>
-                </div>
-                <div v-if="tipoSeleccionado == 'item'" class="table-responsive">
-                    <table class="table table-bordered table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <!-- <th>Opciones</th> -->
-                                <th>Product</th>
-                                <th>Unidad X Paq.</th>
-                                <th>Saldo_stock_total</th>
-                                <th>Cantidad</th>
-                                <th>Almacen</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="inventario in arrayInventario" :key="inventario.id">
-
-                                <td v-text="inventario.nombre_producto"></td>
-                                <td v-text="inventario.unidad_envase"></td>
-                                <td v-text="inventario.saldo_stock_total"></td>
-                                <td v-text="inventario.cantidad"></td>
-                                <td v-text="inventario.nombre_almacen"></td>
-
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!--#####################################-LIStADO LOTE-###############-->
-                <div v-if="tipoSeleccionado == 'lote'" class="table-responsive">
-                    <table class="table table-bordered table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Unid.X.Paq</th>
-                                <th>Costo Unidad</th>
-                                <th>Saldo Stock</th>
-                                <th>Cantidad</th>
-                                <th>Fecha Ingreso</th>
-                                <th>Fecha Vencimiento</th>
-                                <th>Almacen</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="inventario in arrayInventario" :key="inventario.id">
-                                <td v-text="inventario.nombre_producto"></td>
-                                <td v-text="inventario.unidad_envase"></td>
-                                <td v-text="inventario.precio_costo_unid"></td>
-                                <td v-text="inventario.saldo_stock"></td>
-                                <td v-text="inventario.cantidad"></td>
-                                <td v-text="inventario.fecha_ingreso"></td>
-                                <td v-text="inventario.fecha_vencimiento"></td>
-                                <td v-text="inventario.nombre_almacen"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!--######################################-hasta AQUI#################-->
-                <nav>
-                    <ul class="pagination">
-                        <li class="page-item" v-if="pagination.current_page > 1">
-                            <a class="page-link" href="#" @click.prevent="
-                        cambiarPagina(
-                            pagination.current_page - 1,
-                            buscar,
-                            criterio
-                        )
-                        ">Ant</a>
-                        </li>
-                        <li class="page-item" v-for="page in pagesNumber" :key="page"
-                            :class="[page == isActived ? 'active' : '']">
-                            <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                v-text="page"></a>
-                        </li>
-                        <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                            <a class="page-link" href="#" @click.prevent="
-                        cambiarPagina(
-                            pagination.current_page + 1,
-                            buscar,
-                            criterio
-                        )
-                        ">Sig</a>
-                        </li>
-                    </ul>
-                </nav>
-
+            <div class="p-field-radiobutton">
+                <RadioButton 
+                    v-model="tipoSeleccionado" 
+                    inputId="lote" 
+                    name="tipo" 
+                    value="lote"
+                    @change="cambiarTipo" 
+                />
+                <label for="lote" class="p-ml-1">Por Lote</label>
             </div>
         </div>
-        <!-- Fin ejemplo de tabla Listado -->
+    </div>
+</div>
+<div class="p-grid p-mt-1">
+    <div class="p-col-12 p-md-6 p-lg-4">
+        <span class="p-input-icon-left p-input-icon-right w-full">
+            <i class="pi pi-search" />
+            <InputText 
+                v-model="buscar" 
+                placeholder="Buscar por nombre de producto"
+                @input="listarInventario(1, buscar, criterio)" 
+                class="w-full"
+            />
+        </span>
+    </div>
+</div>
+</div>
 
-        <!--Inicio del modal agregar/actualizar-->
 
-        <!--Fin del modal-->
+                    <DataTable :value="arrayInventario" :rows="10" :rowsPerPageOptions="[5, 10, 20]"
+                        responsiveLayout="scroll">
+                        <Column v-for="col in columnas" :key="col.field" :field="col.field" :header="col.header">
+                        </Column>
+                    </DataTable>
+
+                    <Paginator :rows="10" :totalRecords="pagination.total" @page="onPageChange($event)"
+                        :rowsPerPageOptions="[5, 10, 20]" />
+                </template>
+            </Panel>
+        
 
         <div v-if="modalImportar">
             <ImportarExcelInventario @cerrar="cerrarModalImportar" />
         </div>
-
-    </main>
-
-
-
-
-
+    </div>
 </template>
 
 <script>
+import Card from 'primevue/card';
+import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown';
+import RadioButton from 'primevue/radiobutton';
+import InputText from 'primevue/inputtext';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Paginator from 'primevue/paginator';
+import Dialog from 'primevue/dialog';
+import Panel from 'primevue/panel';
+import Toast from 'primevue/toast';
 export default {
+    components: {
+        Card,
+        Button,
+        Dropdown,
+        RadioButton,
+        InputText,
+        DataTable,
+        Column,
+        Paginator,
+        Dialog,
+        Panel,
+        Toast,
+    },
     data() {
         return {
             arrayInventario: [],
-
             arrayAlmacenes: [],
             AlmacenSeleccionado: 1,
             idalmacen: 0,
             tipoSeleccionado: 'item',
-            modalImportar: 0,
+            modalImportar: false,
             pagination: {
                 total: 0,
                 current_page: 0,
@@ -180,64 +133,28 @@ export default {
             },
             offset: 3,
             criterio: 'nombre',
-            buscar: ''
-        }
-    },
-    computed: {
-        isActived: function () {
-            return this.pagination.current_page;
-        },
-        //Calcula los elementos de la paginación
-        pagesNumber: function () {
-            if (!this.pagination.to) {
-                return [];
-            }
-
-            var from = this.pagination.current_page - this.offset;
-            if (from < 1) {
-                from = 1;
-            }
-
-            var to = from + (this.offset * 2);
-            if (to >= this.pagination.last_page) {
-                to = this.pagination.last_page;
-            }
-
-            var pagesArray = [];
-            while (from <= to) {
-                pagesArray.push(from);
-                from++;
-            }
-            return pagesArray;
-
+            buscar: '',
+            columnas: []
         }
     },
     methods: {
-
         abrirModalImportar() {
-            this.modalImportar = 1;
+            this.modalImportar = true;
         },
         cerrarModalImportar() {
-            this.modalImportar = 0;
+            this.modalImportar = false;
             this.listarInventario(1, '', 'nombre');
         },
         cambiarPagina(page, buscar, criterio) {
-            let me = this;
-            console.log("PAGE", page)
-            //Actualiza la página actual
-            me.pagination.current_page = page;
-            //Envia la petición para visualizar la data de esa página
-            me.listarInventario(page, buscar, criterio);
+            this.pagination.current_page = page;
+            this.listarInventario(page, buscar, criterio);
         },
-        //---------------------------------------
         listarInventario(page, buscar, criterio) {
             let me = this;
             let url = '/inventarios/itemLote/' + me.tipoSeleccionado + '?&idAlmacen=' + me.almacenSeleccionado + '&buscar=' + buscar + '&criterio=' + criterio + '&page=' + page;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                console.log("ARRAy:", respuesta);
                 me.arrayInventario = respuesta.inventarios.data;
-                console.log('LLEGA:', me.arrayInventario);
                 me.pagination = respuesta.pagination;
             })
                 .catch(function (error) {
@@ -250,57 +167,74 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.arrayAlmacenes = respuesta.almacenes;
-                console.log('ALMACEN:', me.arrayAlmacenes);
             })
                 .catch(function (error) {
                     console.log(error);
                 });
         },
         getDatosAlmacen() {
-            let me = this;
-            if (me.AlmacenSeleccionado !== '') {
-                me.loading = true;
-                me.almacenSeleccionado = me.AlmacenSeleccionado; // Almacenar el valor seleccionado
-                me.idalmacen = Number(me.AlmacenSeleccionado);
-                console.log('IDalmacen: ' + me.idalmacen);
-                me.listarInventario(1, '', 'nombre');
+            if (this.AlmacenSeleccionado !== '') {
+                this.almacenSeleccionado = this.AlmacenSeleccionado;
+                this.idalmacen = Number(this.AlmacenSeleccionado);
+                this.listarInventario(1, '', 'nombre');
             }
         },
         cambiarTipo() {
-            this.getDatosAlmacen(); // Actualizar datos de almacén
-            //this.listarInventario(); // Listar inventario basado en almacén seleccionado
+            this.getDatosAlmacen();
+            this.setColumnas();
         },
-        //--------------------------------------
+        onPageChange(event) {
+            this.cambiarPagina(event.page + 1, this.buscar, this.criterio);
+        },
+        setColumnas() {
+            if (this.tipoSeleccionado === 'item') {
+                this.columnas = [
+                    { field: 'nombre_producto', header: 'Producto' },
+                    { field: 'unidad_envase', header: 'Unidad X Paq.' },
+                    { field: 'saldo_stock_total', header: 'Saldo Stock Total' },
+                    { field: 'cantidad', header: 'Cantidad' },
+                    { field: 'nombre_almacen', header: 'Almacén' }
+                ];
+            } else {
+                this.columnas = [
+                    { field: 'nombre_producto', header: 'Producto' },
+                    { field: 'unidad_envase', header: 'Unid.X.Paq' },
+                    { field: 'precio_costo_unid', header: 'Costo Unidad' },
+                    { field: 'saldo_stock', header: 'Saldo Stock' },
+                    { field: 'cantidad', header: 'Cantidad' },
+                    { field: 'fecha_ingreso', header: 'Fecha Ingreso' },
+                    { field: 'fecha_vencimiento', header: 'Fecha Vencimiento' },
+                    { field: 'nombre_almacen', header: 'Almacén' }
+                ];
+            }
+        }
     },
     mounted() {
-        //this.listarInventario(1,this.buscar,this.criterio);
         this.getDatosAlmacen();
-        //this.listarInventario(1,this.buscar,this.criterio);
         this.listarInventario(1, '', 'nombre');
         this.selectAlmacen();
-    },
+        this.setColumnas();
+    }
 }
 </script>
-<style>
-.modal-content {
-    width: 100% !important;
-    position: absolute !important;
-}
 
-.mostrar {
-    display: list-item !important;
-    opacity: 1 !important;
-    position: absolute !important;
-    background-color: #3c29297a !important;
+<style scoped>
+>>> .p-panel-header {
+    padding: 0.75rem;
 }
-
-.div-error {
+.panel-header {
     display: flex;
-    justify-content: center;
+    align-items: center;
 }
 
-.text-error {
-    color: red !important;
-    font-weight: bold;
+.panel-icon {
+    font-size: 2rem;
+    padding-left: 10px;
 }
+
+.panel-icon {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
 </style>

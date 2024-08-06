@@ -63,6 +63,7 @@ class ProveedorController extends Controller
             'personas' => $personas
         ];
     }
+
     public function index2(Request $request)
     {
         if (!$request->ajax()) {
@@ -91,7 +92,6 @@ class ProveedorController extends Controller
         $personas = $personas->get();
         return ['personas' => $personas];
     }
-
     public function selectProveedor(Request $request)
     {
         if (!$request->ajax())
@@ -197,6 +197,26 @@ class ProveedorController extends Controller
             Log::error('Error en la importación: ' . $e->getMessage());
 
             return response()->json(['error' => 'Error en la importación', 'mensaje' => $e->getMessage()], 500);
+        }
+    }
+    public function eliminarProveedor($id)
+    {
+        if (!request()->ajax()) return redirect('/');
+
+        try {
+            DB::beginTransaction();
+
+            $proveedor = Proveedor::findOrFail($id);
+            $proveedor->delete();
+
+            $persona = Persona::findOrFail($id);
+            $persona->delete();
+
+            DB::commit();
+            return response()->json(['mensaje' => 'Proveedor eliminado correctamente'], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Error al eliminar el proveedor'], 500);
         }
     }
 

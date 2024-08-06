@@ -1,177 +1,129 @@
 <template>
-    <main class="main">
-        <div class="container-fluid py-3"></div>
-        <div class="card flex-grow-1">
-            <div class="card-header">
-                <i class="fa fa-align-justify"></i> REPORTE DEL DIA
-            </div>
-            <div class="card-body">
-                <template v-if="listado == 1">
-                    <div class="row align-items-center mb-3">
-                        <div class="col-md-3 pe-md-2">
-                            <div class="form-group">
-                                <b-form-datepicker v-model="fecha" locale="es" class="form-control"></b-form-datepicker>
-                            </div>
-                        </div>
-                        <div class="col-md-3 px-md-2">
-                            <div class="form-group">
-                                <select v-model="idcategoria" class="form-select form-select-sm">
-                                    <option value="0" disabled>Seleccione</option>
-                                    <option value="all">Todas las categorías</option>
-                                    <option v-for="categoria in arrayCategoria" :key="categoria.id"
-                                        :value="categoria.id">{{ categoria.nombre }}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3 px-md-2">
-                            <div class="form-group">
-                                <select v-model="idUsuario" class="form-select form-select-sm">
-                                    <option value="0" disabled>Seleccione Usuario</option>
-                                    <option value="all">Todos los usuarios</option>
-                                    <option v-for="usuario in arrayUsuarios" :key="usuario.id" :value="usuario.id">
-                                        {{ usuario.usuario }}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3 ps-md-1">
-                            <button type="button" @click="generarReporte" class="btn btn-primary btn-generar w-100">
-                                <i class="fa fa-search"></i> Generar Reporte
-                            </button>
-                        </div>
+   <main class="main">
+        
+    <Panel>
+        <Toast :breakpoints="{ '920px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
+                </Toast>
+                <template #header>
+                    <div class="panel-header">
+                        
+                        <h4 class="panel-icon">Reporte de Ventas</h4>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-sm">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>Opciones</th>
-                                    <th>Cliente</th>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th>Precio</th>
-                                    <th>Total</th>
-                                    <th>Número Factura</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="venta in arrayVentas" :key="venta.id">
-                                    <td>
-                                        <button type="button" @click="verVenta(venta.id)"
-                                            class="btn btn-success btn-sm">
-                                            <i class="icon-eye"></i>
-                                        </button>
-                                    </td>
-                                    <td>{{ venta.cliente ? venta.cliente : 'Sin Nombre' }}</td>
-                                    <td>{{ venta.articulo }}</td>
-                                    <td>{{ venta.cantidad }}</td>
-                                    <td>{{ venta.precio }}</td>
-                                    <td>{{ venta.total }}</td>
-                                    <td>{{ venta.num_comprobante }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                </template>
+                <template >
+                    <div v-if="listado === 1">
+                        <template>
+                            <div class="p-grid p-mb-3">
+                                <div class="p-col-12 p-md-3 px-md-2">
+                                    <b-form-datepicker v-model="fecha" locale="es"
+                                        class="form-control"></b-form-datepicker>
+                                </div>
+                                <div class="p-col-12 p-md-3 px-md-2">
+                                    <Dropdown v-model="idcategoria" :options="categoriasOptions" optionLabel="nombre"
+                                        optionValue="id" placeholder="Seleccione" class="w-full" />
+                                </div>
+                                <div class="p-col-12 p-md-3 px-md-2">
+                                    <Dropdown v-model="idUsuario" :options="usuariosOptions" optionLabel="usuario"
+                                        optionValue="id" placeholder="Seleccione Usuario" class="w-full" />
+                                </div>
+                                <div class="p-col-12 p-md-3">
+                                    <Button label="Generar Reporte" icon="pi pi-search" @click="generarReporte" />
+                                </div>
+                            </div>
+                        </template>
+
+                        <DataTable :value="arrayVentas" :paginator="true" :rows="10" :rowsPerPageOptions="[5, 10, 20]"
+                            paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
+                            <Column>
+                                <template #body="slotProps">
+                                    <Button icon="pi pi-eye" class="p-button-success p-button-sm"
+                                        @click="verVenta(slotProps.data.id)" />
+                                </template>
+                            </Column>
+                            <Column field="cliente" header="Cliente"></Column>
+                            <Column field="articulo" header="Producto"></Column>
+                            <Column field="cantidad" header="Cantidad"></Column>
+                            <Column field="precio" header="Precio"></Column>
+                            <Column field="total" header="Total"></Column>
+                            <Column field="num_comprobante" header="Número Factura"></Column>
+                        </DataTable>
+
+                        <div class="p-d-flex p-jc-between p-ai-center p-mt-3">
+                            <div>
+                                <strong>Total Ganado: </strong>Bs. {{ totalGanado }}
+                            </div>
+                            <div>
+                                <Button label="Exportar a PDF" icon="pi pi-file-pdf" class="p-button-danger p-mr-2"
+                                    @click="exportarPDF" />
+                                <Button label="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success p-mr-2"
+                                    @click="exportarExcel" />
+                                <Button label="Exportar a Whatsapp" icon="pi pi-whatsapp" class="p-button-success"
+                                    @click="exportarWhatsapp" />
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="text-right">
-                            <strong>Total Ganado: </strong>Bs. {{ totalGanado }}
-                        </div>
-                        <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
-                        <button @click="exportarExcel" class="btn btn-success">Exportar a Excel</button>
-                        <button @click="exportarWhatsapp" class="btn btn-success">Exportar a Whatsapp</button>
-                    </div>
-                    <nav>
-                        <ul class="pagination justify-content-center mt-3">
-                            <li class="page-item" v-if="pagination.current_page > 1">
-                                <a class="page-link" href="#"
-                                    @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
-                            </li>
-                            <li class="page-item" v-for="page in pagesNumber" :key="page"
-                                :class="[page == isActived ? 'active' : '']">
-                                <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)">{{
-                    page }}</a>
-                            </li>
-                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                <a class="page-link" href="#"
-                                    @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </template>
-                <template v-if="listado == 2">
-                    <div class="row mb-3">
-                        <div class="col-md-9">
-                            <div class="form-group">
-                                <label>Cliente</label>
-                                <p>{{ cliente }}</p>
+                    <div v-if="listado === 2">
+                        <div class="p-grid p-mb-3">
+                            <div class="p-col-12 p-md-9">
+                                <div class="p-field">
+                                    <label>Cliente</label>
+                                    <InputText v-model="cliente" disabled />
+                                </div>
+                            </div>
+                            <div class="p-col-12 p-md-3">
+                                <div class="p-field">
+                                    <label>Impuesto</label>
+                                    <InputText v-model="impuesto" disabled />
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <label>Impuesto</label>
-                            <p>{{ impuesto }}</p>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Tipo Comprobante</label>
-                                <p>{{ tipo_comprobante }}</p>
+                        <div class="p-grid p-mb-3">
+                            <div class="p-col-12 p-md-4">
+                                <div class="p-field">
+                                    <label>Tipo Comprobante</label>
+                                    <InputText v-model="tipo_comprobante" disabled />
+                                </div>
+                            </div>
+                            <div class="p-col-12 p-md-4">
+                                <div class="p-field">
+                                    <label>Serie Comprobante</label>
+                                    <InputText v-model="serie_comprobante" disabled />
+                                </div>
+                            </div>
+                            <div class="p-col-12 p-md-4">
+                                <div class="p-field">
+                                    <label>Número Comprobante</label>
+                                    <InputText v-model="num_comprobante" disabled />
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Serie Comprobante</label>
-                                <p>{{ serie_comprobante }}</p>
-                            </div>
+
+                        <DataTable :value="arrayDetalle">
+                            <Column field="articulo" header="Artículo"></Column>
+                            <Column field="precio" header="Precio"></Column>
+                            <Column field="cantidad" header="Cantidad"></Column>
+                            <Column field="descuento" header="Descuento"></Column>
+                            <Column field="subtotal" header="Subtotal">
+                                <template #body="slotProps">
+                                    {{ (slotProps.data.precio * slotProps.data.cantidad -
+                                    slotProps.data.descuento).toFixed(2) }}
+                                </template>
+                            </Column>
+                        </DataTable>
+
+                        <div class="p-text-right p-mt-3">
+                            <strong>Total: ${{ total.toFixed(2) }}</strong>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Número Comprobante</label>
-                                <p>{{ num_comprobante }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-sm">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>Artículo</th>
-                                    <th>Precio</th>
-                                    <th>Cantidad</th>
-                                    <th>Descuento</th>
-                                    <th>Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody v-if="arrayDetalle.length">
-                                <tr v-for="detalle in arrayDetalle" :key="detalle.id">
-                                    <td>{{ detalle.articulo }}</td>
-                                    <td>{{ detalle.precio }}</td>
-                                    <td>{{ detalle.cantidad }}</td>
-                                    <td>{{ detalle.descuento }}</td>
-                                    <td>{{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
-                                    </td>
-                                </tr>
-                                <tr class="table-active">
-                                    <td colspan="4" class="text-end fw-bold">Total:</td>
-                                    <td>$ {{ total.toFixed(2) }}</td>
-                                </tr>
-                            </tbody>
-                            <tbody v-else>
-                                <tr>
-                                    <td colspan="5" class="text-center">No hay artículos agregados</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="form-group row mt-3">
-                        <div class="col-md-12">
-                            <button type="button" @click="ocultarDetalle()" class="btn btn-secondary w-100">
-                                Cerrar
-                            </button>
+
+                        <div class="p-mt-3">
+                            <Button label="Cerrar" icon="pi pi-times" @click="ocultarDetalle" />
                         </div>
                     </div>
                 </template>
-            </div>
-        </div>
+            </Panel>
+       
     </main>
 </template>
 
@@ -180,10 +132,47 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx-js-style';
-
+import Card from 'primevue/card';
+import Calendar from 'primevue/calendar';
+import Dropdown from 'primevue/dropdown';
+import Button from 'primevue/button';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import InputText from 'primevue/inputtext';
+import Panel from 'primevue/panel';
+import Toast from 'primevue/toast';
 export default {
+    components: {
+        Card,
+        Calendar,
+        Dropdown,
+        Button,
+        DataTable,
+        Column,
+        InputText,
+        Panel,
+        Toast,
+    },
     data() {
         return {
+            arrayVentas: [],
+      total: 0,
+            arrayCategoria: [
+                { id: '1', nombre: 'Categoría 1' },
+                { id: '2', nombre: 'Categoría 2' },
+                // Agrega más categorías según sea necesario
+            ],
+            arrayUsuarios: [
+                { id: '1', usuario: 'Usuario 1' },
+                { id: '2', usuario: 'Usuario 2' },
+                // Agrega más usuarios según sea necesario
+            ],
+            categoryOptions: [
+                { label: 'Todas las categorías', value: 'all' }
+            ],
+            userOptions: [
+                { label: 'Todos los usuarios', value: 'all' }
+            ],
             telefonoEmpresa: 0,
             idUsuario: 'all',
             arrayUsuarios: [],
@@ -213,12 +202,29 @@ export default {
         };
     },
     computed: {
+        categoriasOptions() {
+            return [
+                { id: '0', nombre: 'Seleccione' },
+                { id: 'all', nombre: 'Todas las categorías' },
+                ...this.arrayCategoria
+            ];
+        },
+        usuariosOptions() {
+            return [
+                { id: '0', usuario: 'Seleccione Usuario' },
+                { id: 'all', usuario: 'Todos los usuarios' },
+                ...this.arrayUsuarios
+            ];
+        },
         isActived() {
             return this.pagination.current_page;
         },
         totalGanado() {
-            return this.arrayVentas.reduce((total, venta) => total + venta.precio * venta.cantidad, 0).toFixed(2);
-        },
+      return this.arrayVentas.reduce((total, venta) => {
+        const ventaTotal = parseFloat(venta.total) || 0;
+        return total + ventaTotal;
+      }, 0).toFixed(2);
+    },
         pagesNumber() {
             if (!this.pagination.to) {
                 return [];
@@ -262,74 +268,61 @@ export default {
             //Envía la petición para visualizar la data de esa página
             me.listarRol(page, me.buscar, me.criterio);
         },
-        ocultarDetalle() {
-            this.listado = 1;
-            this.codigo = null;
-            this.arrayArticulo.length = 0;
-            this.precioseleccionado = null;
-            this.medida = null;
-            this.nombreCliente = null;
-            this.documento = null;
-            this.email = null;
+    
+        calculateSubtotal(item) {
+      const subtotal = (item.precio * item.cantidad) - item.descuento;
+      return typeof subtotal === 'number' ? subtotal.toFixed(2) : '0.00';
+    },
+    ocultarDetalle() {
+      this.listado = 1;
+      this.cliente = '';
+      this.tipo_comprobante = '';
+      this.serie_comprobante = '';
+      this.num_comprobante = '';
+      this.impuesto = '';
+      this.total = 0;
+      this.arrayDetalle = [];
+    },
+    verVenta(id) {
+      this.listado = 2;
+      axios.get(`/venta/obtenerCabecera?id=${id}`)
+        .then(response => {
+          const venta = response.data.venta[0];
+          this.cliente = venta.nombre;
+          this.tipo_comprobante = venta.tipo_comprobante;
+          this.serie_comprobante = venta.serie_comprobante;
+          this.num_comprobante = venta.num_comprobante;
+          this.impuesto = venta.impuesto;
+          this.total = parseFloat(venta.total) || 0;
+        })
+        .catch(error => {
+          console.log(error);
+        });
 
-        },
+      axios.get(`/venta/obtenerDetalles?id=${id}`)
+        .then(response => {
+          this.arrayDetalle = response.data.detalles;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
 
-        verVenta(id) {
-            let me = this;
-            me.listado = 2;
-            //Obtener datos del ingreso
-            var arrayVentaT = [];
-            var url = '/venta/obtenerCabecera?id=' + id;
+    generarReporte() {
+      const url = `/ventas-diarias?fecha=${this.fecha}&idCategoria=${this.idcategoria}&idUsuario=${this.idUsuario}`;
 
-            axios.get(url).then(function (response) {
-
-                var respuesta = response.data;
-                arrayVentaT = respuesta.venta;
-
-                me.cliente = arrayVentaT[0]['nombre'];
-                me.tipo_comprobante = arrayVentaT[0]['tipo_comprobante'];
-                me.serie_comprobante = arrayVentaT[0]['serie_comprobante'];
-                me.num_comprobante = arrayVentaT[0]['num_comprobante'];
-                me.impuesto = arrayVentaT[0]['impuesto'];
-                me.total = arrayVentaT[0]['total'];
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
-
-            //obtener datos de los detalles
-            var url = '/venta/obtenerDetalles?id=' + id;
-
-            axios.get(url).then(function (response) {
-                //console.log(response);
-                var respuesta = response.data;
-                me.arrayDetalle = respuesta.detalles;
-
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        },
-        generarReporte() {
-            let me = this;
-
-            var url = '/ventas-diarias?fecha=' + me.fecha + '&idCategoria=' + me.idcategoria + '&idUsuario=' + me.idUsuario;
-
-            axios.get(url)
-                .then(function (response) {
-                    if ('mensaje' in response.data && response.data.mensaje === 'Ninguna Venta Realizada en la Fecha Indicada') {
-                        swal("Ninguna Venta", "No se realizaron ventas en la fecha seleccionada", "info");
-                    } else {
-                        var respuesta = response.data;
-                        me.arrayVentas = respuesta.ventas;
-
-
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        },
+      axios.get(url)
+        .then(response => {
+          if ('mensaje' in response.data && response.data.mensaje === 'Ninguna Venta Realizada en la Fecha Indicada') {
+            this.$swal("Ninguna Venta", "No se realizaron ventas en la fecha seleccionada", "info");
+          } else {
+            this.arrayVentas = response.data.ventas;
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
 
 
 
@@ -486,70 +479,23 @@ export default {
     }
 }
 </script>
-<style>
-.mostrar {
-    display: list-item !important;
-    opacity: 1 !important;
-    position: absolute !important;
-    background-color: #3c29297a !important;
+<style scoped>
+>>> .p-panel-header {
+    padding: 0.75rem;
 }
-
-.div-error {
+.panel-header {
     display: flex;
-    justify-content: center;
+    align-items: center;
 }
 
-.text-error {
-    color: red !important;
-    font-weight: bold;
+.panel-icon {
+    font-size: 2rem;
+    padding-left: 10px;
 }
 
-.custom-select {
-    color: #000;
-    /* Establece el color de texto en negro */
-    background-color: #fff;
-    /* Establece el color de fondo en blanco */
-    border: 1px solid #ccc;
-    /* Establece un borde gris claro */
-    padding: 0.5rem 1rem;
-    /* Añade un poco de espaciado interno */
-    font-size: 1rem;
-    /* Establece el tamaño de fuente */
+.panel-icon {
+    font-size: 1.5rem;
+    margin: 0;
 }
 
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-select {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-}
-
-.form-control {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-}
-
-/* Estilos para el botón "Generar Reporte" */
-.btn-generar {
-    margin-top: 1rem;
-}
-
-/* Estilos responsivos para los selects */
-@media (max-width: 767.98px) {
-
-    .form-select,
-    .form-control {
-        font-size: 0.8rem;
-        padding: 0.4rem 0.8rem;
-    }
-}
-
-thead {
-    background-color: #343a40;
-    color: white;
-}
 </style>

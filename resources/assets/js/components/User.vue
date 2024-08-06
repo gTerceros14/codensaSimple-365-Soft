@@ -1,16 +1,21 @@
 <template>
     <div class="main">
-      <Card>
-        <template #title>
-          <div class="p-d-flex p-jc-between p-ai-center">
-            <span><i class="pi pi-users"></i> Usuarios</span>
-            <span>
+      <Panel>
+        <Toast :breakpoints="{ '920px': { width: '100%', right: '0', left: '0' } }" style="padding-top: 40px;">
+                </Toast>
+                <template #header>
+                    <div class="panel-header">
+                        <h4 class="panel-icon">Usuarios</h4>
+         
+                      </div>
+                </template>
+      
+        <template>
+          
+          <span>
               <Button icon="pi pi-plus" class="p-button-secondary" @click="abrirModal('persona', 'registrar')" label="Nuevo" />
               <Button icon="pi pi-file-excel" class="p-button-info" @click="cargarReporteUsuariosExcel()" label="Reporte" />
             </span>
-          </div>
-        </template>
-        <template #content>
           <div class="p-fluid p-formgrid p-grid">
             <div class="p-field-sm">
               <Dropdown v-model="criterio"  :options="criterioOptions" optionLabel="label" optionValue="value" placeholder="Seleccione criterio" />
@@ -50,7 +55,7 @@
             <Column field="sucursal" header="Sucursal"></Column>
           </DataTable>
         </template>
-      </Card>
+      </Panel>
   
       <Dialog :visible.sync="modal" :containerStyle="{width: '550px'}" :modal="true" style="padding-top: 35px !important;">
         <template #header>
@@ -123,7 +128,8 @@
   import Dialog from 'primevue/dialog';
   import Password from 'primevue/password';
   import FileUpload from 'primevue/fileupload';
-  
+  import Panel from 'primevue/panel';
+  import Toast from 'primevue/toast';
   export default {
     components: {
       Card,
@@ -134,7 +140,9 @@
       Column,
       Dialog,
       Password,
-      FileUpload
+      FileUpload,
+      Panel,
+        Toast,
     },
     data() {
       return {
@@ -513,5 +521,23 @@
     }
 }
 </script>
-<style>
+<style scoped>
+>>> .p-panel-header {
+    padding: 0.75rem;
+}
+.panel-header {
+    display: flex;
+    align-items: center;
+}
+
+.panel-icon {
+    font-size: 2rem;
+    padding-left: 10px;
+}
+
+.panel-icon {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
 </style>

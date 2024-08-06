@@ -32,4 +32,9 @@ public function creditoVenta()
 {
     return $this->hasOne(CreditoVenta::class, 'idventa');
 }
+public function tipoPago()
+{
+    return $this->belongsTo(TipoPago::class, 'idtipo_pago');
+}
+
 }
