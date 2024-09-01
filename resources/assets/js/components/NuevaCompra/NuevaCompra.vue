@@ -83,6 +83,7 @@
                         <div class="p-col-12 p-md-6">
                             <div class="tablas-card ">
                                 <div class="card">
+                                    <div class="dt-lista-proveedores">
                                     <DataTable
                                         ref="dt-articulos"
                                         :value="array_articulos_proveedor"
@@ -90,13 +91,11 @@
                                         dataKey="id"
                                         :selection.sync="array_articulos_seleccionados"
                                         responsiveLayout="scroll"
-                                        :paginator="false"
-                                        :scrollable="true"
-                                        scrollHeight="40vh"
-                                        tableStyle="height:40vh"
                                         class="p-datatable-sm"
                                         :metaKeySelection="false"
                                         showGridlines
+                                        :paginator="true"
+                                        :rows="4"
                                     >
                                         <template #header>
                                             <div class="tablas-articulos-header">
@@ -109,10 +108,10 @@
                                         </template>
 
                                         <Column selectionMode="multiple" :styles="{'max-width':'10%'}"></Column>
-                                        <Column field="codigo" header="Codigo" :sortable="true" :styles="{'max-width':'15%'}"></Column>
-                                        <Column field="nombre" header="Nombre" :sortable="true" :styles="{'max-width':'35%'}"></Column>
-                                        <Column field="precio_costo_unid" header="Precio Unidad" :sortable="true" :styles="{'max-width':'20%'}" ></Column>
-                                        <Column field="precio_costo_paq" header="Precio Paquete" :sortable="true" :styles="{'max-width':'20%'}" ></Column>
+                                        <Column field="codigo" header="Codigo" :sortable="false" :styles="{'max-width':'15%'}"></Column>
+                                        <Column field="nombre" header="Nombre" :sortable="false" :styles="{'max-width':'35%'}"></Column>
+                                        <Column field="precio_costo_unid" header="Precio Unidad" :sortable="false" :styles="{'max-width':'20%'}" ></Column>
+                                        <Column field="precio_costo_paq" header="Precio Paquete" :sortable="false" :styles="{'max-width':'20%'}" ></Column>
 
                                         <template #empty>
                                             <div class="imagen-tabla-vacia">
@@ -121,6 +120,7 @@
                                             </div>
                                         </template>
                                     </DataTable>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -128,6 +128,7 @@
                         <div class="p-col-12 p-md-6">
                             <div class="tablas-card ">
                             <div class="card">
+                                <div class="dt-lista-seleccionados">
                                 <DataTable
                                     ref="dt-seleccionados"
                                     :value="array_articulos_seleccionados"
@@ -139,8 +140,6 @@
                                     @row-edit-save="onRowEditSave"
                                     class="p-datatable-sm"
                                     :scrollable="true"
-                                    scrollHeight="40vh"
-                                    tableStyle="height:40vh"
                                     showGridlines
                                     :rowHover="true"
                                 >
@@ -154,14 +153,14 @@
                                         </div>
                                     </template>
 
-                                    <Column field="codigo" header="Codigo" :sortable="true" :styles="{'max-width':'15%'}"></Column>
-                                    <Column field="nombre" header="Nombre" :sortable="true" :styles="{'max-width':'35%'}"></Column>
-                                    <Column field="precio_costo_unid" header="Precio Unidad" :sortable="true" :styles="{'max-width':'15%'}">
+                                    <Column field="codigo" header="Codigo" :sortable="false" :styles="{'max-width':'15%'}"></Column>
+                                    <Column field="nombre" header="Nombre" :sortable="false" :styles="{'max-width':'35%'}"></Column>
+                                    <Column field="precio_costo_unid" header="Precio Unidad" :sortable="false" :styles="{'max-width':'15%'}">
                                         <template #editor="slotProps">
                                             <InputNumber v-model="slotProps.data[slotProps.column.field]" mode="decimal" :maxFractionDigits="2" :min="0" inputStyle="width:4rem;" class="p-inputtext-sm"/>
                                         </template>
                                     </Column>
-                                    <Column field="precio_costo_paq" header="Precio Paquete" :sortable="true" :styles="{'max-width':'15%'}">
+                                    <Column field="precio_costo_paq" header="Precio Paquete" :sortable="false" :styles="{'max-width':'15%'}">
                                         <template #editor="slotProps">
                                             <InputNumber v-model="slotProps.data[slotProps.column.field]" mode="decimal" :maxFractionDigits="2" :min="0" inputStyle="width: 4rem;" class="p-inputtext-sm"/>
                                         </template>
@@ -181,6 +180,7 @@
                                         </div>
                                     </template>
                                 </DataTable>
+                                </div>
                             </div>
                             </div>
                         </div>
@@ -452,7 +452,13 @@
         </Dialog>
 
         <div class="dialog-cuotas">
-            <Dialog header="Compra a Credito" :visible.sync="displayCompraCredito" :modal="true" @hide="closeComprasCredito" :containerStyle="{width: '65vw'}">
+            <Dialog
+                header="Compra a Credito"
+                :visible.sync="displayCompraCredito" 
+                :modal="true"
+                @hide="closeComprasCredito"
+                :position="getDialogPosition()"
+            >
                 <div class="card">
                     <div class="p-fluid p-formgrid p-grid">
                         <div class="p-field p-col-12 p-md-4">
@@ -502,22 +508,19 @@
                 </div>
 
                 <div class="card">
+                    <div class="dt-lista-cuotas">
                     <DataTable
-                        ref="dt-cuotas"
                         :value="array_cuotas_calculadas"
-                        :paginator="false"
+                        :paginator="true"
                         dataKey="id"
                         class="p-datatable-sm"
                         :rowHover="true"
-                        responsiveLayout="scroll"
-                        :scrollable="true"
-                        scrollHeight="37vh"
-                        tableStyle="height:37vh"
+                        :rows="6"
                         showGridlines
                     >
                         <template #empty>
                             <div class="imagen-tabla-vacia">
-                                <img src="img/iconos/lista-cuotas.png" alt="Cuotas vacias" style="width: 100px;">
+                                <img src="img/iconos/lista-cuotas.png" alt="Cuotas vacias" style="width: 90px;">
                                 <h5 style="padding-top: 15px;">Sin cuotas generadas ...</h5>
                             </div> 
                         </template>
@@ -545,11 +548,12 @@
                             </template>
                         </Column>
 
-                        <template #paginatorend>
+                        <!--<template #paginatorend>
                             <Button label="Registrar Compra" icon="pi pi-check-square" @click="registrarCompra" class="p-button-sm p-button-help" autofocus />
-                        </template>
+                        </template>-->
 
                     </DataTable>
+                    </div>
                 </div>
 
                 <template #footer>

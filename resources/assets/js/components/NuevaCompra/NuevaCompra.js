@@ -769,6 +769,10 @@ export default {
         toggle(event) {
             this.$refs.menu.toggle(event);
         },
+
+        getDialogPosition() {
+            return window.innerWidth <= 850 ? 'right' : 'center';
+        },
     },
 
     watch: {

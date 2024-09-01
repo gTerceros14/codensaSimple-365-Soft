@@ -18,6 +18,15 @@
     margin: 0;
 }
 
+/* Tablas */
+>>> .dt-lista-proveedores .p-datatable tbody{
+    height: 30vh;
+}
+
+>>> .dt-lista-seleccionados .p-datatable tbody{
+    height: 37vh;
+}
+
 >>> .p-panel-content {
     padding: 0 0.75rem 0.75rem 0.75rem;
 }
@@ -168,6 +177,18 @@
 }
 
 /* Dialog cuotas*/
+@media (min-width: 1024px) {
+
+    >>>.dialog-cuotas .p-dialog {
+        max-width: 50%;
+        max-height: 85%;
+    }
+}
+
+>>> .dt-lista-cuotas .p-datatable tbody{
+    height: 30vh;
+}
+
 >>> .dialog-cuotas .p-dialog-header {
     padding: 1rem 1rem 1rem 1.5rem;
     background: #33b378;
